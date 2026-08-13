@@ -67,14 +67,62 @@ public class LifetimeTests
     [InlineData(140.7, Lat, Zoom)]
     [InlineData(Lon, 36.68, Zoom)]
     [InlineData(Lon, Lat, 13)]
-    public void Changing_an_input_rebuilds_exactly_once(double lon, double lat, int zoom)
+    public void Moving_the_view_does_not_rebuild_the_map(double lon, double lat, int zoom)
     {
+        // Where the map looks is the navigator's business. Rebuilding would throw away the tile
+        // layer, its memory cache and everything already fetched - and dragging changes the
+        // centre on every frame, so a rebuild-on-move design becomes a per-frame rebuild the
+        // moment interaction exists.
         using var node = Node();
 
         for (int frame = 0; frame < 20; frame++) node.Update(Lon, Lat, Zoom, enabled: true);
         for (int frame = 0; frame < 20; frame++) node.Update(lon, lat, zoom, enabled: true);
 
-        Assert.Equal(2, node.MapsBuiltHere);
+        Assert.Equal(1, node.MapsBuiltHere);
+        Assert.False(node.RebuiltOnConsecutiveFrames);
+    }
+
+    [Fact]
+    public void A_centre_that_moves_every_frame_still_builds_one_map()
+    {
+        // What a drag looks like. Under a rebuild-on-move design this was 200.
+        using var node = Node();
+
+        for (int frame = 0; frame < 200; frame++)
+            node.Update(Lon + frame * 0.001, Lat + frame * 0.001, Zoom, enabled: true);
+
+        Assert.Equal(1, node.MapsBuiltHere);
+        Assert.False(node.RebuiltOnConsecutiveFrames);
+    }
+
+    [Fact]
+    public void Toggling_enabled_by_hand_is_not_reported_as_a_runaway()
+    {
+        // The alarm has to survive ordinary use, or it gets ignored. Each toggle rebuilds, quite
+        // correctly, and none of them happens on consecutive frames.
+        using var node = Node();
+
+        for (int round = 0; round < 5; round++)
+        {
+            for (int frame = 0; frame < 10; frame++) node.Update(Lon, Lat, Zoom, enabled: true);
+            for (int frame = 0; frame < 10; frame++) node.Update(Lon, Lat, Zoom, enabled: false);
+        }
+
+        Assert.Equal(5, node.MapsBuiltHere);
+        Assert.False(node.RebuiltOnConsecutiveFrames);
+    }
+
+    [Fact]
+    public void Rebuilding_on_consecutive_frames_is_reported()
+    {
+        // Negative side of the alarm: something that really is a runaway must set it. Flipping
+        // the cache setting every frame is the cheapest way to force a rebuild each time.
+        using var node = Node();
+
+        for (int frame = 0; frame < 10; frame++)
+            node.Update(Lon, Lat, Zoom, enabled: true, cacheToDisk: frame % 2 == 0);
+
+        Assert.True(node.RebuiltOnConsecutiveFrames);
     }
 
     [Fact]

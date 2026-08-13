@@ -45,6 +45,22 @@ public class OpenStreetMapNode : IDisposable
     /// </summary>
     internal int MapsBuiltHere { get; private set; }
 
+    /// <summary>The map currently held, so a test can inspect how it was wired up.</summary>
+    internal Map? CurrentMap => _map;
+
+    /// <summary>
+    /// True once a rebuild has happened on two consecutive frames, which no deliberate action
+    /// produces and every runaway does.
+    /// </summary>
+    /// <remarks>
+    /// A plain count is the wrong alarm: switching Enabled off and on rebuilds, quite correctly,
+    /// so a counter above one says nothing on its own. What cannot be done by hand is rebuilding
+    /// twice in two frames.
+    /// </remarks>
+    internal bool RebuiltOnConsecutiveFrames { get; private set; }
+
+    int _framesSinceBuild = int.MaxValue / 2;
+
     Map? _map;
     MapsuiLayer? _layer;
 
@@ -52,6 +68,7 @@ public class OpenStreetMapNode : IDisposable
     double _lon = double.NaN;
     double _lat = double.NaN;
     int _zoom = -1;
+    bool _cache;
 
     /// <summary>
     /// Returns the layer to draw, or nothing while Enabled is off.
@@ -66,7 +83,8 @@ public class OpenStreetMapNode : IDisposable
         double centerLatitude = 35.68,
         int zoomLevel = 12,
         bool enabled = false,
-        bool diagnostics = false)
+        bool diagnostics = false,
+        bool cacheToDisk = true)
     {
         if (!enabled)
         {
@@ -74,13 +92,40 @@ public class OpenStreetMapNode : IDisposable
             return null;
         }
 
-        if (_map is null || centerLongitude != _lon || centerLatitude != _lat || zoomLevel != _zoom)
+        _framesSinceBuild++;
+
+        // Only things that change what the tile source *is* justify a rebuild. Where the map is
+        // looking does not: moving the navigator keeps the layer, its memory cache and every
+        // tile already fetched.
+        //
+        // This is not just tidiness. Dragging a map changes the centre on every frame, so a
+        // rebuild-on-centre-change design would rebuild sixty times a second the moment
+        // interaction is added - the same failure that took a network down, arriving by a
+        // different route.
+        if (_map is null || cacheToDisk != _cache)
         {
             Release();
 
-            _map = BuildMap(centerLongitude, centerLatitude, zoomLevel);
+            // Two builds on consecutive frames is the signature of a runaway. Toggling Enabled
+            // by hand also rebuilds, and that is fine, so the alarm has to tell them apart
+            // rather than counting.
+            if (_framesSinceBuild <= 1) RebuiltOnConsecutiveFrames = true;
+            _framesSinceBuild = 0;
+
+            _map = BuildMap(centerLongitude, centerLatitude, zoomLevel, cacheToDisk);
             _layer = new MapsuiLayer(_map);
             MapsBuiltHere++;
+            _lon = centerLongitude;
+            _lat = centerLatitude;
+            _zoom = zoomLevel;
+            _cache = cacheToDisk;
+        }
+        else if (centerLongitude != _lon || centerLatitude != _lat || zoomLevel != _zoom)
+        {
+            var center = SphericalMercator.FromLonLat(centerLongitude, centerLatitude);
+            _map.Navigator.CenterOn(center.x, center.y);
+            if (zoomLevel != _zoom) _map.Navigator.ZoomToLevel(zoomLevel);
+
             _lon = centerLongitude;
             _lat = centerLatitude;
             _zoom = zoomLevel;
@@ -90,13 +135,25 @@ public class OpenStreetMapNode : IDisposable
         // away every tile already fetched.
         _layer!.Diagnostics = diagnostics;
         _layer.MapsBuilt = _mapsBuilt;
+        _layer.Runaway = RebuiltOnConsecutiveFrames;
         return _layer;
     }
 
-    static Map BuildMap(double centerLongitude, double centerLatitude, int zoomLevel)
+    static Map BuildMap(double centerLongitude, double centerLatitude, int zoomLevel, bool cache)
     {
         var map = new Map();
-        map.Layers.Add(OpenStreetMap.CreateTileLayer(UserAgent));
+        var layer = OpenStreetMap.CreateTileLayer(UserAgent);
+
+        // Mapsui's factory takes a user agent and nothing else, so the disk cache is attached
+        // afterwards. Mapsui keeps its own definition of what the OSM source is, which is worth
+        // more than rebuilding one here from BruTile primitives.
+        //
+        // If the source is ever not an HttpTileSource this quietly does nothing, so the overlay
+        // reports whether a cache is actually attached rather than whether one was requested.
+        if (cache && layer.TileSource is BruTile.Web.HttpTileSource http)
+            http.PersistentCache = TileCache.Create();
+
+        map.Layers.Add(layer);
         _mapsBuilt++;
 
         var center = SphericalMercator.FromLonLat(centerLongitude, centerLatitude);
@@ -123,6 +180,7 @@ public class OpenStreetMapNode : IDisposable
         _lon = double.NaN;
         _lat = double.NaN;
         _zoom = -1;
+        _cache = false;
     }
 
     /// <summary>Releases the map and aborts any tile fetch still in flight.</summary>

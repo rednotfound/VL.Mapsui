@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Mapsui;
 using Mapsui.Extensions;   // Viewport.HasSize()
 using Mapsui.Rendering.Skia;
@@ -32,8 +33,11 @@ sealed class MapsuiLayer : ILayer, IDisposable
     /// <summary>Print Mapsui's viewport and layer state over the map.</summary>
     public bool Diagnostics { get; set; }
 
-    /// <summary>How many maps this process has built. One is correct; climbing is the bug.</summary>
+    /// <summary>How many maps this process has built.</summary>
     public int MapsBuilt { get; set; }
+
+    /// <summary>Set once a rebuild happened on two consecutive frames, which is the runaway.</summary>
+    public bool Runaway { get; set; }
 
     /// <summary>The map being drawn, so a patch can navigate it or add layers.</summary>
     public Map Map => _map;
@@ -112,21 +116,26 @@ sealed class MapsuiLayer : ILayer, IDisposable
             Typeface = SKTypeface.FromFamilyName("Consolas"),
         };
 
-        canvas.DrawRect(SKRect.Create(0f, 0f, 440f, 132f), back);
+        canvas.DrawRect(SKRect.Create(0f, 0f, 460f, 150f), back);
 
         var y = 20f;
         void Line(string s) { canvas.DrawText(s, 8f, y, text); y += 16f; }
 
-        // First line, because it is the one that would have caught the runaway. Anything above
-        // 1 means a map is being rebuilt, and every rebuild starts a fresh round of fetches.
+        // First line, because it is the one that catches the runaway. The count alone is not the
+        // alarm: switching Enabled off and on rebuilds, quite correctly, so a number above one
+        // proves nothing. Rebuilding on two consecutive frames is what no hand can do.
         using var warn = new SKPaint
         {
-            Color = MapsBuilt > 1 ? SKColors.OrangeRed : SKColors.LightGreen,
+            Color = Runaway ? SKColors.OrangeRed : SKColors.LightGreen,
             IsAntialias = true,
             TextSize = 13f,
             Typeface = SKTypeface.FromFamilyName("Consolas"),
         };
-        canvas.DrawText($"maps built {MapsBuilt}   (1 is correct; climbing means a leak)", 8f, y, warn);
+        canvas.DrawText(
+            Runaway
+                ? $"maps built {MapsBuilt}   REBUILT ON CONSECUTIVE FRAMES - close vvvv"
+                : $"maps built {MapsBuilt}   (rebuilds only when the tile source changes)",
+            8f, y, warn);
         y += 16f;
 
         Line($"viewport   {v.Width:0} x {v.Height:0}   home called: {_map.HomeIsCalledOnce}");
@@ -135,6 +144,24 @@ sealed class MapsuiLayer : ILayer, IDisposable
         Line($"layers     {_map.Layers.Count}");
         foreach (var l in _map.Layers)
             Line($"  - {l.Name}  enabled={l.Enabled}  busy={l.Busy}");
+
+        // Whether a cache is really attached, not whether one was asked for. And the size on
+        // disk, so it never becomes something growing quietly on someone's machine.
+        // global:: throughout: our own namespace is VL.Mapsui, so a bare "Mapsui.Tiling" binds
+        // to VL.Mapsui.Tiling and does not exist.
+        var attached = _map.Layers
+            .OfType<global::Mapsui.Tiling.Layers.TileLayer>()
+            .Any(l => l.TileSource is BruTile.Web.HttpTileSource { PersistentCache: BruTile.Cache.FileCache });
+
+        if (attached)
+        {
+            var (tiles, bytes) = TileCache.Stats();
+            Line($"cache      {tiles} tiles, {bytes / 1024.0 / 1024.0:0.0} MB on disk");
+        }
+        else
+        {
+            Line("cache      off - every restart refetches the same view");
+        }
     }
 
     public void Dispose() => _map.Dispose();

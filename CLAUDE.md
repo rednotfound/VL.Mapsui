@@ -38,9 +38,13 @@ writing any node; the four questions at the top of it would have prevented both.
    bulk downloading; we send a User-Agent naming this package.
 3. **Never leave vvvv running unattended, and never start it in the background.** Launch, read
    the value, close. Leaks accumulate across sessions — this one grew over several.
-4. **The `maps built` counter in the diagnostics overlay must reach 1 and stop.** If it climbs,
-   close vvvv immediately. It is the cheapest possible smoke alarm and it exists because the
-   first warning we got was a dead network.
+4. **Only a change to what the tile source *is* may rebuild the map.** Where it looks goes
+   through `Navigator.CenterOn` / `ZoomToLevel`, because dragging changes the centre on every
+   frame and a rebuild-on-move design becomes a per-frame rebuild the moment interaction exists.
+5. **The overlay's first line is the smoke alarm.** It turns red on a rebuild across **two
+   consecutive frames**, which nothing done by hand can produce. A raw count is not the alarm —
+   toggling `Enabled` rebuilds, quite correctly, and an earlier version cried wolf for it. If
+   the line goes red, close vvvv immediately.
 
 ## Packaging rules inherited from VL.GIS
 
@@ -60,6 +64,17 @@ see [`../vvvv-gis/docs/VL-PACKAGING.md`](../vvvv-gis/docs/VL-PACKAGING.md).
   restore with NU1605. It works because the whole 2.88.x line carries assembly version
   `2.88.0.0`; the same is true of HarfBuzzSharp (`1.0.0.0` on both sides despite file versions
   7.3.0.1 vs 7.3.0.3). **Compare assembly versions, never file versions.**
+
+## The tile cache
+
+`%LOCALAPPDATA%\VL.Mapsui\tiles`, as `{zoom}/{x}/{y}.png`, expiring after 7 days. Delete the
+folder to reset; there is a `Cache To Disk` pin to turn it off.
+
+**Only tiles that were drawn are stored**, which is what OSM's policy requires; the thing it
+forbids is pre-emptive fetching of tiles nobody is looking at. Measured: a session over Tokyo at
+zoom 12 produced **16 tiles, 736 KB**. The overlay prints the live figure so it is never taken
+on trust, and the directory walk behind it is throttled to once every two seconds because doing
+it per frame is the same mistake in different clothes.
 
 ## VL.GIS cannot be loaded at the same time
 
@@ -90,7 +105,7 @@ vl-mapsui/
 │   ├── PixelSpace.cs             # pixel/VL space bridge + a layer that reports its own inputs
 │   └── MapNodes.cs               # scaffolding only
 ├── spike/Spike.vl                # GENERATED - never hand-edit
-├── test/VL.Mapsui.Tests/         # 15 xunit tests, ~1s, no network, no vvvv
+├── test/VL.Mapsui.Tests/         # 24 xunit tests, ~1s, no network, no vvvv
 ├── NuGet.config                  # sources pinned to nuget.org
 └── tools/
     ├── Build-SpikePatch.ps1      # emits spike/Spike.vl whole
@@ -99,7 +114,7 @@ vl-mapsui/
 
 ## Tests
 
-`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 15 tests, about a second.
+`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 24 tests, about a second.
 
 They exist because the expensive bug here was a **lifetime** bug, not an arithmetic one, so
 every test is shaped like a frame loop: call `Update` many times and assert on how much got

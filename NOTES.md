@@ -152,6 +152,48 @@ so the suite does catch the thing it was written for.
 Confirmed no network by watching the machine's TCP connections across a run: 948 before, 948
 after.
 
+### The disk cache, measured
+
+`%LOCALAPPDATA%\VL.Mapsui\tiles`, laid out as `{zoom}/{x}/{y}.png`, expiring after 7 days —
+the floor OSM's policy sets for a cache that cannot read HTTP headers, which a file cache
+cannot.
+
+**Only tiles that were drawn are stored.** That is what the policy asks for; what it forbids is
+the opposite, "any pre-emptive fetching of tiles other than those a user is actively viewing".
+Before the cache existed we refetched the same view on every restart, which was the
+non-compliant behaviour.
+
+Measured after a session that toggled Enabled several times at zoom 12 over Tokyo:
+
+```
+16 tiles   736 KB   average 46 KB each   zoom levels 10, 11, 12
+```
+
+Under a megabyte. Zoom 10 and 11 appear because Mapsui draws lower-resolution tiles as a
+stand-in while the target level loads. For scale, the whole world at zoom 12 would be 16.7
+million tiles and hundreds of gigabytes, and is exactly what the policy forbids.
+
+The overlay prints the live count and size, so the number is never something to be taken on
+trust. Computing it walks a directory, which is cheap once and ruinous sixty times a second, so
+it is throttled to once every two seconds — the same mistake in different clothes — and a test
+asserts 10,000 calls stay under 200 ms.
+
+### Panning moves the navigator; it does not rebuild the map
+
+Toggling Enabled by hand turned the runaway counter orange-red, which was a false alarm: a
+deliberate rebuild is fine. That exposed something worse waiting for the interaction work.
+**Dragging a map changes the centre on every frame**, and the node rebuilt whenever the centre
+changed — so adding drag would have re-created the per-frame rebuild by a different route.
+
+Now only a change to what the tile source *is* rebuilds; a change to where the map looks calls
+`Navigator.CenterOn` / `ZoomToLevel` and keeps the layer, its memory cache and every tile
+already fetched. `A_centre_that_moves_every_frame_still_builds_one_map` pushes 200 frames of
+movement through it; under the old design that number was 200.
+
+The alarm was rewritten to match: a count above one proves nothing, since toggling by hand
+raises it. **Rebuilding on two consecutive frames** is what no hand can do, and that is what
+turns the line red now.
+
 ### Also settled today
 
 - `%LOCALAPPDATA%\vvvv\gamma\nugets\` **survives a vvvv reinstall** — it lives in the user

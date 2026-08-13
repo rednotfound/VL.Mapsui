@@ -17,11 +17,11 @@ $keys = @(
     'padNote','padLon','padLat','padZoom','padSpace','padClient','padColor',
     'nDiag','diagOut',
     'nMap','mapLon','mapLat','mapZoom','mapOut',
-    'nLayer','layMap','layDiag','layOut','padDiag','padEnabled','mapEnabled',
+    'nLayer','layMap','layDiag','layOut','padDiag','padEnabled','mapEnabled','padCache','mapCache',
     'nR1','r1Bounds','r1Bound','r1Input','r1Color','r1Clear','r1Space','r1Cursor','r1VSync','r1Enabled','r1Form','r1Client','r1Time',
     'nR2','r2Bounds','r2Bound','r2Input','r2Color','r2Clear','r2Space','r2Cursor','r2VSync','r2Enabled','r2Form','r2Client','r2Time'
 )
-$linkKeys = 1..11 | ForEach-Object { "l$_" }
+$linkKeys = 1..12 | ForEach-Object { "l$_" }
 
 $ids = @(& (Join-Path $PSScriptRoot 'New-VLId.ps1') -Count ($keys.Count + $linkKeys.Count))
 $id = @{}; $i = 0
@@ -152,8 +152,25 @@ $xml = @"
             <Pin Id="$($id.mapZoom)" Name="Zoom Level" Kind="InputPin" />
             <Pin Id="$($id.mapEnabled)" Name="Enabled" Kind="InputPin" />
             <Pin Id="$($id.layDiag)" Name="Diagnostics" Kind="InputPin" />
+            <Pin Id="$($id.mapCache)" Name="Cache To Disk" Kind="InputPin" />
             <Pin Id="$($id.mapOut)" Name="Result" Kind="OutputPin" />
           </Node>
+
+          <!--
+            On by default, because OpenStreetMap's tile policy asks for it: cache what was
+            viewed, and never pre-fetch what was not. Only tiles actually drawn are written, so
+            a working session is single-digit megabytes rather than the whole planet. The
+            overlay prints the real count and size, and the folder is
+            %LOCALAPPDATA%\VL.Mapsui\tiles - delete it to reset.
+          -->
+          <Pad Id="$($id.padCache)" Comment="Cache To Disk" Bounds="1020,220,35,35" ShowValueBox="true" isIOBox="true" Value="true">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
 
           <!--
             Off by default, and that is the point. In vvvv opening a document runs it, so a map
@@ -227,6 +244,7 @@ $xml = @"
         <Link Id="$($link.l8)" Ids="$($id.padDiag),$($id.layDiag)" />
         <Link Id="$($link.l9)" Ids="$($id.mapOut),$($id.r2Input)" />
         <Link Id="$($link.l11)" Ids="$($id.padEnabled),$($id.mapEnabled)" />
+        <Link Id="$($link.l12)" Ids="$($id.padCache),$($id.mapCache)" />
       </Patch>
     </Node>
   </Patch>
