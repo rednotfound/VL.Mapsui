@@ -1,3 +1,15 @@
+# RETIRED - do not run this.
+#
+# This built the help patch from scratch, which was the right way to get it working: hand-editing
+# a .vl went badly elsewhere, and a generator that emits the whole document cannot leave one half
+# rewritten. That job is done.
+#
+# The patch under help\VL.Mapsui\ is now the source of truth. Running this again would overwrite
+# it - which already happened once, discarding node positions someone had arranged by hand to
+# make the patch readable. Edit the .vl in vvvv instead and let the file keep the change.
+#
+# Kept because it records where every node reference came from, each copied from a document vvvv
+# itself wrote rather than invented.
 # Authors help\VL.Mapsui\HowTo Show a map.vl.
 #
 # The document is emitted whole, every time. Editing a .vl in place is how VL.GIS once turned a
@@ -20,10 +32,12 @@ $keys = @(
     'nCons','consIn','consIn2','consOut',
     'nMap','mapLayers','mapLon','mapLat','mapZoom','mapOut',
     'nInfo','infoMap','infoLon','infoLat','infoRes','infoW','infoH',
+    'nCenter','ctrMap','ctrLon','ctrLat','ctrOut','nZoom','zmMap','zmLevel','zmOut',
+    'padNavLon','padNavLat','padNavZoom',
     'nSkia','skMap','skDiag','skOut',
     'nR','rBounds','rBound','rInput','rColor','rClear','rSpace','rCursor','rVSync','rEnabled','rForm','rClient','rTime'
 )
-$linkKeys = 1..15 | ForEach-Object { "l$_" }
+$linkKeys = 1..23 | ForEach-Object { "l$_" }
 
 $ids = @(& (Join-Path $PSScriptRoot 'New-VLId.ps1') -Count ($keys.Count + $linkKeys.Count))
 $id = @{}; $i = 0
@@ -142,9 +156,9 @@ $xml = @"
               <Choice Kind="ProcessAppFlag" Name="Map" />
             </p:NodeReference>
             <Pin Id="$($id.mapLayers)" Name="Layers" Kind="InputPin" />
-            <Pin Id="$($id.mapLon)" Name="Center Longitude" Kind="InputPin" />
-            <Pin Id="$($id.mapLat)" Name="Center Latitude" Kind="InputPin" />
-            <Pin Id="$($id.mapZoom)" Name="Zoom Level" Kind="InputPin" />
+            <Pin Id="$($id.mapLon)" Name="Initial Center Longitude" Kind="InputPin" />
+            <Pin Id="$($id.mapLat)" Name="Initial Center Latitude" Kind="InputPin" />
+            <Pin Id="$($id.mapZoom)" Name="Initial Zoom Level" Kind="InputPin" />
             <Pin Id="$($id.mapOut)" Name="Result" Kind="OutputPin" />
           </Node>
 
@@ -168,6 +182,48 @@ $xml = @"
           <Pad Id="$($id.padVpLon)" Comment="Actual Longitude" Bounds="760,270,90,15" ShowValueBox="true" isIOBox="true" />
           <Pad Id="$($id.padVpLat)" Comment="Actual Latitude" Bounds="760,290,90,15" ShowValueBox="true" isIOBox="true" />
           <Pad Id="$($id.padVpRes)" Comment="m per pixel" Bounds="760,310,90,15" ShowValueBox="true" isIOBox="true" />
+
+          <!--
+            Moving the map. The Initial pins above are read once and then ignored, because
+            reading them every frame would undo any navigation on the very next one. These
+            nodes are how a patch moves the view - and where it would wire the mouse, using
+            VL.Skia MouseState, or an LFO, or anything else.
+          -->
+          <Pad Id="$($id.padNavLon)" Comment="Go To Longitude" Bounds="60,400,70,15" ShowValueBox="true" isIOBox="true" Value="139.7">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Float64" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Pad Id="$($id.padNavLat)" Comment="Go To Latitude" Bounds="140,400,70,15" ShowValueBox="true" isIOBox="true" Value="35.68">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Float64" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Pad Id="$($id.padNavZoom)" Comment="Go To Zoom" Bounds="220,400,50,15" ShowValueBox="true" isIOBox="true" Value="12">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Integer32" />
+            </p:TypeAnnotation>
+          </Pad>
+
+          <Node Bounds="60,430,110,19" Id="$($id.nCenter)">
+            <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="CenterOn" />
+            </p:NodeReference>
+            <Pin Id="$($id.ctrMap)" Name="Map" Kind="InputPin" />
+            <Pin Id="$($id.ctrLon)" Name="Longitude" Kind="InputPin" />
+            <Pin Id="$($id.ctrLat)" Name="Latitude" Kind="InputPin" />
+            <Pin Id="$($id.ctrOut)" Name="Output" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="200,430,120,19" Id="$($id.nZoom)">
+            <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="ZoomToLevel" />
+            </p:NodeReference>
+            <Pin Id="$($id.zmMap)" Name="Map" Kind="InputPin" />
+            <Pin Id="$($id.zmLevel)" Name="Zoom Level" Kind="InputPin" />
+            <Pin Id="$($id.zmOut)" Name="Output" Kind="OutputPin" />
+          </Node>
 
           <Pad Id="$($id.padDiag)" Comment="Diagnostics" Bounds="360,340,35,35" ShowValueBox="true" isIOBox="true" Value="true">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
@@ -240,7 +296,12 @@ $xml = @"
         <Link Id="$($link.l9)" Ids="$($id.infoLon),$($id.padVpLon)" />
         <Link Id="$($link.l10)" Ids="$($id.infoLat),$($id.padVpLat)" />
         <Link Id="$($link.l11)" Ids="$($id.infoRes),$($id.padVpRes)" />
-        <Link Id="$($link.l12)" Ids="$($id.mapOut),$($id.skMap)" />
+        <Link Id="$($link.l16)" Ids="$($id.mapOut),$($id.ctrMap)" />
+        <Link Id="$($link.l17)" Ids="$($id.padNavLon),$($id.ctrLon)" />
+        <Link Id="$($link.l18)" Ids="$($id.padNavLat),$($id.ctrLat)" />
+        <Link Id="$($link.l19)" Ids="$($id.ctrOut),$($id.zmMap)" />
+        <Link Id="$($link.l20)" Ids="$($id.padNavZoom),$($id.zmLevel)" />
+        <Link Id="$($link.l12)" Ids="$($id.zmOut),$($id.skMap)" />
         <Link Id="$($link.l13)" Ids="$($id.padDiag),$($id.skDiag)" />
         <Link Id="$($link.l14)" Ids="$($id.skOut),$($id.rInput)" />
       </Patch>

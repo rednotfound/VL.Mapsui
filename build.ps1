@@ -76,6 +76,12 @@ if ($LASTEXITCODE -ne 0) { throw "dotnet build failed ($LASTEXITCODE)" }
 Write-Host "`n== 2/5 stage dist\ ==" -ForegroundColor Cyan
 if (Test-Path $Dist) { Remove-Item $Dist -Recurse -Force }
 
+# vvvv rewrites a help patch's dependency to the exact version it resolved, and that version
+# would then be demanded forever. Normalise the repo copy, not the staged one: each nuspec packs
+# help\ straight out of the repo, so a fix applied on the way into dist\ would be invisible in
+# the published package.
+& (Join-Path $RepoRoot 'tools\Normalize-HelpPatches.ps1')
+
 foreach ($pkg in $Packages) {
     Write-Host "`n   $($pkg.Name)" -ForegroundColor White
     New-Item -ItemType Directory -Force -Path $pkg.PkgDir | Out-Null

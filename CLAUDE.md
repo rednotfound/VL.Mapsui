@@ -180,3 +180,9 @@ Get-NetTCPConnection | Where-Object { $_.OwningProcess -eq (Get-Process vvvv).Id
   `VL.ImGui.ToSkiaLayer` supplied the whole pixel-space approach here. `VL.IO.Redis` uses
   `[ProcessNode]` for a node owning a connection, and reading it first would have prevented the
   incident above.
+- **Trace the whole chain, not one hop.** Surveying every shipped patch for what VL's
+  `Wheel State` connects to found `FrameDifference`, which answered "it accumulates". Stopping
+  there left the magnitude to a guess — Windows sends 120 per notch, VL sends 1 — and the symptom
+  was a wheel that turned and a map that did not move, with nothing on screen to say why. One
+  link further in the same patch sat `FrameDifference → Sign`: vvvv's own answer being that the
+  magnitude is not meaningful at all. What was guessed was two hops from what was read.

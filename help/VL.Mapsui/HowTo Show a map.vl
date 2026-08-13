@@ -1,20 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Document xmlns:p="property" xmlns:r="reflection" Id="FD1gYjZxit9M73IwAQ2H6C" LanguageVersion="2024.6.7-0009-ga0a8422da0" Version="0.128">
-  <NugetDependency Id="C0ML72KP9jQ8Rn67jhZfPp" Location="VL.CoreLib" Version="2025.7.0" />
-  <NugetDependency Id="IRbW9x1LdmDDbS7fSxgIFD" Location="VL.Skia" Version="2025.7.0" />
-  <NugetDependency Id="Sk6UVifignWMzN6vm6J4Rw" Location="VL.Mapsui" Version="0.0.0" />
-  <Patch Id="CsaeFK1G0wO00dAJsW8Byn">
-    <Canvas Id="AhEtkKucErOG053a0QnBnM" DefaultCategory="Main" CanvasType="FullCategory" />
-    <Node Name="Application" Bounds="100,100" Id="Cm99nZ7iSjZ6DopMLo0mmR">
+<Document xmlns:p="property" xmlns:r="reflection" Id="I4hIadDDdoVyqg12xj3ejr" LanguageVersion="2025.7.4" Version="0.128">
+  <NugetDependency Id="SIMDywDLwNbQ5UdOPHQxYD" Location="VL.CoreLib" Version="2025.7.4" />
+  <NugetDependency Id="Sm17wEPgUJCVB75op3gzPF" Location="VL.Skia" Version="2025.7.4" />
+  <NugetDependency Id="CCoTJSCcdlnfZwmjUnPFVB" Location="VL.Mapsui" Version="0.0.0" />
+  <Patch Id="FJzZkKqVfW12i9kQk6L0hz">
+    <Canvas Id="N0E8bKG5vqG1aLaGsfcogC" DefaultCategory="Main" CanvasType="FullCategory" />
+    <!--
+
+    ************************ Application ************************
+
+-->
+    <Node Name="Application" Bounds="100,100" Id="Pt4eKK7Ag0dikcitT4Vmar">
       <p:NodeReference>
         <Choice Kind="ContainerDefinition" Name="Process" />
         <FullNameCategoryReference ID="Primitive" />
       </p:NodeReference>
-      <Patch Id="IMBCe3KKW23SFValfBysOC">
-        <Canvas Id="BeMA6HNLQj8y4HhbCYdLKZ" CanvasType="Group">
-
-          <Pad Id="AEZx0q5MoGt50JAvqrfcb8" Bounds="60,30,620,160" ShowValueBox="true" isIOBox="true" Value="A map, built from separate nodes rather than one node that does everything.&#xD;&#xA;&#xD;&#xA;OpenStreetMap makes a tile layer. Map holds layers and owns the viewport. ToSkiaLayer draws it. Navigate has CenterOn, ZoomToLevel, Drag and ZoomAt for moving it. Nothing here decides for you what the mouse does: read it with VL.Skia MouseState and wire it to Navigate, or drive the map from an LFO, OSC or a keyboard instead. That choice is the reason to be patching at all.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF. Opening a document in vvvv runs it, so a map that fetched on open would give you no chance to decline. Switch it on to see the map.&#xD;&#xA;&#xD;&#xA;Watch Layers Built: it should settle at 1 and stay. A number climbing frame after frame means something rebuilds the layer every frame, and every rebuild starts a fresh round of tile requests. That once exhausted a machine of ephemeral ports and took a home network down. Close vvvv if you see it climb.&#xD;&#xA;&#xD;&#xA;Tiles that were drawn are cached under %LOCALAPPDATA%\VL.Mapsui\tiles, which is what the OpenStreetMap tile policy asks for. A session is a few megabytes. Delete the folder to reset.">
-            <p:TypeAnnotation>
+      <Patch Id="T1yChjTcVpcQLJ4rxMEL44">
+        <Canvas Id="VxYLn5bECvkjhyGerEE3sc" CanvasType="Group">
+          <Pad Id="VaZNqihOnpwz6dORWEdpu0" Bounds="60,30,620,160" ShowValueBox="true" isIOBox="true" Value="A map, built from separate nodes rather than one node that does everything.&#xD;&#xA;&#xD;&#xA;OpenStreetMap makes a tile layer. Map holds layers and owns the viewport. ToSkiaLayer draws it. Navigate has CenterOn, ZoomToLevel, Drag and ZoomAt for moving it. Nothing here decides for you what the mouse does: read it with VL.Skia MouseState and wire it to Navigate, or drive the map from an LFO, OSC or a keyboard instead. That choice is the reason to be patching at all.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF. Opening a document in vvvv runs it, so a map that fetched on open would give you no chance to decline. Switch it on to see the map.&#xD;&#xA;&#xD;&#xA;Watch Layers Built: it should settle at 1 and stay. A number climbing frame after frame means something rebuilds the layer every frame, and every rebuild starts a fresh round of tile requests. That once exhausted a machine of ephemeral ports and took a home network down. Close vvvv if you see it climb.&#xD;&#xA;&#xD;&#xA;Tiles that were drawn are cached under %LOCALAPPDATA%\VL.Mapsui\tiles, which is what the OpenStreetMap tile policy asks for. A session is a few megabytes. Delete the folder to reset.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -22,11 +26,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-
-          <!--
-            Off by default, and that is the point. Opening a document in vvvv runs it.
-          -->
-          <Pad Id="Cey5jkpEabAJTSNWnHiaQn" Comment="Enabled" Bounds="60,220,35,35" ShowValueBox="true" isIOBox="true" Value="false">
+          <Pad Id="UnaIkq8cPr0a4UZQVn7ji7" Comment="Enabled" Bounds="79,280,35,35" ShowValueBox="true" isIOBox="true" Value="True">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
             </p:TypeAnnotation>
@@ -34,7 +34,7 @@
               <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="AkyG6fmJoWR9R8oAO0aKCZ" Comment="Cache To Disk" Bounds="110,220,35,35" ShowValueBox="true" isIOBox="true" Value="true">
+          <Pad Id="CNYLiTg3BUtmCJlFwHyUjv" Comment="Cache To Disk" Bounds="207,280,35,35" ShowValueBox="true" isIOBox="true" Value="true">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
             </p:TypeAnnotation>
@@ -42,96 +42,93 @@
               <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
             </p:ValueBoxSettings>
           </Pad>
-
-          <Node Bounds="60,280,150,19" Id="QVFpsAYR5NQvphlvBYGL1a">
+          <Node Bounds="79,340,150,19" Id="JqwwJBWIvaSJq4DTAz8vuN">
             <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="OpenStreetMap" />
             </p:NodeReference>
-            <Pin Id="LQiCIyRUJ8Ehme1aq5Z9KN" Name="Enabled" Kind="InputPin" />
-            <Pin Id="OzORzr2oVnBccv9d6pUWSJ" Name="Cache To Disk" Kind="InputPin" />
-            <Pin Id="QgOKisxaHpBb7y80980C1p" Name="Layers Built" Kind="OutputPin" />
-            <Pin Id="Li8jpuIlXaN3yeYtbNqSKr" Name="Result" Kind="OutputPin" />
+            <Pin Id="Usi9xynIVqJWvRhEvGVOYQ" Name="Enabled" Kind="InputPin" />
+            <Pin Id="MRc5yVuyw9pbbASUSN49D8" Name="Cache To Disk" Kind="InputPin" />
+            <Pin Id="VE109xy4WqBycyAwxMeCrD" Name="Result" Kind="OutputPin" />
+            <Pin Id="MVGJGduk0mPWJznoGv9YVX" Name="Layers Built" Kind="OutputPin" />
           </Node>
-
-          <!--
-            The smoke alarm, on a pin rather than hidden in an overlay so the patch can watch it
-            or act on it. It should reach 1 and stop.
-          -->
-          <Pad Id="Teazur4MAHn2V8XFLrz07T" Comment="Layers Built" Bounds="240,280,80,15" ShowValueBox="true" isIOBox="true" />
-
-          <!--
-            Map takes a spread of layers, so a single one is wrapped with Cons. That is the
-            point of the spread: a patch can put its own layers alongside this one, in an order
-            it chooses, rather than being handed a map with a fixed stack inside it.
-          -->
-          <Node Bounds="240,320,25,19" Id="MGekHSlUpTbovvFF7yPJpt">
+          <Pad Id="RgIIgaq8NiTBppqeaxZgPe" Comment="Layers Built" Bounds="226,390,80,15" ShowValueBox="true" isIOBox="true" />
+          <Node Bounds="87,523,39,19" Id="IuHPlniMpFcdUZg9WNt7Xp">
             <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Cons" />
               <CategoryReference Kind="RecordType" Name="Spread" NeedsToBeDirectParent="true" />
             </p:NodeReference>
-            <Pin Id="HwPIoZAQafIOPE4ILWqdSs" Name="Input" Kind="InputPin" />
-            <Pin Id="DT6MBXzKJCzoekrcmXp8cP" Name="Input 2" Kind="InputPin" />
-            <Pin Id="Fo1B3otRW7BaeiBVg65sTT" Name="Result" Kind="OutputPin" />
+            <Pin Id="FitnqKKJuItGI6PwD5m2Mp" Name="Input" Kind="InputPin" />
+            <Pin Id="Udad8igNKGlXkj4SIfvVV8" Name="Input 2" Kind="InputPin" />
+            <Pin Id="Obo0KlAOX8uJTLEhkSgG4Y" Name="Result" Kind="OutputPin" />
           </Node>
-
-          <Pad Id="BCcJtjWgOT9rqF0C8tu5FB" Comment="Longitude" Bounds="360,220,62,15" ShowValueBox="true" isIOBox="true" Value="139.7">
+          <Pad Id="QTNlTyezfmbasb8gEcPG61" Comment="Longitude" Bounds="140,583,62,15" ShowValueBox="true" isIOBox="true" Value="135">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float64" />
             </p:TypeAnnotation>
           </Pad>
-          <Pad Id="J7GCYbiRmd2fnDOvcSWlwD" Comment="Latitude" Bounds="440,220,62,15" ShowValueBox="true" isIOBox="true" Value="35.68">
+          <Pad Id="I8MAlGEJKxag8SUuQTLx71" Comment="Latitude" Bounds="229,544,62,15" ShowValueBox="true" isIOBox="true" Value="35">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float64" />
             </p:TypeAnnotation>
           </Pad>
-          <Pad Id="C0Pz99xdO4014qj8Dav26D" Comment="Zoom Level" Bounds="520,220,50,15" ShowValueBox="true" isIOBox="true" Value="12">
+          <Pad Id="MU5GcscWwFrk45xrCPm07u" Comment="Zoom Level" Bounds="329,583,50,15" ShowValueBox="true" isIOBox="true" Value="1">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Integer32" />
             </p:TypeAnnotation>
           </Pad>
-
-          <!--
-            The centre and zoom here are the starting view only. They are applied once, when the
-            viewport first has a size, and ignored afterwards - otherwise navigating the map
-            would be undone by these pins on the very next frame. To move it later, use the
-            nodes in Mapsui.Navigate.
-          -->
-          <Node Bounds="360,280,110,19" Id="VKCL3mD77PRksnTXlJYUS6">
+          <Node Bounds="87,643,110,19" Id="Uap6qMPmqPyqpm6OmKwWZU">
             <p:NodeReference LastCategoryFullName="Mapsui.Maps" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Map" />
             </p:NodeReference>
-            <Pin Id="CopCRR7BKym4JyfguRIviZ" Name="Layers" Kind="InputPin" />
-            <Pin Id="UxOPPC068PIfGo9lIR2EtQ" Name="Center Longitude" Kind="InputPin" />
-            <Pin Id="M5iLv1twc5KIWEmGPXzy40" Name="Center Latitude" Kind="InputPin" />
-            <Pin Id="FTTjBhVNPp17WiKYeWr5Xg" Name="Zoom Level" Kind="InputPin" />
-            <Pin Id="INy8ZNayAcNY3scUwsbbkT" Name="Result" Kind="OutputPin" />
+            <Pin Id="H1dkptL5CUJAlSE1SJXIiL" Name="Layers" Kind="InputPin" />
+            <Pin Id="Dc7rTes8gEFct080wrJNsg" Name="Initial Center Longitude" Kind="InputPin" />
+            <Pin Id="LpWIQOKhRMT4Jt3tKQLG58" Name="Initial Center Latitude" Kind="InputPin" />
+            <Pin Id="JXjk0f1EzodWnmeV9gOzZp" Name="Initial Zoom Level" Kind="InputPin" />
+            <Pin Id="SHAzWUqXFUmNiPpi2L0l9h" Name="Result" Kind="OutputPin" />
           </Node>
-
-          <!--
-            A Map is opaque in a patch, so it needs a reader or you are holding a value you
-            cannot inspect. Reads back what the map is actually looking at, which is not the
-            same as the pins above once anything has moved it.
-          -->
-          <Node Bounds="620,280,110,19" Id="Cm20zJHGM70GsTWGkTlfXu">
+          <Node Bounds="-207,850,110,19" Id="BtM6e71LrPauAI1Lu5QMUn">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="ViewportInfo" />
             </p:NodeReference>
-            <Pin Id="IeuIm7nfevHQ49LZHqQJDT" Name="Map" Kind="InputPin" />
-            <Pin Id="S3sVizXvK2XP0596zGl34P" Name="Center Longitude" Kind="OutputPin" />
-            <Pin Id="SBzuzIjFaLe2Mb0H8Zuo0K" Name="Center Latitude" Kind="OutputPin" />
-            <Pin Id="KnzwrI7RBTdt3SNVaYz4BF" Name="Resolution" Kind="OutputPin" />
-            <Pin Id="H7r76VXt59KXVsxIWbnOFD" Name="Width" Kind="OutputPin" />
-            <Pin Id="UFkO8HsPIAiBFpoJvIhLjb" Name="Height" Kind="OutputPin" />
+            <Pin Id="TIjKhLd4rTZDn2dSnszv01" Name="Map" Kind="InputPin" />
+            <Pin Id="RkfLJEI1nD6Jqo2WEFBeYS" Name="Center Longitude" Kind="OutputPin" />
+            <Pin Id="UUT74iRejEUw8kpEAa6dHx" Name="Center Latitude" Kind="OutputPin" />
+            <Pin Id="NHrVzYogipFEDxC3IV2qWZ" Name="Resolution" Kind="OutputPin" />
+            <Pin Id="NIsTrVwZSBOI2ZxVDBGylo" Name="Width" Kind="OutputPin" />
+            <Pin Id="Ai21lXxwGlrZ63Z4TigeFN" Name="Height" Kind="OutputPin" />
           </Node>
-          <Pad Id="GYKq2x07SwMoowcaoIlsk4" Comment="Actual Longitude" Bounds="760,270,90,15" ShowValueBox="true" isIOBox="true" />
-          <Pad Id="DM9KPa4muPaoTgeaGKrFJd" Comment="Actual Latitude" Bounds="760,290,90,15" ShowValueBox="true" isIOBox="true" />
-          <Pad Id="F57QTNEjuxY0RSNt7QvrXg" Comment="m per pixel" Bounds="760,310,90,15" ShowValueBox="true" isIOBox="true" />
-
-          <Pad Id="L2rSnt26zB6nDsPK7OKUF0" Comment="Diagnostics" Bounds="360,340,35,35" ShowValueBox="true" isIOBox="true" Value="true">
+          <Pad Id="FFjk3xX3QUXJDZcekXlKZa" Comment="Actual Longitude" Bounds="-205,898,90,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="IhsKJMIfZsfYF6xUlVucLc" Comment="Actual Latitude" Bounds="-205,927,90,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="C3LbWfwVElJKvc3TxkWobj" Comment="m per pixel" Bounds="-205,958,90,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="LP1VyC4fmXxkqHFBtoBpx6" Comment="Go To Zoom" Bounds="226,803,92,15" ShowValueBox="true" isIOBox="true" Value="17">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Integer32" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Node Bounds="67,763,110,19" Id="MKk5SORYCSnN9UHZ3aLHtW">
+            <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="CenterOn" />
+            </p:NodeReference>
+            <Pin Id="Gh9wpaet5ZfyQMUHgG2hpi" Name="Map" Kind="InputPin" />
+            <Pin Id="QTPPzT8jqytXQujFVM3PHQ" Name="Longitude" Kind="InputPin" />
+            <Pin Id="BjV1qosy6ELHSme1hTfja5" Name="Latitude" Kind="InputPin" />
+            <Pin Id="RXfqjn22omtTC6wDTFllo0" Name="Output" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="67,833,162,19" Id="LPJgbSnKXjHbjIsB46FAjW">
+            <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="ZoomToLevel" />
+            </p:NodeReference>
+            <Pin Id="BzE8VWshW9qfPTA9l4YT6D" Name="Map" Kind="InputPin" />
+            <Pin Id="HPaM7d8oyGbPQPuTIUgDW4" Name="Zoom Level" Kind="InputPin" />
+            <Pin Id="TXJAYmf93ujKYZvvyF8Xfd" Name="Output" Kind="OutputPin" />
+          </Node>
+          <Pad Id="JXt620dcIwTNKf5ghwhaGp" Comment="Diagnostics" Bounds="236,873,35,15" ShowValueBox="true" isIOBox="true" Value="True">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
             </p:TypeAnnotation>
@@ -139,72 +136,88 @@
               <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
             </p:ValueBoxSettings>
           </Pad>
-
-          <Node Bounds="360,400,130,19" Id="Hah4zFO5w0FnvsNPNfuS8g">
+          <Node Bounds="67,903,172,19" Id="BVYQzg89VCAIpTtlnx3tws">
             <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
             </p:NodeReference>
-            <Pin Id="FQtKv6ukLLUzekS7TQvz7F" Name="Map" Kind="InputPin" />
-            <Pin Id="IqastR2Oi1reDqOKOS6h41" Name="Diagnostics" Kind="InputPin" />
-            <Pin Id="E66w2JBW08NXYgu8yt5RdO" Name="Result" Kind="OutputPin" />
+            <Pin Id="DQROUBK64s5ONRgS27ZRF9" Name="Map" Kind="InputPin" />
+            <Pin Id="MNVbxnjPDHRRznJSzJnEPX" Name="Diagnostics" Kind="InputPin" />
+            <Pin Id="U5emzVQ6EofWagaekCXGH2" Name="Result" Kind="OutputPin" />
           </Node>
-
-          <Pad Id="M1UUlPftWDGCN26H3QtOdE" Comment="Background" Bounds="60,400,143,20" ShowValueBox="true" isIOBox="true" Value="0.1, 0.1, 0.15, 1">
-            <p:TypeAnnotation LastCategoryFullName="Color" LastDependency="VL.CoreLib.vl">
-              <Choice Kind="TypeFlag" Name="RGBA" />
-            </p:TypeAnnotation>
-          </Pad>
-
-          <Node Bounds="360,460,165,19" Id="RrKCMXEskALsLGYBfg7MyZ">
+          <Node Bounds="18,970,227,19" Id="DietAlM1nEjoBZVmG0FHgE">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
             </p:NodeReference>
-            <Pin Id="PeZAuMZHRs91Okg4DPPAoK" Name="Bounds" Kind="InputPin" DefaultValue="200, 150, 900, 640">
+            <Pin Id="Sj87CPJKGDWPdR4OW6sDzr" Name="Node Context" Kind="InputPin" IsHidden="true" />
+            <Pin Id="Gdo6UhaomT1XZfvOU56A8c" Name="Bounds" Kind="InputPin" DefaultValue="952, 63, 900, 640">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
             </Pin>
-            <Pin Id="Svfoo1FnagzqJg2VKcXpPO" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
+            <Pin Id="EWlzVWkOJ3EPuct0fwwbf3" Name="Save Bounds" Kind="InputPin" IsHidden="true" />
+            <Pin Id="U05w0C2neWetrphmTEtIOA" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
-            <Pin Id="CnLkxn5vxb4KPJQIIOUcI3" Name="Input" Kind="InputPin" />
-            <Pin Id="RMkfIR88XlNKIaFEGVMO30" Name="Color" Kind="InputPin" />
-            <Pin Id="VasnDrJtE24UU569mQXcXw" Name="Clear" Kind="InputPin" />
-            <Pin Id="Rk5hoaGSbma8VLLfBKBtdh" Name="Space" Kind="InputPin" />
-            <Pin Id="KjUECeimqGbywbHuzxkAKU" Name="Show Cursor" Kind="InputPin" />
-            <Pin Id="IG2EfC2pBmR9RLMEwAzWUL" Name="VSync" Kind="InputPin" />
-            <Pin Id="Cjqu6c28pVG7vEublEuCqc" Name="Enabled" Kind="InputPin" />
-            <Pin Id="Dh8Pv5KNDu4YuQte5cvHBC" Name="Form" Kind="OutputPin" />
-            <Pin Id="RuizXQq6MKqZaMubhHIdyV" Name="ClientBounds" Kind="OutputPin" />
-            <Pin Id="PQnsDI7ZHG8NREh0srm6Pc" Name="Render Time" Kind="OutputPin" />
+            <Pin Id="N4H3bABnueyMKV1c3meMwm" Name="Dialog If Document Changed" Kind="InputPin" IsHidden="true" />
+            <Pin Id="SE29wCVCUvVN8JEXTE3qOx" Name="Always On Top" Kind="InputPin" IsHidden="true" />
+            <Pin Id="MOAUjs1e5DINZD1urLjEWd" Name="Extend Into Title Bar" Kind="InputPin" IsHidden="true" />
+            <Pin Id="D8REAWAkQaAbVGkxlquS0L" Name="Input" Kind="InputPin" />
+            <Pin Id="Q8JS36Crj3eLMmRka08P1p" Name="Title" Kind="InputPin" />
+            <Pin Id="LT1e8KtEiJgL8TznQqt7Ee" Name="Title Bar Interaction Width" Kind="InputPin" IsHidden="true" />
+            <Pin Id="Dexd8lRZeZXqLjsaUCSXaS" Name="Color" Kind="InputPin" />
+            <Pin Id="ARpZedwbamWspdXEDFoCjg" Name="Clear" Kind="InputPin" />
+            <Pin Id="HdnhWae9EPwZUs6z3FuJ5L" Name="Space" Kind="InputPin" />
+            <Pin Id="Gm6HNJugtFgtkj9HrJMZVx" Name="Show Cursor" Kind="InputPin" />
+            <Pin Id="I6puDMwNYK7JpJ2t5Vhcj7" Name="VSync" Kind="InputPin" />
+            <Pin Id="EW6ImNCjBqyL2LNpLuDUsu" Name="Commands" Kind="InputPin" IsHidden="true" />
+            <Pin Id="F1txhLkd9O1MRGa4FemVvS" Name="Enable Keyboard Shortcuts" Kind="InputPin" IsHidden="true" />
+            <Pin Id="UTYhce2ouWDKuARMSXgV0p" Name="Enabled" Kind="InputPin" />
+            <Pin Id="NAbLf3d0ZNzMvMBYMXcWu2" Name="Form Bounds Notifications" Kind="OutputPin" IsHidden="true" />
+            <Pin Id="SFAG2KU9Uz5jBlEugcqusy" Name="Form" Kind="OutputPin" />
+            <Pin Id="TF7Alj4tttAAVkY9lW5nHi" Name="ClientBounds" Kind="OutputPin" />
+            <Pin Id="QIcTPHhbeLC2apLEctN44C" Name="Render Time" Kind="OutputPin" />
           </Node>
-
+          <Pad Id="IoV1b0dZuX9OfjzvOKVtk6" Comment="Longitude" Bounds="152,720,35,15" ShowValueBox="true" isIOBox="true" Value="135.79">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Float64" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Pad Id="OkavS935XH1PwXkDGEghIj" Comment="Latitude" Bounds="319,730,35,15" ShowValueBox="true" isIOBox="true" Value="34.94">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Float64" />
+            </p:TypeAnnotation>
+          </Pad>
         </Canvas>
-        <Patch Id="MJJ9GcPZURP0RXyRso2cWU" Name="Create" />
-        <Patch Id="JzhkUMNE0i1RuBjnojVfzx" Name="Update" />
-        <ProcessDefinition Id="ENtPWOUb8ZYi9Jm3vNZJLT">
-          <Fragment Id="ORiqCrFzXCJusysldObBSw" Patch="MJJ9GcPZURP0RXyRso2cWU" Enabled="true" />
-          <Fragment Id="GhYSz2i7ns7vFhve0tMUST" Patch="JzhkUMNE0i1RuBjnojVfzx" Enabled="true" />
+        <Patch Id="Qn1Yqox3GN8OqwchBUvODO" Name="Create" />
+        <Patch Id="OFfMGxxvZQSpMkYjxF7dnh" Name="Update" />
+        <ProcessDefinition Id="DhaIijSYwD4pO8zOSvysI5">
+          <Fragment Id="FjiroYIuFc7C6Eo74EFsKw" Patch="Qn1Yqox3GN8OqwchBUvODO" Enabled="true" />
+          <Fragment Id="I4BnpGUL4mYEGtIdqDHclf" Patch="OFfMGxxvZQSpMkYjxF7dnh" Enabled="true" />
         </ProcessDefinition>
-        <Link Id="VPUHJc58b7oFmk0DJ7ZoSY" Ids="Cey5jkpEabAJTSNWnHiaQn,LQiCIyRUJ8Ehme1aq5Z9KN" />
-        <Link Id="NwLALjhsxpVbYufIj8PV6u" Ids="AkyG6fmJoWR9R8oAO0aKCZ,OzORzr2oVnBccv9d6pUWSJ" />
-        <Link Id="Nprv5YCxgJ2bQBv3Cfj4x8" Ids="QgOKisxaHpBb7y80980C1p,Teazur4MAHn2V8XFLrz07T" />
-        <Link Id="MMqh3b1wtfpUaHwB2Q1ocb" Ids="Li8jpuIlXaN3yeYtbNqSKr,HwPIoZAQafIOPE4ILWqdSs" />
-        <Link Id="TwMhdaSNV6A1Wu1AT5Qdti" Ids="Fo1B3otRW7BaeiBVg65sTT,CopCRR7BKym4JyfguRIviZ" />
-        <Link Id="UhisZBGIXZm8yppA5Nrg8u" Ids="BCcJtjWgOT9rqF0C8tu5FB,UxOPPC068PIfGo9lIR2EtQ" />
-        <Link Id="K6rvFbh6HEzgbxui3DXH39" Ids="J7GCYbiRmd2fnDOvcSWlwD,M5iLv1twc5KIWEmGPXzy40" />
-        <Link Id="TrxroYrdeFw96lV24Jh98T" Ids="C0Pz99xdO4014qj8Dav26D,FTTjBhVNPp17WiKYeWr5Xg" />
-        <Link Id="MktV245S2IwJJkBwGHmpGz" Ids="INy8ZNayAcNY3scUwsbbkT,IeuIm7nfevHQ49LZHqQJDT" />
-        <Link Id="FbR9Sfvk8t74FtiQ2raI2G" Ids="S3sVizXvK2XP0596zGl34P,GYKq2x07SwMoowcaoIlsk4" />
-        <Link Id="D7sw53I1APfTFycmalDCfp" Ids="SBzuzIjFaLe2Mb0H8Zuo0K,DM9KPa4muPaoTgeaGKrFJd" />
-        <Link Id="RKHNMZhd19oM00dqzUXbBK" Ids="KnzwrI7RBTdt3SNVaYz4BF,F57QTNEjuxY0RSNt7QvrXg" />
-        <Link Id="AveMtjeE7avjIpt0WAPyTV" Ids="INy8ZNayAcNY3scUwsbbkT,FQtKv6ukLLUzekS7TQvz7F" />
-        <Link Id="GX9lvmkkX7fu00utWtRj6h" Ids="L2rSnt26zB6nDsPK7OKUF0,IqastR2Oi1reDqOKOS6h41" />
-        <Link Id="P4WPksLjZ1f6qNZgIUvmaN" Ids="E66w2JBW08NXYgu8yt5RdO,CnLkxn5vxb4KPJQIIOUcI3" />
+        <Link Id="GuXEmbNFUOCrTx2lsy5vDC" Ids="UnaIkq8cPr0a4UZQVn7ji7,Usi9xynIVqJWvRhEvGVOYQ" />
+        <Link Id="B8o38upRBCpnGJcCCYjsuY" Ids="CNYLiTg3BUtmCJlFwHyUjv,MRc5yVuyw9pbbASUSN49D8" />
+        <Link Id="A1AwFIAycdcFWjykRiUKiv" Ids="MVGJGduk0mPWJznoGv9YVX,RgIIgaq8NiTBppqeaxZgPe" />
+        <Link Id="UyrJAnXQ1yBHJA6DLjynKu" Ids="VE109xy4WqBycyAwxMeCrD,FitnqKKJuItGI6PwD5m2Mp" />
+        <Link Id="Baf7eVHFobPlz4w9svzMrn" Ids="Obo0KlAOX8uJTLEhkSgG4Y,H1dkptL5CUJAlSE1SJXIiL" />
+        <Link Id="QidfCpHBqpkDne4OKX6vcN" Ids="QTNlTyezfmbasb8gEcPG61,Dc7rTes8gEFct080wrJNsg" />
+        <Link Id="A8smptVfsCuuj3w1qPOuv3" Ids="I8MAlGEJKxag8SUuQTLx71,LpWIQOKhRMT4Jt3tKQLG58" />
+        <Link Id="I1BIG0Uj3rcncCROrgGQfL" Ids="MU5GcscWwFrk45xrCPm07u,JXjk0f1EzodWnmeV9gOzZp" />
+        <Link Id="NKHL3IfT3wQC5VqexlCKu1" Ids="RkfLJEI1nD6Jqo2WEFBeYS,FFjk3xX3QUXJDZcekXlKZa" />
+        <Link Id="OUi2Hx35XgWOH3LXMRXw5i" Ids="UUT74iRejEUw8kpEAa6dHx,IhsKJMIfZsfYF6xUlVucLc" />
+        <Link Id="SXnWnvVyAgZJ9sjiEYzfYS" Ids="NHrVzYogipFEDxC3IV2qWZ,C3LbWfwVElJKvc3TxkWobj" />
+        <Link Id="NNEmRA1UxsgZQXqHufYRJ9" Ids="LP1VyC4fmXxkqHFBtoBpx6,HPaM7d8oyGbPQPuTIUgDW4" />
+        <Link Id="LBF4zZQyXrarkPAldO2API" Ids="JXt620dcIwTNKf5ghwhaGp,MNVbxnjPDHRRznJSzJnEPX" />
+        <Link Id="EC4EEDHPTaRQnGAQEVWjbK" Ids="U5emzVQ6EofWagaekCXGH2,D8REAWAkQaAbVGkxlquS0L" />
+        <Link Id="UfsSMy4eOLaMTRV0nQtduw" Ids="RXfqjn22omtTC6wDTFllo0,BzE8VWshW9qfPTA9l4YT6D" />
+        <Link Id="UyfOUdqNxgwQW6jtvOFICr" Ids="SHAzWUqXFUmNiPpi2L0l9h,Gh9wpaet5ZfyQMUHgG2hpi" />
+        <Link Id="PDcZPUTzHkiOBO68bBuBb7" Ids="TXJAYmf93ujKYZvvyF8Xfd,DQROUBK64s5ONRgS27ZRF9" />
+        <Link Id="CwIqS8mQYMjMQPSfGgYVxy" Ids="IoV1b0dZuX9OfjzvOKVtk6,QTPPzT8jqytXQujFVM3PHQ" />
+        <Link Id="KdpElz6eztLNlpgSuK6eUd" Ids="OkavS935XH1PwXkDGEghIj,BjV1qosy6ELHSme1hTfja5" />
+        <Link Id="F1tlkRJYExsO8dJq96tCfK" Ids="TXJAYmf93ujKYZvvyF8Xfd,TIjKhLd4rTZDn2dSnszv01" />
       </Patch>
     </Node>
   </Patch>

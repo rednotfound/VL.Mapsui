@@ -203,6 +203,100 @@ turns the line red now.
   NU1301. `NuGet.config` now pins sources to nuget.org, so a restore here does not depend on
   what a machine happens to have configured.
 
+## 2026-08-13 — what VL needs before it will resolve a foreign type
+
+The single most expensive finding of the day, and it wore three disguises before it was caught.
+
+**An upstream library has to be present as a package in a package repository, not merely
+restorable as an assembly.** Without that, VL cannot resolve its types — and the failure is the
+quiet kind. The node is *constructed*; none of its pins connect; every link to it is dropped;
+the compiled program simply does not contain the call. `vvvvc` exits 0. No red node, nothing in
+the log.
+
+What made it hard was that three plausible explanations each looked confirmed while the real
+cause was still in place:
+
+| what it looked like | what it actually was |
+|---|---|
+| "VL cannot build a pin for `IEnumerable<>` of a foreign interface" | It builds `Sequence<ILayer>` fine. A single layer was being wired into a spread input, which the compiler said plainly *once types resolved*: `ILayer is no Sequence<ILayer>!` |
+| "VL.GIS's BruTile pins were broken all along" | They were fine. Moving `BruTile.6.0.0` out of vvvv's shared `nugets\` that morning is what broke them — my own control experiment was contaminated by my own earlier action |
+| "no package sets `IsForward` outside its own wrapper" (written in VL.GIS's notes) | `VL.Rhino.3dm` does: `<NugetDependency Location="Rhino3dm" IsForward="true" />`. The survey behind that claim only looked at `PlatformDependency` |
+
+**Once the types resolved, vvvv's error messages became precise immediately.** Every silent
+failure that day traced back to the same unresolved-type root.
+
+The evidence that settled it was a pair of probe nodes differing in exactly one thing:
+
+```csharp
+ILayer? Update(int input)               // Update called, wired to the Renderer   ✅
+ILayer? Update(global::Mapsui.Map? map) // Update never called, links dropped     ❌
+```
+
+A real install gets this for free: NuGet pulls VL.Mapsui's dependencies into
+`%LOCALAPPDATA%\vvvv\gamma\nugets\` beside it, which is why `Rhino3dm`, `AssimpNet`,
+`OpenCvSharp4` and `BruTile` are all sitting in there. `build.ps1` now reproduces that into
+`deps\`, transitively, discovered from each `.vl`'s own NugetDependency lines.
+
+`deps\` is separate from `dist\` because `--package-repositories` takes a semicolon-separated
+list, and pointing it at a directory that also holds the document being compiled makes `vvvvc`
+treat that document as a package: *"Entry point for document X.vl not found"*.
+
+Missing a transitive dependency has a different and louder signature: `Mapsui.Rendering.Skia`
+needs `Mapsui.Nts`, and leaving it out threw `FileNotFoundException` from inside a frame, every
+frame, filling the log faster than a window can be closed.
+
+## 2026-08-13 — the mouse, and three guesses that were each wrong
+
+Interaction is wired in the patch, not inside a node: `Console` (a layer, because notifications
+travel through the Skia layer graph) exposes `Mouse`, `MouseState` turns that into `Position`,
+`Left Pressed` and `Wheel State`, and those drive `Mapsui.Navigate`.
+
+Getting the wheel working took three rounds, and **each round was a link in the chain where I
+had inserted a guess instead of a fact**:
+
+1. **"Windows sends 120 per notch, so `Notch Size` defaults to 120."** VL sends **1**. The
+   symptom: the wheel turned, the map did not move, nothing on screen said why. `WheelSteps(1,
+   120)` is 0. My own test data had `[InlineData(1f, 120f, 0)]` commented "a source that reports
+   1, misread as Windows: no movement" — the design was right and the default was wrong.
+2. **"Mapsui reads the delta the way Windows sends it."** It reads only the **sign**:
+   `MouseWheelAnimation.GetResolution` compares against an epsilon and asks for the next
+   resolution in or out, discarding the magnitude. Multiplying by 120 was cargo cult, and
+   harmless only because the sign survived it.
+3. **"`Map.UpdateAnimations()` drives the viewport animation."** It does not — read it and it is
+   a `foreach` over `Layers` and nothing else. The viewport animation lives on the Navigator, so
+   `MouseWheelZoom` started an animation nobody advanced. This is why the bang nodes worked while
+   the wheel did not: `Navigator.ZoomIn()` lands immediately.
+
+**The methodological lesson is sharper than "search more".** I did search — every shipped patch,
+for what `Wheel State` connects to — and found `FrameDifference`, which correctly told me the pin
+accumulates. **I stopped at one hop.** One link further in that same patch sat
+`FrameDifference → Sign`: vvvv's own answer being that the magnitude is not meaningful at all.
+The thing I guessed was two links from the thing I read.
+
+### Three kinds of test, each catching something different
+
+Worth keeping as a pattern:
+
+| | caught |
+|---|---|
+| Read the upstream source | that only the sign is used |
+| `MouseWheelAnimation.Duration = 0`, assert the resolution moved | that the node's own logic is right (50 tests) |
+| **Default duration, drive frames like the patch does** | **the actual bug** — it separates "the call never reached Mapsui" from "it reached it and the animation never advanced" |
+
+The third one is the one that mattered, and it turned a problem that took two rounds of clicking
+in the GUI into a red test that fixes itself in one. Its runtime went from 2 seconds (waiting out
+a timeout) to 92 ms once the fix landed.
+
+### Also settled
+
+- **Fluent nodes' output pin is `Output`, not `Result`.** A static operation whose return type
+  equals its first parameter — `CenterOn(Map, …) -> Map` — gets `Output`. `vvvvc` rejects
+  `Result` outright, which is how this was established rather than guessed.
+- A `Map` takes a **spread** of layers, so a single one is wrapped with `Cons`
+  (`Collections.Spread`, 264 uses in shipped patches).
+- The generators under `tools/legacy/` are retired: the checked-in `.vl` is the source of truth
+  now. Regenerating overwrote node positions someone had arranged by hand.
+
 ### Still open
 
 - nuget.org has nothing newer: Mapsui tops out at 4.1.9 and 5.1.0

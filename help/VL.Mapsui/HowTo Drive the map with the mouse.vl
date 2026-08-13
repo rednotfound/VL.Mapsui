@@ -1,0 +1,313 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document xmlns:p="property" xmlns:r="reflection" Id="CiHeWf1LUnWrCN9rNKqv2U" LanguageVersion="2024.6.7-0009-ga0a8422da0" Version="0.128">
+  <NugetDependency Id="N5T8Hmh2rBlRvdNukHTcWt" Location="VL.CoreLib" Version="2025.7.0" />
+  <NugetDependency Id="LfiIFAo7gIkZMGh4IwEuAa" Location="VL.Skia" Version="2025.7.0" />
+  <NugetDependency Id="DoLRYH8yLewYZ15hO6zgIV" Location="VL.Mapsui" Version="0.0.0" />
+  <Patch Id="PxhKg8BscZY3FZ5BBq5V6S">
+    <Canvas Id="GO0StuvySIilC684AxZCtY" DefaultCategory="Main" CanvasType="FullCategory" />
+    <Node Name="Application" Bounds="100,100" Id="C7TpQCTkK0oo15gfZD0c0o">
+      <p:NodeReference>
+        <Choice Kind="ContainerDefinition" Name="Process" />
+        <FullNameCategoryReference ID="Primitive" />
+      </p:NodeReference>
+      <Patch Id="KxpWAxhkSyww0ws29p3F9Z">
+        <Canvas Id="HV5mZB2AHtDeSwYQHkHv8E" CanvasType="Group">
+
+          <Pad Id="EskmCzlInzRJezMaD9KkUP" Bounds="60,30,640,150" ShowValueBox="true" isIOBox="true" Value="Driving the map with the mouse. Nothing in VL.Mapsui decides this for you: the wiring below is a choice, and swapping the mouse for an LFO, an OSC message or a keyboard means changing these links and nothing else.&#xD;&#xA;&#xD;&#xA;Console is a layer, which is why it goes into the Group along with the map. Notifications travel through the Skia layer graph, so a node that wants the mouse has to sit in it. Its Mouse output feeds MouseState, and that gives Position, Left Pressed and WheelDelta.&#xD;&#xA;&#xD;&#xA;Drag takes a position and a Dragging gate. It remembers the previous frame itself, so there is no FrameDelay to wire, but it does not decide what counts as dragging - that is the Left Pressed link, and you could use the right button or a modifier instead.&#xD;&#xA;&#xD;&#xA;The wheel goes through FrameDifference, because Wheel State accumulates rather than reporting what just happened. Measured in vvvv 7.4: one notch moves the difference by exactly 1, which is why Notch Size defaults to 1. The raw Windows convention is 120 per notch, so if something else drives that pin, set it to match. Both numbers are on IOBoxes so this is visible rather than assumed - and it earned its keep, because a default of 120 meant a wheel that turned and a map that did not move, with nothing on screen to say why.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF, as everywhere in this package: opening a document in vvvv runs it.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">11</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+
+          <Pad Id="EiFGTnBVhigsfbdwmQt39S" Comment="Enabled" Bounds="60,210,35,35" ShowValueBox="true" isIOBox="true" Value="false">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="UCDVsBjunt97N6nzpEeEaQ" Comment="Cache To Disk" Bounds="110,210,35,35" ShowValueBox="true" isIOBox="true" Value="true">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
+
+          <Node Bounds="60,270,150,19" Id="KHnFw70ecMWVxZELXlyTl1">
+            <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="OpenStreetMap" />
+            </p:NodeReference>
+            <Pin Id="JLFcBHQpTCudwT4cR26v8a" Name="Enabled" Kind="InputPin" />
+            <Pin Id="LlxQNdMlBQUzzUuhMCqTLt" Name="Cache To Disk" Kind="InputPin" />
+            <Pin Id="Rzmk0zQoTlnL58F5IAtAIh" Name="Layers Built" Kind="OutputPin" />
+            <Pin Id="IovYhVM0nvQMdLNOVUz0RX" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Pad Id="LzEShfSKk61LhxMpR82M3a" Comment="Layers Built" Bounds="240,270,80,15" ShowValueBox="true" isIOBox="true" />
+
+          <Node Bounds="60,310,25,19" Id="MIVExNNrgbLtLujQss8HqE">
+            <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Cons" />
+              <CategoryReference Kind="RecordType" Name="Spread" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="V5YwWZaRLQYktZH5Twt2yb" Name="Input" Kind="InputPin" />
+            <Pin Id="L3hhfVproKMbvHZa0k5ztQ" Name="Input 2" Kind="InputPin" />
+            <Pin Id="Gzg4blaoPmHl5UJr3j4qnu" Name="Result" Kind="OutputPin" />
+          </Node>
+
+          <Node Bounds="60,350,110,19" Id="Jo678DgcuWJGWtl3yi3LPG">
+            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Map" />
+            </p:NodeReference>
+            <Pin Id="GqMX33rNVbFnsgSpH0x7Fl" Name="Layers" Kind="InputPin" />
+            <Pin Id="EIeQ20Ars5R2PVipViWXBK" Name="Result" Kind="OutputPin" />
+          </Node>
+
+          <!--
+            Console is a LAYER, which is why its Output goes into the Group below rather than
+            nowhere. Notifications travel through the Skia layer graph, so anything that wants
+            the mouse has to sit in that graph. This is the pattern VL.Skia's own help patches
+            use, including the ones that also have a Renderer.
+          -->
+          <Node Bounds="420,210,90,19" Id="FCFHOaQxJF6hICTzgc0kV2">
+            <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Console" />
+            </p:NodeReference>
+            <Pin Id="EkFs6mHHZIMujfdgEOqlk2" Name="Output" Kind="OutputPin" />
+            <Pin Id="RO8aBSYCJdhlqHJCEIyLAA" Name="Mouse" Kind="OutputPin" />
+            <Pin Id="MwdWPjIgy6Udsm4trupS2X" Name="Keyboard" Kind="OutputPin" />
+            <Pin Id="BXefzE2nNAcdukZNFHUU3Y" Name="Notifications" Kind="OutputPin" />
+          </Node>
+
+          <Node Bounds="420,250,185,19" Id="SNTO2Jhhli4U4wWW3wUbhZ">
+            <p:NodeReference LastCategoryFullName="IO.Mouse" LastSymbolSource="CoreLibBasics.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="MouseState" />
+            </p:NodeReference>
+            <Pin Id="CYRfJkATXB3MULFJurXl7J" Name="Mouse Device" Kind="InputPin" />
+            <Pin Id="PzHgZmzlnFRzQmgZ5zVIXX" Name="Position" Kind="OutputPin" />
+            <Pin Id="VaHlWDCnWB4hR4qvgBc3TJ" Name="Left Pressed" Kind="OutputPin" />
+            <Pin Id="J0gfkk0GswK2eKFcxk8pcp" Name="Wheel State" Kind="OutputPin" />
+          </Node>
+
+          <Node Bounds="420,300,46,19" Id="TL0SFaf72g8sO6VrYaRpNi">
+            <p:NodeReference LastCategoryFullName="2D.Vector2" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Vector (Split)" />
+              <CategoryReference Kind="Vector2Type" Name="Vector2" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="FPvEbPKx0Q2bgiWWgJ3KuF" Name="Input" Kind="StateInputPin" />
+            <Pin Id="ICl6Jwe2HfP8e3frWTbgFE" Name="X" Kind="OutputPin" />
+            <Pin Id="FkHVEB8lFqL5MmqkqXCmNk" Name="Y" Kind="OutputPin" />
+          </Node>
+
+          <!--
+            Read these rather than trusting a paragraph. Position tells you which pixels the
+            mouse reports; Wheel State accumulates, and Wheel This Frame below is what changed.
+            One notch moves it by 1 in vvvv 7.4, which is what Notch Size on ZoomByWheel has to
+            agree with. Getting that wrong is silent: the wheel turns and the map does not move.
+          -->
+          <Pad Id="LBTqNYM5YIDsZPdHi5n561" Comment="Mouse Position" Bounds="640,250,110,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="BPpvXe8pgMsrjiIXVcfGVG" Comment="Left Pressed" Bounds="640,270,110,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="QrNak3m7yysHT2kt5oaGI0" Comment="Wheel State" Bounds="640,290,110,15" ShowValueBox="true" isIOBox="true" />
+
+          <!--
+            Drag remembers the previous position itself, so there is no FrameDelay here. What it
+            deliberately does not decide is what counts as dragging: that is the Left Pressed
+            link, and a patch is free to use the right button, a modifier or a touch gesture.
+          -->
+          <Node Bounds="60,400,110,19" Id="CNgVHFYfkEkPUuBiYN3M8T">
+            <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Drag" />
+            </p:NodeReference>
+            <Pin Id="ORtzkXwQGw7OVYDzpI5bZ9" Name="Map" Kind="InputPin" />
+            <Pin Id="Cc6xgbnGsU368CM3MrUcbN" Name="X" Kind="InputPin" />
+            <Pin Id="DEhbqpKlwjTgV2nzO22wfj" Name="Y" Kind="InputPin" />
+            <Pin Id="G88um6CokkWEKxBIVZBAaM" Name="Dragging" Kind="InputPin" />
+            <Pin Id="GqniStYYxec691wpuoGqOX" Name="Result" Kind="OutputPin" />
+          </Node>
+
+          <!--
+            Wheel State accumulates: it counts up and stays there. FrameDifference turns it into
+            what changed this frame, which is what ZoomByWheel wants. This is how vvvv's own
+            patches read that pin - it is the only place in the shipped documents where it is
+            connected to anything.
+          -->
+          <Node Bounds="640,320,91,19" Id="A8qFsyFNdhgTauPVcsAyQS">
+            <p:NodeReference LastCategoryFullName="Animation.FrameBased" LastDependency="CoreLibBasics.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="FrameDifference" />
+            </p:NodeReference>
+            <Pin Id="BOEcqqbX9zI4aeoBawrpYz" Name="Value" Kind="InputPin" />
+            <Pin Id="Pq6PXhDc30Y73OLApgMjM0" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Pad Id="B1GvdOF8oPKteqUOKmISNy" Comment="Wheel This Frame" Bounds="760,320,110,15" ShowValueBox="true" isIOBox="true" />
+
+          <Node Bounds="200,400,150,19" Id="PNvSFuqfxYH1W7SRfNzqsD">
+            <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="ZoomByWheel" />
+            </p:NodeReference>
+            <Pin Id="O44OyRhtxJ6Z4CIvpXlQh1" Name="Map" Kind="InputPin" />
+            <Pin Id="VuvytF8oSOM1ZXfvpw62Rm" Name="X" Kind="InputPin" />
+            <Pin Id="C7raymyT76ZJBj3ILHLxZW" Name="Y" Kind="InputPin" />
+            <Pin Id="NWUw1wkpZWuyw2DccxwAOd" Name="Wheel Delta" Kind="InputPin" />
+            <Pin Id="T2SknmUw1M4vcmqQsQPFoK" Name="Notch Size" Kind="InputPin" />
+            <Pin Id="OKMRQq7ARgCNQ0DguHEGvA" Name="Output" Kind="OutputPin" />
+          </Node>
+
+          <!--
+            Two bangs, because a wheel is not the only way to zoom and not everyone has one. The
+            nodes watch the rising edge, so a toggle left switched on zooms once rather than on
+            every frame - which would be a tile request per frame.
+          -->
+          <Pad Id="TPqtbjftbKCxfkJBJszgN7" Comment="Zoom In" Bounds="60,450,35,35" ShowValueBox="true" isIOBox="true" Value="false">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Bang</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="Pp1NoSpRFSGZ73Fs7XGXYs" Comment="Zoom Out" Bounds="110,450,35,35" ShowValueBox="true" isIOBox="true" Value="false">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Bang</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
+
+          <Node Bounds="160,490,100,19" Id="EAE9Jfv0Hf43vzIISVzgqE">
+            <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="ZoomIn" />
+            </p:NodeReference>
+            <Pin Id="IyrK3QVwqMDAPUumzqM6Sk" Name="Map" Kind="InputPin" />
+            <Pin Id="SxS00uPAZW1eEwvz850rTj" Name="Trigger" Kind="InputPin" />
+            <Pin Id="QprEqWGclHvMMmqvSzxZTg" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="290,490,105,19" Id="DZ1hljDwtqU03X049Js09R">
+            <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="ZoomOut" />
+            </p:NodeReference>
+            <Pin Id="LRWoROawhBaIHoc996IFnC" Name="Map" Kind="InputPin" />
+            <Pin Id="MGPdlH9ThjHKeGXtlkJKea" Name="Trigger" Kind="InputPin" />
+            <Pin Id="LM76tiXtsHjBb4DTEseGuU" Name="Result" Kind="OutputPin" />
+          </Node>
+
+          <Pad Id="SJgz5DxqkZcL3yweiEwfEN" Comment="Diagnostics" Bounds="340,400,35,35" ShowValueBox="true" isIOBox="true" Value="true">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
+
+          <Node Bounds="60,460,130,19" Id="UBeGMKgyWzHdxh3k7jRdxJ">
+            <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
+            </p:NodeReference>
+            <Pin Id="HoGHay1zRE579IxYI9KObY" Name="Map" Kind="InputPin" />
+            <Pin Id="T2kAPlTAITO0pO9KYBYcBS" Name="Diagnostics" Kind="InputPin" />
+            <Pin Id="B2JLZBFRZZ8pOzduqhKvvd" Name="Result" Kind="OutputPin" />
+          </Node>
+
+          <Node Bounds="60,510,105,19" Id="RtnmcH4UMTsIMECMtAlloC">
+            <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Group" />
+              <CategoryReference Kind="Category" Name="Skia" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="SLeoSJ0mtJwpIBrN3Lo82U" Name="Input" Kind="InputPin" />
+            <Pin Id="UYCvpRMOoaQciC5U2bKDca" Name="Input 2" Kind="InputPin" />
+            <Pin Id="PTFy7CVaB74mEbW20etmS8" Name="Output" Kind="OutputPin" />
+          </Node>
+
+          <Pad Id="NPTgxQrFRqY5rx04g3r9be" Comment="Background" Bounds="240,510,143,20" ShowValueBox="true" isIOBox="true" Value="0.1, 0.1, 0.15, 1">
+            <p:TypeAnnotation LastCategoryFullName="Color" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="RGBA" />
+            </p:TypeAnnotation>
+          </Pad>
+
+          <Node Bounds="60,560,165,19" Id="JQXkK2k1zSzu3DSu1n5s8J">
+            <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Renderer" />
+            </p:NodeReference>
+            <Pin Id="SUv3tMtrBLPEmF7yCdoGiO" Name="Bounds" Kind="InputPin" DefaultValue="200, 150, 900, 640">
+              <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
+                <Choice Kind="TypeFlag" Name="Rectangle" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="FVf4Jl8RoVsEHxDlMNd5t4" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Boolean" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="HxtTE9CiHdY3Qy4br6O4qG" Name="Input" Kind="InputPin" />
+            <Pin Id="SbJkHZ61SJrRKGw6PscfYE" Name="Color" Kind="InputPin" />
+            <Pin Id="FsKjqer5PL7VhGuCyKJS4n" Name="Clear" Kind="InputPin" />
+            <Pin Id="SHtkYRzncGgbSDN6jtFyKL" Name="Space" Kind="InputPin" />
+            <Pin Id="LPJYcGuo9ncb5Pr6CmpJZu" Name="Show Cursor" Kind="InputPin" />
+            <Pin Id="VYwLKkK0aCltZXqntQI6GO" Name="VSync" Kind="InputPin" />
+            <Pin Id="DYGaN2Bs0LYDowMedRCwXV" Name="Enabled" Kind="InputPin" />
+            <Pin Id="HSmPhRmVAH8APXOWpsb8iT" Name="Form" Kind="OutputPin" />
+            <Pin Id="T4db7FZFlkq7L8jVQtWKzt" Name="ClientBounds" Kind="OutputPin" />
+            <Pin Id="JM40vxJsuZLntoM0Wcd1eS" Name="Render Time" Kind="OutputPin" />
+          </Node>
+
+        </Canvas>
+        <Patch Id="BHnV6WFhadjpCb50iOTz1F" Name="Create" />
+        <Patch Id="H5YBhE4qwJVj3UjLQdoBN5" Name="Update" />
+        <ProcessDefinition Id="LlrN6dzU14MEQrXynkQi5B">
+          <Fragment Id="TAhslDVeMXqKdYFPSwX56b" Patch="BHnV6WFhadjpCb50iOTz1F" Enabled="true" />
+          <Fragment Id="B27vJDlz4YQtnbwSc6k9du" Patch="H5YBhE4qwJVj3UjLQdoBN5" Enabled="true" />
+        </ProcessDefinition>
+        <Link Id="DE2yurv4jjynosyvk4N3xq" Ids="EiFGTnBVhigsfbdwmQt39S,JLFcBHQpTCudwT4cR26v8a" />
+        <Link Id="LAN58tz5OhCyrJbSuJU3jY" Ids="UCDVsBjunt97N6nzpEeEaQ,LlxQNdMlBQUzzUuhMCqTLt" />
+        <Link Id="VOdzI3kS8MbU1XgZsaQ02p" Ids="Rzmk0zQoTlnL58F5IAtAIh,LzEShfSKk61LhxMpR82M3a" />
+        <Link Id="DOmef095bI00rAr4jsFtGe" Ids="IovYhVM0nvQMdLNOVUz0RX,V5YwWZaRLQYktZH5Twt2yb" />
+        <Link Id="HfAOMvEEdQPmHsO2692d43" Ids="Gzg4blaoPmHl5UJr3j4qnu,GqMX33rNVbFnsgSpH0x7Fl" />
+        <Link Id="VXzm5QeyLaldV4J2QDA5Ic" Ids="RO8aBSYCJdhlqHJCEIyLAA,CYRfJkATXB3MULFJurXl7J" />
+        <Link Id="UBtx77Q7y5XN3xKP8P2kCq" Ids="PzHgZmzlnFRzQmgZ5zVIXX,FPvEbPKx0Q2bgiWWgJ3KuF" />
+        <Link Id="Suemyi6tct8ZIrr9aWGwA5" Ids="PzHgZmzlnFRzQmgZ5zVIXX,LBTqNYM5YIDsZPdHi5n561" />
+        <Link Id="GD2ER1Lxocoq81Fdew3BfV" Ids="VaHlWDCnWB4hR4qvgBc3TJ,BPpvXe8pgMsrjiIXVcfGVG" />
+        <Link Id="PB4gG12iR0SJIE5xhVnCZn" Ids="J0gfkk0GswK2eKFcxk8pcp,QrNak3m7yysHT2kt5oaGI0" />
+        <Link Id="V6TTMYb2B5Y1hoI5ONvxy5" Ids="EIeQ20Ars5R2PVipViWXBK,ORtzkXwQGw7OVYDzpI5bZ9" />
+        <Link Id="L4hvV8i7XhUlwgPCIfU55p" Ids="ICl6Jwe2HfP8e3frWTbgFE,Cc6xgbnGsU368CM3MrUcbN" />
+        <Link Id="U80NI99ydu5NHYhHpdIOdP" Ids="FkHVEB8lFqL5MmqkqXCmNk,DEhbqpKlwjTgV2nzO22wfj" />
+        <Link Id="SndElhUdHGyJdzfVuic15n" Ids="VaHlWDCnWB4hR4qvgBc3TJ,G88um6CokkWEKxBIVZBAaM" />
+        <Link Id="PhaqNk09MlAIYJsbl1CX7c" Ids="GqniStYYxec691wpuoGqOX,O44OyRhtxJ6Z4CIvpXlQh1" />
+        <Link Id="UGAeF8SAsdNNWhAb6BrmIu" Ids="ICl6Jwe2HfP8e3frWTbgFE,VuvytF8oSOM1ZXfvpw62Rm" />
+        <Link Id="TwJCoJX0Cx8wlpmmRIOWQC" Ids="FkHVEB8lFqL5MmqkqXCmNk,C7raymyT76ZJBj3ILHLxZW" />
+        <Link Id="Q7oNkj1dJviIVVFWzEejJV" Ids="J0gfkk0GswK2eKFcxk8pcp,BOEcqqbX9zI4aeoBawrpYz" />
+        <Link Id="Qb96UmZd9rMP86mRlMMKcR" Ids="Pq6PXhDc30Y73OLApgMjM0,B1GvdOF8oPKteqUOKmISNy" />
+        <Link Id="FJHsBZQnIGzWogR2ck04Xh" Ids="Pq6PXhDc30Y73OLApgMjM0,NWUw1wkpZWuyw2DccxwAOd" />
+        <Link Id="EzjIrBit9FkOlOEGnjAZNG" Ids="OKMRQq7ARgCNQ0DguHEGvA,IyrK3QVwqMDAPUumzqM6Sk" />
+        <Link Id="N4642e08vM9IkbM7NQ5swl" Ids="TPqtbjftbKCxfkJBJszgN7,SxS00uPAZW1eEwvz850rTj" />
+        <Link Id="HxKUZSf7XWbPAf4FexstAe" Ids="QprEqWGclHvMMmqvSzxZTg,LRWoROawhBaIHoc996IFnC" />
+        <Link Id="NP80wINaEhNfdKCdywtur4" Ids="Pp1NoSpRFSGZ73Fs7XGXYs,MGPdlH9ThjHKeGXtlkJKea" />
+        <Link Id="Llj4EIWQK0cEreG9nVop0L" Ids="LM76tiXtsHjBb4DTEseGuU,HoGHay1zRE579IxYI9KObY" />
+        <Link Id="SWhXk9y79E60jobXuBzEbp" Ids="SJgz5DxqkZcL3yweiEwfEN,T2kAPlTAITO0pO9KYBYcBS" />
+        <Link Id="PZDcLksNz1hcVSacQ1CD8L" Ids="B2JLZBFRZZ8pOzduqhKvvd,SLeoSJ0mtJwpIBrN3Lo82U" />
+        <Link Id="IrHtYs9a44S8uM588h6Trg" Ids="EkFs6mHHZIMujfdgEOqlk2,UYCvpRMOoaQciC5U2bKDca" />
+        <Link Id="Abenbrk69WBMxtGtcfkJ26" Ids="PTFy7CVaB74mEbW20etmS8,HxtTE9CiHdY3Qy4br6O4qG" />
+      </Patch>
+    </Node>
+  </Patch>
+</Document>

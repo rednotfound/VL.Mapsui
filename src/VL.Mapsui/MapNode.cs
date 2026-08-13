@@ -15,10 +15,13 @@ namespace VL.Mapsui;
 /// <remarks>
 /// A process node because the map owns its layers, and those own connections and caches.
 ///
-/// The initial centre and zoom are applied once, when the viewport first has a size — a zoom
-/// level means nothing before then. **Afterwards they are ignored**, so that navigating the map
-/// is not immediately undone by the pins on this node. To move it later, use the navigation
-/// nodes; that is also what a patch would wire the mouse to.
+/// **The Initial pins are named that way because they mean it.** They are applied once, when the
+/// viewport first has a size - a zoom level means nothing before then - and ignored on every
+/// frame after. Reading them continuously would undo any navigation on the very next frame, so
+/// dragging a map would be impossible.
+///
+/// To move the map, use the nodes in Mapsui.Navigate. That is also where a patch wires the
+/// mouse, an LFO, or anything else it wants to drive the view with.
 /// </remarks>
 [ProcessNode(Name = "Map", Category = "Mapsui")]
 public class MapNode : IDisposable
@@ -34,9 +37,9 @@ public class MapNode : IDisposable
     /// </summary>
     public Map Update(
         IEnumerable<ILayer>? layers = null,
-        double centerLongitude = 139.7,
-        double centerLatitude = 35.68,
-        int zoomLevel = 12)
+        double initialCenterLongitude = 139.7,
+        double initialCenterLatitude = 35.68,
+        int initialZoomLevel = 12)
     {
         if (MapsBuilt == 0)
         {
@@ -45,11 +48,11 @@ public class MapNode : IDisposable
             // Home runs once the viewport has a size, which the renderer sets. Calling the
             // navigator here would be a no-op, and skipping Home altogether leaves the map at a
             // default resolution that shows nothing at all - no error, just an empty window.
-            var center = SphericalMercator.FromLonLat(centerLongitude, centerLatitude);
+            var center = SphericalMercator.FromLonLat(initialCenterLongitude, initialCenterLatitude);
             _map.Home = navigator =>
             {
                 navigator.CenterOn(center.x, center.y);
-                navigator.ZoomToLevel(zoomLevel);
+                navigator.ZoomToLevel(initialZoomLevel);
             };
         }
 
@@ -62,10 +65,25 @@ public class MapNode : IDisposable
             _map.Layers.Clear();
             foreach (var l in incoming) _map.Layers.Add(l);
             _current = incoming;
+
+            // A new layer holds nothing until someone asks it to fetch, and Mapsui expects its
+            // host to do the asking. Without this the map stays empty after Enabled is switched
+            // on: Home already ran, on a map that had no layers at the time, and nothing else
+            // ever triggers a fetch. The same omission is what left panning on stale tiles until
+            // the navigation nodes started calling Refresh.
+            _map.Refresh();
         }
 
-        // The frame tick Mapsui's own hosts give it; drives fly-to and easing.
+        // The frame tick Mapsui's own hosts give it. **Both calls are needed and they do
+        // different things.** Map.UpdateAnimations only walks the layers - read it in Mapsui
+        // 4.1.9 and it is a foreach over Layers and nothing else. The viewport's own animation,
+        // which is what MouseWheelZoom and FlyTo start, lives on the Navigator.
+        //
+        // Calling only the first is why wheel zoom did nothing for a round while the bang nodes
+        // worked: Navigator.ZoomIn lands immediately, whereas MouseWheelZoom eases over
+        // MouseWheelAnimation.Duration and an animation nobody advances never arrives.
         _map.UpdateAnimations();
+        _map.Navigator.UpdateAnimations();
 
         return _map;
     }
