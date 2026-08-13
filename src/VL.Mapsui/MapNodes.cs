@@ -1,57 +1,30 @@
-using Mapsui;
-using Mapsui.Projections;
-using Mapsui.Tiling;
 using VL.Core.Import;
-using VL.Skia;
 
 namespace VL.Mapsui;
 
 /// <summary>
-/// A Mapsui map, and the layer that draws it.
+/// Scaffolding used to bring this package up. Not features.
 /// </summary>
 /// <remarks>
-/// Spike scope: enough nodes to prove a map reaches the screen inside vvvv. Node names and
-/// categories are not settled and will change.
+/// The map itself is <see cref="OpenStreetMapNode"/>, which is a process node rather than a
+/// static method here. Anything that acquires a connection, a file handle or a cache has to be,
+/// because a static method in VL is re-evaluated on every frame - see that class for what
+/// happened when this one was written the other way.
+///
+/// A second rule applies to whatever gets added next: **no public node here may mention a
+/// Mapsui type in its signature yet.** VL builds a node only for methods whose parameter and
+/// return types it has imported, and it learns a foreign library's types from a
+/// &lt;NugetDependency&gt; declared in the .vl document. This spike is loaded through a
+/// ProjectDependency and declares none, so a node returning Mapsui.Map is simply never created:
+/// no error, no red node, nothing in the log, just a node greyed out in the patch and dropped
+/// from the compiled program along with every link to it.
+///
+/// Exposing Map is the better API and returns with the nuspec, which is how VL.GIS surfaces
+/// BruTile's IHttpTileSource and TileIndex.
 /// </remarks>
 [Name("Map")]
 public static class MapNodes
 {
-    /// <summary>
-    /// A map with OpenStreetMap tiles, centred on a WGS84 coordinate at a slippy-map zoom
-    /// level. Uses Mapsui, and OpenStreetMap tiles are © OpenStreetMap contributors (ODbL).
-    /// </summary>
-    /// <remarks>
-    /// Coordinate order is (longitude, latitude) - x first. Mapsui works internally in
-    /// Spherical Mercator metres, so the centre is converted on the way in.
-    /// </remarks>
-    public static Map CreateOpenStreetMap(
-        double centerLongitude = 139.7,
-        double centerLatitude = 35.68,
-        int zoomLevel = 12)
-    {
-        var map = new Map();
-        map.Layers.Add(OpenStreetMap.CreateTileLayer());
-
-        var center = SphericalMercator.FromLonLat(centerLongitude, centerLatitude);
-
-        // Home runs once the viewport has a size, which is the earliest moment a zoom level
-        // means anything. Calling the navigator directly here would be a no-op.
-        map.Home = navigator =>
-        {
-            navigator.CenterOn(center.x, center.y);
-            navigator.ZoomToLevel(zoomLevel);
-        };
-
-        return map;
-    }
-
-    /// <summary>
-    /// Wrap a Mapsui map as a VL.Skia layer, ready for a Renderer.
-    /// The Renderer's Space pin does not need setting: the layer resets the canvas matrix to
-    /// pixels itself, because a wrong Space value fails silently.
-    /// </summary>
-    public static global::VL.Skia.ILayer ToSkiaLayer(Map map) => new MapsuiLayer(map);
-
     /// <summary>
     /// A layer that draws a fixed 200x120 pixel box and prints what it measured about the
     /// space it was given. Scaffolding for bringing this package up; not a feature.
@@ -59,7 +32,8 @@ public static class MapNodes
     /// <remarks>
     /// Put this into a Renderer before wiring the map. If the box appears at the right size,
     /// pixel-space handling works and any remaining problem is Mapsui's. If it does not, there
-    /// is no point looking at Mapsui yet.
+    /// is no point looking at Mapsui yet. It touches no network and no Mapsui type, which is
+    /// what makes it safe to leave running.
     /// </remarks>
     public static global::VL.Skia.ILayer DiagnosticsLayer() => new DiagnosticsLayer();
 }

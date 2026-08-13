@@ -1,18 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Document xmlns:p="property" xmlns:r="reflection" Id="AddB2a7LYh4WD0zDgPtIDG" LanguageVersion="2024.6.7-0009-ga0a8422da0" Version="0.128">
-  <NugetDependency Id="C0QK3vrGj0405tDNrRiVf8" Location="VL.CoreLib" Version="2025.7.0" />
-  <NugetDependency Id="LASv5nggvtzDxMKutU4Bb8" Location="VL.Skia" Version="2025.7.0" />
-  <Patch Id="Osfn6ICDyds3JiPlU8gQBN">
-    <Canvas Id="P0pMLQtiTwwwUzVQUeX4pU" DefaultCategory="Main" CanvasType="FullCategory" />
-    <Node Name="Application" Bounds="100,100" Id="SM17bB8CiLBJVwJXsJcRih">
+<Document xmlns:p="property" xmlns:r="reflection" Id="MBXnuwznAlQFVEwlifQHJJ" LanguageVersion="2024.6.7-0009-ga0a8422da0" Version="0.128">
+  <NugetDependency Id="Cxt0ZvuAOEzZbnDpKqlBdz" Location="VL.CoreLib" Version="2025.7.0" />
+  <NugetDependency Id="KC8qMoa7UiMs8uTi1wVsnm" Location="VL.Skia" Version="2025.7.0" />
+  <Patch Id="ViFnxELgYyPIMwtNp8pO9p">
+    <Canvas Id="H0V6EcEqKHWpdgt5GKiQRI" DefaultCategory="Main" CanvasType="FullCategory" />
+    <Node Name="Application" Bounds="100,100" Id="RHG2n5NnHOWeRTmXWVOQdo">
       <p:NodeReference>
         <Choice Kind="ContainerDefinition" Name="Process" />
         <FullNameCategoryReference ID="Primitive" />
       </p:NodeReference>
-      <Patch Id="F5LRA9NQmNKWnmZdwfc4pF">
-        <Canvas Id="LWmhhSuE3wlpGCVo4oHF40" CanvasType="Group">
+      <Patch Id="T1J1sBRIpZ99SaWfZtkQQf">
+        <Canvas Id="LIKWNpTcGEC68tPid1SO6G" CanvasType="Group">
 
-          <Pad Id="RJRZ8JRCPkVrES7hqIit7C" Bounds="60,30,600,150" ShowValueBox="true" isIOBox="true" Value="VL.Mapsui spike. One question: does a Mapsui map reach the screen inside vvvv?&#xD;&#xA;&#xD;&#xA;LEFT window is the probe, and it draws nothing but what it measured. Read it before looking at the map. An orange 200x120 box at pixel (40,40) plus a few lines of text means pixel-space handling works, and anything still wrong after that is Mapsui's. No box at all means the layer never rendered. A box of the wrong size means the matrix is wrong.&#xD;&#xA;&#xD;&#xA;Change the Space dropdown and the box must NOT move. That is the point: the layer resets the canvas matrix itself instead of trusting a pin whose wrong value is silently replaced by the default.&#xD;&#xA;&#xD;&#xA;RIGHT window is the map. Tiles arrive over the network, so give it a moment.&#xD;&#xA;&#xD;&#xA;Do not launch vvvv with VL.GIS loaded: it uses BruTile 6 and Mapsui.Tiling needs BruTile 5.">
+          <Pad Id="AeYFnqArGTmEG6CD5BmofJ" Bounds="60,30,600,150" ShowValueBox="true" isIOBox="true" Value="VL.Mapsui spike. One question: does a Mapsui map reach the screen inside vvvv?&#xD;&#xA;&#xD;&#xA;LEFT window is the probe, and it draws nothing but what it measured. Read it before looking at the map. An orange 200x120 box at pixel (40,40) plus a few lines of text means pixel-space handling works, and anything still wrong after that is Mapsui's. No box at all means the layer never rendered. A box of the wrong size means the matrix is wrong.&#xD;&#xA;&#xD;&#xA;Change the Space dropdown and the box must NOT move. That is the point: the layer resets the canvas matrix itself instead of trusting a pin whose wrong value is silently replaced by the default.&#xD;&#xA;&#xD;&#xA;RIGHT window is the map, and it is OFF until you switch Enabled on. Opening a document in vvvv runs it, so a map that fetched on open would give you no chance to decline.&#xD;&#xA;&#xD;&#xA;When you do switch it on, watch the first line of the overlay: maps built must reach 1 and STOP. If it climbs, close vvvv at once - a map is being rebuilt every frame, which starts a fresh round of tile requests each time. That exhausted a machine of ephemeral ports and took a home network down. OpenStreetMap runs on donated infrastructure and its tile policy forbids bulk requests.&#xD;&#xA;&#xD;&#xA;Do not launch vvvv with VL.GIS loaded: it uses BruTile 6 and Mapsui.Tiling needs BruTile 5.">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -26,15 +26,15 @@
             Probe first. This layer takes no inputs at all, so if it draws nothing the fault is
             upstream of anything we could have got wrong about Mapsui.
           -->
-          <Node Bounds="60,220,140,19" Id="PUMIIeohRkgDSWH4ZVG3Sp">
+          <Node Bounds="60,220,140,19" Id="BZmtjztZzVT2iIJCMmm9ag">
             <p:NodeReference LastCategoryFullName="Mapsui.Map" LastDependency="VL.Mapsui.csproj">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="DiagnosticsLayer" />
             </p:NodeReference>
-            <Pin Id="LEH6epwg1RYjoIRglHZSFE" Name="Result" Kind="OutputPin" />
+            <Pin Id="Ofr3PN0FBublJGRJxZCsWF" Name="Result" Kind="OutputPin" />
           </Node>
 
-          <Pad Id="DOm1TZ5XHvhwOiG1ypH6Ly" Comment="Space" Bounds="240,220,110,19" ShowValueBox="true" isIOBox="true" Value="Normalized">
+          <Pad Id="RAPqGWluaAUM7Of7xSxOry" Comment="Space" Bounds="240,220,110,19" ShowValueBox="true" isIOBox="true" Value="Normalized">
             <p:TypeAnnotation LastCategoryFullName="VL.Skia" LastDependency="VL.Skia.dll">
               <Choice Kind="TypeFlag" Name="CommonSpace" />
             </p:TypeAnnotation>
@@ -45,123 +45,154 @@
             answer to "which space is actually in effect". Worth reading here because VL.Skia's
             Sizing docs say one unit is 100 pixels, which VL.GIS's notes currently contradict.
           -->
-          <Pad Id="BKJ4hc9TyiFpQ7LcUmkQPi" Comment="ClientBounds" Bounds="380,220,200,44" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="NRrNZHKfqWX4dOJ4rtXPZL" Comment="ClientBounds" Bounds="380,220,200,44" ShowValueBox="true" isIOBox="true" />
 
-          <Pad Id="UCsTxBqx59l8zOEGGBDZl2" Comment="Background" Bounds="60,270,143,20" ShowValueBox="true" isIOBox="true" Value="0.1, 0.1, 0.15, 1">
+          <Pad Id="Q6FR0yGuCkmuOuhqvQCgRL" Comment="Background" Bounds="60,270,143,20" ShowValueBox="true" isIOBox="true" Value="0.1, 0.1, 0.15, 1">
             <p:TypeAnnotation LastCategoryFullName="Color" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="RGBA" />
             </p:TypeAnnotation>
           </Pad>
 
-          <Node Bounds="60,320,165,19" Id="G2Dvlp79v4drHdYj1GTZs9">
+          <Node Bounds="60,320,165,19" Id="UykboR1YY9DHpTjuUO5iTa">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
             </p:NodeReference>
-            <Pin Id="J6ADLJAUPGCtoeCbuaVnjl" Name="Bounds" Kind="InputPin" DefaultValue="80, 120, 640, 520">
+            <Pin Id="BkESghjedvtzyMC6NpEiDW" Name="Bounds" Kind="InputPin" DefaultValue="80, 120, 640, 520">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
             </Pin>
-            <Pin Id="PXew3OfSGdylG0UrEPH1p1" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
+            <Pin Id="LtfYoalSrk1GGYyW2CydfC" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
-            <Pin Id="O3B9VE0RklH6FlzpuuTlQg" Name="Input" Kind="InputPin" />
-            <Pin Id="LHev7DD3kYwBN9tOtn5p3l" Name="Color" Kind="InputPin" />
-            <Pin Id="GPuvKZtetiSycHd8PVw0Sj" Name="Clear" Kind="InputPin" />
-            <Pin Id="LwR6FFhXHTHiRZ9mNH5IhD" Name="Space" Kind="InputPin" />
-            <Pin Id="LMIumRUscEsARY7WB6n2Xc" Name="Show Cursor" Kind="InputPin" />
-            <Pin Id="TvFd2tOhL7hvQ45zOVDF8L" Name="VSync" Kind="InputPin" />
-            <Pin Id="OiiwjPHYAxifB2q7GXC0zS" Name="Enabled" Kind="InputPin" />
-            <Pin Id="Fbeq052vSZGmW5R04dxfLc" Name="Form" Kind="OutputPin" />
-            <Pin Id="RSWti3SSqL9uKBmNX5edZy" Name="ClientBounds" Kind="OutputPin" />
-            <Pin Id="L89cLvTefYAnebrXsDMMQ8" Name="Render Time" Kind="OutputPin" />
+            <Pin Id="OwDmAbp65KgwOZNLBsjaNQ" Name="Input" Kind="InputPin" />
+            <Pin Id="AeB6vIRNaJOkR6VS4LSiA3" Name="Color" Kind="InputPin" />
+            <Pin Id="BDydlQS0dma44SbxK7nbYg" Name="Clear" Kind="InputPin" />
+            <Pin Id="Ic5eJWLRsdOMobvpVsfwVY" Name="Space" Kind="InputPin" />
+            <Pin Id="GJD3SQ8jqix4h9m7NLDkJV" Name="Show Cursor" Kind="InputPin" />
+            <Pin Id="RTCaTrZy74xJUtSofRdmoV" Name="VSync" Kind="InputPin" />
+            <Pin Id="Blp5QFEAH7J9toqsxvrsgu" Name="Enabled" Kind="InputPin" />
+            <Pin Id="Lx3NDFlUFmhllsvm26foZC" Name="Form" Kind="OutputPin" />
+            <Pin Id="Jr2zzJ7oofTlPZdW4N7nFL" Name="ClientBounds" Kind="OutputPin" />
+            <Pin Id="Pe86jv0ZZLRqy4UbkmEoiX" Name="Render Time" Kind="OutputPin" />
           </Node>
 
           <!-- The map itself, in its own window so the probe stays readable. -->
-          <Pad Id="LMRff9SFVBan4J6vjs7dAS" Comment="Longitude" Bounds="700,220,62,15" ShowValueBox="true" isIOBox="true" Value="139.7">
+          <Pad Id="N09AU0GPfmJ3KPGr6JiAhd" Comment="Longitude" Bounds="700,220,62,15" ShowValueBox="true" isIOBox="true" Value="139.7">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float64" />
             </p:TypeAnnotation>
           </Pad>
-          <Pad Id="Lr2Jbr3v8L0W2nPdijyN4h" Comment="Latitude" Bounds="780,220,62,15" ShowValueBox="true" isIOBox="true" Value="35.68">
+          <Pad Id="UEIZ1nj5XgmVhXKxRP7C3H" Comment="Latitude" Bounds="780,220,62,15" ShowValueBox="true" isIOBox="true" Value="35.68">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float64" />
             </p:TypeAnnotation>
           </Pad>
-          <Pad Id="AGPhKEy645b7yl85VyV7Zf" Comment="Zoom Level" Bounds="860,220,50,15" ShowValueBox="true" isIOBox="true" Value="12">
+          <Pad Id="TnfRHYVm4abpB5aP6QSoom" Comment="Zoom Level" Bounds="860,220,50,15" ShowValueBox="true" isIOBox="true" Value="12">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Integer32" />
             </p:TypeAnnotation>
           </Pad>
 
-          <Node Bounds="700,270,175,19" Id="TFk2QX4tI1CqAusuRRq8gB">
-            <p:NodeReference LastCategoryFullName="Mapsui.Map" LastDependency="VL.Mapsui.csproj">
+          <!--
+            A process node, not an operation. Written as a static method this was re-evaluated
+            every frame, so it built a fresh map and tile layer sixty times a second and never
+            released one: 17,000 TCP connections, the machine's ephemeral ports exhausted, and
+            a home network taken down. It is also why nothing was ever drawn, since tiles kept
+            arriving for a map that had already been discarded.
+
+            ProcessAppFlag is what makes vvvv build it once and call Update per frame.
+          -->
+          <Node Bounds="700,270,180,19" Id="LknvD7RmGmp8nkXIRmQcAd">
+            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.csproj">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="CreateOpenStreetMap" />
+              <Choice Kind="ProcessAppFlag" Name="OpenStreetMap" />
             </p:NodeReference>
-            <Pin Id="PaGyprb8NHKyXGg0qD4Ojj" Name="Center Longitude" Kind="InputPin" />
-            <Pin Id="UsRgGO8hTOCDMYaxyqYsEf" Name="Center Latitude" Kind="InputPin" />
-            <Pin Id="LnpkBOpFJlmElbd7rfNIax" Name="Zoom Level" Kind="InputPin" />
-            <Pin Id="CQhlYKvaJhLlFvXDqs2H4t" Name="Result" Kind="OutputPin" />
+            <Pin Id="JHdaCQJH4f4Fbii7jl24dA" Name="Center Longitude" Kind="InputPin" />
+            <Pin Id="ULgYBgP6qkDeC60Kctgaft" Name="Center Latitude" Kind="InputPin" />
+            <Pin Id="TtsJy6ourVXdrelh5bdCSg" Name="Zoom Level" Kind="InputPin" />
+            <Pin Id="UD5oj2VDxQxI3gilKfKXYw" Name="Enabled" Kind="InputPin" />
+            <Pin Id="LSX7gs2XRGUJeoX0Tr4Ign" Name="Diagnostics" Kind="InputPin" />
+            <Pin Id="Ejc1xkCfJUfszldr3CFjKY" Name="Result" Kind="OutputPin" />
           </Node>
 
-          <Node Bounds="700,310,120,19" Id="BK48WIR8OJwGSGQpYFQ7RC">
-            <p:NodeReference LastCategoryFullName="Mapsui.Map" LastDependency="VL.Mapsui.csproj">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="ToSkiaLayer" />
-            </p:NodeReference>
-            <Pin Id="U660mUbEyYf0Cmi3O0Vc3n" Name="Map" Kind="InputPin" />
-            <Pin Id="EVAYn9i1WpIxX444WJomva" Name="Result" Kind="OutputPin" />
-          </Node>
+          <!--
+            Off by default, and that is the point. In vvvv opening a document runs it, so a map
+            that fetches on open gives whoever opened it no chance to decline. Switch it on
+            deliberately, watch the "maps built" counter stay at 1, and switch it off again.
+          -->
+          <Pad Id="GdUs9aioe1ZOP6xNOTLGLJ" Comment="Enabled" Bounds="960,220,35,35" ShowValueBox="true" isIOBox="true" Value="false">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
 
-          <Node Bounds="700,360,165,19" Id="KSjWOaFNxDW66cHa6AQpDx">
+          <!--
+            On by default while bringing the package up. An empty map window says nothing about
+            why it is empty; a resolution of 0 says Home never ran, and an empty layer list says
+            the map was never populated.
+          -->
+          <Pad Id="VNnNeyqqIbd9YGL9ljRLNI" Comment="Diagnostics" Bounds="900,220,35,35" ShowValueBox="true" isIOBox="true" Value="true">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
+
+          <Node Bounds="700,360,165,19" Id="JLffwbIMsamn1fMI5ErPi4">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
             </p:NodeReference>
-            <Pin Id="LgQKBaxI16ZajWqmvOjhCE" Name="Bounds" Kind="InputPin" DefaultValue="760, 120, 640, 520">
+            <Pin Id="KjhKe0dUk9esaScFHQsQ8p" Name="Bounds" Kind="InputPin" DefaultValue="760, 120, 640, 520">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
             </Pin>
-            <Pin Id="RBVC84ASUpQSe5G6HxIHYl" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
+            <Pin Id="TbHTfh1MSVrCE8bfW44J1q" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
-            <Pin Id="SSVIqHAqV6dszWFKbVERd0" Name="Input" Kind="InputPin" />
-            <Pin Id="FquPa3meLqCHzTezyLfD9B" Name="Color" Kind="InputPin" />
-            <Pin Id="BkPEaFXAMmc9aR2kPSONzz" Name="Clear" Kind="InputPin" />
-            <Pin Id="SUtvRMGgPahYQwtJyTk4rT" Name="Space" Kind="InputPin" />
-            <Pin Id="FaaoTtLNugGzx7SRkcfquE" Name="Show Cursor" Kind="InputPin" />
-            <Pin Id="L1oU3GLTslNic6t9V3v5ig" Name="VSync" Kind="InputPin" />
-            <Pin Id="IRo6ZEsH078iOrqGtqGQKD" Name="Enabled" Kind="InputPin" />
-            <Pin Id="D3hYUDPei6LAwlbAlcjJUP" Name="Form" Kind="OutputPin" />
-            <Pin Id="UV7GBs4S39SkxseSCFC55j" Name="ClientBounds" Kind="OutputPin" />
-            <Pin Id="PQgHrdZqlbxXU1WEcADVzs" Name="Render Time" Kind="OutputPin" />
+            <Pin Id="B7RDc1GQdJyMGnxvJPpGTD" Name="Input" Kind="InputPin" />
+            <Pin Id="QnfhRkcJW3TkKNaFGtyNzG" Name="Color" Kind="InputPin" />
+            <Pin Id="K0YdTtcpRVuR7Ta3MtEoGX" Name="Clear" Kind="InputPin" />
+            <Pin Id="RFBLT0vHQBA38EgpeuEsws" Name="Space" Kind="InputPin" />
+            <Pin Id="Atv1B1vl4f39CcLr4NS5pT" Name="Show Cursor" Kind="InputPin" />
+            <Pin Id="MeObcU0SsFGXFH0T2L64pC" Name="VSync" Kind="InputPin" />
+            <Pin Id="KDwJwhNtAurY08KJYP74rE" Name="Enabled" Kind="InputPin" />
+            <Pin Id="Ha5jj0dxU1kGCx8KOIC5hX" Name="Form" Kind="OutputPin" />
+            <Pin Id="NgoTnOk4kmyeSGVQ1zu9i1" Name="ClientBounds" Kind="OutputPin" />
+            <Pin Id="TwdIVw7P7gaqDf0pqukyg2" Name="Render Time" Kind="OutputPin" />
           </Node>
 
         </Canvas>
-        <Patch Id="Fa6wlmznkFvZKJsD8lhThL" Name="Create" />
-        <Patch Id="V4s4buAHJQ9BDTOzg2NaO7" Name="Update" />
-        <ProcessDefinition Id="LppCHgt9eab1tA6kCpFMZh">
-          <Fragment Id="MGINlHfyCgND6o4FqeXTtF" Patch="Fa6wlmznkFvZKJsD8lhThL" Enabled="true" />
-          <Fragment Id="Il7TDUwY8LmbDGk201IUvk" Patch="V4s4buAHJQ9BDTOzg2NaO7" Enabled="true" />
+        <Patch Id="M9YdMSGnNuzAQW7WJ02uW8" Name="Create" />
+        <Patch Id="Uyl1k9DzAfDdEW7VKX2QrQ" Name="Update" />
+        <ProcessDefinition Id="EefAebPaojKZCmwbeQNHDk">
+          <Fragment Id="NhztMZSVD8x4uCEggyAA0M" Patch="M9YdMSGnNuzAQW7WJ02uW8" Enabled="true" />
+          <Fragment Id="S7IeWdBgA8DwwcjlAI5nsV" Patch="Uyl1k9DzAfDdEW7VKX2QrQ" Enabled="true" />
         </ProcessDefinition>
-        <Link Id="BAcCfNtDZ0tsUcLwAydoDy" Ids="LEH6epwg1RYjoIRglHZSFE,O3B9VE0RklH6FlzpuuTlQg" />
-        <Link Id="SzNAieKZzzMEfjiXmnT2FI" Ids="DOm1TZ5XHvhwOiG1ypH6Ly,LwR6FFhXHTHiRZ9mNH5IhD" />
-        <Link Id="PjqRovt55rkdnzgR03ZtJG" Ids="UCsTxBqx59l8zOEGGBDZl2,LHev7DD3kYwBN9tOtn5p3l" />
-        <Link Id="LjRrtMfF5Ut4rt2wektQ68" Ids="RSWti3SSqL9uKBmNX5edZy,BKJ4hc9TyiFpQ7LcUmkQPi" />
-        <Link Id="EzMTY5Sn9yLVfOo8lf0Y3t" Ids="LMRff9SFVBan4J6vjs7dAS,PaGyprb8NHKyXGg0qD4Ojj" />
-        <Link Id="O4gcaOUWqiBurYzraSMOAc" Ids="Lr2Jbr3v8L0W2nPdijyN4h,UsRgGO8hTOCDMYaxyqYsEf" />
-        <Link Id="ORmqmge6TCZArczEXLxupF" Ids="AGPhKEy645b7yl85VyV7Zf,LnpkBOpFJlmElbd7rfNIax" />
-        <Link Id="Mb64NFTwG6Ky2KUMkKcNzr" Ids="CQhlYKvaJhLlFvXDqs2H4t,U660mUbEyYf0Cmi3O0Vc3n" />
-        <Link Id="GqHb8NgceY9AVrKgODQUCx" Ids="EVAYn9i1WpIxX444WJomva,SSVIqHAqV6dszWFKbVERd0" />
+        <Link Id="QPMvmRbutjVpX6s3sw3aF2" Ids="Ofr3PN0FBublJGRJxZCsWF,OwDmAbp65KgwOZNLBsjaNQ" />
+        <Link Id="DURpYIabjpSdtN4wanKVhV" Ids="RAPqGWluaAUM7Of7xSxOry,Ic5eJWLRsdOMobvpVsfwVY" />
+        <Link Id="Qa0eDApUkNaWqPtkFQyshy" Ids="Q6FR0yGuCkmuOuhqvQCgRL,AeB6vIRNaJOkR6VS4LSiA3" />
+        <Link Id="PAft8fiWTNTCOSCaLJZWWK" Ids="Jr2zzJ7oofTlPZdW4N7nFL,NRrNZHKfqWX4dOJ4rtXPZL" />
+        <Link Id="QcgpbmY6TqQo23gwc9HVSv" Ids="N09AU0GPfmJ3KPGr6JiAhd,JHdaCQJH4f4Fbii7jl24dA" />
+        <Link Id="Piq9MjNGFUCvfKlpkjd2am" Ids="UEIZ1nj5XgmVhXKxRP7C3H,ULgYBgP6qkDeC60Kctgaft" />
+        <Link Id="Hcj7FIVdbFQtjd3WiMzXBT" Ids="TnfRHYVm4abpB5aP6QSoom,TtsJy6ourVXdrelh5bdCSg" />
+        <Link Id="Fqqn9ln6OrwkCkSMBCkY93" Ids="VNnNeyqqIbd9YGL9ljRLNI,LSX7gs2XRGUJeoX0Tr4Ign" />
+        <Link Id="CRkn14Cde6vxXbFxpxLYCq" Ids="Ejc1xkCfJUfszldr3CFjKY,B7RDc1GQdJyMGnxvJPpGTD" />
+        <Link Id="GlneCnoXDuhbACL4zHXsKO" Ids="GdUs9aioe1ZOP6xNOTLGLJ,UD5oj2VDxQxI3gilKfKXYw" />
       </Patch>
     </Node>
   </Patch>
-  <ProjectDependency Id="QUzxtBgwLRJqi32QNoQiCB" Location="../src/VL.Mapsui/VL.Mapsui.csproj" />
+  <ProjectDependency Id="FNJxXe91bDb7G7baLKl9Au" Location="../src/VL.Mapsui/VL.Mapsui.csproj" />
 </Document>

@@ -55,6 +55,62 @@ Precedent to copy rather than reinvent: **`VL.ImGui.ToSkiaLayer` implements `ILa
 solves the identical problem of a pixel-based third-party renderer drawing into VL.Skia. Its
 shape is `canvas.Save()` → `canvas.SetMatrix(...)` → draw → `canvas.Restore()`.
 
+### Two silent failures found while bringing the spike up
+
+**1. VL builds no node for a method whose signature names a type it has not imported.**
+
+`DiagnosticsLayer()` returned `VL.Skia.ILayer` and worked. `CreateOpenStreetMap()` returned
+`Mapsui.Map` and `ToSkiaLayer(Mapsui.Map)` took one, and both were greyed out. The dividing line
+was exactly "does the signature mention a Mapsui type", which is what gave it away.
+
+What "greyed out" actually means here: the node is **absent from the compiled program**, and
+every link to it is dropped. The compiled export showed
+`Renderer_20.Update(Input_In: Input_21, ...)` — a default local — where the map layer should
+have been, while the working renderer had `Input_In: Result_7`. No error, no red node, nothing
+in the log.
+
+VL learns a foreign library's types from a `<NugetDependency>` in the `.vl`. This spike is
+loaded through a `ProjectDependency` and declares none, so the fix for now is to keep Mapsui
+types out of public signatures. Exposing `Map` is the better API and returns with the nuspec —
+that is how VL.GIS surfaces BruTile's `IHttpTileSource`.
+
+Worth noting what was *not* the cause: a first guess blamed missing assemblies and added
+`CopyLocalLockFileAssemblies`. It changed nothing — Mapsui.dll was in the export all along.
+Keep the setting anyway, since a class library otherwise emits its assembly alone.
+
+**2. `Mapsui.Map.Home` is the host's job, and there is no host here.**
+
+Mapsui's own `MapControl` calls `Home` once the viewport has a size; `Home` carries the initial
+centre and zoom, and cannot run earlier because a zoom level is meaningless without a size. With
+nobody calling it the map renders at the default resolution, which shows nothing at all. The
+layer now does what a host does: `SetSize` → `Home` once guarded by `HomeIsCalledOnce` →
+`OnViewportSizeInitialized` → `Refresh`, then `UpdateAnimations` every frame.
+
+### The real blocker was five months of leftovers, not Mapsui
+
+With both of the above fixed the node finally ran, and threw the exact ABI break from 2026-08-10:
+
+```
+TypeLoadException: Could not load type 'BruTile.Attribution' from assembly
+'Mapsui.Tiling, Version=4.1.9.0' due to value type mismatch.
+```
+
+Our output folder held the correct BruTile 5.0.6, and so did the `vvvvc` export. The BruTile 6
+came from `%LOCALAPPDATA%\vvvv\gamma\nugets\BruTile.6.0.0`.
+
+**That folder is flat — one version of each library, shared by everything vvvv loads — and it
+wins over a copy sitting next to your own assembly.** It got there on 2026-02-28 when VL.GIS was
+installed from nuget.org, together with `BruTile.MbTiles.6.0.0` and an SQLite stack, because
+VL.GIS's first build declared MbTiles before commit `c75f12f` removed it five minutes earlier.
+
+**Uninstalling a package does not remove its dependencies.** VL.GIS itself was long gone from
+that folder; its dependencies were still sitting there with nothing referencing them. Both
+BruTile packages were moved to `_nugets-backup-VL.GIS\` (moved, not deleted).
+
+Checked while we were there: on all of nuget.org the only `VL.*` package that touches BruTile is
+VL.GIS, and vvvv's own install directory contains no BruTile at all. There is **no official vvvv
+map or GIS pack** — nothing here is duplicating work upstream.
+
 ### Still open
 
 - nuget.org has nothing newer: Mapsui tops out at 4.1.9 and 5.1.0
@@ -63,5 +119,9 @@ shape is `canvas.Save()` → `canvas.SetMatrix(...)` → draw → `canvas.Restor
   bypasses VL's coordinate space, which is the only part that can plausibly break. VL.GIS made
   exactly that mistake and lost a day to it.
 - `VL.Skia.Sizing` documents one unit as **100 actual pixels**, which contradicts what VL.GIS's
-  notes currently claim about `DIPTopLeft`. The spike patch reads `ClientBounds` so this can be
-  settled rather than argued.
+  notes currently claim about `DIPTopLeft`. Measured so far, in the spike's left window:
+  `Normalized` gives Pos (-1.267297, -1), Size (2.594595, 2.00) — height is always 2 and width
+  is 2 × aspect ratio. `DIPTopLeft` is still unmeasured; switching the Space dropdown and
+  reading `ClientBounds` settles it, and VL.GIS's docs should be corrected either way.
+- The layer resets the canvas matrix itself rather than trusting `Space`, and that was confirmed
+  the way it should be: changing the dropdown does not move the diagnostics box.

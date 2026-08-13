@@ -17,11 +17,11 @@ $keys = @(
     'padNote','padLon','padLat','padZoom','padSpace','padClient','padColor',
     'nDiag','diagOut',
     'nMap','mapLon','mapLat','mapZoom','mapOut',
-    'nLayer','layMap','layOut',
+    'nLayer','layMap','layDiag','layOut','padDiag','padEnabled','mapEnabled',
     'nR1','r1Bounds','r1Bound','r1Input','r1Color','r1Clear','r1Space','r1Cursor','r1VSync','r1Enabled','r1Form','r1Client','r1Time',
     'nR2','r2Bounds','r2Bound','r2Input','r2Color','r2Clear','r2Space','r2Cursor','r2VSync','r2Enabled','r2Form','r2Client','r2Time'
 )
-$linkKeys = 1..9 | ForEach-Object { "l$_" }
+$linkKeys = 1..11 | ForEach-Object { "l$_" }
 
 $ids = @(& (Join-Path $PSScriptRoot 'New-VLId.ps1') -Count ($keys.Count + $linkKeys.Count))
 $id = @{}; $i = 0
@@ -30,7 +30,7 @@ $link = @{}
 foreach ($k in $linkKeys) { $link[$k] = $ids[$i]; $i++ }
 
 $note = @'
-VL.Mapsui spike. One question: does a Mapsui map reach the screen inside vvvv?&#xD;&#xA;&#xD;&#xA;LEFT window is the probe, and it draws nothing but what it measured. Read it before looking at the map. An orange 200x120 box at pixel (40,40) plus a few lines of text means pixel-space handling works, and anything still wrong after that is Mapsui's. No box at all means the layer never rendered. A box of the wrong size means the matrix is wrong.&#xD;&#xA;&#xD;&#xA;Change the Space dropdown and the box must NOT move. That is the point: the layer resets the canvas matrix itself instead of trusting a pin whose wrong value is silently replaced by the default.&#xD;&#xA;&#xD;&#xA;RIGHT window is the map. Tiles arrive over the network, so give it a moment.&#xD;&#xA;&#xD;&#xA;Do not launch vvvv with VL.GIS loaded: it uses BruTile 6 and Mapsui.Tiling needs BruTile 5.
+VL.Mapsui spike. One question: does a Mapsui map reach the screen inside vvvv?&#xD;&#xA;&#xD;&#xA;LEFT window is the probe, and it draws nothing but what it measured. Read it before looking at the map. An orange 200x120 box at pixel (40,40) plus a few lines of text means pixel-space handling works, and anything still wrong after that is Mapsui's. No box at all means the layer never rendered. A box of the wrong size means the matrix is wrong.&#xD;&#xA;&#xD;&#xA;Change the Space dropdown and the box must NOT move. That is the point: the layer resets the canvas matrix itself instead of trusting a pin whose wrong value is silently replaced by the default.&#xD;&#xA;&#xD;&#xA;RIGHT window is the map, and it is OFF until you switch Enabled on. Opening a document in vvvv runs it, so a map that fetched on open would give you no chance to decline.&#xD;&#xA;&#xD;&#xA;When you do switch it on, watch the first line of the overlay: maps built must reach 1 and STOP. If it climbs, close vvvv at once - a map is being rebuilt every frame, which starts a fresh round of tile requests each time. That exhausted a machine of ephemeral ports and took a home network down. OpenStreetMap runs on donated infrastructure and its tile policy forbids bulk requests.&#xD;&#xA;&#xD;&#xA;Do not launch vvvv with VL.GIS loaded: it uses BruTile 6 and Mapsui.Tiling needs BruTile 5.
 '@ -replace "`r?`n", ''
 
 $xml = @"
@@ -133,25 +133,55 @@ $xml = @"
             </p:TypeAnnotation>
           </Pad>
 
-          <Node Bounds="700,270,175,19" Id="$($id.nMap)">
-            <p:NodeReference LastCategoryFullName="Mapsui.Map" LastDependency="VL.Mapsui.csproj">
+          <!--
+            A process node, not an operation. Written as a static method this was re-evaluated
+            every frame, so it built a fresh map and tile layer sixty times a second and never
+            released one: 17,000 TCP connections, the machine's ephemeral ports exhausted, and
+            a home network taken down. It is also why nothing was ever drawn, since tiles kept
+            arriving for a map that had already been discarded.
+
+            ProcessAppFlag is what makes vvvv build it once and call Update per frame.
+          -->
+          <Node Bounds="700,270,180,19" Id="$($id.nMap)">
+            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.csproj">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="CreateOpenStreetMap" />
+              <Choice Kind="ProcessAppFlag" Name="OpenStreetMap" />
             </p:NodeReference>
             <Pin Id="$($id.mapLon)" Name="Center Longitude" Kind="InputPin" />
             <Pin Id="$($id.mapLat)" Name="Center Latitude" Kind="InputPin" />
             <Pin Id="$($id.mapZoom)" Name="Zoom Level" Kind="InputPin" />
+            <Pin Id="$($id.mapEnabled)" Name="Enabled" Kind="InputPin" />
+            <Pin Id="$($id.layDiag)" Name="Diagnostics" Kind="InputPin" />
             <Pin Id="$($id.mapOut)" Name="Result" Kind="OutputPin" />
           </Node>
 
-          <Node Bounds="700,310,120,19" Id="$($id.nLayer)">
-            <p:NodeReference LastCategoryFullName="Mapsui.Map" LastDependency="VL.Mapsui.csproj">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="ToSkiaLayer" />
-            </p:NodeReference>
-            <Pin Id="$($id.layMap)" Name="Map" Kind="InputPin" />
-            <Pin Id="$($id.layOut)" Name="Result" Kind="OutputPin" />
-          </Node>
+          <!--
+            Off by default, and that is the point. In vvvv opening a document runs it, so a map
+            that fetches on open gives whoever opened it no chance to decline. Switch it on
+            deliberately, watch the "maps built" counter stay at 1, and switch it off again.
+          -->
+          <Pad Id="$($id.padEnabled)" Comment="Enabled" Bounds="960,220,35,35" ShowValueBox="true" isIOBox="true" Value="false">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
+
+          <!--
+            On by default while bringing the package up. An empty map window says nothing about
+            why it is empty; a resolution of 0 says Home never ran, and an empty layer list says
+            the map was never populated.
+          -->
+          <Pad Id="$($id.padDiag)" Comment="Diagnostics" Bounds="900,220,35,35" ShowValueBox="true" isIOBox="true" Value="true">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
 
           <Node Bounds="700,360,165,19" Id="$($id.nR2)">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
@@ -194,8 +224,9 @@ $xml = @"
         <Link Id="$($link.l5)" Ids="$($id.padLon),$($id.mapLon)" />
         <Link Id="$($link.l6)" Ids="$($id.padLat),$($id.mapLat)" />
         <Link Id="$($link.l7)" Ids="$($id.padZoom),$($id.mapZoom)" />
-        <Link Id="$($link.l8)" Ids="$($id.mapOut),$($id.layMap)" />
-        <Link Id="$($link.l9)" Ids="$($id.layOut),$($id.r2Input)" />
+        <Link Id="$($link.l8)" Ids="$($id.padDiag),$($id.layDiag)" />
+        <Link Id="$($link.l9)" Ids="$($id.mapOut),$($id.r2Input)" />
+        <Link Id="$($link.l11)" Ids="$($id.padEnabled),$($id.mapEnabled)" />
       </Patch>
     </Node>
   </Patch>
@@ -203,11 +234,19 @@ $xml = @"
 </Document>
 "@
 
-# XML forbids "--" inside a comment, everywhere and not just in MSBuild. A generator that emits
-# one produces a document that will not parse, so check before writing rather than after.
+# Check the document before writing it, not after. A .vl that fails to parse is not obviously
+# broken from inside vvvv - it simply does not load - so every mistake caught here is a round
+# trip saved.
+#
+# XML forbids "--" inside a comment, everywhere and not just in MSBuild.
 foreach ($m in [regex]::Matches($xml, '(?s)<!--(.*?)-->')) {
     if ($m.Groups[1].Value -match '--') { throw "XML comment contains '--'" }
 }
+
+# And parse the whole thing. A stray double quote inside an attribute value ends the attribute
+# early, which is how a sentence with a quoted phrase in it once broke this document.
+try { $null = [xml]$xml }
+catch { throw "generated document is not well-formed XML: $($_.Exception.Message)" }
 
 # UTF-8 *with* BOM. vvvv will not load the document without it.
 [IO.File]::WriteAllText($target, $xml, (New-Object System.Text.UTF8Encoding($true)))

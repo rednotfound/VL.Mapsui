@@ -13,18 +13,33 @@
     <Authors>VL.Mapsui Contributors</Authors>
     <Description>Mapsui as vvvv gamma nodes</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!--
+      Put every NuGet dependency next to the built assembly. A class library does not do this
+      by default: it emits VL.Mapsui.dll alone and leaves the host to resolve Mapsui, BruTile
+      and Svg.Skia from deps.json plus the NuGet cache.
+
+      vvvv does not resolve them that way when the project is pulled in through a
+      ProjectDependency, and the failure is quiet and easy to misread: nodes whose signatures
+      mention no Mapsui type work perfectly, while the ones returning or taking Mapsui.Map are
+      simply greyed out - not red, not logged, no exception anywhere. The dividing line is the
+      signature, which is what gives the cause away.
+    -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <!--
-      Both ship inside vvvv. They are referenced to compile against and must never be packed;
-      vvvv substitutes its own copy at runtime.
+      Both ship inside vvvv. ExcludeAssets="runtime" is what keeps our copies out of the output
+      folder while still compiling against them; without it CopyLocalLockFileAssemblies below
+      drops VL.Core.dll and VL.Core.Skia.dll next to our assembly, which is exactly the thing
+      every note in VL.GIS warns against.
 
       Pinned to 2025.7.4, which is what is installed here, so the minimum vvvv is 7.4. The
       attributes this package needs ([Name], [SkipCategory]) arrived in 7.2, so 2025.7.2 would
       also do and would widen the audience; revisit when there is a reason to care.
     -->
-    <PackageReference Include="VL.Core" Version="2025.7.4" />
-    <PackageReference Include="VL.Core.Skia" Version="2025.7.4" />
+    <PackageReference Include="VL.Core" Version="2025.7.4" ExcludeAssets="runtime" />
+    <PackageReference Include="VL.Core.Skia" Version="2025.7.4" ExcludeAssets="runtime" />
   </ItemGroup>
   <ItemGroup>
     <!--
