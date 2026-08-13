@@ -207,6 +207,12 @@ Get-NetTCPConnection | Where-Object { $_.OwningProcess -eq (Get-Process vvvv).Id
   `VL.ImGui.ToSkiaLayer` supplied the whole pixel-space approach here. `VL.IO.Redis` uses
   `[ProcessNode]` for a node owning a connection, and reading it first would have prevented the
   incident above.
+- **Opening a help patch in vvvv rewrites its `NugetDependency` version to whatever is installed,
+  and saving keeps it.** `0.0.0` became `0.0.1-alpha` that way, which would ask every user for that
+  exact version forever. Run `tools\Normalize-HelpPatches.ps1` after any GUI session.
+- **Validate before committing, in a separate step.** The rewrite above was caught by
+  `Test-VLPackage.ps1` in the same command block as the commit, so it was already pushed by the
+  time the FAIL printed. A check whose result arrives after the irreversible action is not a gate.
 - **Trace the whole chain, not one hop.** Surveying every shipped patch for what VL's
   `Wheel State` connects to found `FrameDifference`, which answered "it accumulates". Stopping
   there left the magnitude to a guess — Windows sends 120 per notch, VL sends 1 — and the symptom
