@@ -33,12 +33,6 @@ sealed class MapsuiLayer : ILayer, IDisposable
     /// <summary>Print Mapsui's viewport and layer state over the map.</summary>
     public bool Diagnostics { get; set; }
 
-    /// <summary>How many maps this process has built.</summary>
-    public int MapsBuilt { get; set; }
-
-    /// <summary>Set once a rebuild happened on two consecutive frames, which is the runaway.</summary>
-    public bool Runaway { get; set; }
-
     /// <summary>The map being drawn, so a patch can navigate it or add layers.</summary>
     public Map Map => _map;
 
@@ -46,8 +40,19 @@ sealed class MapsuiLayer : ILayer, IDisposable
     // a concrete rectangle would make downstream layout try to fit it.
     public Stride.Core.Mathematics.RectangleF? Bounds => null;
 
-    // Interaction comes after the map renders at all. Returning false leaves notifications for
-    // whatever else is in the scene graph rather than swallowing them.
+    /// <summary>
+    /// Notifications pass straight through.
+    /// </summary>
+    /// <remarks>
+    /// **Interaction is the patch's business, not this layer's.** An earlier version handled
+    /// drag and wheel in here, which quietly decided that the left button pans and the wheel
+    /// zooms, and left no way to drive the map from an LFO, an OSC message or a keyboard.
+    /// VL.Skia already has Mouse, MouseState and Notifications nodes; a patch reads those and
+    /// wires them to Mapsui.Navigate. That composition is the reason to reach for a patching
+    /// environment in the first place.
+    ///
+    /// Returning false leaves every notification for whatever else is in the scene graph.
+    /// </remarks>
     public bool Notify(INotification notification, CallerInfo caller) => false;
 
     public void Render(CallerInfo caller)
@@ -116,27 +121,11 @@ sealed class MapsuiLayer : ILayer, IDisposable
             Typeface = SKTypeface.FromFamilyName("Consolas"),
         };
 
-        canvas.DrawRect(SKRect.Create(0f, 0f, 460f, 150f), back);
+        canvas.DrawRect(SKRect.Create(0f, 0f, 480f, 152f), back);
 
         var y = 20f;
         void Line(string s) { canvas.DrawText(s, 8f, y, text); y += 16f; }
 
-        // First line, because it is the one that catches the runaway. The count alone is not the
-        // alarm: switching Enabled off and on rebuilds, quite correctly, so a number above one
-        // proves nothing. Rebuilding on two consecutive frames is what no hand can do.
-        using var warn = new SKPaint
-        {
-            Color = Runaway ? SKColors.OrangeRed : SKColors.LightGreen,
-            IsAntialias = true,
-            TextSize = 13f,
-            Typeface = SKTypeface.FromFamilyName("Consolas"),
-        };
-        canvas.DrawText(
-            Runaway
-                ? $"maps built {MapsBuilt}   REBUILT ON CONSECUTIVE FRAMES - close vvvv"
-                : $"maps built {MapsBuilt}   (rebuilds only when the tile source changes)",
-            8f, y, warn);
-        y += 16f;
 
         Line($"viewport   {v.Width:0} x {v.Height:0}   home called: {_map.HomeIsCalledOnce}");
         Line($"center     {v.CenterX:0.##}, {v.CenterY:0.##}   (spherical mercator metres)");
@@ -162,6 +151,7 @@ sealed class MapsuiLayer : ILayer, IDisposable
         {
             Line("cache      off - every restart refetches the same view");
         }
+
     }
 
     public void Dispose() => _map.Dispose();

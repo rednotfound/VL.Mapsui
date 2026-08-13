@@ -29,3 +29,6 @@ desktop.ini
 .idea/
 *.swp
 *~
+
+# Upstream packages installed by build.ps1 so VL can resolve their types.
+deps/

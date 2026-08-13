@@ -1,4 +1,4 @@
-using System.IO;
+using System;
 using System.Linq;
 using BruTile.Cache;
 using BruTile.Web;
@@ -13,52 +13,50 @@ namespace VL.Mapsui.Tests;
 /// OpenStreetMap's tile usage policy requires local caching — "Cache tiles locally according to
 /// HTTP caching headers (or at least 7 days if your cache cannot read them)" — and forbids the
 /// opposite thing, "any pre-emptive fetching of tiles other than those a user is actively
-/// viewing". Nothing here or in the node fetches anything; the cache only keeps what the map has
-/// already asked for.
+/// viewing". Nothing here or in the nodes fetches anything; the cache only keeps what the map
+/// has already asked for.
 ///
-/// These tests assert on **wiring**, not on files appearing: the assertion is that the tile
-/// source really carries a FileCache, which is what the diagnostics overlay reports too. Writing
-/// a tile would mean fetching one.
+/// These assert on **wiring**, not on files appearing: the assertion is that the tile source
+/// really carries a FileCache, which is what the diagnostics overlay reports too. Writing a tile
+/// would mean fetching one.
 /// </remarks>
 public class TileCacheTests
 {
-    static FileCache? AttachedCache(OpenStreetMapNode node)
-        => node.CurrentMap?.Layers
-            .OfType<global::Mapsui.Tiling.Layers.TileLayer>()
-            .Select(l => (l.TileSource as HttpTileSource)?.PersistentCache as FileCache)
-            .FirstOrDefault();
+    static FileCache? AttachedCache(global::Mapsui.Layers.ILayer? layer)
+        => ((layer as global::Mapsui.Tiling.Layers.TileLayer)?.TileSource as HttpTileSource)
+            ?.PersistentCache as FileCache;
 
     [Fact]
     public void The_tile_source_really_carries_a_disk_cache()
     {
-        // The overlay reports whether a cache is attached rather than whether one was asked for,
-        // because attaching happens through a type test that could silently not apply.
-        using var node = new OpenStreetMapNode();
-        node.Update(139.7, 35.68, 12, enabled: true, cacheToDisk: true);
+        // Attaching happens through a type test that could silently not apply, so it is worth
+        // asserting the result rather than the intent.
+        using var node = new OpenStreetMapLayerNode();
+        var layer = node.Update(out _, enabled: true, cacheToDisk: true);
 
-        Assert.NotNull(AttachedCache(node));
+        Assert.NotNull(AttachedCache(layer));
     }
 
     [Fact]
     public void Turning_the_cache_off_leaves_the_source_without_one()
     {
-        using var node = new OpenStreetMapNode();
-        node.Update(139.7, 35.68, 12, enabled: true, cacheToDisk: false);
+        using var node = new OpenStreetMapLayerNode();
+        var layer = node.Update(out _, enabled: true, cacheToDisk: false);
 
-        Assert.Null(AttachedCache(node));
+        Assert.Null(AttachedCache(layer));
     }
 
     [Fact]
-    public void Changing_the_cache_setting_rebuilds_once()
+    public void Changing_the_cache_setting_rebuilds_the_layer_once()
     {
-        // The cache is attached at construction, so it belongs to the map's identity. Without
+        // The cache is attached at construction, so it belongs to the layer's identity. Without
         // that, switching it on would appear to do nothing until something else changed.
-        using var node = new OpenStreetMapNode();
+        using var node = new OpenStreetMapLayerNode();
 
-        for (int frame = 0; frame < 10; frame++) node.Update(139.7, 35.68, 12, enabled: true, cacheToDisk: true);
-        for (int frame = 0; frame < 10; frame++) node.Update(139.7, 35.68, 12, enabled: true, cacheToDisk: false);
+        for (int frame = 0; frame < 10; frame++) node.Update(out _, enabled: true, cacheToDisk: true);
+        for (int frame = 0; frame < 10; frame++) node.Update(out _, enabled: true, cacheToDisk: false);
 
-        Assert.Equal(2, node.MapsBuiltHere);
+        Assert.Equal(2, node.LayersBuilt);
     }
 
     [Fact]
@@ -69,17 +67,15 @@ public class TileCacheTests
         var dir = TileCache.Directory;
 
         Assert.Contains("VL.Mapsui", dir);
-        Assert.StartsWith(
-            System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
-            dir);
-        Assert.False(dir.Contains("vl-mapsui", System.StringComparison.OrdinalIgnoreCase));
+        Assert.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dir);
+        Assert.False(dir.Contains("vl-mapsui", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
-    public void Stats_on_a_directory_that_does_not_exist_yet_reports_nothing()
+    public void Stats_survives_a_directory_that_does_not_exist_yet()
     {
         // Called from the render loop, so it has to survive the state before the first tile is
-        // ever written rather than throwing into a frame.
+        // written rather than throwing into a frame.
         var (tiles, bytes) = TileCache.Stats();
 
         Assert.True(tiles >= 0);
@@ -90,9 +86,8 @@ public class TileCacheTests
     public void Stats_does_not_walk_the_disk_on_every_call()
     {
         // Reading a directory once is cheap and sixty times a second is not, which is the same
-        // mistake that took a network down wearing different clothes. Repeated calls must be
-        // served from the remembered answer.
-        var first = TileCache.Stats();
+        // mistake that took a network down wearing different clothes.
+        TileCache.Stats();
         var sw = System.Diagnostics.Stopwatch.StartNew();
         for (int i = 0; i < 10_000; i++) TileCache.Stats();
         sw.Stop();

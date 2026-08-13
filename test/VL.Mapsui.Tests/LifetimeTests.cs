@@ -1,3 +1,4 @@
+using System.Linq;
 using VL.Mapsui;
 
 namespace VL.Mapsui.Tests;
@@ -6,191 +7,168 @@ namespace VL.Mapsui.Tests;
 /// Locks down the bug that took a home network offline.
 /// </summary>
 /// <remarks>
-/// The map node was a public static method, which VL evaluates on every frame. At 60fps it
-/// built a fresh Map and tile layer sixty times a second and released none: 17,085 TCP
-/// connections in 13 minutes, the machine's 16,384 ephemeral ports exhausted, DNS dead for
-/// every program on it. The same bug is why nothing ever rendered, since tiles kept arriving
-/// for maps that had already been discarded.
+/// The map used to be one node written as a public static method, which VL evaluates on every
+/// frame. At 60fps it built a fresh map and tile layer sixty times a second and released none:
+/// 17,085 TCP connections in 13 minutes, the machine's 16,384 ephemeral ports exhausted, DNS
+/// dead for every program on it. The same bug is why nothing ever rendered, since tiles kept
+/// arriving for maps that had already been discarded.
 ///
-/// Every test below is a frame loop. That is the shape of the failure, so it is the shape of
-/// the test: call Update many times and assert on how much got built.
+/// The package is now several nodes rather than one, so the same property has to hold in more
+/// places: **a frame loop with unchanged inputs must build nothing after the first frame**, in
+/// the layer, in the map, and across navigation.
+///
+/// Every test here is a frame loop, because that is the shape of the failure.
 /// </remarks>
 public class LifetimeTests
 {
-    const double Lon = 139.7;
-    const double Lat = 35.68;
-    const int Zoom = 12;
-
-    static OpenStreetMapNode Node() => new();
+    // ── The tile layer ────────────────────────────────────────────────────────
 
     [Fact]
-    public void A_hundred_frames_with_unchanged_inputs_build_one_map()
+    public void A_hundred_frames_with_unchanged_inputs_build_one_layer()
     {
         // The regression test. Under the old code this number was 100.
-        using var node = Node();
+        using var layer = new OpenStreetMapLayerNode();
 
         for (int frame = 0; frame < 100; frame++)
-            node.Update(Lon, Lat, Zoom, enabled: true);
+            layer.Update(out _, enabled: true);
 
-        Assert.Equal(1, node.MapsBuiltHere);
+        Assert.Equal(1, layer.LayersBuilt);
     }
 
     [Fact]
     public void The_same_layer_instance_comes_back_every_frame()
     {
-        // Identity matters as much as the count: a new layer each frame would throw away
-        // whatever the renderer had accumulated, even if the map underneath were reused.
-        using var node = Node();
+        // Identity matters as much as the count: a new layer each frame would discard every
+        // tile already fetched, even if the count somehow stayed low.
+        using var node = new OpenStreetMapLayerNode();
 
-        var first = node.Update(Lon, Lat, Zoom, enabled: true);
+        var first = node.Update(out _, enabled: true);
         for (int frame = 0; frame < 10; frame++)
-        {
-            var again = node.Update(Lon, Lat, Zoom, enabled: true);
-            Assert.Same(first, again);
-        }
+            Assert.Same(first, node.Update(out _, enabled: true));
     }
 
     [Fact]
     public void Nothing_is_built_until_enabled()
     {
-        // Opening a document in vvvv runs it. A map that fetches on open gives whoever opened
+        // Opening a document in vvvv runs it. A layer that fetches on open gives whoever opened
         // it no chance to decline, so the default has to cost nothing.
-        using var node = Node();
+        using var node = new OpenStreetMapLayerNode();
 
         for (int frame = 0; frame < 50; frame++)
-            Assert.Null(node.Update(Lon, Lat, Zoom, enabled: false));
+            Assert.Null(node.Update(out _, enabled: false));
 
-        Assert.Equal(0, node.MapsBuiltHere);
-    }
-
-    [Theory]
-    [InlineData(140.7, Lat, Zoom)]
-    [InlineData(Lon, 36.68, Zoom)]
-    [InlineData(Lon, Lat, 13)]
-    public void Moving_the_view_does_not_rebuild_the_map(double lon, double lat, int zoom)
-    {
-        // Where the map looks is the navigator's business. Rebuilding would throw away the tile
-        // layer, its memory cache and everything already fetched - and dragging changes the
-        // centre on every frame, so a rebuild-on-move design becomes a per-frame rebuild the
-        // moment interaction exists.
-        using var node = Node();
-
-        for (int frame = 0; frame < 20; frame++) node.Update(Lon, Lat, Zoom, enabled: true);
-        for (int frame = 0; frame < 20; frame++) node.Update(lon, lat, zoom, enabled: true);
-
-        Assert.Equal(1, node.MapsBuiltHere);
-        Assert.False(node.RebuiltOnConsecutiveFrames);
+        Assert.Equal(0, node.LayersBuilt);
     }
 
     [Fact]
-    public void A_centre_that_moves_every_frame_still_builds_one_map()
+    public void Layers_built_is_reported_on_the_output_pin()
     {
-        // What a drag looks like. Under a rebuild-on-move design this was 200.
-        using var node = Node();
+        // It is a pin rather than something hidden in an overlay so a patch can watch it. This
+        // failure was first noticed when a network died; a number that climbs shows it in
+        // seconds.
+        using var node = new OpenStreetMapLayerNode();
 
-        for (int frame = 0; frame < 200; frame++)
-            node.Update(Lon + frame * 0.001, Lat + frame * 0.001, Zoom, enabled: true);
+        node.Update(out var atStart, enabled: false);
+        Assert.Equal(0, atStart);
 
-        Assert.Equal(1, node.MapsBuiltHere);
-        Assert.False(node.RebuiltOnConsecutiveFrames);
+        node.Update(out var afterEnabling, enabled: true);
+        Assert.Equal(1, afterEnabling);
     }
 
     [Fact]
-    public void Toggling_enabled_by_hand_is_not_reported_as_a_runaway()
-    {
-        // The alarm has to survive ordinary use, or it gets ignored. Each toggle rebuilds, quite
-        // correctly, and none of them happens on consecutive frames.
-        using var node = Node();
-
-        for (int round = 0; round < 5; round++)
-        {
-            for (int frame = 0; frame < 10; frame++) node.Update(Lon, Lat, Zoom, enabled: true);
-            for (int frame = 0; frame < 10; frame++) node.Update(Lon, Lat, Zoom, enabled: false);
-        }
-
-        Assert.Equal(5, node.MapsBuiltHere);
-        Assert.False(node.RebuiltOnConsecutiveFrames);
-    }
-
-    [Fact]
-    public void Rebuilding_on_consecutive_frames_is_reported()
-    {
-        // Negative side of the alarm: something that really is a runaway must set it. Flipping
-        // the cache setting every frame is the cheapest way to force a rebuild each time.
-        using var node = Node();
-
-        for (int frame = 0; frame < 10; frame++)
-            node.Update(Lon, Lat, Zoom, enabled: true, cacheToDisk: frame % 2 == 0);
-
-        Assert.True(node.RebuiltOnConsecutiveFrames);
-    }
-
-    [Fact]
-    public void Toggling_diagnostics_does_not_rebuild()
-    {
-        // Diagnostics is deliberately not part of the map's identity. Rebuilding on it would
-        // discard every tile already fetched, which is both slow and rude to the tile server.
-        using var node = Node();
-
-        for (int frame = 0; frame < 20; frame++)
-            node.Update(Lon, Lat, Zoom, enabled: true, diagnostics: frame % 2 == 0);
-
-        Assert.Equal(1, node.MapsBuiltHere);
-    }
-
-    [Fact]
-    public void Disabling_releases_the_map_and_re_enabling_builds_a_fresh_one()
+    public void Disabling_releases_the_layer_and_re_enabling_builds_a_fresh_one()
     {
         // Switching off has to actually let go, or the gate only stops new work while the old
-        // map keeps its connections. The rebuild on the way back is the price of that.
-        using var node = Node();
+        // layer keeps its connections.
+        using var node = new OpenStreetMapLayerNode();
 
-        node.Update(Lon, Lat, Zoom, enabled: true);
-        Assert.Equal(1, node.MapsBuiltHere);
-
+        node.Update(out _, enabled: true);
         for (int frame = 0; frame < 10; frame++)
-            Assert.Null(node.Update(Lon, Lat, Zoom, enabled: false));
+            Assert.Null(node.Update(out _, enabled: false));
+        node.Update(out var built, enabled: true);
 
-        node.Update(Lon, Lat, Zoom, enabled: true);
-        Assert.Equal(2, node.MapsBuiltHere);
+        Assert.Equal(2, built);
     }
 
     [Fact]
-    public void An_input_change_while_disabled_does_not_build_anything()
-    {
-        using var node = Node();
-
-        for (int frame = 0; frame < 20; frame++)
-            node.Update(Lon + frame, Lat, Zoom, enabled: false);
-
-        Assert.Equal(0, node.MapsBuiltHere);
-    }
-
-    [Fact]
-    public void Dispose_is_safe_to_call_twice_and_after_use()
+    public void Dispose_is_safe_to_call_twice()
     {
         // VL disposes a process node when it leaves the patch, and a patch can be edited while
         // running. Throwing there would take the whole document down.
-        var node = Node();
-        node.Update(Lon, Lat, Zoom, enabled: true);
+        var node = new OpenStreetMapLayerNode();
+        node.Update(out _, enabled: true);
 
         node.Dispose();
         node.Dispose();
     }
 
+    // ── The map ───────────────────────────────────────────────────────────────
+
     [Fact]
-    public void Update_after_dispose_builds_again_rather_than_throwing()
+    public void A_hundred_frames_build_one_map()
     {
-        // Not a supported sequence, but it must fail softly: Dispose only releases, it does not
-        // put the node into a broken state.
-        var node = Node();
-        node.Update(Lon, Lat, Zoom, enabled: true);
-        node.Dispose();
+        using var map = new MapNode();
 
-        var layer = node.Update(Lon, Lat, Zoom, enabled: true);
+        for (int frame = 0; frame < 100; frame++)
+            map.Update();
 
-        Assert.NotNull(layer);
-        Assert.Equal(2, node.MapsBuiltHere);
-        node.Dispose();
+        Assert.Equal(1, map.MapsBuilt);
+    }
+
+    [Fact]
+    public void The_same_map_instance_comes_back_every_frame()
+    {
+        using var node = new MapNode();
+
+        var first = node.Update();
+        for (int frame = 0; frame < 10; frame++)
+            Assert.Same(first, node.Update());
+    }
+
+    [Fact]
+    public void The_layer_collection_is_left_alone_while_the_layers_are_the_same()
+    {
+        // Clearing and re-adding every frame would throw away each layer's fetched tiles, which
+        // is the per-frame-rebuild mistake one level up.
+        using var layerNode = new OpenStreetMapLayerNode();
+        using var mapNode = new MapNode();
+
+        var layer = layerNode.Update(out _, enabled: true);
+        var layers = new[] { layer! };
+
+        var map = mapNode.Update(layers);
+        var before = map.Layers.First();
+
+        for (int frame = 0; frame < 20; frame++) mapNode.Update(layers);
+
+        Assert.Single(map.Layers);
+        Assert.Same(before, map.Layers.First());
+    }
+
+    [Fact]
+    public void A_changed_layer_set_is_taken_up()
+    {
+        using var layerNode = new OpenStreetMapLayerNode();
+        using var mapNode = new MapNode();
+
+        var map = mapNode.Update(System.Array.Empty<global::Mapsui.Layers.ILayer>());
+        Assert.Empty(map.Layers);
+
+        var layer = layerNode.Update(out _, enabled: true);
+        mapNode.Update(new[] { layer! });
+
+        Assert.Single(map.Layers);
+    }
+
+    [Fact]
+    public void A_null_layer_is_ignored_rather_than_added()
+    {
+        // The layer node returns null while disabled, and that arrives here as a null in the
+        // spread. Adding it would throw inside Mapsui on the next render.
+        using var mapNode = new MapNode();
+
+        var map = mapNode.Update(new global::Mapsui.Layers.ILayer?[] { null }!);
+
+        Assert.Empty(map.Layers);
     }
 }

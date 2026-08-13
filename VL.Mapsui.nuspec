@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>VL.Mapsui</id>
+    <version>0.0.1-alpha</version>
+    <title>VL.Mapsui — Mapsui map engine nodes for vvvv gamma</title>
+    <authors>VL.Mapsui Contributors</authors>
+    <owners>VL.Mapsui Contributors</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/rednotfound/VL.Mapsui</projectUrl>
+    <description>
+      EARLY - not ready for real work yet.
+
+      Mapsui as nodes for vvvv gamma: a tile layer, a map that holds layers, navigation
+      operations, and a node that draws the map into VL.Skia.
+
+      Deliberately not one all-in-one map node. The pieces are Mapsui's own - Map, layers,
+      Navigator - so a patch composes them, decides for itself how the mouse drives the map,
+      and can put its own layers on it. That is what a patching environment is for.
+
+      Requires vvvv gamma 7.4 or newer (.NET 8).
+    </description>
+    <summary>Mapsui map engine as composable nodes for vvvv gamma.</summary>
+    <releaseNotes>
+      0.0.1-alpha - First package. Not published.
+    </releaseNotes>
+    <copyright>Copyright 2026 VL.Mapsui Contributors</copyright>
+    <!-- The "VL" tag is what makes the pack discoverable at https://vvvv.org/packs -->
+    <tags>VL vvvv gamma map mapsui gis openstreetmap tiles skia</tags>
+    <repository type="git" url="https://github.com/rednotfound/VL.Mapsui" />
+
+    <!--
+      These must match the NugetDependency lines in VL.Mapsui.vl. The .vl is what teaches VL
+      the types, so a node whose signature mentions Mapsui.Map only exists because Mapsui is
+      declared there; the nuspec is what makes the package resolvable for a consumer.
+
+      VL.Core, VL.Core.Skia, VL.CoreLib, VL.Skia and SkiaSharp are deliberately absent: they
+      ship inside vvvv, which substitutes its own copies for anything declared here.
+    -->
+    <dependencies>
+      <group targetFramework="net8.0">
+        <dependency id="Mapsui"                version="4.1.9" />
+        <dependency id="Mapsui.Tiling"         version="4.1.9" />
+        <dependency id="Mapsui.Rendering.Skia" version="4.1.9" />
+      </group>
+    </dependencies>
+  </metadata>
+
+  <files>
+    <!-- Entry point. Must sit at the package root, no subfolder. -->
+    <file src="VL.Mapsui.vl" target="" />
+
+    <file src="src\VL.Mapsui\bin\Release\net8.0\VL.Mapsui.dll" target="lib\net8.0\" />
+    <file src="src\VL.Mapsui\bin\Release\net8.0\VL.Mapsui.xml" target="lib\net8.0\" />
+
+    <!-- This package's own examples. target stays help\ because that is where vvvv looks. -->
+    <file src="help\VL.Mapsui\**\*.vl" target="help\" />
+
+    <file src="README.md"  target="docs\" />
+    <file src="NOTES.md"   target="docs\" />
+  </files>
+</package>

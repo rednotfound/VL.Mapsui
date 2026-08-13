@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document xmlns:p="property" xmlns:r="reflection" Id="Khlwq6HIrj0E8m8D7zyzC1" LanguageVersion="2024.6.7-0009-ga0a8422da0" Version="0.128">
+  <NugetDependency Id="TwVzndeBUP9PzlN8hiKKP1" Location="VL.CoreLib" Version="2025.7.0" />
+  <NugetDependency Id="KdWAqj12zv1YI9BuyfT0zw" Location="VL.Skia" Version="2025.7.0" />
+  <NugetDependency Id="BhPRhjEVwFzD76lMyYlP4D" Location="Mapsui" Version="4.1.9" />
+  <NugetDependency Id="VfIRfgtyOCMRPootau27LP" Location="Mapsui.Tiling" Version="4.1.9" />
+  <NugetDependency Id="DFZbuOs18UewjPmtzRlxNE" Location="Mapsui.Rendering.Skia" Version="4.1.9" />
+  <Patch Id="LVkoJXByLMF5JQz9FpO910">
+    <Canvas Id="AhuURXyh7Pvvv7k8RuOlFF" DefaultCategory="Mapsui" CanvasType="FullCategory" />
+    <!--
+
+    ************************ Application ************************
+
+-->
+    <Node Name="Application" Bounds="100,100" Id="HEH6GCikV74ZnCiG2yy0q5">
+      <p:NodeReference>
+        <Choice Kind="ContainerDefinition" Name="Process" />
+        <FullNameCategoryReference ID="Primitive" />
+      </p:NodeReference>
+      <Patch Id="Q91j2rsFpHciTrsj66Tpt5">
+        <Canvas Id="O8XlimpphIcCMmUsfviP7Q" CanvasType="Group" />
+        <Patch Id="Q3EnzFplsZH0OZU1wtqnUM" Name="Create" />
+        <Patch Id="TcanusW3pbNB20KAgABINz" Name="Update" />
+        <ProcessDefinition Id="UphWOWnuYJ0aHYRG9Kj4P9">
+          <Fragment Id="ESxIfqyLVyyPdTz4FYhzb4" Patch="Q3EnzFplsZH0OZU1wtqnUM" Enabled="true" />
+          <Fragment Id="Hm5Afs1knC6G3LeLOlfH8l" Patch="TcanusW3pbNB20KAgABINz" Enabled="true" />
+        </ProcessDefinition>
+      </Patch>
+    </Node>
+  </Patch>
+  <PlatformDependency Id="Ab7OG9RF69TsW7YYdvmKgK" Location="./lib/net8.0/VL.Mapsui.dll" IsForward="true" />
+</Document>
