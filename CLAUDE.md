@@ -45,6 +45,18 @@ writing any node; the four questions at the top of it would have prevented both.
    consecutive frames**, which nothing done by hand can produce. A raw count is not the alarm —
    toggling `Enabled` rebuilds, quite correctly, and an earlier version cried wolf for it. If
    the line goes red, close vvvv immediately.
+6. **A machine-dependent default is a node, not a pin's initial value**, and a path pin is
+   `VL.Lib.IO.Path` rather than `string`. Both are settled facts, not preferences: a C# default
+   parameter value must be a compile-time constant (`CS1736`), so a folder built from
+   `Environment.GetFolderPath` cannot be one — and hardcoding a literal would ship this machine's
+   path inside the node, which is what `VL.Audio.vl`'s `Filename` pin does (`C:\temp\foo.wav`).
+   vvvv's own answer is `SystemFolder [IO]`, a node that *yields* the path; `Mapsui.Layers.CacheFolder`
+   copies it. Type the pin `VLPath?` with `= null` (`null` is a constant) and resolve empty
+   internally. Details in `NOTES.md`, 2026-08-13.
+7. **Adding a pin is not finished until an IOBox reaches it.** A pin with no pad connected is
+   unreachable in the patch, and `vvvvc` compiles it without complaint as a literal
+   (`string Cache_Folder_11 = @"";`). A compile proving the pin exists proves nothing about
+   whether anyone can set it — that cost a whole test round here.
 
 ## Packaging rules inherited from VL.GIS
 
@@ -55,9 +67,14 @@ see [`../vvvv-gis/docs/VL-PACKAGING.md`](../vvvv-gis/docs/VL-PACKAGING.md).
   are invisible with no warning anywhere. Already in `src/VL.Mapsui/AssemblyInfo.cs`.
 - A `.vl` is **UTF-8 with BOM**, and every `Id` is exactly 22 characters, first `[A-V]`, rest
   `[0-9A-Za-z]`, unique in the document. `tools\New-VLId.ps1` generates them.
-- **Regenerate a `.vl`, never edit one in place.** `tools\Build-SpikePatch.ps1` emits the whole
-  document and parses it before writing; patching in place once produced thirteen duplicated
-  nodes and six colliding IDs elsewhere.
+- **The checked-in `.vl` is the source of truth; the generators under `tools\legacy\` are
+  retired.** This reverses the earlier rule "regenerate, never edit in place", which was written
+  when patching in place produced thirteen duplicated nodes and six colliding IDs. Regenerating
+  turned out to be the more destructive of the two once a patch was in use: it discarded a layout
+  arranged by hand in the GUI. So editing in place is now the only route, and the mitigation moved
+  from *avoid it* to **validate every edit**: anchor each insertion on a match that occurs exactly
+  once (fail loudly otherwise), then check ID legality and uniqueness, dangling link endpoints, the
+  BOM, an XML parse, `tools\Test-VLPackage.ps1`, and a `vvvvc` compile of each patch.
 - `VL.Core` and `VL.Core.Skia` are referenced with `ExcludeAssets="runtime"` — they ship inside
   vvvv and our copies must never be distributed. **SkiaSharp is deliberately not pinned**:
   Mapsui.Rendering.Skia wants ≥ 2.88.9 and vvvv has 2.88.8, so pinning vvvv's version fails
@@ -68,7 +85,17 @@ see [`../vvvv-gis/docs/VL-PACKAGING.md`](../vvvv-gis/docs/VL-PACKAGING.md).
 ## The tile cache
 
 `%LOCALAPPDATA%\VL.Mapsui\tiles`, as `{zoom}/{x}/{y}.png`, expiring after 7 days. Delete the
-folder to reset; there is a `Cache To Disk` pin to turn it off.
+folder to reset; `Cache To Disk` turns it off and `Cache Folder` moves it — empty means the default
+above, and `Mapsui.Layers.CacheFolder` shows what that resolved to without switching a layer on.
+
+The folder is part of the layer's **rebuild identity** (the cache is attached at construction), so
+changing it rebuilds once — compared case-insensitively and trimmed, since Windows paths that differ
+only in case are the same folder and refetching every tile for that would be absurd. Two failures
+are deliberately *not* silent: an unusable folder and a **relative** one are both reported on
+`Cache Status` with the cache left off, rather than falling back to the default. Files appearing
+somewhere nobody asked for, with nothing to say so, is the worse outcome — and a relative path
+cannot be honestly rooted here, which matters because a Path IOBox stores relative whenever it can
+and hides that from you.
 
 **Only tiles that were drawn are stored**, which is what OSM's policy requires; the thing it
 forbids is pre-emptive fetching of tiles nobody is looking at. Measured: a session over Tokyo at

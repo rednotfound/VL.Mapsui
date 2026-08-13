@@ -2,7 +2,7 @@
 <Document xmlns:p="property" xmlns:r="reflection" Id="I4hIadDDdoVyqg12xj3ejr" LanguageVersion="2025.7.4" Version="0.128">
   <NugetDependency Id="SIMDywDLwNbQ5UdOPHQxYD" Location="VL.CoreLib" Version="2025.7.4" />
   <NugetDependency Id="Sm17wEPgUJCVB75op3gzPF" Location="VL.Skia" Version="2025.7.4" />
-  <NugetDependency Id="CCoTJSCcdlnfZwmjUnPFVB" Location="VL.Mapsui" Version="0.0.0" />
+  <NugetDependency Id="CCoTJSCcdlnfZwmjUnPFVB" Location="VL.Mapsui" Version="0.0.1-alpha" />
   <Patch Id="FJzZkKqVfW12i9kQk6L0hz">
     <Canvas Id="N0E8bKG5vqG1aLaGsfcogC" DefaultCategory="Main" CanvasType="FullCategory" />
     <!--
@@ -50,9 +50,11 @@
             <Pin Id="Usi9xynIVqJWvRhEvGVOYQ" Name="Enabled" Kind="InputPin" />
             <Pin Id="MRc5yVuyw9pbbASUSN49D8" Name="Cache To Disk" Kind="InputPin" />
             <Pin Id="VE109xy4WqBycyAwxMeCrD" Name="Result" Kind="OutputPin" />
+            <Pin Id="VV9jfhQGprHpgzTwLz3AF8" Name="Cache Folder" Kind="InputPin" />
             <Pin Id="MVGJGduk0mPWJznoGv9YVX" Name="Layers Built" Kind="OutputPin" />
+            <Pin Id="HwRnfleRlGfpKEI7pXlafv" Name="Cache Status" Kind="OutputPin" />
           </Node>
-          <Pad Id="RgIIgaq8NiTBppqeaxZgPe" Comment="Layers Built" Bounds="226,390,80,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="RgIIgaq8NiTBppqeaxZgPe" Comment="Layers Built" Bounds="153,391,80,15" ShowValueBox="true" isIOBox="true" />
           <Node Bounds="87,523,39,19" Id="IuHPlniMpFcdUZg9WNt7Xp">
             <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
@@ -191,6 +193,27 @@
               <Choice Kind="TypeFlag" Name="Float64" />
             </p:TypeAnnotation>
           </Pad>
+          <Pad Id="H1yv1JBLijwVmMX34e3Fzf" Comment="Cache Status" Bounds="226,430,300,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="SZONokgOOw3PKrH0lXmVdd" Comment="Cache Folder" Bounds="300,282,240,15" ShowValueBox="true" isIOBox="true" Value="">
+            <p:TypeAnnotation LastCategoryFullName="IO" LastDependency="CoreLibBasics.vl">
+              <Choice Kind="TypeFlag" Name="Path" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:pathtype p:Assembly="VL.Core" p:Type="VL.Core.PathType">Directory</p:pathtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Node Bounds="560,330,150,19" Id="LiTqhjEAEzU3PZESW3B35q">
+            <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="CacheFolder" />
+            </p:NodeReference>
+            <Pin Id="Q2PNoFSapPeFXxtamnrI4n" Name="Folder" Kind="InputPin" />
+            <Pin Id="PDfAZ7dDcrkFW1pQwiJ9x4" Name="Output" Kind="OutputPin" />
+            <Pin Id="Ddqg0xhHjdkgJZ68fhWmTD" Name="Tiles" Kind="OutputPin" />
+            <Pin Id="CVRaaziqPOJpNW7u2ror8A" Name="Size MB" Kind="OutputPin" />
+          </Node>
+          <Pad Id="Sn0IFyPbF1sneJyHMkVp7A" Comment="Default Folder" Bounds="560,375,300,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="GoA5ugmSeRASmqqlJuk5hE" Comment="Tiles Cached" Bounds="634,400,80,15" ShowValueBox="true" isIOBox="true" />
         </Canvas>
         <Patch Id="Qn1Yqox3GN8OqwchBUvODO" Name="Create" />
         <Patch Id="OFfMGxxvZQSpMkYjxF7dnh" Name="Update" />
@@ -218,6 +241,10 @@
         <Link Id="CwIqS8mQYMjMQPSfGgYVxy" Ids="IoV1b0dZuX9OfjzvOKVtk6,QTPPzT8jqytXQujFVM3PHQ" />
         <Link Id="KdpElz6eztLNlpgSuK6eUd" Ids="OkavS935XH1PwXkDGEghIj,BjV1qosy6ELHSme1hTfja5" />
         <Link Id="F1tlkRJYExsO8dJq96tCfK" Ids="TXJAYmf93ujKYZvvyF8Xfd,TIjKhLd4rTZDn2dSnszv01" />
+        <Link Id="JwT1G22UtV44dBwf7C3qpK" Ids="HwRnfleRlGfpKEI7pXlafv,H1yv1JBLijwVmMX34e3Fzf" />
+        <Link Id="UrAoolSnTnIRBvOxBpGnn9" Ids="SZONokgOOw3PKrH0lXmVdd,VV9jfhQGprHpgzTwLz3AF8" />
+        <Link Id="GEqsNpmBuxct8MoUzAqSxR" Ids="PDfAZ7dDcrkFW1pQwiJ9x4,Sn0IFyPbF1sneJyHMkVp7A" />
+        <Link Id="PclhoIhHEmjZvJGPjU662Y" Ids="Ddqg0xhHjdkgJZ68fhWmTD,GoA5ugmSeRASmqqlJuk5hE" />
       </Patch>
     </Node>
   </Patch>

@@ -15,7 +15,7 @@ OpenStreetMap map inside vvvv, and that is the whole of what has been shown.
 | | |
 |---|---|
 | ✅ Verified | A map renders in vvvv 7.4, panning and zooming work through the navigation nodes |
-| ✅ Verified | 30 tests covering node lifetime, the disk cache and the pixel-space bridge. No test touches the network, checked by watching the test process's own connections |
+| ✅ Verified | 63 tests covering node lifetime, navigation arithmetic, the disk cache and the pixel-space bridge. No test touches the network, checked by watching the test process's own connections |
 | ⚠️ Thin | One tile source, no vector layers, no styling, no widgets |
 | ❌ Missing | CI, a published package, custom tile sources |
 
@@ -27,9 +27,11 @@ BruTile 6 and matches VL.GIS exactly.
 ## Not one map node
 
 ```
-Mapsui.Layers    OpenStreetMap   Enabled, Cache To Disk    -> a tile layer + Layers Built
+Mapsui.Layers    OpenStreetMap   Enabled, Cache To Disk, Cache Folder
+                                                           -> a tile layer + Layers Built, Cache Status
+Mapsui.Layers    CacheFolder     Folder                    -> where tiles go + Tiles, Size MB
 Mapsui           Map             Layers, initial view      -> a map
-Mapsui.Navigate  CenterOn  ZoomToLevel  Drag  ZoomAt  Refresh
+Mapsui.Navigate  CenterOn  ZoomToLevel  Drag  ZoomAt  ZoomByWheel  ZoomIn  ZoomOut  Refresh
 Mapsui           ViewportInfo  LayerInfo                    (readers)
 Mapsui.Skia      ToSkiaLayer     Map                       -> a VL.Skia layer
 ```
@@ -53,6 +55,11 @@ megabytes; delete the folder to reset. That is what
 [OpenStreetMap's tile policy](https://operations.osmfoundation.org/policies/tiles/) asks for.
 What it forbids is the opposite: fetching tiles nobody is looking at. Requests carry a
 User-Agent naming this package.
+
+`Cache Folder` moves it — beside your project so it travels with it, onto a fast disk, or shared
+between patches. Leave it empty for the default above; `CacheFolder` is a node that shows what that
+resolved to and how much is in it, without switching a layer on. An unusable folder is reported on
+`Cache Status` and the cache is left off, rather than quietly writing somewhere you did not ask for.
 
 `Layers Built` is an output pin, and it should reach 1 and stay. A number that climbs frame after
 frame means the layer is being rebuilt every frame and every rebuild starts a fresh round of tile

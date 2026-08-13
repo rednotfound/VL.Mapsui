@@ -47,6 +47,8 @@
             </p:NodeReference>
             <Pin Id="JLFcBHQpTCudwT4cR26v8a" Name="Enabled" Kind="InputPin" />
             <Pin Id="LlxQNdMlBQUzzUuhMCqTLt" Name="Cache To Disk" Kind="InputPin" />
+            <Pin Id="Lh7hoAaAZR4lGDS8cJSPmf" Name="Cache Folder" Kind="InputPin" />
+            <Pin Id="IZcuJT7w88rK5YvXc5hP0d" Name="Cache Status" Kind="OutputPin" />
             <Pin Id="Rzmk0zQoTlnL58F5IAtAIh" Name="Layers Built" Kind="OutputPin" />
             <Pin Id="IovYhVM0nvQMdLNOVUz0RX" Name="Result" Kind="OutputPin" />
           </Node>
@@ -271,6 +273,15 @@
             <Pin Id="JM40vxJsuZLntoM0Wcd1eS" Name="Render Time" Kind="OutputPin" />
           </Node>
 
+  <Pad Id="Shay0pkZOUlYXmQs0zZ7iS" Comment="Cache Status" Bounds="240,240,300,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="MCN91kHUREiofhGBG5SMdk" Comment="Cache Folder" Bounds="160,215,240,15" ShowValueBox="true" isIOBox="true" Value="">
+            <p:TypeAnnotation LastCategoryFullName="IO" LastDependency="CoreLibBasics.vl">
+              <Choice Kind="TypeFlag" Name="Path" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:pathtype p:Assembly="VL.Core" p:Type="VL.Core.PathType">Directory</p:pathtype>
+            </p:ValueBoxSettings>
+          </Pad>
         </Canvas>
         <Patch Id="BHnV6WFhadjpCb50iOTz1F" Name="Create" />
         <Patch Id="H5YBhE4qwJVj3UjLQdoBN5" Name="Update" />
@@ -307,6 +318,7 @@
         <Link Id="PZDcLksNz1hcVSacQ1CD8L" Ids="B2JLZBFRZZ8pOzduqhKvvd,SLeoSJ0mtJwpIBrN3Lo82U" />
         <Link Id="IrHtYs9a44S8uM588h6Trg" Ids="EkFs6mHHZIMujfdgEOqlk2,UYCvpRMOoaQciC5U2bKDca" />
         <Link Id="Abenbrk69WBMxtGtcfkJ26" Ids="PTFy7CVaB74mEbW20etmS8,HxtTE9CiHdY3Qy4br6O4qG" />
+        <Link Id="UzyeR46cfLAILvtHZg0Twh" Ids="MCN91kHUREiofhGBG5SMdk,Lh7hoAaAZR4lGDS8cJSPmf" />
       </Patch>
     </Node>
   </Patch>

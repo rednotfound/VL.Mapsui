@@ -297,6 +297,79 @@ a timeout) to 92 ms once the fix landed.
 - The generators under `tools/legacy/` are retired: the checked-in `.vl` is the source of truth
   now. Regenerating overwrote node positions someone had arranged by hand.
 
+## 2026-08-13 — the cache folder pin, and what a pin's type is worth
+
+The pin started as `string cacheFolder = ""`, empty meaning the default location. The question
+that improved it was **"shouldn't the default path *be* the initial value?"** Two layers of answer,
+and the first is a hard stop.
+
+**It cannot be.** A C# default parameter value must be a compile-time constant, and the folder is
+built from `Environment.GetFolderPath(LocalApplicationData)` at runtime:
+
+```
+error CS1736: Default parameter value for 'folder' must be a compile-time constant
+```
+
+Measured with a three-line throwaway project rather than recalled, because the whole point of the
+question was whether the current shape was a choice or a constraint.
+
+**It also should not be.** Hardcoding a literal would ship *this machine's* path inside the node
+definition. vvvv's own packs hold the counterexample: of the 815 `.vl` files shipped with 7.4,
+`VL.Audio.vl` has a `Filename` pin whose initial value is `C:\temp\foo.wav`.
+
+### What vvvv does instead: a node that yields it
+
+`SystemFolder` in category `IO` (`CoreLibBasics.vl`) takes a `VL.Lib.IO.SpecialFolder` and outputs
+a `VL.Lib.IO.Path`. **A machine-dependent path is produced by a node, not pre-filled in a pin.**
+`Mapsui.Layers.CacheFolder` is the same move: empty in, default out, plus `Tiles` and `Size MB`. It
+reads the disk and never the network, so it answers "where do tiles go, and how much is there?"
+without switching a tile layer on.
+
+### The larger find: a path in VL is a type, not a string
+
+`VL.Lib.IO.Path` — 54 members of VL.CoreLib take it. It has a public `(string)` ctor, `.Value`,
+`Path.Default`, and `IsRooted` / `Exists` / `Parent` / `Children`. The pin is now `VLPath?` with
+`= null`, which is legal precisely because `null` *is* a compile-time constant.
+
+Worth knowing: **no C# assembly shipped with vvvv 7.4 uses `Path` as a node parameter** — every
+precedent is in `.vl`-defined nodes — so this was verified rather than assumed. `vvvvc`'s generated
+C# shows the type flowing end to end:
+
+```csharp
+n11.Path __pad_SZONokgOOw3PKrH0lXmVdd_3 = __slot_SZONokgOOw3PKrH0lXmVdd;
+var Result_12 = OpenStreetMap_11.Update(…, cacheFolder: __pad_SZONokgOOw3PKrH0lXmVdd_3);
+var Output_49 = n17.CacheNodes.CacheFolder(folder: Folder_48, tiles: out int Tiles_50, …);
+```
+
+The payoff is in the editor: a Path IOBox opens a **file chooser on rightclick and a directory
+chooser on SHIFT+rightclick**, set by
+`<p:pathtype p:Assembly="VL.Core" p:Type="VL.Core.PathType">Directory</p:pathtype>`. A string pin
+makes the author type the path out. The IOBox XML was copied verbatim from vvvv's own
+`Example Sound particles.vl` rather than composed.
+
+### A trap the Gray Book states outright
+
+> "Path IOBoxes always store relative paths if possible but actually hide this fact from you!"
+
+Its own advice for a guaranteed absolute path is a string IOBox plus `ToPath [IO]`. A relative path
+reaching a node that writes files **cannot be honestly rooted** — relative to the document, to
+vvvv's install folder, to whatever the working directory happens to be? `CreateDirectory` silently
+picks the last, and tiles land somewhere nobody could predict. So `TileCache.TryCreate` refuses a
+non-rooted path and says why, the same rule as never falling back to the default when a folder is
+unusable.
+
+### The gap that made the previous round untestable
+
+The pin existed for a whole test round with **no IOBox connected to it**, so the three things I
+asked to be checked could not be typed into at all. A pin with no pad is invisible in a patch:
+`vvvvc` compiled it happily as `string Cache_Folder_11 = @"";`. **Wiring is part of adding a pin;
+the compile proving the pin exists proves nothing about whether anyone can reach it.**
+
+63 tests. Five new: a relative folder is refused rather than guessed at; `CacheFolder` reports the
+default when given nothing, echoes what it is given, measures what is there, and — because it is a
+static method, evaluated every frame in every patch that holds it — does not walk the disk 10,000
+times in 300 ms.
+
 ### Still open
 
 - nuget.org has nothing newer: Mapsui tops out at 4.1.9 and 5.1.0

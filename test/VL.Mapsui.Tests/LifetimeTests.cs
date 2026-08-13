@@ -30,7 +30,7 @@ public class LifetimeTests
         using var layer = new OpenStreetMapLayerNode();
 
         for (int frame = 0; frame < 100; frame++)
-            layer.Update(out _, enabled: true);
+            layer.Update(out _, out _, enabled: true);
 
         Assert.Equal(1, layer.LayersBuilt);
     }
@@ -42,9 +42,9 @@ public class LifetimeTests
         // tile already fetched, even if the count somehow stayed low.
         using var node = new OpenStreetMapLayerNode();
 
-        var first = node.Update(out _, enabled: true);
+        var first = node.Update(out _, out _, enabled: true);
         for (int frame = 0; frame < 10; frame++)
-            Assert.Same(first, node.Update(out _, enabled: true));
+            Assert.Same(first, node.Update(out _, out _, enabled: true));
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class LifetimeTests
         using var node = new OpenStreetMapLayerNode();
 
         for (int frame = 0; frame < 50; frame++)
-            Assert.Null(node.Update(out _, enabled: false));
+            Assert.Null(node.Update(out _, out _, enabled: false));
 
         Assert.Equal(0, node.LayersBuilt);
     }
@@ -68,10 +68,10 @@ public class LifetimeTests
         // seconds.
         using var node = new OpenStreetMapLayerNode();
 
-        node.Update(out var atStart, enabled: false);
+        node.Update(out var atStart, out _, enabled: false);
         Assert.Equal(0, atStart);
 
-        node.Update(out var afterEnabling, enabled: true);
+        node.Update(out var afterEnabling, out _, enabled: true);
         Assert.Equal(1, afterEnabling);
     }
 
@@ -82,10 +82,10 @@ public class LifetimeTests
         // layer keeps its connections.
         using var node = new OpenStreetMapLayerNode();
 
-        node.Update(out _, enabled: true);
+        node.Update(out _, out _, enabled: true);
         for (int frame = 0; frame < 10; frame++)
-            Assert.Null(node.Update(out _, enabled: false));
-        node.Update(out var built, enabled: true);
+            Assert.Null(node.Update(out _, out _, enabled: false));
+        node.Update(out var built, out _, enabled: true);
 
         Assert.Equal(2, built);
     }
@@ -96,7 +96,7 @@ public class LifetimeTests
         // VL disposes a process node when it leaves the patch, and a patch can be edited while
         // running. Throwing there would take the whole document down.
         var node = new OpenStreetMapLayerNode();
-        node.Update(out _, enabled: true);
+        node.Update(out _, out _, enabled: true);
 
         node.Dispose();
         node.Dispose();
@@ -133,7 +133,7 @@ public class LifetimeTests
         using var layerNode = new OpenStreetMapLayerNode();
         using var mapNode = new MapNode();
 
-        var layer = layerNode.Update(out _, enabled: true);
+        var layer = layerNode.Update(out _, out _, enabled: true);
         var layers = new[] { layer! };
 
         var map = mapNode.Update(layers);
@@ -154,7 +154,7 @@ public class LifetimeTests
         var map = mapNode.Update(System.Array.Empty<global::Mapsui.Layers.ILayer>());
         Assert.Empty(map.Layers);
 
-        var layer = layerNode.Update(out _, enabled: true);
+        var layer = layerNode.Update(out _, out _, enabled: true);
         mapNode.Update(new[] { layer! });
 
         Assert.Single(map.Layers);

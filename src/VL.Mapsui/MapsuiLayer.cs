@@ -142,15 +142,12 @@ sealed class MapsuiLayer : ILayer, IDisposable
             .OfType<global::Mapsui.Tiling.Layers.TileLayer>()
             .Any(l => l.TileSource is BruTile.Web.HttpTileSource { PersistentCache: BruTile.Cache.FileCache });
 
-        if (attached)
-        {
-            var (tiles, bytes) = TileCache.Stats();
-            Line($"cache      {tiles} tiles, {bytes / 1024.0 / 1024.0:0.0} MB on disk");
-        }
-        else
-        {
-            Line("cache      off - every restart refetches the same view");
-        }
+        // Whether one is attached, not where it is: a FileCache does not expose its folder, and
+        // the layer node reports that on its Cache Status pin - which is the better place for it
+        // anyway, being something a patch can read and act on.
+        Line(attached
+            ? "cache      on (see the layer node's Cache Status pin)"
+            : "cache      off - every restart refetches the same view");
 
     }
 
