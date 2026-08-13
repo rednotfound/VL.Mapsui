@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>12.0</LangVersion>
+    <AssemblyName>VL.Mapsui</AssemblyName>
+    <!--
+      The VL node category comes from the namespace, not the assembly name. Keeping the two
+      decoupled is deliberate, and is the same arrangement VL.GIS uses.
+    -->
+    <RootNamespace>VL.Mapsui</RootNamespace>
+    <Version>0.0.1</Version>
+    <Authors>VL.Mapsui Contributors</Authors>
+    <Description>Mapsui as vvvv gamma nodes</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <!--
+      Both ship inside vvvv. They are referenced to compile against and must never be packed;
+      vvvv substitutes its own copy at runtime.
+
+      Pinned to 2025.7.4, which is what is installed here, so the minimum vvvv is 7.4. The
+      attributes this package needs ([Name], [SkipCategory]) arrived in 7.2, so 2025.7.2 would
+      also do and would widen the audience; revisit when there is a reason to care.
+    -->
+    <PackageReference Include="VL.Core" Version="2025.7.4" />
+    <PackageReference Include="VL.Core.Skia" Version="2025.7.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <!--
+      Mapsui 4.1.9, not 5.x. 5.x needs SkiaSharp >= 3.119.2 and vvvv ships 2.88.8, which is an
+      assembly-identity break nothing can paper over.
+
+      SkiaSharp is deliberately NOT pinned here. Mapsui.Rendering.Skia requires
+      >= 2.88.9 while vvvv ships 2.88.8, so pinning vvvv's version would fail restore with
+      NU1605. Letting it resolve to 2.88.9 is correct and harmless: the whole 2.88.x line
+      carries assembly version 2.88.0.0, so vvvv's copy satisfies the reference at runtime.
+      Measured, not assumed - the same holds for HarfBuzzSharp (1.0.0.0 on both sides despite
+      file versions 7.3.0.1 vs 7.3.0.3) and SkiaSharp.HarfBuzz (2.88.0.0 on both).
+
+      Mapsui.Tiling is what pins BruTile to [5.0.6, 6.0.0), and it is the sole reason this
+      package cannot be loaded alongside VL.GIS, which uses BruTile 6. That is an accepted
+      trade for now; it dissolves when vvvv moves to SkiaSharp 3 and we can use Mapsui 5.
+    -->
+    <PackageReference Include="Mapsui" Version="4.1.9" />
+    <PackageReference Include="Mapsui.Tiling" Version="4.1.9" />
+    <PackageReference Include="Mapsui.Rendering.Skia" Version="4.1.9" />
+  </ItemGroup>
+</Project>
