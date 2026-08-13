@@ -111,6 +111,56 @@ Checked while we were there: on all of nuget.org the only `VL.*` package that to
 VL.GIS, and vvvv's own install directory contains no BruTile at all. There is **no official vvvv
 map or GIS pack** — nothing here is duplicating work upstream.
 
+## 2026-08-13 — the incident, and the tests that lock it out
+
+The map node was `public static`, which in VL is a stateless operation evaluated **every frame**.
+At 60fps it built a fresh `Map` and tile layer sixty times a second and released none:
+
+```
+17,085 TCP connections   87,202 handles   1,294 threads   3.1 GB   in 13 minutes
+```
+
+The machine's ephemeral port range is 49152–65535 — 16,384 ports for the whole system. Once
+exhausted, every program on it lost DNS. **It took the author's home network down**, and it
+breached OpenStreetMap's tile usage policy, which forbids bulk downloading from donated
+hardware.
+
+**The same bug is why nothing ever rendered.** Tiles requested on frame N arrived after frame
+N's map was already garbage, so the layer stayed permanently busy and permanently blank. Worth
+generalising: *a resource bug usually breaks the feature too, so a mysterious blank is a reason
+to look at lifetime.*
+
+The evidence had been on screen for an hour. The stack read
+`at VL.Mapsui.MapNodes.OpenStreetMapLayer(...)` / `at ...Update__TRACE__(...)` — and
+`Update__TRACE__` is the evaluation context, not decoration. **Read a vvvv stack for which
+method it was called from**, not only where it threw.
+
+Fixed by making it a `[ProcessNode]` (`VL.Core.Import.ProcessNodeAttribute`, which vvvv itself
+uses in VL.Skia, VL.CoreLib and — the precedent for anything networked — VL.IO.Redis). Plus a
+second, smaller leak hiding behind the first: `MapsuiLayer` called `Navigator.SetSize` every
+frame, and each call raises `ViewportChanged`, which Mapsui answers with a refresh.
+
+Proven from the C# `vvvvc` generates, before any window was opened: `new OpenStreetMapNode()`
+appears in `Create` and is held as state, `Update` runs per frame on that instance.
+
+### 15 tests, and they were negative-tested
+
+`dotnet test` — about a second, no network, no vvvv. Every test is a frame loop, because that is
+the shape of the failure. Reverting the guard so the map rebuilds unconditionally fails 6 of 15,
+so the suite does catch the thing it was written for.
+
+Confirmed no network by watching the machine's TCP connections across a run: 948 before, 948
+after.
+
+### Also settled today
+
+- `%LOCALAPPDATA%\vvvv\gamma\nugets\` **survives a vvvv reinstall** — it lives in the user
+  profile, not the install directory. That is why five-month-old orphans were still shadowing our
+  BruTile after a fresh install of vvvv 7.4.
+- A globally configured Stride feed timed out for 100s per package and failed a restore with
+  NU1301. `NuGet.config` now pins sources to nuget.org, so a restore here does not depend on
+  what a machine happens to have configured.
+
 ### Still open
 
 - nuget.org has nothing newer: Mapsui tops out at 4.1.9 and 5.1.0

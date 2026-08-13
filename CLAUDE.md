@@ -90,10 +90,40 @@ vl-mapsui/
 │   ├── PixelSpace.cs             # pixel/VL space bridge + a layer that reports its own inputs
 │   └── MapNodes.cs               # scaffolding only
 ├── spike/Spike.vl                # GENERATED - never hand-edit
+├── test/VL.Mapsui.Tests/         # 15 xunit tests, ~1s, no network, no vvvv
+├── NuGet.config                  # sources pinned to nuget.org
 └── tools/
     ├── Build-SpikePatch.ps1      # emits spike/Spike.vl whole
     └── New-VLId.ps1              # 22-char VL document IDs
 ```
+
+## Tests
+
+`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 15 tests, about a second.
+
+They exist because the expensive bug here was a **lifetime** bug, not an arithmetic one, so
+every test is shaped like a frame loop: call `Update` many times and assert on how much got
+built. `A_hundred_frames_with_unchanged_inputs_build_one_map` is the regression test; under the
+old code that number was 100.
+
+**Negative-tested**, per the rule that a check which has never failed on known-bad input is not
+a check: reverting the guard in `OpenStreetMapNode.Update` to rebuild unconditionally fails 6 of
+the 15. Confirmed 2026-08-13.
+
+Two things the suite is careful about:
+
+- **No test touches the network**, and that is load bearing rather than tidy. Building a map
+  creates a tile source but issues no request; fetching starts only when a viewport size and a
+  refresh arrive, which is `MapsuiLayer.Render`'s job and is never called. Verified by watching
+  the machine's TCP connections across a run rather than by assuming.
+- **`PixelSpaceTests` hands the caller a transformation that would ruin the result if it were
+  honoured.** Drawing onto a bare `SKCanvas` with no transformation would prove nothing — that
+  is the false proof already made once on this stack.
+
+The test project references `VL.Core` and `VL.Core.Skia` **without** `ExcludeAssets`, unlike
+`src\VL.Mapsui`. The package excludes them because vvvv supplies its own; a test host supplies
+nothing, and without them every test fails on `Could not load file or assembly 'VL.Core.Skia'`
+before reaching an assertion.
 
 ## Node categories
 

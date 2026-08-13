@@ -35,8 +35,15 @@ public class OpenStreetMapNode : IDisposable
 
     // Counts every map ever built in this process. The whole failure above would have been
     // obvious in three seconds from a number that climbed instead of stopping at one, and we
-    // only found out when the network died. Shown in the diagnostics overlay.
+    // only found out when the network died. Shown in the diagnostics overlay, where a
+    // process-wide total also catches a second node instance nobody noticed.
     static int _mapsBuilt;
+
+    /// <summary>
+    /// Maps built by this node alone. The overlay shows the process-wide total; this one is
+    /// per instance so a test can assert on it without depending on what ran before.
+    /// </summary>
+    internal int MapsBuiltHere { get; private set; }
 
     Map? _map;
     MapsuiLayer? _layer;
@@ -73,6 +80,7 @@ public class OpenStreetMapNode : IDisposable
 
             _map = BuildMap(centerLongitude, centerLatitude, zoomLevel);
             _layer = new MapsuiLayer(_map);
+            MapsBuiltHere++;
             _lon = centerLongitude;
             _lat = centerLatitude;
             _zoom = zoomLevel;

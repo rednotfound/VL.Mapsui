@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Functional tests, run with `dotnet test`.
+
+    What they are for: the expensive bug in this package was a lifetime bug, not an arithmetic
+    one. A map node written as a static method rebuilt its map on every frame and took a home
+    network down with it. Most of what is here exists so that cannot come back silently.
+
+    No test touches the network, and that is load bearing rather than tidy. Building a Mapsui
+    map creates a tile source object but issues no request; fetching starts only when a viewport
+    size and a refresh arrive, which is MapsuiLayer.Render's job and is never called here.
+    Verify it rather than trust it: watch the process's TCP connections while the suite runs.
+
+    Note for anyone editing this file: MSBuild rejects a '- -' pair inside an XML comment with
+    MSB4025, so the prose here avoids dashes as punctuation.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+
+    <!-- Matches the InternalsVisibleTo in src\VL.Mapsui\AssemblyInfo.cs -->
+    <AssemblyName>VL.Mapsui.Tests</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\VL.Mapsui\VL.Mapsui.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Referenced here WITHOUT ExcludeAssets, unlike in src\VL.Mapsui, and the difference is the
+      whole point. The package excludes them at runtime because vvvv supplies its own copies and
+      shipping ours would be the mistake every note in VL.GIS warns about. A test host is not
+      vvvv and supplies nothing, so without these every test fails on
+      "Could not load file or assembly 'VL.Core.Skia'" before reaching a single assertion.
+    -->
+    <PackageReference Include="VL.Core" Version="2025.7.4" />
+    <PackageReference Include="VL.Core.Skia" Version="2025.7.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
