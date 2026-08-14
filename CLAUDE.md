@@ -176,11 +176,13 @@ vl-mapsui/
 │   ├── MapNode.cs                # [ProcessNode] Map + ViewportInfo / LayerInfo readers
 │   ├── NavigateNodes.cs          # CenterOn, ZoomToLevel, ZoomByWheel, Refresh …
 │   ├── DragNode.cs, ZoomNodes.cs # [ProcessNode] - they remember the previous frame
+│   ├── WidgetNodes.cs            # [ProcessNode] ScaleBar, Attribution, ZoomButtons
+│   ├── WidgetInput.cs            # handing a press to a widget - the host's job, testable alone
 │   ├── SkiaNodes.cs              # ToSkiaLayer
 │   ├── MapsuiLayer.cs            # VL.Skia.ILayer - draws it, plus the diagnostics overlay
 │   ├── PixelSpace.cs             # pixel/VL space bridge
 │   └── TileCache.cs              # the disk cache, its folder and its size
-├── help/VL.Mapsui/               # HowTo Show a map, HowTo Drive the map with the mouse
+├── help/VL.Mapsui/               # Explanation Overview + 3 HowTos + Help.xml (ordering and tags)
 ├── test/VL.Mapsui.Tests/         # 75 xunit tests, no network, no vvvv
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org

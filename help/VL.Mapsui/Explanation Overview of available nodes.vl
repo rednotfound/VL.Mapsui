@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document xmlns:p="property" xmlns:r="reflection" Id="LU0yHzVKP5MPCD5FJXnqwA" LanguageVersion="2025.7.4" Version="0.128">
+  <NugetDependency Id="JHrmRYV6kaXGfR5fhnLAvu" Location="VL.CoreLib" Version="2025.7.4" />
+  <NugetDependency Id="UcHNTKsqQ94qCVnCi6Qf6N" Location="VL.Mapsui" Version="0.0.0" />
+  <Patch Id="CKUDFWxnddiBPoo7VMDDWj">
+    <Canvas Id="CUS2cheWVipdQYZ22OuK5G" DefaultCategory="Main" CanvasType="FullCategory" />
+    <Node Name="Application" Bounds="100,100" Id="GmFXaJ2DFb4hkO4AGzdbYI">
+      <p:NodeReference>
+        <Choice Kind="ContainerDefinition" Name="Process" />
+        <FullNameCategoryReference ID="Primitive" />
+      </p:NodeReference>
+      <Patch Id="GQRINiK2rt2mLqy326dLyk">
+        <Canvas Id="Gp1a0FaD43khjHQAVpDF6b" CanvasType="Group">
+
+          <Pad Id="J4CECueddGDolpN45UF4c2" Bounds="50,30,700,150" ShowValueBox="true" isIOBox="true" Value="VL.Mapsui&#xD;&#xA;&#xD;&#xA;Mapsui is a real map engine, and this package hands it to a patch. The difference from a toolbox is worth knowing up front: VL.GIS computes and lets you draw the result, while a Mapsui map draws itself - it owns its tiles, its styles, its labels and its viewport.&#xD;&#xA;&#xD;&#xA;So the nodes here are small and composable rather than one node that does everything. That is deliberate: an earlier version of this package WAS one node that did everything, and rebuilding it as pieces is what made panning, caching and widgets possible at all.&#xD;&#xA;&#xD;&#xA;A map is built by wiring layers into a Map, moving it with Navigate nodes, and handing it to ToSkiaLayer. Nothing here decides what the mouse means; you wire that.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">12</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+
+          <Pad Id="JPjizJiuQdUYI1bBMICmtl" Bounds="50,200,340,230" ShowValueBox="true" isIOBox="true" Value="Mapsui.Layers - what goes on the map&#xD;&#xA;&#xD;&#xA;OpenStreetMap   a tile layer over the OSM tile source. Enabled starts OFF: opening a document in vvvv runs it, and whoever opened it has not agreed to download anything yet. Watch Layers Built - it should reach 1 and stay.&#xD;&#xA;&#xD;&#xA;Geometry   NetTopologySuite geometry as a layer, with stroke, fill and width. This is where VL.GIS meets VL.Mapsui: neither package references the other, they meet through NTS.&#xD;&#xA;&#xD;&#xA;TileCache   the disk cache: where tiles go and how much is there. Leave its Folder pin unconnected for the default under LOCALAPPDATA. Reads the disk, never the network.&#xD;&#xA;&#xD;&#xA;Mapsui - the map itself&#xD;&#xA;&#xD;&#xA;Map   holds the layers and owns the viewport.&#xD;&#xA;ViewportInfo, LayerInfo   readers: centre, resolution, size, layer count, busy.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">11</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+
+          <Pad Id="VLtTzY1bB8RWvSJloGYSIT" Bounds="410,200,340,230" ShowValueBox="true" isIOBox="true" Value="Mapsui.Navigate - where the map looks&#xD;&#xA;&#xD;&#xA;CenterOn, ZoomToLevel, ZoomAt, Refresh   set it directly.&#xD;&#xA;Drag, ZoomIn, ZoomOut, ZoomByWheel   gestures; the stateful ones remember the previous frame for you.&#xD;&#xA;&#xD;&#xA;Moving the map never rebuilds a layer, which matters more than it sounds: dragging changes the centre on every frame, so a design that rebuilt on movement would refetch every tile sixty times a second.&#xD;&#xA;&#xD;&#xA;Mapsui.Widgets - Mapsui's own furniture&#xD;&#xA;&#xD;&#xA;ScaleBar, Attribution, ZoomButtons   each takes the map, adds itself once, hands the map on. Map.Widgets is append only, so Enabled is how a widget goes away.&#xD;&#xA;&#xD;&#xA;Mapsui.Skia - getting it on screen&#xD;&#xA;&#xD;&#xA;ToSkiaLayer   the whole bridge into VL.Skia. Its Diagnostics pin prints the viewport, the layers, the cache and the last press over the map.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">11</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+
+          <Pad Id="GEyKXylOHcH1NNc6OxWK6l" Bounds="50,450,700,120" ShowValueBox="true" isIOBox="true" Value="Where to go next&#xD;&#xA;&#xD;&#xA;HowTo Show a map   the smallest complete map: a tile layer, a Map, ToSkiaLayer, and where the tiles are cached.&#xD;&#xA;HowTo Drive the map with the mouse   Console and MouseState wired to Drag and the wheel. Read it as a set of choices you can swap, not as the way.&#xD;&#xA;HowTo Add widgets to the map   the scale bar, the attribution OpenStreetMap's policy requires, and buttons you can click.&#xD;&#xA;&#xD;&#xA;Manners: tiles come from donated hardware. Nothing fetches until you switch it on, only tiles that were drawn are kept, and requests carry a User-Agent naming this package. If Layers Built ever climbs frame after frame, close vvvv - that once took a home network down.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">11</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+
+        </Canvas>
+        <Patch Id="Lu3zL43W75S9xq29uKlvIl" Name="Create" />
+        <Patch Id="OhsG9lLQhIyhEUp0D5lj1M" Name="Update" />
+        <ProcessDefinition Id="I2AdJy7t6pJ91rtE8SBVBo">
+          <Fragment Id="LQfcudKR0QMUabv24MyFcf" Patch="Lu3zL43W75S9xq29uKlvIl" Enabled="true" />
+          <Fragment Id="AUuEIe5BtU4RRkwoD2quAx" Patch="OhsG9lLQhIyhEUp0D5lj1M" Enabled="true" />
+        </ProcessDefinition>
+      </Patch>
+    </Node>
+  </Patch>
+</Document>

@@ -58,6 +58,13 @@
     <!-- This package's own examples. target stays help\ because that is where vvvv looks. -->
     <file src="help\VL.Mapsui\**\*.vl" target="help\" />
 
+    <!--
+      Help.xml orders the help patches in the browser and carries their search tags. It needs its
+      own line: the glob above takes .vl and nothing else, so leaving this out would ship the
+      patches unordered and untagged with no warning anywhere.
+    -->
+    <file src="help\VL.Mapsui\Help.xml" target="help\" />
+
     <file src="README.md"  target="docs\" />
     <file src="NOTES.md"   target="docs\" />
   </files>

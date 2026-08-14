@@ -5,6 +5,86 @@ them do not belong here.
 
 ---
 
+## 2026-08-14 — widgets, and a click that had to be watched rather than argued about
+
+Three widget nodes: `ScaleBar`, `Attribution`, `ZoomButtons`. All three confirmed on screen, and
+**the zoom buttons respond to a click** — which is the part that was worth the care, because it was
+the only claim in the batch that could not be settled by a test.
+
+### What the probe answered before any code was written
+
+Whether a widget draws at all depends on the renderer having one registered, and that **cannot be
+asked in PowerShell** — constructing a `MapRenderer` needs SkiaSharp's native library. The test
+project can, so the first thing written was the question:
+
+```
+WidgetRenders: 9
+    BoxWidget  ButtonWidget  EditingWidget  Hyperlink  MapInfoWidget
+    MouseCoordinatesWidget  ScaleBarWidget  TextBox  ZoomInOutWidget
+```
+
+**`PerformanceWidget` is not among them**, which contradicts what `docs/MAPSUI-SURFACE.md` claimed
+("every one below has a Skia renderer") and is now corrected there. Wrapping it means registering a
+renderer by hand — the reason it is not in this batch.
+
+### The trap, and the shape of the test that catches it
+
+`Map.Widgets` is a `ConcurrentQueue<IWidget>`: append only, no removal. A widget node written as a
+static operation would enqueue sixty widgets a second and **nothing could ever take them out**. So
+every widget test is a frame loop that counts what ended up on the map, the same shape as the tile
+layer tests. Negative-tested by making the enqueue unconditional: 3 tests red immediately.
+
+`Enabled` is therefore how a widget goes away, not removal — which is worth saying on the pin,
+because it is the opposite of how everything else in a patch behaves.
+
+### Clicks: two inferences that agreed, and one reading that settled it
+
+A widget draws itself where only the renderer knows, so only the host can route a press to it.
+Whether our press arrived in the right units was **inference from two independent directions**:
+`IProjectionSpace.MapFromPixels` documents a notification's position as being in pixels, and
+`DragNode` says "a position in view pixels", consumes `MouseState.Position`, and pans correctly.
+
+Both pointed the same way and neither is a reading. The overlay now prints
+
+```
+widgets    3, 3 placed by the renderer
+last press 412, 88  taken by a widget
+```
+
+which separates the three ways a button can look dead: the notification never arrived, it arrived
+in the wrong space, or the renderer had not laid the widget out yet (`Envelope` is null until it
+has drawn once). Confirmed in the GUI: the buttons zoom, and dragging away from them still pans —
+the second half matters just as much, because a widget that swallowed every press would break the
+map quietly.
+
+### `Result`, not `Output`, for a process node
+
+`vvvvc` rejected `Output` outright: *"ScaleBar doesn't have a pin called Output"*. The fluent rule —
+return type equals the first parameter type, so the output pin is `Output` — **applies to static
+operations only**. A `[ProcessNode]` returning its own first argument still gets `Result`, exactly
+as `OpenStreetMap` does. Established the same way the rule itself was: by being told.
+
+Also worth keeping: the out parameter has to come *after* the map, not before. `Update(out string,
+Map)` is not the fluent shape and would not sit in a chain.
+
+### Help stopped being one patch that teaches everything
+
+`HowTo Show a map.vl` had grown a cache story, a navigation story and then widgets. Split:
+
+- `Explanation Overview of available nodes.vl` — **the front door, and we had none**; vvvv's own
+  packs ship 57 of them
+- `HowTo Add widgets to the map.vl` — its own topic, with the mouse wiring copied verbatim from the
+  mouse patch so the buttons can actually be clicked
+- `Help.xml` — ordering and search tags. **It needs its own line in the nuspec**: the existing glob
+  takes `**\*.vl` and nothing else, so it would have shipped unordered and untagged with no warning.
+  Verified by reading the built `.nupkg` rather than by assuming.
+
+A new document copied from an existing one needs **a new Document Id and nothing else renumbered** —
+element ids are scoped by document. Two ids were hand-typed in the first draft rather than generated,
+which is exactly the rule `tools\New-VLId.ps1` exists for; both replaced.
+
+---
+
 ## 2026-08-14 — an empty Path IOBox is not empty
 
 The stray tiles from the entry below are explained, and the explanation was **read off a pin, not

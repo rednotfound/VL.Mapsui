@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Pack>
+	<Topic title="Overview">
+		<VLDocument link="Explanation Overview of available nodes.vl" tags="map,mapsui,openstreetmap,osm,tiles,gis" />
+	</Topic>
+	<Topic title="HowTo">
+		<VLDocument link="HowTo Show a map.vl" tags="map,tiles,openstreetmap,osm,cache,zoom" />
+		<VLDocument link="HowTo Drive the map with the mouse.vl" tags="mouse,drag,pan,wheel,zoom,interaction" />
+		<VLDocument link="HowTo Add widgets to the map.vl" tags="widget,scalebar,attribution,zoom,buttons,legal" />
+	</Topic>
+</Pack>

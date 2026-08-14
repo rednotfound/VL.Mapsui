@@ -52,8 +52,33 @@ sealed class MapsuiLayer : ILayer, IDisposable
     /// environment in the first place.
     ///
     /// Returning false leaves every notification for whatever else is in the scene graph.
+    ///
+    /// **Widgets are the one exception, and they are not an exception to the rule above.** A widget
+    /// is something the patch explicitly put on the map; it draws itself at a position only the
+    /// renderer knows, so nothing but the host can route a click to it, which is what Mapsui's own
+    /// MapControl does. A press is offered to the widgets and kept only if one takes it - so a
+    /// click that misses them all still reaches the rest of the scene graph.
     /// </remarks>
-    public bool Notify(INotification notification, CallerInfo caller) => false;
+    public bool Notify(INotification notification, CallerInfo caller)
+    {
+        if (notification is MouseDownNotification mouse)
+        {
+            var position = new MPoint(mouse.Position.X, mouse.Position.Y);
+            var taken = WidgetInput.Route(_map, position);
+
+            // Remembered for the overlay. Whether a click reaches a widget depends on the space
+            // its position arrives in, and a button that does nothing looks exactly the same
+            // whether the notification never came, came in the wrong units, or came before the
+            // renderer had laid the widget out. Printing it separates the three.
+            _lastPress = $"{position.X:0}, {position.Y:0}  {(taken ? "taken by a widget" : "left for the patch")}";
+
+            return taken;
+        }
+
+        return false;
+    }
+
+    string _lastPress = "none yet";
 
     public void Render(CallerInfo caller)
     {
@@ -121,7 +146,7 @@ sealed class MapsuiLayer : ILayer, IDisposable
             Typeface = SKTypeface.FromFamilyName("Consolas"),
         };
 
-        canvas.DrawRect(SKRect.Create(0f, 0f, 480f, 152f), back);
+        canvas.DrawRect(SKRect.Create(0f, 0f, 480f, 186f), back);
 
         var y = 20f;
         void Line(string s) { canvas.DrawText(s, 8f, y, text); y += 16f; }
@@ -148,6 +173,14 @@ sealed class MapsuiLayer : ILayer, IDisposable
         Line(attached
             ? "cache      on (see the layer node's Cache Status pin)"
             : "cache      off - every restart refetches the same view");
+
+        // Widgets, and whether they can be clicked at all. Envelope is written by the renderer
+        // while drawing, so "0 of 3 placed" means nothing has been laid out yet rather than that
+        // the click arithmetic is wrong - two failures that look identical from the outside.
+        var widgets = _map.Widgets.ToArray();
+        var placed = widgets.Count(w => w.Envelope is not null);
+        Line($"widgets    {widgets.Length}, {placed} placed by the renderer");
+        Line($"last press {_lastPress}");
 
     }
 

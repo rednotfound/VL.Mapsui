@@ -42,8 +42,14 @@ and wire it to `Navigate`, or drive the map from an LFO, an OSC message, a keybo
 timeline instead. Composing that is the reason to reach for a patching environment, and an
 earlier version of this package took the choice away by handling drag and wheel internally.
 
-`help\VL.Mapsui\HowTo Show a map.vl` is the wired-up example. Beginners start from a help patch,
-not from a fatter node.
+`help\VL.Mapsui\Explanation Overview of available nodes.vl` is the front door; `HowTo Show a map`,
+`HowTo Drive the map with the mouse` and `HowTo Add widgets to the map` are the wired-up examples,
+one topic each. Beginners start from a help patch, not from a fatter node.
+
+Widgets are Mapsui's own furniture — a scale bar, the attribution the tile policy requires, buttons
+that zoom. Each node takes the map, puts one widget on it and hands the map on. `Map.Widgets` is
+append only, so `Enabled` is how a widget goes away rather than removal, and a press that lands on a
+widget is handed to it while one that misses is left for the rest of the patch.
 
 ## Manners
 

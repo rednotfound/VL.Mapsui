@@ -29,7 +29,8 @@ out to be sitting in a Mapsui dependency we already ship.
 | `ViewportInfo`, `LayerInfo` | `Mapsui` | readers — centre, resolution, size; layer count and busy |
 | `CenterOn`, `ZoomToLevel`, `ZoomAt`, `ZoomByWheel`, `DragBetween`, `Refresh` | `Mapsui.Navigate` | the navigator |
 | `Drag`, `ZoomIn`, `ZoomOut` | `Mapsui.Navigate` | stateful gestures — they remember the previous frame |
-| `ToSkiaLayer` | `Mapsui.Skia` | the bridge into VL.Skia's scene graph |
+| `ScaleBar`, `Attribution`, `ZoomButtons` | `Mapsui.Widgets` | Mapsui's own furniture, added to a map once each |
+| `ToSkiaLayer` | `Mapsui.Skia` | the bridge into VL.Skia's scene graph, including the press a widget gets |
 
 ---
 
@@ -37,22 +38,38 @@ out to be sitting in a Mapsui dependency we already ship.
 
 Ordered by what a map patch actually needs.
 
-### Widgets — 0 of 10
+### Widgets — 3 of 10
 
-`MapsuiLayer.Render` already hands `_map.Widgets` to the renderer, so **a widget node draws the
-moment it exists**. Every one below has a Skia renderer shipped in `Mapsui.Rendering.Skia`.
+Wrapped: `ScaleBar` (metric / imperial / nautical), `Attribution` (a `Hyperlink` fed from the
+layers), `ZoomButtons` (`ZoomInOutWidget`). All three confirmed on screen 2026-08-14, buttons
+included.
 
-`ScaleBarWidget` (metric / imperial / nautical), `ZoomInOutWidget`, `MouseCoordinatesWidget`,
-`PerformanceWidget`, `TextBox`, `ButtonWidget`, `BoxWidget`, `Hyperlink`, `MapInfoWidget`,
-`EditingWidget`.
+**Corrected here, because this document said otherwise and it was wrong:** not every widget has a
+renderer registered. Measured by constructing a `MapRenderer` and reading `WidgetRenders` — a thing
+PowerShell cannot do, since it needs SkiaSharp's native library — **9 are registered**:
+`BoxWidget`, `ButtonWidget`, `EditingWidget`, `Hyperlink`, `MapInfoWidget`,
+`MouseCoordinatesWidget`, `ScaleBarWidget`, `TextBox`, `ZoomInOutWidget`. **`PerformanceWidget` is
+not**, so wrapping it means registering a renderer by hand as well.
+
+Not wrapped, with the reason each is not merely "next":
+
+- **`MouseCoordinatesWidget`** needs the host to feed the map a mouse position. This package
+  deliberately routes the mouse to `Navigate` nodes in the patch instead, so wiring it quietly
+  would re-make the "the node decides what the mouse means" mistake.
+- **`PerformanceWidget`** needs the renderer registered by hand *and* render timings fed in from
+  `MapsuiLayer` — the only one of the ten that touches the render loop.
+- `TextBox`, `ButtonWidget`, `BoxWidget`, `MapInfoWidget`, `EditingWidget`. `MapInfoWidget` is the
+  interesting one: it belongs with `Map.OnInfo` and "what did I click on", not with furniture.
 
 **`Map.Widgets` is a `ConcurrentQueue<IWidget>` — append only, no removal.** So a widget node has
 to be a `[ProcessNode]`: enqueue once, then drive it through `Enabled` and its properties. A static
-method would enqueue a fresh widget sixty times a second.
+method would enqueue a fresh widget sixty times a second, and nothing could ever take them out.
 
-Attribution is not a feature request. **OSM's tile policy requires the attribution to be
-displayed**; our layer node has carried the text since the beginning and nothing has ever drawn it.
-`Hyperlink` (it has `Url` and `Text`) is the piece that closes that.
+**Clicks are the host's job.** A widget draws itself at a position only the renderer knows, so
+`MapsuiLayer.Notify` offers a press to the widgets and keeps it only if one takes it — a press that
+misses them all still reaches the rest of the patch, which is what keeps dragging working with
+buttons on screen. That is not the same as deciding what the mouse means for the map: a widget is
+something the patch explicitly put there.
 
 ### Styles — 1 of 28
 
