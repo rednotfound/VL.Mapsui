@@ -26,7 +26,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="UnaIkq8cPr0a4UZQVn7ji7" Comment="Enabled" Bounds="79,280,35,35" ShowValueBox="true" isIOBox="true" Value="True">
+          <Pad Id="UnaIkq8cPr0a4UZQVn7ji7" Comment="Enabled" Bounds="79,280,35,35" ShowValueBox="true" isIOBox="true" Value="false">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
             </p:TypeAnnotation>

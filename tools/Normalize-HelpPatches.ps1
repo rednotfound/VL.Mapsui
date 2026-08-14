@@ -108,4 +108,48 @@ if ($Check -and $stale.Count -gt 0) {
     exit 1
 }
 
+# ---------------------------------------------------------------------------------------------
+# The Enabled toggle, off.
+#
+# Anything that fetches ships with Enabled off, because opening a document in vvvv *runs* it and
+# whoever opened it has agreed to nothing yet. The IOBox in the patch overrides the node's own
+# `enabled = false`, so the patch is where this is decided.
+#
+# It is normalised rather than merely checked because of how it breaks: a GUI round switches the
+# map on to look at it, vvvv saves that with everything else, and four patches shipped reading
+# Value="True" while their own description said "Enabled starts OFF" (2026-08-14). The capital T
+# is the tell - vvvv writes True, this file and every hand-written pad write false.
+#
+# Comment="Enabled" is the tile layer's toggle in every patch here and nothing else. A pad that
+# should stay on gets a different comment, which is worth knowing before adding one.
+# ---------------------------------------------------------------------------------------------
+$EnabledPattern = '(<Pad\b[^>]*\bComment="Enabled"[^>]*\bValue=")([^"]*)(")'
+$switchedOn = @()
+
+foreach ($patch in $patches) {
+    $relative = $patch.FullName.Substring($RepoRoot.Length + 1)
+    $text     = [IO.File]::ReadAllText($patch.FullName)
+
+    $rewritten = $text -replace $EnabledPattern, '${1}false${3}'
+    if ($rewritten -eq $text) { continue }
+
+    $was = @(([regex]$EnabledPattern).Matches($text) |
+        Where-Object { $_.Groups[2].Value -cne 'false' } |
+        ForEach-Object { $_.Groups[2].Value }) -join ', '
+    $switchedOn += $relative
+
+    if ($Check) {
+        Write-Host "  would switch off  $relative  (Enabled = $was)"
+    }
+    else {
+        [IO.File]::WriteAllText($patch.FullName, $rewritten, (New-Object System.Text.UTF8Encoding($true)))
+        Write-Host "   help\$($patch.Directory.Name)\$($patch.Name): Enabled $was -> false"
+    }
+}
+
+if ($Check -and $switchedOn.Count -gt 0) {
+    Write-Host "FAIL - $($switchedOn.Count) help patch(es) ship with Enabled switched on. Run tools\Normalize-HelpPatches.ps1" -ForegroundColor Red
+    exit 1
+}
+
 exit 0

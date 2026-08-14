@@ -79,7 +79,7 @@ public class GeometryLayerNode : IDisposable
             _geometries = incoming;
         }
 
-        return _layer.Update(out layersBuilt, _features, _style.Update(fillColor, lineColor, lineWidth), "Geometry");
+        return _layer.Update(out layersBuilt, _features, _style.Update(fillColor, lineColor, lineWidth), name: "Geometry");
     }
 
     /// <summary>

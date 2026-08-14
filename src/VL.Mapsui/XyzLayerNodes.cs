@@ -62,7 +62,9 @@ public class XyzTileLayerNode : IDisposable
     public ILayer? Update(
         out int layersBuilt,
         out string cacheStatus,
-        string urlTemplate = "",
+        // Without this the pin reads "Url Template": VL builds a pin name by splitting the
+        // parameter at its capitals, and the C# name cannot carry an acronym through that.
+        [Pin(Name = "URL Template")] string urlTemplate = "",
         string attribution = "",
         bool enabled = false,
         TileDiskCache? cache = null)

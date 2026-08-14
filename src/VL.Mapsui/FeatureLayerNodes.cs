@@ -66,6 +66,7 @@ public class FeatureLayerNode : IDisposable
         out int layersBuilt,
         IEnumerable<NtsFeature>? features = null,
         IStyle? style = null,
+        bool enabled = true,
         string name = "Features")
     {
         var incoming = features?.Where(f => f?.Geometry is not null).ToArray() ?? Array.Empty<NtsFeature>();
@@ -105,6 +106,12 @@ public class FeatureLayerNode : IDisposable
             _layer.Style = wanted;
             _style = wanted;
         }
+
+        // Enabled is Mapsui's own visibility flag, set rather than rebuilt: switching a layer off
+        // and on again keeps its features, its style and everything the renderer has cached about
+        // them. It is also why this is a pin at all - a patch should be able to hide a layer
+        // without dismantling it.
+        _layer.Enabled = enabled;
 
         layersBuilt = LayersBuilt;
         return _layer;

@@ -79,12 +79,13 @@ NOTES.md, 2026-08-14. vvvv's own statement of the idiom is in `VL.Skia`'s *Expla
 Keyboard*: the Mouse node is connected to the Renderer it interacts with, and its position is wired
 onward.
 
-### Styles — 2 of 28
+### Styles — 3 of 28
 
-`VectorStyle` is now its own node, which was the fix for the geometry layer's pin count and the
-Mapsui-idiomatic shape. Mapsui also has `SymbolStyle`, `LabelStyle`, `CalloutStyle`, `RasterStyle`,
-`StyleCollection`, `ThemeStyle`, plus `Pen`, `Brush`, `Font`, `Offset`, `Sprite`, `SymbolType`,
-`PenStyle`, `PenStrokeCap`, `StrokeJoin`, `UnitType`.
+`VectorStyle` and `LabelStyle` are their own nodes, which was the fix for the geometry layer's pin
+count and the Mapsui-idiomatic shape. Mapsui also has `SymbolStyle`, `CalloutStyle`, `RasterStyle`,
+`ThemeStyle`, plus `Pen`, `Brush`, `Font`, `Offset`, `Sprite`, `SymbolType`, `PenStyle`,
+`PenStrokeCap`, `StrokeJoin`, `UnitType`. `StyleCollection` is used but not exposed: it is how
+`LabelStyle` carries an upstream style through, since a layer takes one style and two were needed.
 
 **A style node is stateful, and the reason is worth carrying to the next one.** It holds no
 resource, but its *identity* is compared downstream twice: a layer treats a new style object as a
@@ -92,8 +93,14 @@ change and rebuilds, and Mapsui keys its rendered-geometry cache on the style ob
 (`IFeature.RenderedGeometry` is an `IDictionary<IStyle, object>`). Handing out a fresh style per
 frame therefore rebuilds every layer holding it. Reverting the cache to prove it turns 7 tests red.
 
-`LabelStyle` is the difference between shapes on a map and data you can read, and it is the next
-one worth doing — attributes now exist to feed it.
+`LabelStyle` is the difference between shapes on a map and data you can read, and what unblocked it
+was not the style but the **attributes**: a label names a column, so it needed a patch to be able to
+build `Feature`'s attribute dictionary at all. `Collections.Dictionary`'s `Add` does it, with an
+unconnected `Input` for the empty one to start from — measured 2026-08-14, and
+`HowTo Label your data.vl` is the example.
+
+`SymbolStyle` is the next one worth doing, and it is what points currently lack: `VectorStyle`
+draws lines and fills, so a `POINT` handed to `FeatureLayer` today is labelled but not marked.
 
 ### Layers — 2 of ~10
 

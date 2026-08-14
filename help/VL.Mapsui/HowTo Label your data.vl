@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Document xmlns:p="property" xmlns:r="reflection" Id="Q1aoeZG7m4VW5jytuRs2lN" LanguageVersion="2025.7.4" Version="0.128">
+<Document xmlns:p="property" xmlns:r="reflection" Id="VLHxnsZzcEC6MBNW1IZZxG" LanguageVersion="2025.7.4" Version="0.128">
   <NugetDependency Id="SIMDywDLwNbQ5UdOPHQxYD" Location="VL.CoreLib" Version="2025.7.4" />
   <NugetDependency Id="Sm17wEPgUJCVB75op3gzPF" Location="VL.Skia" Version="2025.7.4" />
   <NugetDependency Id="CCoTJSCcdlnfZwmjUnPFVB" Location="VL.Mapsui" Version="0.0.0" />
@@ -31,14 +31,10 @@
       </p:NodeReference>
       <Patch Id="T1yChjTcVpcQLJ4rxMEL44">
         <Canvas Id="VxYLn5bECvkjhyGerEE3sc" CanvasType="Group">
-          <Pad Id="VaZNqihOnpwz6dORWEdpu0" Bounds="60,30,620,160" ShowValueBox="true" isIOBox="true" Value="Drawing your own shapes on the map.&#xD;&#xA;&#xD;&#xA;The chain is Geometry to Feature to FeatureLayer, with a VectorStyle beside it, and each of those is a node you can replace. A Feature is NetTopologySuite's own type - geometry plus attributes, nothing about rendering - so whatever produced the geometry never had to know that Mapsui would draw it.&#xD;&#xA;&#xD;&#xA;THE SHAPE COMES FROM SOMEWHERE ELSE, AND THAT IS DELIBERATE. This package draws geometry; it does not create it. Here the shape is made by VL.NetTopologySuite - Read WKT turns a string into a Geometry - and anything else producing a NetTopologySuite Geometry would do just as well: a file reader, a service, a package that does not exist yet. Nothing in the chain below had to know where the shape came from.&#xD;&#xA;&#xD;&#xA;THE THING TO WATCH: drag the map and zoom it. The shape stays on ITS GROUND rather than on the window - same streets, same size relative to them. That is the whole difference between a map and a drawing, and it is what the Feature to FeatureLayer chain buys you.&#xD;&#xA;&#xD;&#xA;Try: change Line Width or a colour - the outline changes at once and Layers Built stays at 1, because a style keeps its identity while its pins are unchanged. Edit the WKT - the shape moves, and Layers Built STILL stays at 1: the layer keeps its identity and only its contents are replaced. That matters more than it sounds. A new layer object every frame made the whole map flicker on 2026-08-14, because the Map compares the layers it was handed.&#xD;&#xA;&#xD;&#xA;There is no CenterOn or ZoomToLevel here on purpose. Those are operations, so they run every frame and would re-pin the view on every one of them - you could not drag the map at all. The starting view comes from the Map node's Initial pins instead, which are applied once through Home. HowTo Show a map is where driving the view from IOBoxes is the lesson.&#xD;&#xA;&#xD;&#xA;OpenStreetMap makes a tile layer. Map holds layers and owns the viewport. ToSkiaLayer draws it. Layer order is spread order: the tile layer goes into Cons first, so the shape lands on top of it.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF. Opening a document in vvvv runs it, so a map that fetched on open would give you no chance to decline. Switch it on to see the map.&#xD;&#xA;&#xD;&#xA;Watch Layers Built: it should settle at 1 and stay. A number climbing frame after frame means something rebuilds the layer every frame, and every rebuild starts a fresh round of tile requests. That once exhausted a machine of ephemeral ports and took a home network down. Close vvvv if you see it climb.&#xD;&#xA;&#xD;&#xA;Tiles that were drawn are cached under %LOCALAPPDATA%\VL.Mapsui\tiles, which is what the OpenStreetMap tile policy asks for. A session is a few megabytes. Delete the folder to reset.&#xD;&#xA;&#xD;&#xA;A scale bar, the attribution the tile policy asks for, and buttons that zoom: see HowTo Add widgets to the map.&#xD;&#xA;&#xD;&#xA;TileCache decides where tiles go, and it is the only thing that does: hand its output to the layer's Cache pin, or leave that pin unconnected for the same default. Leave its Folder pin UNCONNECTED too - do NOT connect an empty Path IOBox, because there is no such thing. VL resolves an empty Path against the document and hands the node this patch's own folder, which wrote 444 tiles into two repositories on 2026-08-14 while every pin still read correctly.">
+          <Pad Id="VaZNqihOnpwz6dORWEdpu0" Bounds="60,30,620,180" ShowValueBox="true" isIOBox="true" Value="Labelling your data - letting the map write the words for you.&#xD;&#xA;&#xD;&#xA;A LABEL IS NOT TEXT YOU PLACE. LabelStyle's Attribute pin names an ATTRIBUTE, and every feature that carries one gets its own word, in its own place, at its own zoom. Two features here, one style, two different labels - and adding a third feature adds a third label with nothing else to change. That is why it is worth learning: the alternative, one text node per label, stops working the moment the data has a hundred rows.&#xD;&#xA;&#xD;&#xA;THIS IS WHAT THE OTHER HALF OF A FEATURE IS FOR. A Feature is geometry PLUS attributes, and the attributes have been empty in every other patch here. Dictionary Add builds one: leave its Input UNCONNECTED and you start from an empty dictionary, because that is the type's default. Chain a second Add onto the first for a second attribute.&#xD;&#xA;&#xD;&#xA;The key is the contract between the two halves. &quot;name&quot; is written in the attribute, &quot;name&quot; is written on LabelStyle, and they have to match - change one and the labels go blank. Nothing warns you, so change both.&#xD;&#xA;&#xD;&#xA;Try: type into the value IOBoxes - the labels change as you type, and Layers Built stays at 1, because a feature's contents are replaced rather than its layer rebuilt. Empty LabelStyle's Attribute pin - the labels vanish and the fill stays, since a style with nothing named has nothing to write. Change Label Size - the text grows while the shapes do not, because a label is drawn in pixels and geometry in metres.&#xD;&#xA;&#xD;&#xA;STYLE TAKES A STYLE. LabelStyle's Style pin holds the VectorStyle, and the two arrive at the layer as one thing - a layer takes a single style, so combining is how you get both. The order in the chain is the order they draw in: fill first, then the word on top of it.&#xD;&#xA;&#xD;&#xA;The shapes come from VL.NetTopologySuite, as everywhere else here: this package draws geometry, it does not create it. Read WKT is one source of it and a file reader would be another.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF on the tile layer. Opening a document in vvvv runs it, so a map that fetched on open would give you no chance to decline.&#xD;&#xA;&#xD;&#xA;Watch Layers Built: it should settle at 1 and stay. A number climbing frame after frame means something rebuilds the layer every frame, and every rebuild starts a fresh round of tile requests. Close vvvv if you see it climb.&#xD;&#xA;&#xD;&#xA;Where to go next: HowTo Draw your own shapes for the chain without labels, HowTo Stack several layers for layer order and ZoomToLayer, HowTo Add widgets to the map for the scale bar and the attribution the tile policy asks for.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
-            <p:ValueBoxSettings>
-              <p:fontsize p:Type="Int32">11</p:fontsize>
-              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
-            </p:ValueBoxSettings>
           </Pad>
           <Pad Id="UnaIkq8cPr0a4UZQVn7ji7" Comment="Enabled" Bounds="79,280,35,35" ShowValueBox="true" isIOBox="true" Value="false">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
@@ -105,7 +101,7 @@
             HowTo Create a polygon shows that. Either way what arrives here is the same type, which
             is the point: geometry is a TYPE, not a format.
           -->
-          <Pad Id="IrotR4gFylcZ62ydUXjBUC" Comment="WKT - edit me" Bounds="300,430,420,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((135.7551 34.9834, 135.7611 34.9834, 135.7611 34.9884, 135.7551 34.9884, 135.7551 34.9834))">
+          <Pad Id="IrotR4gFylcZ62ydUXjBUC" Comment="WKT - the station" Bounds="300,430,420,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((135.7565 34.9848, 135.7597 34.9848, 135.7597 34.9870, 135.7565 34.9870, 135.7565 34.9848))">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -123,6 +119,38 @@
           </Node>
           <Pad Id="RS6Hqm6oVzhIG8hIyXH2eJ" Comment="parsed?" Bounds="420,470,60,15" ShowValueBox="true" isIOBox="true" />
 
+          <!--
+            ***** what makes a label possible *****
+
+            A Feature is geometry PLUS attributes, and this is the attributes half finally being
+            used. Dictionary Add builds one entry: leave its Input unconnected and you start from an
+            empty dictionary, which is what the type's default is.
+
+            The key is what LabelStyle will look up. Change "name" to something else in both places
+            and the map labels itself with that instead.
+          -->
+          <Pad Id="HGP1rmsjVxPDxnOTru8beX" Comment="key" Bounds="620,470,110,15" ShowValueBox="true" isIOBox="true" Value="name">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Pad Id="LGtwJci1BGc0aQ6Vd7RgiK" Comment="value" Bounds="620,495,110,15" ShowValueBox="true" isIOBox="true" Value="Kyoto Station">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Node Bounds="620,520,53,26" Id="RWIfEsRqDpp3Rlackc7ZjC">
+            <p:NodeReference LastCategoryFullName="Collections.Dictionary" LastDependency="VL.Collections.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Add" />
+              <CategoryReference Kind="RecordType" Name="Dictionary" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="MZ7L8rlVq8PgUM4iexhZzS" Name="Input" Kind="StateInputPin" />
+            <Pin Id="A2MwBQcBrOEBq5qt2zSLmS" Name="Key" Kind="InputPin" />
+            <Pin Id="PQmavk7r4bugSLYvWQ29Ch" Name="Value" Kind="InputPin" />
+            <Pin Id="Px8c9IZ8rmzrxsLDzpiJBe" Name="Output" Kind="StateOutputPin" />
+          </Node>
+
           <Node Bounds="300,510,110,19" Id="LKlHCGkEW27uDksjQ03tsc">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
@@ -131,6 +159,88 @@
             <Pin Id="VZkOsrOFuCUESnjJOlfiv8" Name="Geometry" Kind="InputPin" />
             <Pin Id="T4DyhbpJF7z3MVEDGgU1l4" Name="Attributes" Kind="InputPin" />
             <Pin Id="T3xaP10ssIBu1W84JenuLS" Name="Result" Kind="OutputPin" />
+          </Node>
+
+          <!--
+            ***** a second feature on the SAME layer *****
+
+            One layer, two features, one style - and two different labels, because LabelColumn names
+            an attribute rather than carrying the text. That is the whole point of it.
+          -->
+          <Pad Id="L3sCYKzDqfJ1Ln07iscIZJ" Comment="WKT - the temple" Bounds="760,430,420,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((135.7470 34.9800, 135.7502 34.9800, 135.7502 34.9822, 135.7470 34.9822, 135.7470 34.9800))">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Node Bounds="760,470,90,19" Id="Mvw0wWq7iYh07qtlWO9SOS">
+            <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Read WKT" />
+            </p:NodeReference>
+            <Pin Id="VC6eiuumEU9ZF15v0tCeBi" Name="WKT" Kind="InputPin" />
+            <Pin Id="KQcx3XRZOrrtlXSlXLN7di" Name="Factory" Kind="InputPin" />
+            <Pin Id="PbQtP61o3GOyrsTd5H7060" Name="Result" Kind="OutputPin" />
+            <Pin Id="QCKEsIDkpLyLbuB4i2Aedh" Name="Success" Kind="OutputPin" />
+          </Node>
+          <Pad Id="SPoGHPkhHTTJMpNpdvn5vM" Comment="key" Bounds="1000,470,110,15" ShowValueBox="true" isIOBox="true" Value="name">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Pad Id="ELTkm3wJi1QIrMhJjqHMPH" Comment="value" Bounds="1000,495,110,15" ShowValueBox="true" isIOBox="true" Value="Toji Temple">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Node Bounds="1000,520,53,26" Id="IlAfU7YYtPaBvzMkbB19JD">
+            <p:NodeReference LastCategoryFullName="Collections.Dictionary" LastDependency="VL.Collections.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Add" />
+              <CategoryReference Kind="RecordType" Name="Dictionary" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="Js6Ftw4EWi7LsyjVQtgem5" Name="Input" Kind="StateInputPin" />
+            <Pin Id="HFhtow0YTfDoYcgKG1nenI" Name="Key" Kind="InputPin" />
+            <Pin Id="VDTknQYGfwMggmvCG14oBT" Name="Value" Kind="InputPin" />
+            <Pin Id="JhiUpC16QLwmysryQygVUO" Name="Output" Kind="StateOutputPin" />
+          </Node>
+          <Node Bounds="760,560,110,19" Id="HcC4GmxTQkOX0h9f1QBHMp">
+            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Feature" />
+            </p:NodeReference>
+            <Pin Id="PNKrWr4KJbpUT0gsGW7XhA" Name="Geometry" Kind="InputPin" />
+            <Pin Id="Tz1zq6vR6pQ7JbgqkEZRcD" Name="Attributes" Kind="InputPin" />
+            <Pin Id="RrfmPdrt92ItSEVnLBtEmd" Name="Result" Kind="OutputPin" />
+          </Node>
+
+          <!--
+            ***** the labels *****
+
+            Attribute names an ATTRIBUTE, not the text: one style, and every feature gets its own
+            word. Style takes the VectorStyle so both arrive at the layer as one thing, because a
+            layer takes a single style. Empty the Attribute pin and the fill passes through
+            untouched - nothing named, nothing to write.
+          -->
+          <Pad Id="RZzJ7ARmOHcsPdJWcCLoP3" Comment="Label Attribute" Bounds="760,640,110,15" ShowValueBox="true" isIOBox="true" Value="name">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Pad Id="LKQjuhfaOhae1zpNGMpoU2" Comment="Label Size" Bounds="880,640,62,15" ShowValueBox="true" isIOBox="true" Value="16">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Float32" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Node Bounds="520,590,130,19" Id="T23qWAurpyrgoRh8fLKCdS">
+            <p:NodeReference LastCategoryFullName="Mapsui.Styles" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="LabelStyle" />
+            </p:NodeReference>
+            <Pin Id="QNGu1JxjXlXVk8x5Vzah2L" Name="Style" Kind="InputPin" />
+            <Pin Id="ULIbppmgrRmENEkrSodKrP" Name="Attribute" Kind="InputPin" />
+            <Pin Id="MdXpohRLjhyLuWsCdwFoHx" Name="Color" Kind="InputPin" />
+            <Pin Id="D4vCbMFhMY5ij6p7V7EUj9" Name="Size" Kind="InputPin" />
+            <Pin Id="AzHYShl1Cy0Pdw52S7C5ZT" Name="Result" Kind="OutputPin" />
           </Node>
 
           <Node Bounds="300,550,39,19" Id="A4jSu2sjauZP2s8LlxSayy">
@@ -375,7 +485,19 @@
         <Link Id="JXVN1i305ManttJcPP1nv1" Ids="OgXXHEYRAmZYPBiQSUUGoM,RS6Hqm6oVzhIG8hIyXH2eJ" />
         <Link Id="DTPQJefyRW74Itu3WTLkG8" Ids="T3xaP10ssIBu1W84JenuLS,Hv9nORTiBeD0FjRJwQP1zt" />
         <Link Id="BoHqfeHAOk4llpsoMSZCZw" Ids="PAwh0bTqOnKYu3GBgYxASP,AMeaHKeDjwSfsDqswpSIBi" />
-        <Link Id="RqjAlj5y7JKAALPXuqGjwi" Ids="VMyWIw2DDLYJnnMn4lhUAv,Sb8LY47ypOqKRxpyRAwgiA" />
+        <Link Id="RqjAlj5y7JKAALPXuqGjwi" Ids="VMyWIw2DDLYJnnMn4lhUAv,QNGu1JxjXlXVk8x5Vzah2L" />
+        <Link Id="Hs93yVrVtspMpjll2Y7TEd" Ids="AzHYShl1Cy0Pdw52S7C5ZT,Sb8LY47ypOqKRxpyRAwgiA" />
+        <Link Id="Mse5NJYgY9nckAkn4XwosT" Ids="RZzJ7ARmOHcsPdJWcCLoP3,ULIbppmgrRmENEkrSodKrP" />
+        <Link Id="HYBIIHzwzFgWtC4jzKgugh" Ids="LKQjuhfaOhae1zpNGMpoU2,D4vCbMFhMY5ij6p7V7EUj9" />
+        <Link Id="OUin8BwfwRW8FtprPeEb8y" Ids="HGP1rmsjVxPDxnOTru8beX,A2MwBQcBrOEBq5qt2zSLmS" />
+        <Link Id="LfmlGiuJj7e5TWXPHk8YuX" Ids="LGtwJci1BGc0aQ6Vd7RgiK,PQmavk7r4bugSLYvWQ29Ch" />
+        <Link Id="Ahjo7MOX1BX1L5yiHVW2tr" Ids="Px8c9IZ8rmzrxsLDzpiJBe,T4DyhbpJF7z3MVEDGgU1l4" />
+        <Link Id="M9vrAPZcddLqu3YVw80I4A" Ids="L3sCYKzDqfJ1Ln07iscIZJ,VC6eiuumEU9ZF15v0tCeBi" />
+        <Link Id="AX4PC1ZbWOpS0jDMobsiyK" Ids="PbQtP61o3GOyrsTd5H7060,PNKrWr4KJbpUT0gsGW7XhA" />
+        <Link Id="JtUCvEjXAb24pYdNp5Z21z" Ids="SPoGHPkhHTTJMpNpdvn5vM,HFhtow0YTfDoYcgKG1nenI" />
+        <Link Id="BPQuKrptf5CCmJFDsDBRYr" Ids="ELTkm3wJi1QIrMhJjqHMPH,VDTknQYGfwMggmvCG14oBT" />
+        <Link Id="UlHmNt2if0TC2x5g97KOZg" Ids="JhiUpC16QLwmysryQygVUO,Tz1zq6vR6pQ7JbgqkEZRcD" />
+        <Link Id="K1XwTaBHH8WcaZKlZpI4zl" Ids="RrfmPdrt92ItSEVnLBtEmd,LVp2NShI38PM2uwngTMRoZ" />
         <Link Id="Lm9ZrpqdLFEJS702uLGM3a" Ids="Ck0b9Fm6W6GxEbNGJgeI05,Udad8igNKGlXkj4SIfvVV8" />
         <Link Id="QidfCpHBqpkDne4OKX6vcN" Ids="QTNlTyezfmbasb8gEcPG61,Dc7rTes8gEFct080wrJNsg" />
         <Link Id="A8smptVfsCuuj3w1qPOuv3" Ids="I8MAlGEJKxag8SUuQTLx71,LpWIQOKhRMT4Jt3tKQLG58" />

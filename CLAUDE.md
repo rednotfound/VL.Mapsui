@@ -14,7 +14,7 @@ is its own library.
 
 **Current state (2026-08-14): a working package, not yet published.** A map renders in vvvv 7.4,
 pans, zooms and takes geometry from any NTS source. `VL.Mapsui.nuspec`, `build.ps1`, `pack.ps1`,
-`tools\Test-VLPackage.ps1` and **75 tests** exist. Nothing is on nuget.org.
+`tools\Test-VLPackage.ps1` and **143 tests** exist. Nothing is on nuget.org.
 
 Node count is the honest measure of how far this is from finished: **Mapsui exposes 306 public
 types and we wrap a few dozen**. See [docs/MAPSUI-SURFACE.md](docs/MAPSUI-SURFACE.md) for what is
@@ -186,20 +186,21 @@ vl-mapsui/
 │   ├── MapsuiLayer.cs            # VL.Skia.ILayer - draws it, plus the diagnostics overlay
 │   ├── PixelSpace.cs             # pixel/VL space bridge
 │   └── TileCache.cs              # the disk cache, its folder and its size
-├── help/VL.Mapsui/               # Explanation Overview + 3 HowTos + Help.xml (ordering and tags)
+├── help/VL.Mapsui/               # Explanation Overview + 5 HowTos + Help.xml (ordering and tags)
 ├── test/VL.Mapsui.Tests/         # 75 xunit tests, no network, no vvvv
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org
 └── tools/
     ├── Test-VLPackage.ps1        # static package validator
-    ├── Normalize-HelpPatches.ps1 # run after any GUI session - vvvv repins help patches
+    ├── Normalize-HelpPatches.ps1 # run after any GUI session - vvvv repins deps AND saves Enabled=True
+    ├── Compile-HelpPatches.ps1   # headless vvvvc over every help patch; needs pack.ps1 first
     ├── New-VLId.ps1              # 22-char VL document IDs
     └── legacy/                   # retired generators; the checked-in .vl is the truth
 ```
 
 ## Tests
 
-`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 75 tests, well under a second. No
+`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 143 tests, well under a second. No
 network and no vvvv: the tile source is faked, and the geometry tests use a MemoryLayer.
 
 They exist because the expensive bug here was a **lifetime** bug, not an arithmetic one, so
@@ -246,10 +247,15 @@ the better API and returns with the nuspec.
 dotnet build src\VL.Mapsui\VL.Mapsui.csproj -c Release
 .\tools\Build-SpikePatch.ps1
 
-# Compile headlessly, then READ THE GENERATED C# before opening any window:
+# Compile every help patch headlessly, then READ THE GENERATED C# before opening any window:
 #   new OpenStreetMapNode() must appear in Create, never in Update
-& "C:\Program Files\vvvv\vvvv_gamma_7.4-win-x64\vvvvc.exe" `
-    (Resolve-Path .\spike\Spike.vl).Path --output-directory <abs-dir>
+.\pack.ps1                                  # dist\feed\*.nupkg is what restore reads
+.\tools\Compile-HelpPatches.ps1 -OutputDirectory <abs-dir>
+
+# It needs BOTH `--package-repositories dist` (how vvvv finds the package folder) and a NuGet
+# source for dist\feed (how restore finds the nupkg). Passing one gives a confident error about
+# the other, and it only ever seemed to need one because a stale package sat in
+# %USERPROFILE%\.nuget\packages -- exactly what build.ps1 now evicts. NOTES.md, 2026-08-14.
 
 # Launch with Enabled off, confirm zero connections, then turn it on and watch
 Get-NetTCPConnection | Where-Object { $_.OwningProcess -eq (Get-Process vvvv).Id }

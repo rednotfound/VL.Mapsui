@@ -5,6 +5,100 @@ them do not belong here.
 
 ---
 
+## 2026-08-14 — attributes in a patch, and four patches that shipped switched on
+
+### A patch can build the attribute dictionary, and this was not obvious
+
+`Feature`'s `Attributes` pin wants an `ImmutableDictionary<string, object>`, and until now nothing
+in a patch could produce one — which is why every example here had geometry and no attributes, and
+why `LabelStyle` had no example at all: **a label names an attribute, so a patch that cannot make
+attributes cannot demonstrate labels.**
+
+The answer is `Collections.Dictionary`'s `Add`, and the part that had to be measured is what happens
+to its **unconnected `Input`**. Compiled a throwaway probe rather than reasoning about it, and read
+the generated C#:
+
+```csharp
+ImmutableDictionary<string, Object> Input_2 = __v_PSWf5hJTnDxqOO1xxFnlPe;
+public static ImmutableDictionary<string, Object> __v_… = Dictionary._Operations_.CreateDefault<string, Object>();
+var Result_5 = FeatureNodes.Feature(geometry: Geometry_4, attributes: Output_3);
+```
+
+Two facts in three lines. An unconnected `Input` is the **type's default**, an empty dictionary — so
+a chain of `Add`s starts from nothing without a node to make the nothing. And VL **propagated the
+expected type upstream**: nothing in the patch says `<string, object>`, the `Feature` pin does, and
+the generic `Dictionary` node was resolved from the pin it feeds rather than from its own inputs.
+
+Worth stating why the C# was read at all when the exit code was already 0: an unresolved type in a
+`.vl` compiles **silently** here (2026-08-13), so an exit code proves the file parsed, not that the
+node it names exists. The generated C# naming `FeatureNodes.Feature(attributes: …)` is the proof.
+
+`HowTo Label your data.vl` came out of this — two features, one style, two labels, and the whole
+point on screen: `Attribute` names a column rather than carrying text, so a third feature would
+label itself.
+
+### Four help patches shipped with `Enabled` switched on
+
+Rule 2 of this repository is that anything which fetches ships **off**, because opening a document
+in vvvv runs it. The nodes obey it — `enabled = false` in C# — but **the IOBox in the patch
+overrides the node**, and four of the six patches carried `Value="True"`:
+
+```
+HowTo Draw your own shapes.vl   True     <- and its own description says "Enabled starts OFF"
+HowTo Label your data.vl        True
+HowTo Show a map.vl             True
+HowTo Stack several layers.vl   True
+```
+
+**The capital `T` is the tell.** Every pad written by hand in this repository says `false`; vvvv
+writes `True`. So this was not a decision anyone made — it is a GUI round switching the map on to
+look at it, and vvvv saving that along with the window positions. The same mechanism that rewrites
+`NugetDependency` versions on save, which `tools\Normalize-HelpPatches.ps1` already existed to undo.
+
+Fixed there rather than by hand, because a hand fix would last exactly until the next GUI round.
+`Comment="Enabled"` is the tile-layer toggle in every patch here and nothing else, so the rule can
+be that precise. **Negative-tested in the order that proves anything:** `-Check` was run *before*
+the fix and printed the four files and exited 1; after the fix it exits 0.
+
+### The headless compile needs two things lined up, and only ever had one
+
+Every help patch failed to compile this round, all seven identically, and the package had not
+changed. Two different errors depending on what was passed:
+
+```
+--package-repositories dist        NU1101: package VL.Mapsui not found      (sources: nuget.org, …)
+--package-repositories dist\feed   VL.Lang.CompileException: Missing package: VL.Mapsui
+```
+
+They are not two attempts at one setting; they are **two mechanisms that both have to be satisfied**.
+`--package-repositories` is how *vvvv* finds a package **folder** (`dist\VL.Mapsui\`). vvvvc then
+generates a `.csproj` with a `PackageReference` and runs an ordinary **NuGet restore**, which knows
+nothing about that flag and needs the **nupkg** (`dist\feed\`).
+
+**It only ever appeared to work because of a stale package.** Restore was quietly satisfied by
+`%USERPROFILE%\.nuget\packages\vl.mapsui`, left over from an earlier `pack.ps1`. `build.ps1` evicts
+that on purpose — it is what once made vvvvc insist a node did not exist hours after it was
+written — so running `build.ps1` without `pack.ps1` removed the only thing that had been holding
+the compile up. A green check resting on a cache nobody named is the same class of false proof this
+repository keeps finding.
+
+Fixed by `tools\Compile-HelpPatches.ps1`, which passes `dist\` as the repository and drops a
+`NuGet.config` pointing at `dist\feed\` at the output root, where restore finds it by walking up
+from the generated project. Both mechanisms, named, in one place.
+
+### Two mistakes of my own, both caught by `vvvvc` rather than by me
+
+- `[Pin(Name = "URL Template")]`. Without it the pin reads **`Url Template`** — VL builds a pin name
+  by splitting the C# parameter at its capitals, and `urlTemplate` cannot carry an acronym through
+  that. The patch named the pin correctly and the compile failed on the node not having it.
+- `Result`, not `Output`. A `[ProcessNode]`'s return pin is `Result`; `Output` is what a fluent
+  static operation returns. Written from memory, wrong, and the compile said so.
+
+Both are in the class this repository keeps re-learning: **the pin names in a hand-written `.vl` are
+a claim about the C#, and only a compile checks the claim.**
+
+---
+
 ## 2026-08-14 — a shape on a map, and three defects the screen found first
 
 `HowTo Draw your own shapes.vl` draws a polygon over OpenStreetMap, the shape stays on its ground

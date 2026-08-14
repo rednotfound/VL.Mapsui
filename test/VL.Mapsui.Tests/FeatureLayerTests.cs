@@ -134,6 +134,26 @@ public class FeatureLayerTests
     // ── The layer ─────────────────────────────────────────────────────────────
 
     [Fact]
+    public void Switching_a_layer_off_hides_it_without_dismantling_it()
+    {
+        // Enabled is Mapsui's visibility flag, and hiding a layer must not cost its features, its
+        // style or whatever the renderer has cached about them - so it is set, never rebuilt.
+        using var node = new FeatureLayerNode();
+        var features = new[] { At(0, 0) };
+
+        var on = node.Update(out _, features, enabled: true);
+        var off = node.Update(out _, features, enabled: false);
+
+        Assert.Same(on, off);
+        Assert.False(off!.Enabled);
+        Assert.Equal(1, node.LayersBuilt);
+        Assert.Equal(1, node.FeatureSetsBuilt);
+
+        Assert.True(node.Update(out _, features, enabled: true)!.Enabled);
+        Assert.Equal(1, node.FeatureSetsBuilt);   // nothing was rebuilt on the way back
+    }
+
+    [Fact]
     public void No_features_gives_no_layer()
     {
         // So a Map can be wired up before there is anything to draw.
