@@ -31,7 +31,7 @@
       </p:NodeReference>
       <Patch Id="T1yChjTcVpcQLJ4rxMEL44">
         <Canvas Id="VxYLn5bECvkjhyGerEE3sc" CanvasType="Group">
-          <Pad Id="VaZNqihOnpwz6dORWEdpu0" Bounds="60,30,620,180" ShowValueBox="true" isIOBox="true" Value="Labelling your data - letting the map write the words for you.&#xD;&#xA;&#xD;&#xA;A LABEL IS NOT TEXT YOU PLACE. LabelStyle's Attribute pin names an ATTRIBUTE, and every feature that carries one gets its own word, in its own place, at its own zoom. Two features here, one style, two different labels - and adding a third feature adds a third label with nothing else to change. That is why it is worth learning: the alternative, one text node per label, stops working the moment the data has a hundred rows.&#xD;&#xA;&#xD;&#xA;THIS IS WHAT THE OTHER HALF OF A FEATURE IS FOR. A Feature is geometry PLUS attributes, and the attributes have been empty in every other patch here. Dictionary Add builds one: leave its Input UNCONNECTED and you start from an empty dictionary, because that is the type's default. Chain a second Add onto the first for a second attribute.&#xD;&#xA;&#xD;&#xA;The key is the contract between the two halves. &quot;name&quot; is written in the attribute, &quot;name&quot; is written on LabelStyle, and they have to match - change one and the labels go blank. Nothing warns you, so change both.&#xD;&#xA;&#xD;&#xA;Try: type into the value IOBoxes - the labels change as you type, and Layers Built stays at 1, because a feature's contents are replaced rather than its layer rebuilt. Empty LabelStyle's Attribute pin - the labels vanish and the fill stays, since a style with nothing named has nothing to write. Change Label Size - the text grows while the shapes do not, because a label is drawn in pixels and geometry in metres.&#xD;&#xA;&#xD;&#xA;STYLE TAKES A STYLE. LabelStyle's Style pin holds the VectorStyle, and the two arrive at the layer as one thing - a layer takes a single style, so combining is how you get both. The order in the chain is the order they draw in: fill first, then the word on top of it.&#xD;&#xA;&#xD;&#xA;The shapes come from VL.NetTopologySuite, as everywhere else here: this package draws geometry, it does not create it. Read WKT is one source of it and a file reader would be another.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF on the tile layer. Opening a document in vvvv runs it, so a map that fetched on open would give you no chance to decline.&#xD;&#xA;&#xD;&#xA;Watch Layers Built: it should settle at 1 and stay. A number climbing frame after frame means something rebuilds the layer every frame, and every rebuild starts a fresh round of tile requests. Close vvvv if you see it climb.&#xD;&#xA;&#xD;&#xA;Where to go next: HowTo Draw your own shapes for the chain without labels, HowTo Stack several layers for layer order and ZoomToLayer, HowTo Add widgets to the map for the scale bar and the attribution the tile policy asks for.">
+          <Pad Id="VaZNqihOnpwz6dORWEdpu0" Bounds="60,30,620,180" ShowValueBox="true" isIOBox="true" Value="Labelling your data - letting the map write the words for you.&#xD;&#xA;&#xD;&#xA;A LABEL IS NOT TEXT YOU PLACE. LabelStyle's Attribute pin names an ATTRIBUTE, and every feature that carries one gets its own word, in its own place, at its own zoom. Two features here, one style, two different labels - and adding a third feature adds a third label with nothing else to change. That is why it is worth learning: the alternative, one text node per label, stops working the moment the data has a hundred rows.&#xD;&#xA;&#xD;&#xA;THIS IS WHAT THE OTHER HALF OF A FEATURE IS FOR. A Feature is geometry PLUS attributes, and the attributes have been empty in every other patch here. Dictionary Add builds one: leave its Input UNCONNECTED and you start from an empty dictionary, because that is the type's default. Each feature here carries TWO - name and type - and the second Add takes the first one's Output as its Input. Only the first Add in a chain has a free Input, which is the whole rule.&#xD;&#xA;&#xD;&#xA;THE PAYOFF IS ONE PIN. Change LabelStyle's Attribute from name to type and the map relabels itself station and temple - same features, same style, same layer, nothing else touched. That is a thousand rows relabelled by one word, and it is the reason a label names a column instead of carrying text.&#xD;&#xA;&#xD;&#xA;The key is the contract between the two halves. &quot;name&quot; is written in the attribute, &quot;name&quot; is written on LabelStyle, and they have to match - change one and the labels go blank. Nothing warns you, so change both.&#xD;&#xA;&#xD;&#xA;Try: type into the value IOBoxes - the labels change as you type, and Layers Built stays at 1, because a feature's contents are replaced rather than its layer rebuilt. Empty LabelStyle's Attribute pin - the labels vanish and the fill stays, since a style with nothing named has nothing to write. Change Label Size - the text grows while the shapes do not, because a label is drawn in pixels and geometry in metres.&#xD;&#xA;&#xD;&#xA;STYLE TAKES A STYLE. LabelStyle's Style pin holds the VectorStyle, and the two arrive at the layer as one thing - a layer takes a single style, so combining is how you get both. The order in the chain is the order they draw in: fill first, then the word on top of it.&#xD;&#xA;&#xD;&#xA;The shapes come from VL.NetTopologySuite, as everywhere else here: this package draws geometry, it does not create it. Read WKT is one source of it and a file reader would be another.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF on the tile layer. Opening a document in vvvv runs it, so a map that fetched on open would give you no chance to decline.&#xD;&#xA;&#xD;&#xA;Watch Layers Built: it should settle at 1 and stay. A number climbing frame after frame means something rebuilds the layer every frame, and every rebuild starts a fresh round of tile requests. Close vvvv if you see it climb.&#xD;&#xA;&#xD;&#xA;Where to go next: HowTo Draw your own shapes for the chain without labels, HowTo Stack several layers for layer order and ZoomToLayer, HowTo Add widgets to the map for the scale bar and the attribution the tile policy asks for.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -151,6 +151,33 @@
             <Pin Id="Px8c9IZ8rmzrxsLDzpiJBe" Name="Output" Kind="StateOutputPin" />
           </Node>
 
+          <!--
+            A SECOND attribute: the first Add's Output goes into the second Add's Input, and one
+            feature now carries two. Only the FIRST Add in a chain leaves its Input unconnected -
+            that is where the empty dictionary comes from.
+          -->
+          <Pad Id="KLvSfosYiB7QogYuRtcpbk" Comment="key 2" Bounds="620,570,110,15" ShowValueBox="true" isIOBox="true" Value="type">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Pad Id="AeBfzFC7yMsUDLilNXrSVB" Comment="value 2" Bounds="620,595,110,15" ShowValueBox="true" isIOBox="true" Value="station">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Node Bounds="620,620,53,26" Id="PqMpFhUvRub3j7B6UzJzdm">
+            <p:NodeReference LastCategoryFullName="Collections.Dictionary" LastDependency="VL.Collections.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Add" />
+              <CategoryReference Kind="RecordType" Name="Dictionary" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="AO9qtL79u94vYlpD0qRXGu" Name="Input" Kind="StateInputPin" />
+            <Pin Id="KFEKyP19UcTz7YdC4F8ZsV" Name="Key" Kind="InputPin" />
+            <Pin Id="Bx4Bc7fGhOjf8z5qyFkRip" Name="Value" Kind="InputPin" />
+            <Pin Id="QBcQPULvEtLTXAlkr6cySk" Name="Output" Kind="StateOutputPin" />
+          </Node>
+
           <Node Bounds="300,510,110,19" Id="LKlHCGkEW27uDksjQ03tsc">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
@@ -202,6 +229,27 @@
             <Pin Id="HFhtow0YTfDoYcgKG1nenI" Name="Key" Kind="InputPin" />
             <Pin Id="VDTknQYGfwMggmvCG14oBT" Name="Value" Kind="InputPin" />
             <Pin Id="JhiUpC16QLwmysryQygVUO" Name="Output" Kind="StateOutputPin" />
+          </Node>
+          <Pad Id="QK0QagMxVl8KzH5G4C8sPk" Comment="key 2" Bounds="1000,570,110,15" ShowValueBox="true" isIOBox="true" Value="type">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Pad Id="SrGHPl2mVtCzAkYvodCfkD" Comment="value 2" Bounds="1000,595,110,15" ShowValueBox="true" isIOBox="true" Value="temple">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Node Bounds="1000,620,53,26" Id="TOun4SRPqKXmrc9Nq73FM4">
+            <p:NodeReference LastCategoryFullName="Collections.Dictionary" LastDependency="VL.Collections.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Add" />
+              <CategoryReference Kind="RecordType" Name="Dictionary" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="QP2rxkw92Q4SiH3VLMGsl6" Name="Input" Kind="StateInputPin" />
+            <Pin Id="INbhiKbjeNqroBjiT1mVQf" Name="Key" Kind="InputPin" />
+            <Pin Id="N54kIv7rN0J1hN3Qzo8p3s" Name="Value" Kind="InputPin" />
+            <Pin Id="HJHDCrUQpmWaLMi47xnQaV" Name="Output" Kind="StateOutputPin" />
           </Node>
           <Node Bounds="760,560,110,19" Id="HcC4GmxTQkOX0h9f1QBHMp">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
@@ -491,13 +539,19 @@
         <Link Id="HYBIIHzwzFgWtC4jzKgugh" Ids="LKQjuhfaOhae1zpNGMpoU2,D4vCbMFhMY5ij6p7V7EUj9" />
         <Link Id="OUin8BwfwRW8FtprPeEb8y" Ids="HGP1rmsjVxPDxnOTru8beX,A2MwBQcBrOEBq5qt2zSLmS" />
         <Link Id="LfmlGiuJj7e5TWXPHk8YuX" Ids="LGtwJci1BGc0aQ6Vd7RgiK,PQmavk7r4bugSLYvWQ29Ch" />
-        <Link Id="Ahjo7MOX1BX1L5yiHVW2tr" Ids="Px8c9IZ8rmzrxsLDzpiJBe,T4DyhbpJF7z3MVEDGgU1l4" />
+        <Link Id="Ahjo7MOX1BX1L5yiHVW2tr" Ids="Px8c9IZ8rmzrxsLDzpiJBe,AO9qtL79u94vYlpD0qRXGu" />
         <Link Id="M9vrAPZcddLqu3YVw80I4A" Ids="L3sCYKzDqfJ1Ln07iscIZJ,VC6eiuumEU9ZF15v0tCeBi" />
         <Link Id="AX4PC1ZbWOpS0jDMobsiyK" Ids="PbQtP61o3GOyrsTd5H7060,PNKrWr4KJbpUT0gsGW7XhA" />
         <Link Id="JtUCvEjXAb24pYdNp5Z21z" Ids="SPoGHPkhHTTJMpNpdvn5vM,HFhtow0YTfDoYcgKG1nenI" />
         <Link Id="BPQuKrptf5CCmJFDsDBRYr" Ids="ELTkm3wJi1QIrMhJjqHMPH,VDTknQYGfwMggmvCG14oBT" />
-        <Link Id="UlHmNt2if0TC2x5g97KOZg" Ids="JhiUpC16QLwmysryQygVUO,Tz1zq6vR6pQ7JbgqkEZRcD" />
+        <Link Id="UlHmNt2if0TC2x5g97KOZg" Ids="JhiUpC16QLwmysryQygVUO,QP2rxkw92Q4SiH3VLMGsl6" />
         <Link Id="K1XwTaBHH8WcaZKlZpI4zl" Ids="RrfmPdrt92ItSEVnLBtEmd,LVp2NShI38PM2uwngTMRoZ" />
+        <Link Id="NXYaILjtnWc6d6bDFTwlGY" Ids="KLvSfosYiB7QogYuRtcpbk,KFEKyP19UcTz7YdC4F8ZsV" />
+        <Link Id="RLvOXz80S6J9s2SsORR16Y" Ids="AeBfzFC7yMsUDLilNXrSVB,Bx4Bc7fGhOjf8z5qyFkRip" />
+        <Link Id="SZ1wP5y6v4EZdN0ThAw1be" Ids="QBcQPULvEtLTXAlkr6cySk,T4DyhbpJF7z3MVEDGgU1l4" />
+        <Link Id="Ixu1bt3NDqTL4ipVFkwHTI" Ids="QK0QagMxVl8KzH5G4C8sPk,INbhiKbjeNqroBjiT1mVQf" />
+        <Link Id="HkXQG9yXyMceEJ3eYd7P9A" Ids="SrGHPl2mVtCzAkYvodCfkD,N54kIv7rN0J1hN3Qzo8p3s" />
+        <Link Id="K1FueWZgAPK1wThLKGnsRH" Ids="HJHDCrUQpmWaLMi47xnQaV,Tz1zq6vR6pQ7JbgqkEZRcD" />
         <Link Id="Lm9ZrpqdLFEJS702uLGM3a" Ids="Ck0b9Fm6W6GxEbNGJgeI05,Udad8igNKGlXkj4SIfvVV8" />
         <Link Id="QidfCpHBqpkDne4OKX6vcN" Ids="QTNlTyezfmbasb8gEcPG61,Dc7rTes8gEFct080wrJNsg" />
         <Link Id="A8smptVfsCuuj3w1qPOuv3" Ids="I8MAlGEJKxag8SUuQTLx71,LpWIQOKhRMT4Jt3tKQLG58" />
