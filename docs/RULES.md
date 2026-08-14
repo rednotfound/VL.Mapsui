@@ -1,0 +1,147 @@
+# The rules, carried over
+
+Everything below was learned in `vvvv-gis` (VL.GIS) and applies here unchanged. It is written out
+rather than linked because **a rule transfers; a note about another repository's file does not** —
+that lesson was itself learned by carrying the packaging rules across and leaving the runtime ones
+behind, where they promptly cost a home network.
+
+Each rule is followed by what it cost or the measurement behind it. The long forensics stay where
+they were written and are linked at the end; nothing here depends on that repository being present.
+
+---
+
+## Packaging — break these and the package fails *silently*
+
+Nine releases shipped, installed, and contributed **zero nodes**, with no error anywhere.
+
+1. **A `.vl` is generated or edited, never regenerated carelessly.** Every `Id` is exactly 22
+   characters, first `[A-V]`, rest `[0-9A-Za-z]`, unique in the document. `tools\New-VLId.ps1`
+   makes them. To add a dependency, append one line with a fresh ID — existing IDs are identities
+   that must stay stable across releases.
+2. **A `.vl` is UTF-8 *with* BOM.** Without it vvvv will not load the document. Any tool that
+   rewrites one must use `New-Object System.Text.UTF8Encoding($true)`.
+3. **Every forwarded assembly needs `[assembly: ImportAsIs(Namespace = "VL")]`.** Without it the
+   package loads, compiles, packs and exports with zero warnings — and its methods are demoted to
+   raw .NET reflection nodes that the NodeBrowser hides. Indistinguishable from the package not
+   loading at all.
+4. **A shipped `.vl` must never contain `<ProjectDependency>`.** It forces the package and
+   everything downstream to stay editable.
+5. **Never repack a version number that already exists locally.** NuGet treats a version as
+   immutable and serves a stale copy from `~\.nuget\packages\<id>\<version>` forever. `pack.ps1`
+   evicts that directory; keep it that way.
+6. **nuget.org is not a test environment.** The loop is local: `dist\` as a package repository,
+   `dist\feed` as a feed. A published version can never be replaced.
+7. **An upstream library must be a *package in a package repository*, not just a
+   `<NugetDependency>` line.** Declaring it is necessary and not sufficient. Without the package
+   present VL cannot resolve its types, so a node whose signature mentions a foreign type is built
+   with no working pins and every link to it is dropped — `vvvvc` exits 0 and nothing is red.
+   `build.ps1` installs them into `deps\`, kept apart from `dist\` because pointing
+   `--package-repositories` at the document being compiled fails with *"Entry point for document
+   X.vl not found"*.
+
+**Installing without pruning is the same bug one level up.** `deps\` is handed to vvvv, so a
+package nobody declares any more is still offered to everything that loads. `build.ps1` prunes by
+reachability, reading each manifest out of the `.nupkg` — there are no `.nuspec` files on disk, and
+the first version of that prune treated an unreadable manifest as a leaf and deleted the whole
+transitive closure.
+
+---
+
+## Runtime — break these and something *outside* the package fails
+
+8. **A `public static` method is evaluated on every frame.** Sixty times a second, from the moment
+   the document is opened — opening a `.vl` *is* running it. Anything that acquires a connection,
+   file handle, GPU resource, cache, thread or subscription must be a `[ProcessNode]` class,
+   built once and rebuilt only when an input actually changes. Written as a static method, a map
+   node opened **17,000 TCP connections in 13 minutes**, exhausted the machine's 16,384 ephemeral
+   ports and took down a home network.
+9. **Never block on a task inside a node.** vvvv's runtime thread owns a `SynchronizationContext`,
+   so `.Result` / `.Wait()` deadlocks it — the window closes without the process exiting. Return
+   `IObservable`, or wrap in `Task.Run`. Testing sync-over-async in a host without a context
+   (PowerShell) proves nothing about a host that has one.
+10. **A node pointing at free public infrastructure is off by default.** Zero requests on open, a
+    disk cache, a User-Agent naming the package, and an on-screen count of what has been built.
+    OpenStreetMap's tile policy forbids bulk downloading, and whoever opens a patch has not agreed
+    to anything yet.
+11. **Never leave vvvv running unattended, and never start it in the background.** Launch, read
+    the value, close. Leaks accumulate across sessions.
+
+---
+
+## Node design — what earns a node
+
+Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
+
+- **Three questions, in order.** Can a patch reach the same result by wiring three existing nodes
+  (then it is a help patch, not a node)? Does it hold a resource (then it is a `[ProcessNode]`)?
+  Is the thing it decides something the user cares about (if not, put it behind a pin)?
+- **Three inputs is the target, four wants a reason, five means two decisions are wearing one
+  node.** Of VL.CoreLib's 901 static nodes, 493 take one input and **94% take three or fewer**;
+  every node above five is a machine-generated arity family, so **not one designed node exceeds
+  five**.
+- **Bundle a choice the user does not want to make; never a concept they have to understand
+  anyway.** Heron covers the whole GIS domain in 37 components and reads seven file formats in one
+  of them. What must never be bundled, each already paid for here: what the mouse means, where the
+  view looks, where files go, which renderer draws it.
+- **Help is the teaching surface, not a fatter node.** VL.Skia ships 4 C# static nodes and **98
+  help patches**; VL.Stride ships none and 125. In libraries people learn from, help runs 16–24%
+  of node count. Five prefixes, not interchangeable: `Explanation` (one per library, the front
+  door — 57 in vvvv's own packs), `HowTo`, `Reference`, `Example`, `Tutorial`. `Help.xml` orders
+  them and carries search tags.
+- **Naming, from the Gray Book:** process nodes are nouns, operation nodes prefer verbs; never
+  start a name with `As..`, use `To..`/`From..`; a container datatype gets a **`Split`**/`Join`
+  pair (`Split` appears 194 times in shipped help patches — it is what a user types); `Create` is
+  for complex types, not property bags; avoid excessive subcategories.
+- **A path pin is `VL.Lib.IO.Path`, never `string`** — its IOBox opens a directory chooser on
+  SHIFT+rightclick. And **a machine-dependent default cannot be a pin's initial value**: a C#
+  default must be a compile-time constant (`CS1736`). Expose it through a node, the way
+  `SystemFolder [IO]` does. Beware that a Path IOBox stores a *relative* path whenever it can and
+  hides that from you, so a node that writes files must refuse a non-rooted path rather than guess.
+- **Tags are not a C# attribute.** `VL.Core.Import` has no `TagsAttribute`; `Tags=` and `Summary=`
+  live on a node definition in a `.vl`, including on a `ForwardDefinition` — vvvv's own
+  `VL.Skia.vl` does this for `Console`. Across every shipped `.vl`, **251 multi-term tags use
+  commas and none use spaces**, which contradicts the guidelines; follow the shipped code.
+- **Fluent operations** (return type equals the first parameter type) get an output pin named
+  `Output`; everything else gets `Result`. `vvvvc` rejects the wrong one, which is how this was
+  established rather than guessed.
+
+---
+
+## Working style
+
+- **Change one variable at a time.** Nine failed releases came from editing the `.vl`, the csproj
+  and the nuspec in one round with no idea which mattered.
+- **Before believing a green result, name the mechanism by which it could have gone red.** A
+  console program rendering a PNG proves nothing about vvvv: it draws onto a bare `SKCanvas` and
+  bypasses the coordinate space, which is the only part that plausibly breaks.
+- **A check that has never gone red is not a check.** The `.gitignore` rule added to stop stray
+  tiles did not work on the first attempt — a pattern containing a slash is anchored to the
+  repository root — and only planting a file and watching git ignore it caught that.
+- **Validate before committing, in a separate step.** A validator run in the same command block as
+  the commit reported its failure after the push had already happened.
+- **Trace the whole chain, not one hop.** Surveying shipped patches for what `Wheel State`
+  connects to found `FrameDifference`, which answered "it accumulates" — and stopping there left
+  the magnitude to a guess. One link further sat `FrameDifference → Sign`.
+- **Before writing a node of an unfamiliar kind, read a shipped package that ships that kind.**
+  `VL.ImGui.ToSkiaLayer` supplied the pixel-space approach here; `VL.IO.Redis` is the precedent
+  for a `[ProcessNode]` owning a connection.
+- **Copy node XML verbatim from a shipped patch** rather than composing it. And an XML comment
+  cannot contain `--`; that has cost three rounds.
+
+---
+
+## The long version
+
+Full forensics, kept where they were written:
+
+- [`../../vvvv-gis/docs/VL-PACKAGING.md`](../../vvvv-gis/docs/VL-PACKAGING.md) — how a node comes
+  to exist, and every way that fails quietly
+- [`../../vvvv-gis/docs/VL-RUNTIME.md`](../../vvvv-gis/docs/VL-RUNTIME.md) — what happens once it
+  runs; both incidents dissected
+- [`../../vvvv-gis/docs/NODE-DESIGN.md`](../../vvvv-gis/docs/NODE-DESIGN.md) — the survey behind
+  the node-design section above
+- [`../../vvvv-gis/docs/DESIGN.md`](../../vvvv-gis/docs/DESIGN.md) — why VL.GIS is shaped the way
+  it is, and the division of labour between the two packages
+
+Those links assume both repositories sit side by side under `D:\2026_Projects\`. If they do not,
+this file is still complete on its own.

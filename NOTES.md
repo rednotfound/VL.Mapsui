@@ -5,6 +5,82 @@ them do not belong here.
 
 ---
 
+## 2026-08-14 — geometry on the map, and a cache that writes where it likes
+
+The two packages compose now. VL.GIS dropped BruTile, which was the entire conflict, and both load
+into one vvvv with the map rendering. `Mapsui.Layers.Geometry` takes NetTopologySuite geometry and
+returns a layer, so **they meet through NTS rather than through each other** — neither references
+the other, and the same node draws geometry from any source.
+
+### The design I got wrong first
+
+My first version of the overlay read Mapsui's viewport, converted its resolution to a zoom level,
+built a VL.GIS `MapView`, turned the geometry into an `SKPath` in pixels, and drew that above the
+map through `WithinCommonSpace`. Nine nodes, two coordinate systems held in step by hand, and
+nothing on screen. The user asked why the circle was not simply a layer on the map — which is what
+Mapsui is for. Four nodes now, and the example patch dropped from 190 ids to 154.
+
+Worth keeping from the wrong path: `ViewportNodes.MercatorResolution` and
+`ZoomFromMercatorResolution` in VL.GIS, and the trap they exist to name. VL.GIS's `Resolution`
+reports *ground* metres at the centre latitude and carries a cos(latitude) factor; a map engine's
+resolution is *projection* metres and does not. Swapping them leaves an overlay 19% out at Tokyo,
+31% at Berlin — drifting with latitude, and looking merely a little misaligned.
+
+Unexplained and left alone: `DrawPath`'s output disappeared downstream of `WithinCommonSpace`. The
+branch is gone from the example, so the symptom is no longer on any path. **Not diagnosed, and not
+guessed at.**
+
+### The cache writes next to the document — still open
+
+444 stray tiles across the two repositories, in `{z}/{x}/{y}.png` form:
+
+| where | count | when |
+|---|---|---|
+| `vvvv-gis\examples\` | 366 | the two runs of the example patch |
+| `vl-mapsui\help\VL.Mapsui\` | 78 | the coexistence test |
+
+In the same window the real cache under `%LOCALAPPDATA%\VL.Mapsui\tiles` gained **nothing**. So the
+cache root became the directory vvvv was launched from. `Cache Status` did not report it and the
+relative-path guard in `TileCache.TryCreate` did not fire, which means the explanation is not the
+obvious one and **must be measured rather than reasoned about**: open the patch and read the pin.
+
+This is precisely the failure the `Cache Folder` design was written against — "files appearing
+somewhere nobody asked for, with nothing to say so". Three things made it worse than one bug:
+
+- **38 of them were committed**, in `d3b9bf5`, because I ran `git add -A` without looking.
+- `build.ps1` had already staged them into `dist\`, one `pack.ps1` from shipping inside the package.
+- `Test-VLPackage.ps1` passed throughout. It has no idea what does not belong in a package.
+
+Fixed so far: removed, and `.gitignore` covers the shape in both repositories. The pattern was
+wrong on the first attempt — one containing a slash is anchored to the repository root — and only
+planting a file and watching git ignore it caught that. **A check that has never gone red is not a
+check.**
+
+### I deleted both help patches
+
+While removing the stray tiles I wrote `$_` where I meant `$d` inside a `foreach`. In PowerShell
+`$_` is not the loop variable there, so the path collapsed to the help folder itself and the
+command removed both hand-arranged patches. Recovered whole from the index with `git checkout`,
+verified by BOM, XML parse and node count.
+
+The lesson is not "be careful with `$_`". It is that **a destructive command should name its
+targets explicitly and refuse anything that does not match the shape it expects** — the retry built
+the list of directory names first and threw on anything that was not all digits.
+
+### Also settled
+
+- `Map.Widgets` is a `ConcurrentQueue<IWidget>`: append only, no removal. Every widget node must
+  therefore be a `[ProcessNode]` that enqueues once and then drives `Enabled`.
+- Mapsui's whole surface is now written down in [docs/MAPSUI-SURFACE.md](docs/MAPSUI-SURFACE.md):
+  **306 public types**, of which we wrap a few dozen. `Mapsui.Nts` carries a **Shapefile reader**
+  and Mapsui carries **WMS and WFS providers** — one of which VL.GIS had on its roadmap as a
+  reason to take on GDAL.
+- The rules carried over from VL.GIS now live in [docs/RULES.md](docs/RULES.md) rather than behind
+  relative paths into the other repository, so a standalone clone is not missing half its
+  instructions.
+
+---
+
 ## 2026-08-13 — Mapsui is not blocked for a standalone package
 
 VL.GIS's `CLAUDE.md` says "Wrapping Mapsui is not currently possible". **That verdict was

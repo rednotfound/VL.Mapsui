@@ -12,11 +12,18 @@ package hands over a map that draws itself.
 Separate repository on purpose. VL.GIS's rule is **one package per wrapped library**, and Mapsui
 is its own library.
 
-**Current state: a spike, and nothing more.** One question — does a Mapsui map reach the screen
-inside vvvv — plus the scaffolding needed to answer it. **No nuspec, no build or pack scripts,
-no CI, no tests, nothing published.** That is deliberate: VL.GIS shipped nine releases that
-installed cleanly and contributed zero nodes because the packaging was built around something
-never verified.
+**Current state (2026-08-14): a working package, not yet published.** A map renders in vvvv 7.4,
+pans, zooms and takes geometry from any NTS source. `VL.Mapsui.nuspec`, `build.ps1`, `pack.ps1`,
+`tools\Test-VLPackage.ps1` and **75 tests** exist. Nothing is on nuget.org.
+
+Node count is the honest measure of how far this is from finished: **Mapsui exposes 306 public
+types and we wrap a few dozen**. See [docs/MAPSUI-SURFACE.md](docs/MAPSUI-SURFACE.md) for what is
+wrapped, what is not, and what will not be.
+
+**One open bug, and it writes files:** the tile cache lands next to whatever document vvvv was
+launched from rather than in the cache folder — 444 stray tiles across two repositories, 38 of
+which reached a commit. `.gitignore` now covers the shape and they have been removed, but the
+cause is unknown and it is the first thing to fix. See NOTES.md, 2026-08-14.
 
 Measurements and their dates live in [NOTES.md](NOTES.md). Claims without a measurement behind
 them do not belong there or here.
@@ -24,7 +31,7 @@ them do not belong there or here.
 ## The rules that matter most here
 
 Both of the expensive mistakes in this repository were about **when a node runs**, not about
-what it computes. Read [`../vvvv-gis/docs/VL-RUNTIME.md`](../vvvv-gis/docs/VL-RUNTIME.md) before
+what it computes. Read [`docs/RULES.md`](docs/RULES.md) before
 writing any node; the four questions at the top of it would have prevented both.
 
 1. **A `public static` method is evaluated every frame.** Opening a `.vl` *is* running it.
@@ -60,7 +67,7 @@ writing any node; the four questions at the top of it would have prevented both.
 
 ## Node design rules inherited from VL.GIS
 
-[`../vvvv-gis/docs/NODE-DESIGN.md`](../vvvv-gis/docs/NODE-DESIGN.md) — what earns a node, how many
+[`docs/RULES.md`](docs/RULES.md) — what earns a node, how many
 pins one may have, what may be bundled and what must never be. Read it before adding a node, and
 especially before "this is confusing, let me make one node that does it all": that instinct
 produced the all-in-one map node this package was rebuilt to undo. Measured summary: 94% of the
@@ -72,7 +79,7 @@ patches than nodes.
 ## Packaging rules inherited from VL.GIS
 
 These apply the moment a `.nuspec` appears here. All of them are silent when broken —
-see [`../vvvv-gis/docs/VL-PACKAGING.md`](../vvvv-gis/docs/VL-PACKAGING.md).
+see [`docs/RULES.md`](docs/RULES.md).
 
 - Every forwarded assembly needs `[assembly: ImportAsIs(Namespace = "VL")]`; without it nodes
   are invisible with no warning anywhere. Already in `src/VL.Mapsui/AssemblyInfo.cs`.
@@ -114,45 +121,65 @@ zoom 12 produced **16 tiles, 736 KB**. The overlay prints the live figure so it 
 on trust, and the directory walk behind it is throttled to once every two seconds because doing
 it per frame is the same mistake in different clothes.
 
-## VL.GIS cannot be loaded at the same time
+## VL.GIS can now be loaded at the same time — fixed 2026-08-14
 
-`Mapsui.Tiling` pins BruTile to `[5.0.6, 6.0.0)`; VL.GIS uses BruTile 6. `BruTile.Attribution`
-changed layout between them, so mixing throws `TypeLoadException` at runtime. Accepted for now,
-and it dissolves when vvvv reaches SkiaSharp 3 and Mapsui 5 becomes usable — 5.x uses BruTile 6
-and matches VL.GIS exactly.
+It could not before, and worse: installing VL.GIS *broke* this package. `Mapsui.Tiling` pins
+BruTile to `[5.0.6, 6.0.0)` while VL.GIS used BruTile 6, and `BruTile.Attribution` changed layout
+between them, so mixing threw `TypeLoadException`.
 
-**The conflict is machine-wide.** `%LOCALAPPDATA%\vvvv\gamma\nugets\` is a flat folder with one
+**The conflict was machine-wide.** `%LOCALAPPDATA%\vvvv\gamma\nugets\` is a flat folder with one
 version of each library, shared by everything vvvv loads, and it wins over a copy sitting next to
-our own assembly. Installing VL.GIS from nuget.org puts BruTile 6 there — and **uninstalling does
-not remove it**, nor does reinstalling vvvv, since that folder lives in the user profile rather
-than the install directory. Both BruTile packages currently sit in
-`%LOCALAPPDATA%\vvvv\gamma\_nugets-backup-VL.GIS\`; if VL.GIS is ever installed from nuget.org
-again they come back and this package breaks again.
+our own assembly. **Uninstalling does not remove a package's dependencies**, nor does reinstalling
+vvvv, since that folder lives in the user profile — VL.GIS's BruTile 6 outlived VL.GIS by five
+months. The published `VL.GIS 0.2.0-alpha` still carries it, so anyone who installed that version
+must delete `%LOCALAPPDATA%\vvvv\gamma\nugets\BruTile.6.0.0` by hand; upgrading will not.
 
-Everyday VL.GIS work goes through its `start.ps1` with `--package-repositories dist`, which never
-touches that folder.
+**VL.GIS dropped BruTile entirely** (its commit `15d40f5`), which was the whole conflict. Compared
+by assembly version rather than file version, every other shared library resolves to one identity:
+NetTopologySuite 2.5 and 2.6 are both `2.0.0.0`, and SkiaSharp 2.88.8 and 2.88.9 are both
+`2.88.0.0`. Verified in one vvvv with both packages loaded — no exception, both node sets present,
+map renders, which also clears the risk that Mapsui 4.1.9 (compiled against NTS 2.5) would object
+to VL.GIS's 2.6.
+
+The two packages compose through **NetTopologySuite**, not through each other: VL.GIS computes
+geometry and `Mapsui.Layers.Geometry` draws it. Neither references the other.
+`vvvv-gis\examples\Example Map with data on it.vl` is the patch that proves it — it lives there,
+outside either package's `help\`, because a patch needing two packages cannot ship inside one whose
+dependencies do not guarantee the other.
 
 ## Repository layout
 
 ```
 vl-mapsui/
 ├── NOTES.md                      # measurement log, with dates
+├── docs/RULES.md                 # ⭐ the rules carried over from VL.GIS - read before any node
+├── docs/MAPSUI-SURFACE.md        # what Mapsui offers, what we wrap, what we will not
+├── VL.Mapsui.vl / .nuspec        # the package. .vl is hand-edited but never regenerated
 ├── src/VL.Mapsui/
-│   ├── OpenStreetMapNode.cs      # [ProcessNode] - the map. Owns the Map's lifetime
-│   ├── MapsuiLayer.cs            # VL.Skia.ILayer - draws it, and the diagnostics overlay
-│   ├── PixelSpace.cs             # pixel/VL space bridge + a layer that reports its own inputs
-│   └── MapNodes.cs               # scaffolding only
-├── spike/Spike.vl                # GENERATED - never hand-edit
-├── test/VL.Mapsui.Tests/         # 24 xunit tests, ~1s, no network, no vvvv
+│   ├── LayerNodes.cs             # [ProcessNode] OpenStreetMap - tile layer, cache, attribution
+│   ├── GeometryLayerNodes.cs     # [ProcessNode] Geometry - NTS geometry as a Mapsui layer
+│   ├── MapNode.cs                # [ProcessNode] Map + ViewportInfo / LayerInfo readers
+│   ├── NavigateNodes.cs          # CenterOn, ZoomToLevel, ZoomByWheel, Refresh …
+│   ├── DragNode.cs, ZoomNodes.cs # [ProcessNode] - they remember the previous frame
+│   ├── SkiaNodes.cs              # ToSkiaLayer
+│   ├── MapsuiLayer.cs            # VL.Skia.ILayer - draws it, plus the diagnostics overlay
+│   ├── PixelSpace.cs             # pixel/VL space bridge
+│   └── TileCache.cs              # the disk cache, its folder and its size
+├── help/VL.Mapsui/               # HowTo Show a map, HowTo Drive the map with the mouse
+├── test/VL.Mapsui.Tests/         # 75 xunit tests, no network, no vvvv
+├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org
 └── tools/
-    ├── Build-SpikePatch.ps1      # emits spike/Spike.vl whole
-    └── New-VLId.ps1              # 22-char VL document IDs
+    ├── Test-VLPackage.ps1        # static package validator
+    ├── Normalize-HelpPatches.ps1 # run after any GUI session - vvvv repins help patches
+    ├── New-VLId.ps1              # 22-char VL document IDs
+    └── legacy/                   # retired generators; the checked-in .vl is the truth
 ```
 
 ## Tests
 
-`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 24 tests, about a second.
+`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 75 tests, well under a second. No
+network and no vvvv: the tile source is faked, and the geometry tests use a MemoryLayer.
 
 They exist because the expensive bug here was a **lifetime** bug, not an arithmetic one, so
 every test is shaped like a frame loop: call `Update` many times and assert on how much got
