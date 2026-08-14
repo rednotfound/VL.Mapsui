@@ -59,6 +59,18 @@
     -->
     <PackageReference Include="Mapsui" Version="4.1.9" />
     <PackageReference Include="Mapsui.Tiling" Version="4.1.9" />
+    <!--
+      Declared explicitly although Mapsui.Nts already drags it in. VL needs an upstream library to
+      be a package in a package repository, not merely a restorable assembly: without that it
+      cannot resolve the type, and a node whose signature mentions NetTopologySuite.Geometry is
+      built with no working pins while every link to it is dropped - vvvvc exits 0 and nothing is
+      red. build.ps1 installs what this file declares into deps\.
+
+      2.6.0 rather than the 2.5.0 Mapsui.Nts asks for, so both repositories name the same version.
+      The whole 2.x line carries assembly version 2.0.0.0, so the loader sees one identity either
+      way; naming the same number removes the question of which folder wins.
+    -->
+    <PackageReference Include="NetTopologySuite" Version="2.6.0" />
     <PackageReference Include="Mapsui.Rendering.Skia" Version="4.1.9" />
   </ItemGroup>
 </Project>

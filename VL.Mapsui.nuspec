@@ -42,6 +42,7 @@
       <group targetFramework="net8.0">
         <dependency id="Mapsui"                version="4.1.9" />
         <dependency id="Mapsui.Tiling"         version="4.1.9" />
+        <dependency id="NetTopologySuite"      version="2.6.0" />
         <dependency id="Mapsui.Rendering.Skia" version="4.1.9" />
       </group>
     </dependencies>

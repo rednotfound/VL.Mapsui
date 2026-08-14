@@ -4,6 +4,7 @@
   <NugetDependency Id="KdWAqj12zv1YI9BuyfT0zw" Location="VL.Skia" Version="2025.7.0" />
   <NugetDependency Id="BhPRhjEVwFzD76lMyYlP4D" Location="Mapsui" Version="4.1.9" />
   <NugetDependency Id="VfIRfgtyOCMRPootau27LP" Location="Mapsui.Tiling" Version="4.1.9" />
+  <NugetDependency Id="L3zO7DmAJaDW9Hh1aNmTFF" Location="NetTopologySuite" Version="2.6.0" />
   <NugetDependency Id="DFZbuOs18UewjPmtzRlxNE" Location="Mapsui.Rendering.Skia" Version="4.1.9" />
   <Patch Id="LVkoJXByLMF5JQz9FpO910">
     <Canvas Id="AhuURXyh7Pvvv7k8RuOlFF" DefaultCategory="Mapsui" CanvasType="FullCategory" />

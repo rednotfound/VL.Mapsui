@@ -32,3 +32,9 @@ desktop.ini
 
 # Upstream packages installed by build.ps1 so VL can resolve their types.
 deps/
+
+# Tile caches written next to whatever document vvvv had open. 38 of these were swept into a
+# commit by "git add -A" before anyone looked, and build.ps1 had already staged them into dist\,
+# which is one pack.ps1 away from shipping them inside the package. The bug that writes them is
+# still open; this stops it contaminating the repository meanwhile.
+**/[0-9]*/[0-9]*/[0-9]*.png
