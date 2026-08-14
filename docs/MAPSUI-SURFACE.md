@@ -23,15 +23,17 @@ out to be sitting in a Mapsui dependency we already ship.
 | node | category | what it is |
 |---|---|---|
 | `OpenStreetMap` | `Mapsui.Layers` | `TileLayer` over the OSM tile source, taking a cache |
+| `XYZ` | `Mapsui.Layers` | any slippy-map URL template — the package stops being about one basemap |
 | `Feature` | `Mapsui` | NTS geometry + attributes → `NetTopologySuite.Features.Feature`, the neutral type |
 | `FeatureLayer` | `Mapsui.Layers` | features + a style → `MemoryLayer`. **The NTS → Mapsui adapter lives here** |
 | `VectorStyle` | `Mapsui.Styles` | fill, outline, width. Stateful on purpose — see below |
+| `LabelStyle` | `Mapsui.Styles` | writes an attribute of each feature. `LabelColumn` names an attribute, so one style labels a thousand features differently |
 | `Geometry` | `Mapsui.Layers` | the shortcut: shapes and one colour, composed from the three above |
 | `TileCache` | `Mapsui.Layers` | the disk cache itself: where tiles go and how much is there |
 | `Map` | `Mapsui` | the `Map` and its layer collection |
 | `ViewportInfo`, `LayerInfo` | `Mapsui` | readers — centre, resolution, size; layer count and busy |
 | `CenterOn`, `ZoomToLevel`, `ZoomAt`, `ZoomByWheel`, `DragBetween`, `Refresh` | `Mapsui.Navigate` | the navigator |
-| — **next** — | `Mapsui.Navigate` | **`ZoomToBox` / `ZoomToLayer`: put the view where the data is.** Mapsui has the first and every layer knows its `Extent`. Every geometry example wants it, and the one that exists had to hardcode a matching centre instead |
+| `ZoomToLayer`, `ZoomToLayers` | `Mapsui.Navigate` | put the view where the data is, on a trigger. Framing every frame would pin the view and the map could not be moved |
 | `Drag`, `ZoomIn`, `ZoomOut` | `Mapsui.Navigate` | stateful gestures — they remember the previous frame |
 | `ScaleBar`, `Attribution`, `ZoomButtons` | `Mapsui.Widgets` | Mapsui's own furniture, added to a map once each |
 | `ToSkiaLayer` | `Mapsui.Skia` | the bridge into VL.Skia's scene graph, including the press a widget gets |
@@ -77,7 +79,7 @@ NOTES.md, 2026-08-14. vvvv's own statement of the idiom is in `VL.Skia`'s *Expla
 Keyboard*: the Mouse node is connected to the Renderer it interacts with, and its position is wired
 onward.
 
-### Styles — 1 of 28
+### Styles — 2 of 28
 
 `VectorStyle` is now its own node, which was the fix for the geometry layer's pin count and the
 Mapsui-idiomatic shape. Mapsui also has `SymbolStyle`, `LabelStyle`, `CalloutStyle`, `RasterStyle`,
@@ -111,8 +113,11 @@ Wrapped: `MemoryLayer`, `TileLayer`. Not: `ImageLayer`, `RasterizingLayer`, `Ras
 - **`Mapsui.Providers.Wfs`** — WFS, the vector equivalent (22 types of query-building machinery).
 - `MemoryProvider`, `ProjectingProvider`, `FilteringProvider`, `StackedLabelProvider`.
 
-Only one tile source is wrapped, and that is the largest capability gap after widgets: no custom
-XYZ template, no TMS (`TmsTileSourceBuilder` exists), no WMS-as-tiles.
+Two tile sources are wrapped now — `OpenStreetMap` and the general `XYZ` template, which covers
+most public raster services. Still missing: TMS (`TmsTileSourceBuilder` exists, and its Y axis is
+flipped, which is the whole reason it is a separate thing) and WMS-as-tiles.
+
+**Interaction is now the largest gap**, and it is the one with the most to gain: see below.
 
 ### Interaction — 0
 

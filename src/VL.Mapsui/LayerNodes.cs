@@ -32,8 +32,9 @@ namespace VL.Mapsui;
 public class OpenStreetMapLayerNode : IDisposable
 {
     // OSM's tile usage policy requires a User-Agent naming the application. The default one is
-    // not acceptable for anything beyond a first trial.
-    const string UserAgent = "VL.Mapsui/0.0.1-alpha (+https://github.com/rednotfound/VL.Mapsui)";
+    // not acceptable for anything beyond a first trial. Shared with the XYZ node: any tile server
+    // deserves to know who is asking, and a shared constant means one place to change it.
+    internal const string UserAgent = "VL.Mapsui/0.0.1-alpha (+https://github.com/rednotfound/VL.Mapsui)";
 
     TileLayer? _layer;
     TileDiskCache? _attached;
