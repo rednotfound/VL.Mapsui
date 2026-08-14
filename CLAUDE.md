@@ -58,6 +58,17 @@ writing any node; the four questions at the top of it would have prevented both.
    (`string Cache_Folder_11 = @"";`). A compile proving the pin exists proves nothing about
    whether anyone can set it — that cost a whole test round here.
 
+## Node design rules inherited from VL.GIS
+
+[`../vvvv-gis/docs/NODE-DESIGN.md`](../vvvv-gis/docs/NODE-DESIGN.md) — what earns a node, how many
+pins one may have, what may be bundled and what must never be. Read it before adding a node, and
+especially before "this is confusing, let me make one node that does it all": that instinct
+produced the all-in-one map node this package was rebuilt to undo. Measured summary: 94% of the
+ecosystem's nodes take three inputs or fewer, and the libraries people learn from carry more help
+patches than nodes.
+
+`ZoomByWheel` (5 inputs) is this package's entry on that document's to-do list.
+
 ## Packaging rules inherited from VL.GIS
 
 These apply the moment a `.nuspec` appears here. All of them are silent when broken —
