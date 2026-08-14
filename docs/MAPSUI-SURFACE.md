@@ -31,6 +31,7 @@ out to be sitting in a Mapsui dependency we already ship.
 | `Map` | `Mapsui` | the `Map` and its layer collection |
 | `ViewportInfo`, `LayerInfo` | `Mapsui` | readers — centre, resolution, size; layer count and busy |
 | `CenterOn`, `ZoomToLevel`, `ZoomAt`, `ZoomByWheel`, `DragBetween`, `Refresh` | `Mapsui.Navigate` | the navigator |
+| — **next** — | `Mapsui.Navigate` | **`ZoomToBox` / `ZoomToLayer`: put the view where the data is.** Mapsui has the first and every layer knows its `Extent`. Every geometry example wants it, and the one that exists had to hardcode a matching centre instead |
 | `Drag`, `ZoomIn`, `ZoomOut` | `Mapsui.Navigate` | stateful gestures — they remember the previous frame |
 | `ScaleBar`, `Attribution`, `ZoomButtons` | `Mapsui.Widgets` | Mapsui's own furniture, added to a map once each |
 | `ToSkiaLayer` | `Mapsui.Skia` | the bridge into VL.Skia's scene graph, including the press a widget gets |

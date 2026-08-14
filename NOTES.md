@@ -5,6 +5,88 @@ them do not belong here.
 
 ---
 
+## 2026-08-14 — a shape on a map, and three defects the screen found first
+
+`HowTo Draw your own shapes.vl` draws a polygon over OpenStreetMap, the shape stays on its ground
+while the map is dragged and zoomed, and `Layers Built` stays at 1 throughout. The geometry comes
+from **VL.NetTopologySuite**, a sibling package: `Read WKT` turns a string into an NTS `Geometry`,
+`Feature` carries it, `FeatureLayer` draws it. **Nothing in VL.Mapsui creates geometry**, and that
+boundary held — the example needed a second package rather than a shortcut node.
+
+Every one of the three defects below was found by looking at the screen, and each was invisible to a
+green test suite.
+
+### 1. The map flickered, and the cause was a missing value semantics
+
+`Feature` is a static node, so VL evaluates it every frame and it returns a **new object every
+frame**. `FeatureLayer` compared features by reference, so every frame looked like a change: the
+layer was rebuilt, the `Map` was handed a new layer and rebuilt in turn, and the whole map
+flickered.
+
+**Why the old `Geometry` node never had this:** it compared *geometries*, and
+`NetTopologySuite.Geometries.Geometry` **overrides `Equals` with value semantics**.
+`NetTopologySuite.Features.Feature` does not. Moving the pipeline from geometries to features
+silently dropped the comparison that had been holding it up.
+
+Fixed two ways at once, and both were needed:
+
+- **compare by value** — `Geometry.EqualsExact` plus the attributes, which is far cheaper than
+  reprojecting and rebuilding Mapsui's features
+- **keep the layer object and replace its contents** — `MemoryLayer.Features` is settable, and the
+  layer's *identity* is what a `Map` compares. `Layers Built` now stays at 1 for the life of the
+  patch and `Features Sets Built` counts content changes separately
+
+### 2. A test that did not test its own fix
+
+Reverting the value comparison left **all 115 tests green**. Keeping the layer alive makes
+`LayersBuilt` 1 whatever the comparison does, so the assertion was measuring the wrong thing. Only
+after the assertion moved to `FeatureSetsBuilt` did the negative test fail as it should.
+
+*A check that has never gone red is not a check* — and this time the check went red, was fixed, and
+still tested nothing. Run the negative test **after** the fix, not only before it.
+
+### 3. The example contradicted itself
+
+The patch pinned the view to Kyoto with `CenterOn` while the polygon sat in **Tokyo, 350 km away**,
+in a window about 8 km wide. The shape was simply off screen whenever the basemap was on — which
+read on screen as "the basemap follows the zoom and the geometry does not", and as "toggling the
+tile layer fixes it" (it changes the layer set, which calls `Map.Refresh`).
+
+Two theories were killed cheaply before that was understood, and are recorded so nobody re-opens
+them: `MemoryLayer.Extent` is `Features.GetExtent()`, recomputed on every access, so replacing
+features in place cannot leave a stale extent; and `MapRenderer` holds no viewport-keyed cache of
+rendered geometry.
+
+**`CenterOn` and `ZoomToLevel` are operations, so a patch holding them re-pins the view every
+frame and the map cannot be dragged at all.** They are the lesson in `HowTo Show a map`; they have
+no place in an example whose whole claim is that a shape stays glued to the ground. The starting
+view now comes from the `Map` node's `Initial` pins, applied once through `Home`, and the patch
+carries `Drag` and `ZoomByWheel` so there is something to test the claim with.
+
+### Using nodes from another package, measured
+
+- **A document must declare `NetTopologySuite` itself** to use NTS nodes. VL.Mapsui declaring it is
+  what lets *our* node signatures name NTS types; it does not extend to a patch. Without the line
+  the node is `Not found`; with it, it resolves.
+- Six rounds of hand-written XML for raw NTS types ended at `The reference is ambiguous` —
+  `WKTReader` has three constructors and hand-written XML cannot pick one. **Static members work
+  and their output pin is named after the member** (`GeometryFactory.Default`'s pin is `Default`,
+  not `Result`). The sibling package made all of it unnecessary: its help patches were placed in the
+  GUI, so their node XML is correct by construction and was copied verbatim.
+- **VL.Mapsui's nuspec now depends on VL.NetTopologySuite.** Surveyed first: 25+ shipped packs
+  declare VL-to-VL dependencies, *and* help patches routinely reference packs their nuspec does not
+  (VL.Skia's help uses VL.ImGui; VL.Audio declares no VL dependency at all and its help uses
+  VL.Stride). The second only works because those ship inside vvvv. Ours does not, and a missing
+  document dependency is **not** fetched automatically — The Gray Book's referencing page says it
+  shows red and offers to install on rightclick.
+
+### Still missing, and every geometry example will want it
+
+**There is no way to say "put the view where the data is".** Mapsui has `ZoomToBox` and a layer
+knows its `Extent`. Next navigation node.
+
+---
+
 ## 2026-08-14 — geometry, style and layer become three things
 
 An ecosystem architecture arrived in writing, and the audit against it found one node genuinely

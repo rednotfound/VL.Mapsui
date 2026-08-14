@@ -45,6 +45,9 @@ public class GeometryLayerNode : IDisposable
     /// <summary>Layers built by this node. Should settle at 1 and stay there.</summary>
     internal int LayersBuilt => _layer.LayersBuilt;
 
+    /// <summary>How often the shapes on the layer were replaced.</summary>
+    internal int FeatureSetsBuilt => _layer.FeatureSetsBuilt;
+
     /// <summary>
     /// A layer drawing the given geometry, ready to hand to a Map alongside a tile layer.
     /// </summary>

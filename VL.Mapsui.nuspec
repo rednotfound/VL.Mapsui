@@ -44,6 +44,17 @@
         <dependency id="Mapsui.Tiling"         version="4.1.9" />
         <dependency id="NetTopologySuite"      version="2.6.0" />
         <dependency id="NetTopologySuite.Features" version="2.1.0" />
+        <!--
+          The package that MAKES geometry, which this one only draws. Declared so that installing
+          VL.Mapsui brings it along and the help patch that draws a shape opens working: vvvv does
+          not fetch a missing document dependency by itself - it shows the entry red and offers to
+          install on rightclick.
+
+          vvvv's own packs get away without this (VL.Skia's help uses VL.ImGui, VL.Audio declares no
+          VL dependency at all and its help uses VL.Stride) because everything there ships inside
+          vvvv and is therefore always present. Nothing guarantees that for us.
+        -->
+        <dependency id="VL.NetTopologySuite"   version="0.0.1-alpha" />
         <dependency id="Mapsui.Rendering.Skia" version="4.1.9" />
       </group>
     </dependencies>

@@ -151,27 +151,37 @@ public class GeometryLayerTests
         //
         // This test asserted 10 first, on the assumption that new objects meant new inputs. The
         // code was right and the expectation was wrong.
+        //
+        // Updated 2026-08-14 for the same reason one level along: a different shape no longer
+        // rebuilds the LAYER either, it replaces the layer's contents. The layer's identity is what
+        // a Map compares, and handing out a new one made the whole map flicker.
         using var node = new GeometryLayerNode();
 
         for (int frame = 0; frame < 5; frame++) node.Update(out _, new Geometry[] { Tokyo() });
         for (int frame = 0; frame < 5; frame++)
             node.Update(out _, new Geometry[] { Factory.CreatePoint(new Coordinate(1, 1)) });
 
-        Assert.Equal(2, node.LayersBuilt);
+        Assert.Equal(1, node.LayersBuilt);        // one layer, kept
+        Assert.Equal(2, node.FeatureSetsBuilt);   // two distinct shapes, two replacements
     }
 
     [Fact]
-    public void Changing_only_the_colour_still_rebuilds()
+    public void Changing_only_the_colour_takes_effect_without_rebuilding()
     {
-        // The style is baked into the layer at construction, so it belongs to its identity --
-        // without this, changing a colour would appear to do nothing until something else changed.
+        // A colour change has to actually reach the map - that is what this has always guarded.
+        // What changed is how: the style is now set on the layer rather than baked in at
+        // construction, so the layer keeps its identity and the Map holding it is left alone.
         using var node = new GeometryLayerNode();
         var geometries = new Geometry[] { Tokyo() };
 
-        node.Update(out _, geometries);
-        node.Update(out _, geometries, fillColor: new Color4(0f, 1f, 0f, 1f));
+        var first = node.Update(out _, geometries);
+        var firstStyle = ((global::Mapsui.Layers.MemoryLayer)first!).Style;
 
-        Assert.Equal(2, node.LayersBuilt);
+        var second = node.Update(out _, geometries, fillColor: new Color4(0f, 1f, 0f, 1f));
+
+        Assert.Same(first, second);                                                   // same layer
+        Assert.NotSame(firstStyle, ((global::Mapsui.Layers.MemoryLayer)second!).Style); // new style on it
+        Assert.Equal(1, node.LayersBuilt);
     }
 
     [Fact]

@@ -48,10 +48,16 @@ whatever computes geometry            VL.Mapsui                Mapsui
 Dependency direction, which is the same statement read downwards:
 
 ```
-VL.Mapsui ──► Mapsui ──► NetTopologySuite        ✅
-VL.Mapsui ──► VL.GIS                             ✗ does not exist
-VL.GIS    ──► Mapsui                             ✗ does not exist
+VL.Mapsui ──► VL.NetTopologySuite ──► NetTopologySuite     ✅ rendering above processing
+VL.Mapsui ──► Mapsui              ──► NetTopologySuite     ✅
+VL.NetTopologySuite ──► Mapsui                             ✗ must never happen
+VL.GIS              ──► Mapsui                             ✗ does not exist
 ```
+
+**VL.NetTopologySuite is the package that makes geometry**; this one draws it. The dependency is
+declared in the nuspec so `HowTo Draw your own shapes` opens working rather than red — vvvv does not
+fetch a missing document dependency by itself. That direction is allowed and the reverse never is:
+nothing that computes geometry may learn about a renderer.
 
 VL.GIS and VL.Mapsui compose **through NTS**, neither referencing the other.
 `vvvv-gis\examples\Example Map with data on it.vl` is the patch that proves it, and it lives

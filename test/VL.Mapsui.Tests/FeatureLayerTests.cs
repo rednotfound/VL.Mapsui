@@ -156,8 +156,10 @@ public class FeatureLayerTests
     }
 
     [Fact]
-    public void Changing_the_features_rebuilds_once()
+    public void Changing_the_features_replaces_them_without_rebuilding_the_layer()
     {
+        // Two questions, two counters: the layer's identity must not churn - that is what makes a
+        // Map rebuild and a map flicker - while its contents must actually follow the input.
         using var node = new FeatureLayerNode();
         var first = new[] { At(0, 0) };
         var second = new[] { At(0, 0), At(1, 1) };
@@ -165,7 +167,56 @@ public class FeatureLayerTests
         for (int frame = 0; frame < 10; frame++) node.Update(out _, first);
         for (int frame = 0; frame < 10; frame++) node.Update(out _, second);
 
-        Assert.Equal(2, node.LayersBuilt);
+        Assert.Equal(1, node.LayersBuilt);
+        Assert.Equal(2, node.FeatureSetsBuilt);
+    }
+
+    // ── The way a patch actually evaluates ───────────────────────────────────
+
+    [Fact]
+    public void Features_rebuilt_every_frame_still_build_one_layer()
+    {
+        // **The test the earlier ones were missing.** Every other test here hands the layer an
+        // array built once, which is not what a patch does: `Feature` is a static node, so VL
+        // evaluates it sixty times a second and it returns a NEW object every frame. Read WKT
+        // upstream is static too, so even the geometry is a new object each frame.
+        //
+        // Caught on screen before it was caught here: the map flickered, because a new feature set
+        // read as a change, the layer was rebuilt, the Map saw a new layer and rebuilt in turn.
+        // The screenshot did what the test suite could not, which is the whole argument for
+        // verifying in the host that can actually fail.
+        var style = new VectorStyleNode();
+        using var layer = new FeatureLayerNode();
+
+        for (int frame = 0; frame < 100; frame++)
+        {
+            // Exactly what the patch computes per frame: a fresh geometry, a fresh feature.
+            var geometry = Factory.CreatePoint(new Coordinate(139.7671, 35.6812));
+            var feature = FeatureNodes.Feature(geometry);
+            layer.Update(out _, new[] { feature }, style.Update());
+        }
+
+        Assert.Equal(1, layer.LayersBuilt);
+
+        // **This is the assertion that tests the fix**, and the first version of this test did not
+        // have it: keeping the layer alive makes LayersBuilt 1 whatever the comparison does, so
+        // only this one fails if features go back to being compared by reference. A hundred frames
+        // of the same point must reproject and rebuild Mapsui's features exactly once.
+        Assert.Equal(1, layer.FeatureSetsBuilt);
+    }
+
+    [Fact]
+    public void The_same_layer_object_comes_back_when_only_the_values_repeat()
+    {
+        // The layer's identity is what a Map compares, so handing out a new layer per frame makes
+        // the Map rebuild as well - which is what turned the whole map into a flicker.
+        var style = new VectorStyleNode();
+        using var node = new FeatureLayerNode();
+
+        var first = node.Update(out _, new[] { At(0, 0) }, style.Update());
+        var second = node.Update(out _, new[] { At(0, 0) }, style.Update());
+
+        Assert.Same(first, second);
     }
 
     // ── Size, which the architecture document asks about ─────────────────────

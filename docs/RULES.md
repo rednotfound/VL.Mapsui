@@ -18,6 +18,10 @@ Nine releases shipped, installed, and contributed **zero nodes**, with no error 
    characters, first `[A-V]`, rest `[0-9A-Za-z]`, unique in the document. `tools\New-VLId.ps1`
    makes them. To add a dependency, append one line with a fresh ID — existing IDs are identities
    that must stay stable across releases.
+   **Every id comes from the generator; not one is ever typed by hand.** Typing one that happens to
+   match the format has now happened three times, and each time it passed every check that exists:
+   the format is right, so nothing goes red. Generate more than you need — they are free — and if
+   you run out mid-edit, generate again rather than inventing the last one.
 2. **A `.vl` is UTF-8 *with* BOM.** Without it vvvv will not load the document. Any tool that
    rewrites one must use `New-Object System.Text.UTF8Encoding($true)`.
 3. **Every forwarded assembly needs `[assembly: ImportAsIs(Namespace = "VL")]`.** Without it the
@@ -131,6 +135,11 @@ Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
 - **A check that has never gone red is not a check.** The `.gitignore` rule added to stop stray
   tiles did not work on the first attempt — a pattern containing a slash is anchored to the
   repository root — and only planting a file and watching git ignore it caught that.
+- **Run the negative test *after* the fix, not only before it.** A test that goes red on the broken
+  code can still be measuring the wrong thing once the code is fixed: the flicker fix kept the layer
+  alive, which made the counter the test asserted on stay at 1 whether or not the fix was present.
+  Reverting the fix left all 115 green. The rule is not "make it fail once" but **"make it fail
+  against the finished code"**.
 - **Validate before committing, in a separate step.** A validator run in the same command block as
   the commit reported its failure after the push had already happened.
 - **Trace the whole chain, not one hop.** Surveying shipped patches for what `Wheel State`

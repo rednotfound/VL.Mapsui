@@ -5,6 +5,7 @@
 	</Topic>
 	<Topic title="HowTo">
 		<VLDocument link="HowTo Show a map.vl" tags="map,tiles,openstreetmap,osm,cache,zoom" />
+		<VLDocument link="HowTo Draw your own shapes.vl" tags="geometry,feature,style,vector,polygon,nts,netTopologySuite,data" />
 		<VLDocument link="HowTo Drive the map with the mouse.vl" tags="mouse,drag,pan,wheel,zoom,interaction" />
 		<VLDocument link="HowTo Add widgets to the map.vl" tags="widget,scalebar,attribution,zoom,buttons,legal" />
 	</Topic>

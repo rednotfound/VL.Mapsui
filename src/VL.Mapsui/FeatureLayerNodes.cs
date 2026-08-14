@@ -9,6 +9,7 @@ using GeometryFeature = global::Mapsui.Nts.GeometryFeature;
 using MapsuiFeature = global::Mapsui.IFeature;
 using IStyle = global::Mapsui.Styles.IStyle;
 using NtsFeature = NetTopologySuite.Features.Feature;
+using IAttributesTable = NetTopologySuite.Features.IAttributesTable;
 
 namespace VL.Mapsui;
 
@@ -41,16 +42,25 @@ public class FeatureLayerNode : IDisposable
     internal int LayersBuilt { get; private set; }
 
     /// <summary>
+    /// How often the features on the layer were replaced. Separate from LayersBuilt because they
+    /// answer different questions: whether the layer's identity churned, and whether its contents
+    /// did.
+    /// </summary>
+    internal int FeatureSetsBuilt { get; private set; }
+
+    /// <summary>
     /// A layer drawing the given features, ready to hand to a Map alongside a tile layer.
     /// </summary>
     /// <remarks>
     /// No features gives no layer rather than an empty one, so a Map can be wired up before there
     /// is anything to draw.
     ///
-    /// **Watch Layers Built.** It should reach 1 and stay. A number that climbs frame after frame
-    /// means one of the inputs is a new object every frame — features are compared as a set by
-    /// identity, and the style by identity too, which is why <c>VectorStyle</c> hands out the same
-    /// object while its pins are unchanged.
+    /// **Watch Layers Built.** It should reach 1 and stay, and it now can: **features are compared
+    /// by value, not by reference.** That is not a refinement, it is the difference between a map
+    /// and a flickering map. `Feature` is a static node, so VL evaluates it every frame and it
+    /// returns a new object every frame; comparing those by reference meant the layer was rebuilt
+    /// sixty times a second, the Map saw a new layer each time and rebuilt in turn, and the whole
+    /// thing flickered. Seen on screen before any test caught it.
     /// </remarks>
     public ILayer? Update(
         out int layersBuilt,
@@ -68,29 +78,79 @@ public class FeatureLayerNode : IDisposable
             return null;
         }
 
-        if (_layer is null
-            || !incoming.SequenceEqual(_features)
-            || !ReferenceEquals(wanted, _style)
-            || name != _name)
+        // The layer object is built once and kept. Everything else is set on it, because its
+        // identity is what a Map compares - handing out a new layer is what makes a map rebuild.
+        if (_layer is null)
         {
-            Release();
-            _layer = Build(incoming, wanted, name);
-            _features = incoming;
-            _style = wanted;
+            _layer = new MemoryLayer(name);
             _name = name;
             LayersBuilt++;
+        }
+        else if (name != _name)
+        {
+            _layer.Name = name;
+            _name = name;
+        }
+
+        if (!SameFeatures(incoming, _features))
+        {
+            _layer.Features = incoming.Select(ToMapsui).ToArray();
+            _features = incoming;
+            _layer.DataHasChanged();
+            FeatureSetsBuilt++;
+        }
+
+        if (!ReferenceEquals(wanted, _style))
+        {
+            _layer.Style = wanted;
+            _style = wanted;
         }
 
         layersBuilt = LayersBuilt;
         return _layer;
     }
 
-    static MemoryLayer Build(NtsFeature[] features, IStyle style, string name)
-        => new(name)
+    /// <summary>
+    /// Whether two feature sets say the same thing, rather than whether they are the same objects.
+    /// </summary>
+    /// <remarks>
+    /// Reference equality is the wrong question here and asking it cost a flickering map: in a
+    /// patch every one of these is a fresh object every frame. <c>EqualsExact</c> is NTS's own
+    /// structural comparison — same type, same coordinates, same order — and walking the
+    /// coordinates is far cheaper than reprojecting them and rebuilding Mapsui's features, which is
+    /// what the alternative does.
+    /// </remarks>
+    static bool SameFeatures(NtsFeature[] a, NtsFeature[] b)
+    {
+        if (a.Length != b.Length) return false;
+
+        for (var i = 0; i < a.Length; i++)
         {
-            Features = features.Select(ToMapsui).ToArray(),
-            Style = style,
-        };
+            if (ReferenceEquals(a[i], b[i])) continue;
+            if (a[i].Geometry is not { } left || b[i].Geometry is not { } right) return false;
+            if (!left.EqualsExact(right)) return false;
+            if (!SameAttributes(a[i].Attributes, b[i].Attributes)) return false;
+        }
+
+        return true;
+    }
+
+    static bool SameAttributes(IAttributesTable? a, IAttributesTable? b)
+    {
+        if (ReferenceEquals(a, b)) return true;
+        if (a is null || b is null) return false;
+
+        var names = a.GetNames();
+        if (names.Length != b.GetNames().Length) return false;
+
+        foreach (var name in names)
+        {
+            if (!b.Exists(name)) return false;
+            if (!Equals(a[name], b[name])) return false;
+        }
+
+        return true;
+    }
 
     /// <summary>
     /// One neutral feature as one Mapsui feature: geometry projected, attributes copied across.
