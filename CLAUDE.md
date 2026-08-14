@@ -168,11 +168,15 @@ dependencies do not guarantee the other.
 vl-mapsui/
 ├── NOTES.md                      # measurement log, with dates
 ├── docs/RULES.md                 # ⭐ the rules carried over from VL.GIS - read before any node
+├── docs/ARCHITECTURE.md          # the pipeline, the NTS boundary, why a node holds state
 ├── docs/MAPSUI-SURFACE.md        # what Mapsui offers, what we wrap, what we will not
 ├── VL.Mapsui.vl / .nuspec        # the package. .vl is hand-edited but never regenerated
 ├── src/VL.Mapsui/
 │   ├── LayerNodes.cs             # [ProcessNode] OpenStreetMap - tile layer, cache, attribution
-│   ├── GeometryLayerNodes.cs     # [ProcessNode] Geometry - NTS geometry as a Mapsui layer
+│   ├── FeatureNodes.cs           # Feature - NTS geometry + attributes, the neutral type
+│   ├── FeatureLayerNodes.cs      # [ProcessNode] FeatureLayer - THE NTS to Mapsui adapter
+│   ├── StyleNodes.cs             # [ProcessNode] VectorStyle - stateful for its identity, not a resource
+│   ├── GeometryLayerNodes.cs     # [ProcessNode] Geometry - the shortcut, composed from those three
 │   ├── MapNode.cs                # [ProcessNode] Map + ViewportInfo / LayerInfo readers
 │   ├── NavigateNodes.cs          # CenterOn, ZoomToLevel, ZoomByWheel, Refresh …
 │   ├── DragNode.cs, ZoomNodes.cs # [ProcessNode] - they remember the previous frame

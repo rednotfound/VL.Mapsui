@@ -71,6 +71,15 @@
       way; naming the same number removes the question of which folder wins.
     -->
     <PackageReference Include="NetTopologySuite" Version="2.6.0" />
+    <!--
+      The neutral feature model - NetTopologySuite.Features.Feature plus AttributesTable - rather
+      than a VLFeature of our own. Declared for the same reason NetTopologySuite above is: it
+      already arrives transitively through Mapsui.Nts and compiles fine either way, but VL cannot
+      resolve a type whose package is not present as a package, and that failure is silent. A node
+      whose signature names Feature would be built with no working pins and every link to it
+      dropped.
+    -->
+    <PackageReference Include="NetTopologySuite.Features" Version="2.1.0" />
     <PackageReference Include="Mapsui.Rendering.Skia" Version="4.1.9" />
   </ItemGroup>
 </Project>

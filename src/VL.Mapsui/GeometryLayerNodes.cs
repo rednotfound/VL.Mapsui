@@ -6,12 +6,7 @@ using Stride.Core.Mathematics;
 using VL.Core.Import;
 
 using ILayer = global::Mapsui.Layers.ILayer;
-using MemoryLayer = global::Mapsui.Layers.MemoryLayer;
-using GeometryFeature = global::Mapsui.Nts.GeometryFeature;
-using VectorStyle = global::Mapsui.Styles.VectorStyle;
-using Brush = global::Mapsui.Styles.Brush;
-using Pen = global::Mapsui.Styles.Pen;
-using MapsuiColor = global::Mapsui.Styles.Color;
+using NtsFeature = NetTopologySuite.Features.Feature;
 using SphericalMercator = global::Mapsui.Projections.SphericalMercator;
 
 namespace VL.Mapsui;
@@ -39,14 +34,16 @@ namespace VL.Mapsui;
 [ProcessNode(Name = "Geometry", Category = "Mapsui.Layers")]
 public class GeometryLayerNode : IDisposable
 {
-    MemoryLayer? _layer;
+    // The shortcut is composed of the three nodes it stands in for rather than being a fourth
+    // implementation of the same thing. If they compose here they compose in a patch.
+    readonly VectorStyleNode _style = new();
+    readonly FeatureLayerNode _layer = new();
+
     Geometry[] _geometries = Array.Empty<Geometry>();
-    Color4 _fill;
-    Color4 _line;
-    float _lineWidth = -1f;
+    NtsFeature[] _features = Array.Empty<NtsFeature>();
 
     /// <summary>Layers built by this node. Should settle at 1 and stay there.</summary>
-    internal int LayersBuilt { get; private set; }
+    internal int LayersBuilt => _layer.LayersBuilt;
 
     /// <summary>
     /// A layer drawing the given geometry, ready to hand to a Map alongside a tile layer.
@@ -67,48 +64,20 @@ public class GeometryLayerNode : IDisposable
         Color4? lineColor = null,
         float lineWidth = 2f)
     {
-        // A machine-independent default still cannot be a literal in the signature: Color4 is not
-        // a compile-time constant. Same rule as the cache folder, one type along.
-        var fill = fillColor ?? new Color4(1f, 0.2f, 0.1f, 0.35f);
-        var line = lineColor ?? new Color4(1f, 0.2f, 0.1f, 0.9f);
-
         var incoming = geometries?.Where(g => g is not null).ToArray() ?? Array.Empty<Geometry>();
 
-        if (incoming.Length == 0)
+        // Features are rebuilt only when the geometry set changes. Building them every frame would
+        // hand the layer a new set every frame and rebuild it, which is the whole failure this
+        // package guards against - and it would be hidden inside a convenience node, which is
+        // worse than having it in the open.
+        if (!incoming.SequenceEqual(_geometries))
         {
-            Release();
-            layersBuilt = LayersBuilt;
-            return null;
-        }
-
-        if (_layer is null
-            || !incoming.SequenceEqual(_geometries)
-            || fill != _fill || line != _line || lineWidth != _lineWidth)
-        {
-            Release();
-            _layer = Build(incoming, fill, line, lineWidth);
+            _features = incoming.Select(g => FeatureNodes.Feature(g)).ToArray();
             _geometries = incoming;
-            _fill = fill;
-            _line = line;
-            _lineWidth = lineWidth;
-            LayersBuilt++;
         }
 
-        layersBuilt = LayersBuilt;
-        return _layer;
+        return _layer.Update(out layersBuilt, _features, _style.Update(fillColor, lineColor, lineWidth), "Geometry");
     }
-
-    static MemoryLayer Build(Geometry[] geometries, Color4 fill, Color4 line, float lineWidth)
-        => new MemoryLayer("Geometry")
-        {
-            Features = geometries.Select(g => (global::Mapsui.IFeature)new GeometryFeature(ToMercator(g))).ToArray(),
-            Style = new VectorStyle
-            {
-                Fill = new Brush(ToMapsui(fill)),
-                Outline = new Pen(ToMapsui(line), lineWidth),
-                Line = new Pen(ToMapsui(line), lineWidth),
-            },
-        };
 
     /// <summary>
     /// The same geometry in spherical mercator, which is what the map draws in.
@@ -139,20 +108,6 @@ public class GeometryLayerNode : IDisposable
         }
     }
 
-    static MapsuiColor ToMapsui(Color4 c) => new MapsuiColor(
-        (int)Math.Round(Math.Clamp(c.R, 0f, 1f) * 255f),
-        (int)Math.Round(Math.Clamp(c.G, 0f, 1f) * 255f),
-        (int)Math.Round(Math.Clamp(c.B, 0f, 1f) * 255f),
-        (int)Math.Round(Math.Clamp(c.A, 0f, 1f) * 255f));
-
-    void Release()
-    {
-        _layer?.Dispose();
-        _layer = null;
-        _geometries = Array.Empty<Geometry>();
-        _lineWidth = -1f;
-    }
-
-    /// <summary>Releases the layer.</summary>
-    public void Dispose() => Release();
+    /// <summary>Releases the layer it composed.</summary>
+    public void Dispose() => _layer.Dispose();
 }

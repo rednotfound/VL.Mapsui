@@ -5,6 +5,80 @@ them do not belong here.
 
 ---
 
+## 2026-08-14 — geometry, style and layer become three things
+
+An ecosystem architecture arrived in writing, and the audit against it found one node genuinely
+wrong-shaped: `Geometry` did geometry, style and layer in a single node. It is now three, and the
+old node is the three composed rather than a fourth implementation of the same thing.
+
+```
+NTS Geometry ─┐
+              ├──► Feature ──┐
+attributes  ──┘              ├──► FeatureLayer ──► Map
+             VectorStyle ────┘
+```
+
+### The feature type is NetTopologySuite's, and that was a decision not a default
+
+`NetTopologySuite.Features.Feature` — geometry plus an `AttributesTable`, nothing about rendering —
+already existed, is mature, and was **already shipping transitively in `deps\` as 2.1.0** without
+being declared anywhere. Inventing a `VLFeature` would have made this package the definition of the
+whole domain; using Mapsui's own feature would have made the renderer the definition.
+
+Declaring it mattered and is the reason to write this down: **compiling against a transitively
+present assembly proves nothing about whether VL can resolve the type.** It needs the package
+declared in the csproj, the nuspec *and* `VL.Mapsui.vl`'s `NugetDependency` list, or the node is
+built with no working pins and every link to it is dropped in silence. Verified the only way that
+counts — by reading the generated C# of a patch that uses it:
+
+```csharp
+using n15 = e232::NetTopologySuite.Features;
+var Result_29 = n14.FeatureNodes.Feature(geometry: Output_27, attributes: Attributes_28);
+n17._Operations_.Cons<n15.Feature>(…) → Spread<n15.Feature>
+var Result_42 = FeatureLayer_40.Update(features: Features_34, style: Result_39, …);
+```
+
+Attributes arrive as `ImmutableDictionary<string, Object>`, which is what VL's own `Dictionary` is
+underneath — also read off the generated code rather than assumed.
+
+### A third reason for a node to hold state
+
+The rule was "anything holding a resource is a process node". `VectorStyle` holds nothing and is
+one anyway, because **its identity is compared downstream**:
+
+- a layer treats a new style object as a change and rebuilds
+- Mapsui keys its rendered-geometry cache on the style object — `IFeature.RenderedGeometry` is an
+  `IDictionary<IStyle, object>`, so a fresh style every frame is a fresh key every frame, on every
+  feature
+
+Negative-tested by removing the cache so a new style is built each frame: **7 tests red**, including
+all three feature-count ones.
+
+### Feature counts, which the architecture document asked for
+
+100 / 1,000 / 10,000 features, 60 frames each: one layer built, one style built, at every size. The
+point is not speed — it is that a lifecycle mistake only becomes visible when the count is large
+enough to hurt, and by then it looks like "the map is slow" rather than like a bug.
+
+### `[SkipCategory]`, not `[Name("")]`
+
+A named static class becomes a category level of its own, so naming the feature node's class would
+have put the node one level away from where it belongs and it would have failed to resolve — the
+trap already recorded for `MapInfoNodes`, walked into again and caught by reading that note.
+
+### Also settled
+
+- `docs/ARCHITECTURE.md` now exists: the pipeline, the NTS boundary, the dependency direction, and
+  the three reasons a node holds state. It was the one document genuinely missing.
+- The ecosystem decision: **VL.GIS is frozen** — no new features there, contents move to focused
+  packages over time, and the published `0.2.0-alpha` stays where it is because a published version
+  can never be deleted.
+- Read "MapControl" in that document as "`ToSkiaLayer` + VL.Skia's `Renderer`". `Mapsui.UI.*` are
+  the WPF / Avalonia / MAUI hosts; **vvvv is the host here**, which is why they are on the
+  will-not-wrap list.
+
+---
+
 ## 2026-08-14 — widgets, and a click that had to be watched rather than argued about
 
 Three widget nodes: `ScaleBar`, `Attribution`, `ZoomButtons`. All three confirmed on screen, and

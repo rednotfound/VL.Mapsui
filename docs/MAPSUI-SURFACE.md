@@ -23,7 +23,10 @@ out to be sitting in a Mapsui dependency we already ship.
 | node | category | what it is |
 |---|---|---|
 | `OpenStreetMap` | `Mapsui.Layers` | `TileLayer` over the OSM tile source, taking a cache |
-| `Geometry` | `Mapsui.Layers` | `MemoryLayer` + `GeometryFeature` + `VectorStyle`, from NTS geometry |
+| `Feature` | `Mapsui` | NTS geometry + attributes → `NetTopologySuite.Features.Feature`, the neutral type |
+| `FeatureLayer` | `Mapsui.Layers` | features + a style → `MemoryLayer`. **The NTS → Mapsui adapter lives here** |
+| `VectorStyle` | `Mapsui.Styles` | fill, outline, width. Stateful on purpose — see below |
+| `Geometry` | `Mapsui.Layers` | the shortcut: shapes and one colour, composed from the three above |
 | `TileCache` | `Mapsui.Layers` | the disk cache itself: where tiles go and how much is there |
 | `Map` | `Mapsui` | the `Map` and its layer collection |
 | `ViewportInfo`, `LayerInfo` | `Mapsui` | readers — centre, resolution, size; layer count and busy |
@@ -75,15 +78,19 @@ onward.
 
 ### Styles — 1 of 28
 
-We construct one `VectorStyle` inside the geometry layer and expose three pins for it. Mapsui has
-`VectorStyle`, `SymbolStyle`, `LabelStyle`, `CalloutStyle`, `RasterStyle`, `StyleCollection`,
-`ThemeStyle`, plus `Pen`, `Brush`, `Font`, `Offset`, `Sprite`, `SymbolType`, `PenStyle`,
-`PenStrokeCap`, `StrokeJoin`, `UnitType`.
+`VectorStyle` is now its own node, which was the fix for the geometry layer's pin count and the
+Mapsui-idiomatic shape. Mapsui also has `SymbolStyle`, `LabelStyle`, `CalloutStyle`, `RasterStyle`,
+`StyleCollection`, `ThemeStyle`, plus `Pen`, `Brush`, `Font`, `Offset`, `Sprite`, `SymbolType`,
+`PenStyle`, `PenStrokeCap`, `StrokeJoin`, `UnitType`.
 
-Splitting the style out of the layer node is also the fix for that node's pin count — a separate
-`VectorStyle` node is both the Mapsui-idiomatic shape and the one `docs/RULES.md` asks for.
+**A style node is stateful, and the reason is worth carrying to the next one.** It holds no
+resource, but its *identity* is compared downstream twice: a layer treats a new style object as a
+change and rebuilds, and Mapsui keys its rendered-geometry cache on the style object
+(`IFeature.RenderedGeometry` is an `IDictionary<IStyle, object>`). Handing out a fresh style per
+frame therefore rebuilds every layer holding it. Reverting the cache to prove it turns 7 tests red.
 
-`LabelStyle` is the difference between shapes on a map and data you can read.
+`LabelStyle` is the difference between shapes on a map and data you can read, and it is the next
+one worth doing — attributes now exist to feed it.
 
 ### Layers — 2 of ~10
 
