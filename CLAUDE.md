@@ -177,7 +177,7 @@ vl-mapsui/
 │   ├── NavigateNodes.cs          # CenterOn, ZoomToLevel, ZoomByWheel, Refresh …
 │   ├── DragNode.cs, ZoomNodes.cs # [ProcessNode] - they remember the previous frame
 │   ├── WidgetNodes.cs            # [ProcessNode] ScaleBar, Attribution, ZoomButtons
-│   ├── WidgetInput.cs            # handing a press to a widget - the host's job, testable alone
+│   ├── WidgetInput.cs            # the hit test behind Click - arithmetic only, testable alone
 │   ├── SkiaNodes.cs              # ToSkiaLayer
 │   ├── MapsuiLayer.cs            # VL.Skia.ILayer - draws it, plus the diagnostics overlay
 │   ├── PixelSpace.cs             # pixel/VL space bridge

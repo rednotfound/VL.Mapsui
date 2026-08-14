@@ -65,11 +65,13 @@ Not wrapped, with the reason each is not merely "next":
 to be a `[ProcessNode]`: enqueue once, then drive it through `Enabled` and its properties. A static
 method would enqueue a fresh widget sixty times a second, and nothing could ever take them out.
 
-**Clicks are the host's job.** A widget draws itself at a position only the renderer knows, so
-`MapsuiLayer.Notify` offers a press to the widgets and keeps it only if one takes it — a press that
-misses them all still reaches the rest of the patch, which is what keeps dragging working with
-buttons on screen. That is not the same as deciding what the mouse means for the map: a widget is
-something the patch explicitly put there.
+**Clicks are wired, not swallowed.** `Click [Mapsui.Widgets]` takes `Map, X, Y, Pressed` — the same
+shape as `Drag` — and reports `Handled`, so the patch can gate dragging with `Left Pressed AND NOT
+Handled` and pressing a button does not also start a pan. A first version did this inside
+`MapsuiLayer.Notify`, which quietly decided that a left press is what clicking a widget means; see
+NOTES.md, 2026-08-14. vvvv's own statement of the idiom is in `VL.Skia`'s *Explanation Mouse and
+Keyboard*: the Mouse node is connected to the Renderer it interacts with, and its position is wired
+onward.
 
 ### Styles — 1 of 28
 

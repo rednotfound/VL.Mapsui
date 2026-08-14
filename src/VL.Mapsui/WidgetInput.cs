@@ -7,15 +7,11 @@ namespace VL.Mapsui;
 /// Handing a click to a widget, which is a thing only the host can do.
 /// </summary>
 /// <remarks>
-/// **This is not the same as deciding what the mouse means.** <see cref="MapsuiLayer"/> deliberately
-/// leaves panning and zooming to the patch, because an earlier version that handled drag and wheel
-/// internally quietly decided that the left button pans, and left no way to drive the map from an
-/// LFO or an OSC message. A widget is different: it is something the patch explicitly added to the
-/// map, it draws itself at a position only the renderer knows, and there is nothing else in the
-/// scene graph that could route to it. Mapsui's own hosts do exactly this in their MapControl.
-///
-/// Kept out of the layer so it can be tested without a canvas: everything here is a Map, a point,
-/// and a bool.
+/// The arithmetic only. **What counts as a click is the patch's business** and arrives through
+/// <c>Click [Mapsui.Widgets]</c>; this is what that node calls once it has been told a press
+/// happened. Everything here is a Map, a point and a bool, so it can be tested without a canvas -
+/// which is also why the first version of this lived in the Skia layer and was wrong: putting it
+/// there meant deciding for every patch that a left press is what clicking a widget means.
 /// </remarks>
 static class WidgetInput
 {

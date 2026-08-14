@@ -219,13 +219,13 @@ public class AttributionWidgetNode
 }
 
 /// <summary>
-/// Plus and minus buttons that zoom the map.
+/// Plus and minus buttons that zoom the map. Wire a <c>Click</c> node for them to respond.
 /// </summary>
 /// <remarks>
-/// These need clicks to reach them, which only the host can arrange: <see cref="MapsuiLayer"/>
-/// routes a mouse press to whichever widget's envelope contains it. That is not the same as
-/// deciding what the mouse means for the map itself - a patch still wires drag and wheel to
-/// Mapsui.Navigate - because a widget is something the patch explicitly put on the map.
+/// The buttons draw as soon as they are on the map, but a press has to be wired to them like
+/// anything else in this package: <c>Click [Mapsui.Widgets]</c> takes a position and a pressed
+/// gate, exactly as <c>Drag</c> does. Nothing here decides that the left button means clicking a
+/// widget.
 /// </remarks>
 [ProcessNode(Name = "ZoomButtons", Category = "Mapsui.Widgets")]
 public class ZoomButtonsWidgetNode
@@ -248,6 +248,50 @@ public class ZoomButtonsWidgetNode
         widget.Enabled = enabled;
         WidgetSlot<ZoomInOutWidget>.Place(widget, corner);
 
+        return map;
+    }
+}
+
+/// <summary>
+/// Offers a press to the widgets on the map. Handled says whether one took it.
+/// </summary>
+/// <remarks>
+/// **This node exists so that a click is wired rather than assumed.** A first version handled the
+/// press inside the Skia layer, which meant deciding for every patch that a left press is what
+/// clicking a widget means — the same thing this package refuses to do for panning and zooming.
+/// vvvv's own answer is in VL.Skia's *Explanation Mouse and Keyboard*: the Mouse node is connected
+/// to the Renderer it interacts with, and its position is wired onward. So this takes a position
+/// and a gate, exactly like <c>Drag</c>, and a patch is free to use the right button, a modifier or
+/// a touch point instead.
+///
+/// **Handled is the pin that earns the node.** With the press swallowed inside the layer, a patch
+/// could not know that a click had hit a button — so pressing zoom would also start a pan, and
+/// nothing on screen would say why. Gate Dragging with it: `Left Pressed AND NOT Handled`.
+///
+/// Only the rising edge routes. A press held down would otherwise zoom on every frame, which is a
+/// fresh round of tile requests sixty times a second — the same reason ZoomIn and ZoomOut watch
+/// their trigger's edge rather than its level.
+/// </remarks>
+[ProcessNode(Name = "Click", Category = "Mapsui.Widgets")]
+public class WidgetClickNode
+{
+    bool _wasPressed;
+
+    /// <summary>The same map, so this sits in the chain with the widget nodes.</summary>
+    public Map? Update(
+        Map? map,
+        out bool handled,
+        float x = 0f,
+        float y = 0f,
+        bool pressed = false)
+    {
+        handled = false;
+        if (map is null) return null;
+
+        if (pressed && !_wasPressed)
+            handled = WidgetInput.Route(map, new global::Mapsui.MPoint(x, y));
+
+        _wasPressed = pressed;
         return map;
     }
 }

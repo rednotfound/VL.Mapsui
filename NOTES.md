@@ -57,6 +57,37 @@ has drawn once). Confirmed in the GUI: the buttons zoom, and dragging away from 
 the second half matters just as much, because a widget that swallowed every press would break the
 map quietly.
 
+### Corrected the same day: the press is wired, not swallowed
+
+The first version handled the press inside `MapsuiLayer.Notify` and offered it to the widgets. It
+worked, and it was wrong — **it decided for every patch that a left press is what clicking a widget
+means**, which is the item this repository's own rules list as never to be bundled, next to what the
+mouse means for panning. Written down, then broken in the same file that argues against it.
+
+The reference that settles it is in vvvv itself, in `VL.Skia\help\Overview\Explanation Mouse and
+Keyboard.vl`, on a comment pad:
+
+> *"The Mouse and Keyboard nodes need to be connected to the Renderer they want to interact with"*
+> *"Mouse's 'World Position' is used to translate the Layer."*
+
+The mouse is a value you wire. VL.ImGui does swallow notifications inside its layer — checked, its
+`ToSkiaLayer.Update` has pins for Widget, Fonts, Style and no input pin at all — but that is a GUI
+toolkit whose whole purpose is to consume input, not a map that a patch drives.
+
+So `Click [Mapsui.Widgets]` takes `Map, X, Y, Pressed`, the same shape as `Drag`, and
+`MapsuiLayer.Notify` returns false again.
+
+**`Handled` is what earns the node.** With the press swallowed, a patch could not know a click had
+hit a button, so pressing zoom also started a pan and nothing said why. The patch now wires
+`Left Pressed AND NOT Handled` into `Drag.Dragging`, and that decision is visible on the canvas.
+
+The pins deliberately did *not* go onto `ZoomButtons` itself: it would have reached six inputs, past
+the point `docs/RULES.md` calls two decisions wearing one node, and every clickable widget would
+repeat them. One node decides what a press is; the widgets stay at three pins.
+
+Only the rising edge routes — a held press would zoom every frame, which is a fresh round of tile
+requests sixty times a second. Negative-tested by routing on the level instead: 2 tests red.
+
 ### `Result`, not `Output`, for a process node
 
 `vvvvc` rejected `Output` outright: *"ScaleBar doesn't have a pin called Output"*. The fluent rule —

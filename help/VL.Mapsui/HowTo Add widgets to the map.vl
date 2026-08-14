@@ -13,7 +13,7 @@
       <Patch Id="KxpWAxhkSyww0ws29p3F9Z">
         <Canvas Id="HV5mZB2AHtDeSwYQHkHv8E" CanvasType="Group">
 
-          <Pad Id="EskmCzlInzRJezMaD9KkUP" Bounds="60,30,660,190" ShowValueBox="true" isIOBox="true" Value="Widgets are Mapsui's own furniture: a scale bar, the attribution, buttons that zoom. Each node takes the map, puts one widget on it, and hands the map on - so they sit in a chain between Map and ToSkiaLayer.&#xD;&#xA;&#xD;&#xA;Map.Widgets is append only. Nothing can take a widget off a map again, which is why these are process nodes and why Enabled is how a widget goes away. The Widgets toggle drives all three; watch them appear and disappear without anything being rebuilt.&#xD;&#xA;&#xD;&#xA;Attribution reads its text from the layers on the map rather than from a pin. That is deliberate: OpenStreetMap's tile policy requires the attribution to be displayed, and a text you type in yourself can quietly stop matching the tiles on screen. The layer has carried that text since the beginning and nothing ever drew it until now.&#xD;&#xA;&#xD;&#xA;ZoomButtons needs clicks, and only the host can deliver those - a widget draws itself at a position only the renderer knows. So ToSkiaLayer offers a press to the widgets and keeps it only if one takes it. THE THING TO CHECK: click + and - and the map zooms, then drag somewhere away from the buttons and the map still pans. If a widget swallowed every press, dragging would break quietly.&#xD;&#xA;&#xD;&#xA;Turn Diagnostics on to see it: 'widgets N, M placed by the renderer' and 'last press X, Y taken by a widget / left for the patch'. A button that does nothing looks the same whether the click never arrived, arrived in the wrong units, or the widget had not been laid out yet - those two lines tell them apart.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF, as everywhere in this package: opening a document in vvvv runs it.">
+          <Pad Id="EskmCzlInzRJezMaD9KkUP" Bounds="60,30,660,190" ShowValueBox="true" isIOBox="true" Value="Widgets are Mapsui's own furniture: a scale bar, the attribution, buttons that zoom. Each node takes the map, puts one widget on it, and hands the map on - so they sit in a chain between Map and ToSkiaLayer.&#xD;&#xA;&#xD;&#xA;Map.Widgets is append only. Nothing can take a widget off a map again, which is why these are process nodes and why Enabled is how a widget goes away. The Widgets toggle drives all three; watch them appear and disappear without anything being rebuilt.&#xD;&#xA;&#xD;&#xA;Attribution reads its text from the layers on the map rather than from a pin. That is deliberate: OpenStreetMap's tile policy requires the attribution to be displayed, and a text you type in yourself can quietly stop matching the tiles on screen. The layer has carried that text since the beginning and nothing ever drew it until now.&#xD;&#xA;&#xD;&#xA;ZoomButtons needs clicks, and they are WIRED here rather than handled behind your back. Click takes a position and a pressed gate, exactly as Drag does, so the left button is a choice this patch makes and not one VL.Mapsui makes for you - swap it for the right button, a modifier or a touch point and nothing else changes.&#xD;&#xA;&#xD;&#xA;Handled is why Click is a node at all. Follow it: Left Pressed AND NOT Handled is what gates Drag, so pressing a zoom button does not start a pan as well. With the press swallowed inside the layer - which is how this was first written - the patch had no way to know a click had been taken, and no way to say what should happen instead.&#xD;&#xA;&#xD;&#xA;THE THING TO CHECK: click + and - and the map zooms; then drag somewhere away from the buttons and the map still pans. Turn Diagnostics on for 'widgets N, M placed by the renderer' - Envelope is written by the renderer while drawing, so a widget that has never been drawn cannot be clicked yet.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF, as everywhere in this package: opening a document in vvvv runs it.">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -112,10 +112,52 @@
           <Pad Id="BPpvXe8pgMsrjiIXVcfGVG" Comment="Left Pressed" Bounds="720,310,110,15" ShowValueBox="true" isIOBox="true" />
 
           <!--
+            Click is what makes a press reach a widget, and it is a node rather than something the
+            layer does behind your back. It takes a position and a gate exactly as Drag does, so
+            the left button is a choice made here in the patch and not inside VL.Mapsui.
+
+            Handled is why it is worth a node: without it a press on the zoom button would start a
+            pan as well, and nothing on screen would say why. Left Pressed AND NOT Handled is the
+            wiring that fixes that, and it is visible.
+          -->
+          <Node Bounds="60,460,110,19" Id="SSoldJI6PSmx31Lf6KGLS7">
+            <p:NodeReference LastCategoryFullName="Mapsui.Widgets" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Click" />
+            </p:NodeReference>
+            <Pin Id="E4Breut4Ux4IRfeaOt11Qi" Name="Map" Kind="InputPin" />
+            <Pin Id="Ik2jbiQW8wnjKKpSJ8vgF2" Name="Handled" Kind="OutputPin" />
+            <Pin Id="HC78MB9PoxQ6O8bvEgW4Jv" Name="X" Kind="InputPin" />
+            <Pin Id="AVOB1aXwJrDBGr5OEIzRv6" Name="Y" Kind="InputPin" />
+            <Pin Id="H8P9lRDK2o8vc1i9csWdrV" Name="Pressed" Kind="InputPin" />
+            <Pin Id="UMoXjGuYFCzzdNwOhlsOSz" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Pad Id="Ig52cyIqtlUZUKVyyO59aE" Comment="Handled" Bounds="200,460,110,15" ShowValueBox="true" isIOBox="true" />
+
+          <Node Bounds="340,410,37,19" Id="FCTlM02FYdKnpN0YX1hOrz">
+            <p:NodeReference LastCategoryFullName="Primitive.Boolean" LastSymbolSource="CoreLibBasics.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="NOT" />
+            </p:NodeReference>
+            <Pin Id="BvcvUEyhUH1r8leCQyYXZ3" Name="Input" Kind="StateInputPin" />
+            <Pin Id="TwWMYrVSSDmAT3rNYtX8xR" Name="Output" Kind="StateOutputPin" />
+          </Node>
+
+          <Node Bounds="340,440,37,19" Id="LjZfglPpMAmVrwiNRU5fvF">
+            <p:NodeReference LastCategoryFullName="Primitive.Boolean" LastSymbolSource="CoreLibBasics.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="AND" />
+            </p:NodeReference>
+            <Pin Id="OzzlSL5jaQU1dJRIDxkcDz" Name="Input" Kind="StateInputPin" />
+            <Pin Id="AqyBmx2luz1rGmlnaLq4gy" Name="Input 2" Kind="InputPin" />
+            <Pin Id="Lbd9pCHvRcioWAigucBd0z" Name="Output" Kind="StateOutputPin" />
+          </Node>
+
+          <!--
             Drag is here so there is something to break: a widget that swallowed every press would
             stop the map panning, and nothing on screen would say why.
           -->
-          <Node Bounds="60,460,110,19" Id="CNgVHFYfkEkPUuBiYN3M8T">
+          <Node Bounds="60,500,110,19" Id="CNgVHFYfkEkPUuBiYN3M8T">
             <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Drag" />
@@ -255,10 +297,18 @@
         <Link Id="UBtx77Q7y5XN3xKP8P2kCq" Ids="PzHgZmzlnFRzQmgZ5zVIXX,FPvEbPKx0Q2bgiWWgJ3KuF" />
         <Link Id="Suemyi6tct8ZIrr9aWGwA5" Ids="PzHgZmzlnFRzQmgZ5zVIXX,LBTqNYM5YIDsZPdHi5n561" />
         <Link Id="GD2ER1Lxocoq81Fdew3BfV" Ids="VaHlWDCnWB4hR4qvgBc3TJ,BPpvXe8pgMsrjiIXVcfGVG" />
-        <Link Id="V6TTMYb2B5Y1hoI5ONvxy5" Ids="EIeQ20Ars5R2PVipViWXBK,ORtzkXwQGw7OVYDzpI5bZ9" />
+        <Link Id="V6TTMYb2B5Y1hoI5ONvxy5" Ids="EIeQ20Ars5R2PVipViWXBK,E4Breut4Ux4IRfeaOt11Qi" />
+        <Link Id="SYo7av7sYuN2xQd2rV1xef" Ids="ICl6Jwe2HfP8e3frWTbgFE,HC78MB9PoxQ6O8bvEgW4Jv" />
+        <Link Id="MldKMUKr3hhVxPcqbMmjh4" Ids="FkHVEB8lFqL5MmqkqXCmNk,AVOB1aXwJrDBGr5OEIzRv6" />
+        <Link Id="PCZeuqpVf2GQmhMi3JrLWQ" Ids="VaHlWDCnWB4hR4qvgBc3TJ,H8P9lRDK2o8vc1i9csWdrV" />
+        <Link Id="RrcA5GJmlzJSgFERncLnc5" Ids="Ik2jbiQW8wnjKKpSJ8vgF2,Ig52cyIqtlUZUKVyyO59aE" />
+        <Link Id="ENvvvAcmuDzOGoWG4cY4mF" Ids="Ik2jbiQW8wnjKKpSJ8vgF2,BvcvUEyhUH1r8leCQyYXZ3" />
+        <Link Id="URdhZwvdCAixxMLuScXQgG" Ids="TwWMYrVSSDmAT3rNYtX8xR,OzzlSL5jaQU1dJRIDxkcDz" />
+        <Link Id="SmLyHvc4WcexTRX7toCNUY" Ids="VaHlWDCnWB4hR4qvgBc3TJ,AqyBmx2luz1rGmlnaLq4gy" />
+        <Link Id="TLWWxTbUWZFk0ufFLCxgNR" Ids="UMoXjGuYFCzzdNwOhlsOSz,ORtzkXwQGw7OVYDzpI5bZ9" />
         <Link Id="L4hvV8i7XhUlwgPCIfU55p" Ids="ICl6Jwe2HfP8e3frWTbgFE,Cc6xgbnGsU368CM3MrUcbN" />
         <Link Id="U80NI99ydu5NHYhHpdIOdP" Ids="FkHVEB8lFqL5MmqkqXCmNk,DEhbqpKlwjTgV2nzO22wfj" />
-        <Link Id="SndElhUdHGyJdzfVuic15n" Ids="VaHlWDCnWB4hR4qvgBc3TJ,G88um6CokkWEKxBIVZBAaM" />
+        <Link Id="SndElhUdHGyJdzfVuic15n" Ids="Lbd9pCHvRcioWAigucBd0z,G88um6CokkWEKxBIVZBAaM" />
         <Link Id="IYIkjEBh7DLFmCjSmsSfjn" Ids="GqniStYYxec691wpuoGqOX,MmB2IjjJsguj7g38qPG9s8" />
         <Link Id="Ui9dewA8ET2eGDMfdOAK68" Ids="BmkZKA7M3lsrJQWjmgkfEJ,CyHGJO1ej4ibyuFwiMBlin" />
         <Link Id="BCEz5PagFNOy6EboY7k6WC" Ids="B2HO3r1hWBppnvcY7VArrz,OhBrs6435Z70MGJt601DRA" />

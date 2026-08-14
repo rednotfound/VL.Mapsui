@@ -226,5 +226,71 @@ public class WidgetTests
 
         Assert.False(WidgetInput.Route(map, new MPoint(30, 30)));
     }
+
+    // ── The Click node, which is what makes a press something a patch wires ───
+
+    [Fact]
+    public void Only_the_rising_edge_of_a_press_reaches_a_widget()
+    {
+        // A press held down would zoom on every frame - a fresh round of tile requests sixty times
+        // a second, which is this package's oldest failure wearing a mouse button.
+        var map = NewMap();
+        new ZoomButtonsWidgetNode().Update(map);
+        map.Widgets.Single().Envelope = new MRect(10, 10, 60, 110);
+        var click = new WidgetClickNode();
+
+        var handledOnFrames = 0;
+        for (int frame = 0; frame < 100; frame++)
+        {
+            click.Update(map, out var handled, x: 30, y: 30, pressed: true);
+            if (handled) handledOnFrames++;
+        }
+
+        Assert.Equal(1, handledOnFrames);
+    }
+
+    [Fact]
+    public void Releasing_and_pressing_again_is_a_second_click()
+    {
+        var map = NewMap();
+        new ZoomButtonsWidgetNode().Update(map);
+        map.Widgets.Single().Envelope = new MRect(10, 10, 60, 110);
+        var click = new WidgetClickNode();
+
+        var count = 0;
+        foreach (var pressed in new[] { true, true, false, false, true, true })
+        {
+            click.Update(map, out var handled, x: 30, y: 30, pressed: pressed);
+            if (handled) count++;
+        }
+
+        Assert.Equal(2, count);
+    }
+
+    [Fact]
+    public void A_press_that_misses_every_widget_is_not_handled()
+    {
+        // Handled is what lets a patch keep panning: gate Dragging with NOT Handled and a press on
+        // a button stops being a drag as well. With the press swallowed inside the layer, as it
+        // was first written, a patch could not know.
+        var map = NewMap();
+        new ZoomButtonsWidgetNode().Update(map);
+        map.Widgets.Single().Envelope = new MRect(10, 10, 60, 110);
+
+        new WidgetClickNode().Update(map, out var handled, x: 400, y: 400, pressed: true);
+
+        Assert.False(handled);
+    }
+
+    [Fact]
+    public void The_Click_node_passes_the_map_on_and_survives_an_unconnected_one()
+    {
+        var map = NewMap();
+        var click = new WidgetClickNode();
+
+        Assert.Same(map, click.Update(map, out _));
+        Assert.Null(click.Update(null, out var handled));
+        Assert.False(handled);
+    }
 }
 

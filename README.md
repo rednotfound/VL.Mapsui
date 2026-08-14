@@ -48,8 +48,12 @@ one topic each. Beginners start from a help patch, not from a fatter node.
 
 Widgets are Mapsui's own furniture — a scale bar, the attribution the tile policy requires, buttons
 that zoom. Each node takes the map, puts one widget on it and hands the map on. `Map.Widgets` is
-append only, so `Enabled` is how a widget goes away rather than removal, and a press that lands on a
-widget is handed to it while one that misses is left for the rest of the patch.
+append only, so `Enabled` is how a widget goes away rather than removal.
+
+**A click is wired like everything else here.** `Click` takes a position and a pressed gate, the
+same shape as `Drag`, so nothing decides for you that the left button is what presses a widget. Its
+`Handled` output is what keeps the two apart: gate dragging with `Left Pressed AND NOT Handled` and
+a press on a zoom button stops being a pan as well.
 
 ## Manners
 
