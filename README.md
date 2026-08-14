@@ -56,10 +56,16 @@ megabytes; delete the folder to reset. That is what
 What it forbids is the opposite: fetching tiles nobody is looking at. Requests carry a
 User-Agent naming this package.
 
-`Cache Folder` moves it — beside your project so it travels with it, onto a fast disk, or shared
-between patches. Leave it empty for the default above; `CacheFolder` is a node that shows what that
-resolved to and how much is in it, without switching a layer on. An unusable folder is reported on
-`Cache Status` and the cache is left off, rather than quietly writing somewhere you did not ask for.
+`TileCache` is the node that decides where they go — beside your project so it travels with it,
+onto a fast disk, or shared between patches — and it is the only thing that decides. Hand its
+output to a layer's `Cache` pin, or leave that pin unconnected for the default above. It reads the
+disk and never the network, so it also answers how much is cached with the layer switched off.
+
+**Leave its `Folder` pin unconnected for the default; do not connect an empty Path IOBox.** There is
+no such thing as an empty one: VL resolves an empty Path against the document and hands the node
+your patch's own folder. That wrote 444 tiles into two repositories on 2026-08-14 while every pin
+still read correctly. A folder that cannot be used is reported and the cache left off, rather than
+quietly writing somewhere you did not ask for.
 
 `Layers Built` is an output pin, and it should reach 1 and stay. A number that climbs frame after
 frame means the layer is being rebuilt every frame and every rebuild starts a fresh round of tile

@@ -5,6 +5,111 @@ them do not belong here.
 
 ---
 
+## 2026-08-14 — an empty Path IOBox is not empty
+
+The stray tiles from the entry below are explained, and the explanation was **read off a pin, not
+reasoned out**. Three values from the patch that produced them:
+
+| read | what it says |
+|---|---|
+| `Cache Folder` IOBox showed `D:\2026_Projects\vvvv-gis\examples` | the "empty" Path IOBox was not handing the node an empty value |
+| `Cache Status` showed `D:\2026_Projects\vvvv-gis\examples — 1 tiles, 0.0 MB` | the node was using it, and counting the `.vl` itself as a tile |
+| the `CacheFolder` node showed `%LOCALAPPDATA%\VL.Mapsui\tiles`, 1165 tiles | its input was **unconnected**, so C# got `null` and the default applied |
+
+Same `Resolve`, two results, and the difference is only how the pin was reached.
+
+**`Value=""` in a `.vl` does not mean empty. It means "the path relative to this document", and the
+empty relative path is the document's own folder.** `vvvvc` compiles the pin to
+
+```csharp
+public static n11.Path __slot_SZONokgOOw3PKrH0lXmVdd =
+    n10.CompilationHelper.Deserialize<n11.Path>(@"", false, @"I4hIadDDdoVyqg12xj3ejr", @"…");
+```
+
+— the document id is passed in, and VL resolves against it. So the node received a rooted, existing,
+writable folder and every guard agreed: `IsPathRooted` passed, `CreateDirectory` succeeded, and the
+status pin reported the folder honestly. **Nothing was broken except the assumption that a pin can
+be empty.** `"empty means the default"` holds for a `string` pin and cannot hold for a `Path` one.
+
+The timeline had said so before the measurement did: `%LOCALAPPDATA%` stopped receiving tiles at
+**21:18 on 8-13**, and `d3b9bf5` — which replaced `string cacheFolder = ""` with a
+`VL.Lib.IO.Path` pin — landed at **21:53 that evening**. The pin's type changed and the tiles moved.
+
+### What was ruled out first, offline, and why that mattered
+
+Before opening anything, a throwaway probe asked what is attached when we attach nothing:
+`BruTile.Cache.NullCache`, and across Mapsui, Mapsui.Tiling, Mapsui.Rendering.Skia and BruTile
+there are exactly **three cache-typed statics, all null**. So no third party was writing. Two of
+those findings are now tests (`ForeignCacheDefaultsTests`) because
+`Mapsui.Tiling.OpenStreetMap.DefaultCache` is public and static: anything loaded into the same vvvv
+could set it and silently redirect every tile.
+
+Ruling that out is what made "it was us, handed the wrong folder" a conclusion rather than a guess.
+
+### The fix: the cache is a value, and one node owns it
+
+Two places could set the folder — the layer node's pin and a separate `CacheFolder` node — and they
+had no way to agree. Now `TileCache` produces a `TileDiskCache` and `OpenStreetMap` consumes it:
+
+```
+TileCache [Mapsui.Layers]                OpenStreetMap [Mapsui.Layers]
+  in : Enabled, Folder                     in : Enabled, Cache
+  out: Result, Status, Tiles, Size MB      out: Result, Layers Built, Cache Status
+```
+
+The layer node has **no Path pin at all** now, and none of the three patches contains a Path IOBox.
+`Cache To Disk` is gone as a pin: the cache node has its own `Enabled`.
+
+**Off is a value, and so is "that folder did not work".** Both were `null` in the first attempt, and
+a test caught what that costs immediately: a folder that failed came back as null, the layer read
+that as "nothing connected", and fell back to the default — silently, which is the one thing this
+package promises not to do. An unconnected pin, a switched-off cache and a broken folder have to be
+three different things, or the layer cannot tell "nobody said anything" from "somebody said no".
+That is the same ambiguity as the empty IOBox, one level up.
+
+### Measured after the fix
+
+Launched from a scratch directory, so the working directory was neither a repository nor the
+document's folder — the two coincided in both earlier incidents and had never been told apart:
+
+| | before | after |
+|---|---|---|
+| `help\VL.Mapsui\` | 2 files | **2** |
+| `vvvv-gis\examples\` | 1 file | **1** |
+| vvvv's working directory | 0 files | **0** |
+| `%LOCALAPPDATA%\VL.Mapsui\tiles` | 1165 tiles | **1184** |
+
+`Layers Built` stayed at 1. Both status pins read
+`C:\Users\laval\AppData\Local\VL.Mapsui\tiles — 1184 tiles, 25.2 MB`, and they cannot disagree
+because there is one cache object behind both.
+
+### Two guards, both made to go red first
+
+- **A test**: with nothing connected, the `FileCache` attached to the `HttpTileSource` must have
+  `DefaultDirectory` as its root — read out of its private field, because the folder is not exposed
+  and taking it on trust is what this whole entry is about. Negative-tested by pointing the default
+  at `Directory.GetCurrentDirectory()`: red immediately.
+- **`Test-VLPackage.ps1` check 11**: no `{zoom}\{x}\{y}.png` under `help\` or `dist\`. A planted
+  file made it fail with `found 1 file(s) shaped like cached map tiles`; removing it returned
+  `ok no {zoom}\{x}\{y}.png`. Every other check in that file asks whether what should be there is
+  there; this is the first that asks whether something else turned up.
+
+80 tests, up from 75.
+
+### A stale cache that made a good build look broken
+
+The first `vvvvc` run after the change failed with *"type TileCacheNode does not exist"* against a
+dll that plainly contained it. **A version number is immutable to every cache, and this repository
+rebuilds `0.0.1-alpha` over and over.** `pack.ps1` evicted the NuGet one; nobody evicted
+`C:\Program Files\vvvv\…\package-cache\VL.Mapsui.0.0.1-alpha`, which is the one that matters for
+opening a patch straight after a build. `build.ps1` now evicts both.
+
+Worth knowing for the next headless verification: an exported project restores `VL.Mapsui` as a
+real NuGet package, so `dist\feed` has to be a source. Evicting the global cache without packing
+first turns the compile into `NU1101 package not found` — correct, and nothing to do with the code.
+
+---
+
 ## 2026-08-14 — geometry on the map, and a cache that writes where it likes
 
 The two packages compose now. VL.GIS dropped BruTile, which was the entire conflict, and both load

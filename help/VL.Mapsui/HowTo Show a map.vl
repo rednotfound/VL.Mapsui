@@ -17,7 +17,7 @@
       </p:NodeReference>
       <Patch Id="T1yChjTcVpcQLJ4rxMEL44">
         <Canvas Id="VxYLn5bECvkjhyGerEE3sc" CanvasType="Group">
-          <Pad Id="VaZNqihOnpwz6dORWEdpu0" Bounds="60,30,620,160" ShowValueBox="true" isIOBox="true" Value="A map, built from separate nodes rather than one node that does everything.&#xD;&#xA;&#xD;&#xA;OpenStreetMap makes a tile layer. Map holds layers and owns the viewport. ToSkiaLayer draws it. Navigate has CenterOn, ZoomToLevel, Drag and ZoomAt for moving it. Nothing here decides for you what the mouse does: read it with VL.Skia MouseState and wire it to Navigate, or drive the map from an LFO, OSC or a keyboard instead. That choice is the reason to be patching at all.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF. Opening a document in vvvv runs it, so a map that fetched on open would give you no chance to decline. Switch it on to see the map.&#xD;&#xA;&#xD;&#xA;Watch Layers Built: it should settle at 1 and stay. A number climbing frame after frame means something rebuilds the layer every frame, and every rebuild starts a fresh round of tile requests. That once exhausted a machine of ephemeral ports and took a home network down. Close vvvv if you see it climb.&#xD;&#xA;&#xD;&#xA;Tiles that were drawn are cached under %LOCALAPPDATA%\VL.Mapsui\tiles, which is what the OpenStreetMap tile policy asks for. A session is a few megabytes. Delete the folder to reset.">
+          <Pad Id="VaZNqihOnpwz6dORWEdpu0" Bounds="60,30,620,160" ShowValueBox="true" isIOBox="true" Value="A map, built from separate nodes rather than one node that does everything.&#xD;&#xA;&#xD;&#xA;OpenStreetMap makes a tile layer. Map holds layers and owns the viewport. ToSkiaLayer draws it. Navigate has CenterOn, ZoomToLevel, Drag and ZoomAt for moving it. Nothing here decides for you what the mouse does: read it with VL.Skia MouseState and wire it to Navigate, or drive the map from an LFO, OSC or a keyboard instead. That choice is the reason to be patching at all.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF. Opening a document in vvvv runs it, so a map that fetched on open would give you no chance to decline. Switch it on to see the map.&#xD;&#xA;&#xD;&#xA;Watch Layers Built: it should settle at 1 and stay. A number climbing frame after frame means something rebuilds the layer every frame, and every rebuild starts a fresh round of tile requests. That once exhausted a machine of ephemeral ports and took a home network down. Close vvvv if you see it climb.&#xD;&#xA;&#xD;&#xA;Tiles that were drawn are cached under %LOCALAPPDATA%\VL.Mapsui\tiles, which is what the OpenStreetMap tile policy asks for. A session is a few megabytes. Delete the folder to reset.&#xD;&#xA;&#xD;&#xA;TileCache decides where tiles go, and it is the only thing that does: hand its output to the layer's Cache pin, or leave that pin unconnected for the same default. Leave its Folder pin UNCONNECTED too - do NOT connect an empty Path IOBox, because there is no such thing. VL resolves an empty Path against the document and hands the node this patch's own folder, which wrote 444 tiles into two repositories on 2026-08-14 while every pin still read correctly.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -48,9 +48,8 @@
               <Choice Kind="ProcessAppFlag" Name="OpenStreetMap" />
             </p:NodeReference>
             <Pin Id="Usi9xynIVqJWvRhEvGVOYQ" Name="Enabled" Kind="InputPin" />
-            <Pin Id="MRc5yVuyw9pbbASUSN49D8" Name="Cache To Disk" Kind="InputPin" />
+            <Pin Id="ARy89W2GJw4s60rzwfmBsV" Name="Cache" Kind="InputPin" />
             <Pin Id="VE109xy4WqBycyAwxMeCrD" Name="Result" Kind="OutputPin" />
-            <Pin Id="VV9jfhQGprHpgzTwLz3AF8" Name="Cache Folder" Kind="InputPin" />
             <Pin Id="MVGJGduk0mPWJznoGv9YVX" Name="Layers Built" Kind="OutputPin" />
             <Pin Id="HwRnfleRlGfpKEI7pXlafv" Name="Cache Status" Kind="OutputPin" />
           </Node>
@@ -194,25 +193,19 @@
             </p:TypeAnnotation>
           </Pad>
           <Pad Id="H1yv1JBLijwVmMX34e3Fzf" Comment="Cache Status" Bounds="226,430,300,15" ShowValueBox="true" isIOBox="true" />
-          <Pad Id="SZONokgOOw3PKrH0lXmVdd" Comment="Cache Folder" Bounds="300,282,240,15" ShowValueBox="true" isIOBox="true" Value="">
-            <p:TypeAnnotation LastCategoryFullName="IO" LastDependency="CoreLibBasics.vl">
-              <Choice Kind="TypeFlag" Name="Path" />
-            </p:TypeAnnotation>
-            <p:ValueBoxSettings>
-              <p:pathtype p:Assembly="VL.Core" p:Type="VL.Core.PathType">Directory</p:pathtype>
-            </p:ValueBoxSettings>
-          </Pad>
-          <Node Bounds="560,330,150,19" Id="LiTqhjEAEzU3PZESW3B35q">
+          <Node Bounds="300,282,150,19" Id="LiTqhjEAEzU3PZESW3B35q">
             <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="CacheFolder" />
+              <Choice Kind="ProcessAppFlag" Name="TileCache" />
             </p:NodeReference>
+            <Pin Id="ULh17fD8cDxRi4lqa2hYtY" Name="Enabled" Kind="InputPin" />
             <Pin Id="Q2PNoFSapPeFXxtamnrI4n" Name="Folder" Kind="InputPin" />
-            <Pin Id="PDfAZ7dDcrkFW1pQwiJ9x4" Name="Output" Kind="OutputPin" />
+            <Pin Id="PDfAZ7dDcrkFW1pQwiJ9x4" Name="Result" Kind="OutputPin" />
+            <Pin Id="FRGL7PazfZpBv73noSDRaO" Name="Status" Kind="OutputPin" />
             <Pin Id="Ddqg0xhHjdkgJZ68fhWmTD" Name="Tiles" Kind="OutputPin" />
             <Pin Id="CVRaaziqPOJpNW7u2ror8A" Name="Size MB" Kind="OutputPin" />
           </Node>
-          <Pad Id="Sn0IFyPbF1sneJyHMkVp7A" Comment="Default Folder" Bounds="560,375,300,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="Sn0IFyPbF1sneJyHMkVp7A" Comment="Cache Folder" Bounds="560,375,300,15" ShowValueBox="true" isIOBox="true" />
           <Pad Id="GoA5ugmSeRASmqqlJuk5hE" Comment="Tiles Cached" Bounds="634,400,80,15" ShowValueBox="true" isIOBox="true" />
         </Canvas>
         <Patch Id="Qn1Yqox3GN8OqwchBUvODO" Name="Create" />
@@ -222,7 +215,7 @@
           <Fragment Id="I4BnpGUL4mYEGtIdqDHclf" Patch="OFfMGxxvZQSpMkYjxF7dnh" Enabled="true" />
         </ProcessDefinition>
         <Link Id="GuXEmbNFUOCrTx2lsy5vDC" Ids="UnaIkq8cPr0a4UZQVn7ji7,Usi9xynIVqJWvRhEvGVOYQ" />
-        <Link Id="B8o38upRBCpnGJcCCYjsuY" Ids="CNYLiTg3BUtmCJlFwHyUjv,MRc5yVuyw9pbbASUSN49D8" />
+        <Link Id="B8o38upRBCpnGJcCCYjsuY" Ids="CNYLiTg3BUtmCJlFwHyUjv,ULh17fD8cDxRi4lqa2hYtY" />
         <Link Id="A1AwFIAycdcFWjykRiUKiv" Ids="MVGJGduk0mPWJznoGv9YVX,RgIIgaq8NiTBppqeaxZgPe" />
         <Link Id="UyrJAnXQ1yBHJA6DLjynKu" Ids="VE109xy4WqBycyAwxMeCrD,FitnqKKJuItGI6PwD5m2Mp" />
         <Link Id="Baf7eVHFobPlz4w9svzMrn" Ids="Obo0KlAOX8uJTLEhkSgG4Y,H1dkptL5CUJAlSE1SJXIiL" />
@@ -242,8 +235,8 @@
         <Link Id="KdpElz6eztLNlpgSuK6eUd" Ids="OkavS935XH1PwXkDGEghIj,BjV1qosy6ELHSme1hTfja5" />
         <Link Id="F1tlkRJYExsO8dJq96tCfK" Ids="TXJAYmf93ujKYZvvyF8Xfd,TIjKhLd4rTZDn2dSnszv01" />
         <Link Id="JwT1G22UtV44dBwf7C3qpK" Ids="HwRnfleRlGfpKEI7pXlafv,H1yv1JBLijwVmMX34e3Fzf" />
-        <Link Id="UrAoolSnTnIRBvOxBpGnn9" Ids="SZONokgOOw3PKrH0lXmVdd,VV9jfhQGprHpgzTwLz3AF8" />
-        <Link Id="GEqsNpmBuxct8MoUzAqSxR" Ids="PDfAZ7dDcrkFW1pQwiJ9x4,Sn0IFyPbF1sneJyHMkVp7A" />
+        <Link Id="UZX1mywk6V3MXXAQSglT3i" Ids="PDfAZ7dDcrkFW1pQwiJ9x4,ARy89W2GJw4s60rzwfmBsV" />
+        <Link Id="GEqsNpmBuxct8MoUzAqSxR" Ids="FRGL7PazfZpBv73noSDRaO,Sn0IFyPbF1sneJyHMkVp7A" />
         <Link Id="PclhoIhHEmjZvJGPjU662Y" Ids="Ddqg0xhHjdkgJZ68fhWmTD,GoA5ugmSeRASmqqlJuk5hE" />
       </Patch>
     </Node>

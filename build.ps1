@@ -76,6 +76,26 @@ if ($LASTEXITCODE -ne 0) { throw "dotnet build failed ($LASTEXITCODE)" }
 Write-Host "`n== 2/5 stage dist\ ==" -ForegroundColor Cyan
 if (Test-Path $Dist) { Remove-Item $Dist -Recurse -Force }
 
+# A version number is immutable as far as every cache is concerned, and this repository rebuilds
+# 0.0.1-alpha over and over. Two caches then keep serving yesterday's assembly while dist\ holds
+# today's, and nothing says so: on 2026-08-14 a vvvvc compile failed with "type TileCacheNode does
+# not exist" against a dll that plainly contained it. pack.ps1 evicts the NuGet one; nobody evicted
+# vvvv's, and vvvv's is the one that matters for opening a patch straight after a build.
+foreach ($pkg in $Packages) {
+    $meta = ([xml](Get-Content $pkg.Nuspec -Raw)).package.metadata
+    $stale = @(
+        Join-Path $env:USERPROFILE ".nuget\packages\$($meta.id.ToLowerInvariant())\$($meta.version)"
+        Join-Path (Split-Path (& (Join-Path $RepoRoot 'tools\Find-Vvvv.ps1')) -Parent) "package-cache\$($meta.id).$($meta.version)"
+    )
+    foreach ($dir in $stale) {
+        # Named targets only, and each must look like the package it claims to be.
+        if ((Test-Path $dir) -and (Split-Path $dir -Leaf) -match [regex]::Escape($meta.version)) {
+            Remove-Item $dir -Recurse -Force
+            Write-Host "   evicted stale $($meta.id) $($meta.version) from $(Split-Path $dir -Parent)"
+        }
+    }
+}
+
 # vvvv rewrites a help patch's dependency to the exact version it resolved, and that version
 # would then be demanded forever. Normalise the repo copy, not the staged one: each nuspec packs
 # help\ straight out of the repo, so a fix applied on the way into dist\ would be invisible in

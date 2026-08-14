@@ -97,6 +97,20 @@ Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
   default must be a compile-time constant (`CS1736`). Expose it through a node, the way
   `SystemFolder [IO]` does. Beware that a Path IOBox stores a *relative* path whenever it can and
   hides that from you, so a node that writes files must refuse a non-rooted path rather than guess.
+- **An empty Path IOBox is not empty, so "empty means the default" cannot be a Path pin's rule.**
+  `Value=""` in a `.vl` means *the path relative to this document*, and the empty relative path is
+  the document's own folder; `vvvvc` compiles it to
+  `CompilationHelper.Deserialize<Path>("", false, <documentId>, …)` and VL hands the node that
+  folder, absolute. Only an **unconnected** pin produces the `null` that can mean "the default".
+  Cost: 444 tiles written next to two repositories with every guard reporting success — the path
+  was rooted, the folder existed, the status pin named it honestly, and nothing was wrong except
+  the assumption. So: never wire an empty Path IOBox in a shipped patch, and never document a pin
+  as "leave it empty" — that sentence is what causes it.
+- **An option that can be off needs a value for "off", not `null`.** An unconnected pin, a switched
+  off producer and a producer that failed all arrive as `null`, and a consumer cannot tell "nobody
+  said anything, use the default" from "somebody said no". Give the type an `IsOn` and carry the
+  reason. Same ambiguity as the empty IOBox, one level up, and it cost a silent fallback to the
+  default in the very commit that fixed the first one.
 - **Tags are not a C# attribute.** `VL.Core.Import` has no `TagsAttribute`; `Tags=` and `Summary=`
   live on a node definition in a `.vl`, including on a `ForwardDefinition` — vvvv's own
   `VL.Skia.vl` does this for `Console`. Across every shipped `.vl`, **251 multi-term tags use

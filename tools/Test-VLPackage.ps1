@@ -18,6 +18,7 @@
       8. nuspec ships every assembly     forwarding a .dll that is not in the package
       9. nuspec declares every nuget     third-party deps the .vl references
      10. help patches                    BOM, no ProjectDependency, local packages pinned to 0.0.0
+     11. no stray map tiles              a cache once wrote {z}\{x}\{y}.png into the repository
 
     Run .\build.ps1 first, or pass -FromBuildOutput to read assemblies straight out of
     src\*\bin\<Configuration>\net8.0 (what CI does).
@@ -223,6 +224,37 @@ if ($helpDocs.Count -eq 0) {
     Write-Host "  warn  no help patches" -ForegroundColor DarkYellow
 } elseif (-not ($errors | Where-Object { $_ -like 'help\*' })) {
     Ok "$($helpDocs.Count) help patch(es) valid"
+}
+
+# 11. stray map tiles -------------------------------------------------------
+#
+# On 2026-08-14 a cache wrote 444 tiles next to two repositories, 38 of them reached a
+# commit, and build.ps1 had already staged them into dist\ -- one pack.ps1 away from
+# shipping inside the package. Every check in this file passed throughout: they all ask
+# whether what should be there is there, and none asked whether something else had turned
+# up. This asks that.
+#
+# The shape is BruTile's FileCache layout, {zoom}\{x}\{y}.png, which is what a tile cache
+# writes and what nothing else in a package looks like.
+Write-Host "`nchecking for stray map tiles" -ForegroundColor White
+
+$tileRoots = @('help', 'dist') |
+    ForEach-Object { Join-Path $RepoRoot $_ } |
+    Where-Object { Test-Path $_ }
+
+$strays = @(
+    foreach ($root in $tileRoots) {
+        Get-ChildItem $root -Recurse -File -Filter '*.png' -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -match '\\\d+\\\d+\\\d+\.png$' }
+    }
+)
+
+if ($strays.Count -gt 0) {
+    $shown = ($strays | Select-Object -First 5 | ForEach-Object { $_.FullName.Replace("$RepoRoot\", '') }) -join ', '
+    $more  = if ($strays.Count -gt 5) { " (and $($strays.Count - 5) more)" } else { '' }
+    Fail "found $($strays.Count) file(s) shaped like cached map tiles under help\ or dist\: $shown$more. A tile cache has written into the repository; see NOTES.md 2026-08-14. Delete them and find out which folder the cache was given."
+} else {
+    Ok "no {zoom}\{x}\{y}.png under help\ or dist\"
 }
 
 # ---------------------------------------------------------------------------

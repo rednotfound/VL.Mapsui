@@ -31,23 +31,13 @@
               <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="UCDVsBjunt97N6nzpEeEaQ" Comment="Cache To Disk" Bounds="110,210,35,35" ShowValueBox="true" isIOBox="true" Value="true">
-            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
-              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
-            </p:TypeAnnotation>
-            <p:ValueBoxSettings>
-              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
-            </p:ValueBoxSettings>
-          </Pad>
-
           <Node Bounds="60,270,150,19" Id="KHnFw70ecMWVxZELXlyTl1">
             <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="OpenStreetMap" />
             </p:NodeReference>
             <Pin Id="JLFcBHQpTCudwT4cR26v8a" Name="Enabled" Kind="InputPin" />
-            <Pin Id="LlxQNdMlBQUzzUuhMCqTLt" Name="Cache To Disk" Kind="InputPin" />
-            <Pin Id="Lh7hoAaAZR4lGDS8cJSPmf" Name="Cache Folder" Kind="InputPin" />
+            <Pin Id="ALuFzsTrR4zRoYka0jm5xG" Name="Cache" Kind="InputPin" />
             <Pin Id="IZcuJT7w88rK5YvXc5hP0d" Name="Cache Status" Kind="OutputPin" />
             <Pin Id="Rzmk0zQoTlnL58F5IAtAIh" Name="Layers Built" Kind="OutputPin" />
             <Pin Id="IovYhVM0nvQMdLNOVUz0RX" Name="Result" Kind="OutputPin" />
@@ -274,14 +264,6 @@
           </Node>
 
   <Pad Id="Shay0pkZOUlYXmQs0zZ7iS" Comment="Cache Status" Bounds="240,240,300,15" ShowValueBox="true" isIOBox="true" />
-          <Pad Id="MCN91kHUREiofhGBG5SMdk" Comment="Cache Folder" Bounds="160,215,240,15" ShowValueBox="true" isIOBox="true" Value="">
-            <p:TypeAnnotation LastCategoryFullName="IO" LastDependency="CoreLibBasics.vl">
-              <Choice Kind="TypeFlag" Name="Path" />
-            </p:TypeAnnotation>
-            <p:ValueBoxSettings>
-              <p:pathtype p:Assembly="VL.Core" p:Type="VL.Core.PathType">Directory</p:pathtype>
-            </p:ValueBoxSettings>
-          </Pad>
         </Canvas>
         <Patch Id="BHnV6WFhadjpCb50iOTz1F" Name="Create" />
         <Patch Id="H5YBhE4qwJVj3UjLQdoBN5" Name="Update" />
@@ -290,7 +272,6 @@
           <Fragment Id="B27vJDlz4YQtnbwSc6k9du" Patch="H5YBhE4qwJVj3UjLQdoBN5" Enabled="true" />
         </ProcessDefinition>
         <Link Id="DE2yurv4jjynosyvk4N3xq" Ids="EiFGTnBVhigsfbdwmQt39S,JLFcBHQpTCudwT4cR26v8a" />
-        <Link Id="LAN58tz5OhCyrJbSuJU3jY" Ids="UCDVsBjunt97N6nzpEeEaQ,LlxQNdMlBQUzzUuhMCqTLt" />
         <Link Id="VOdzI3kS8MbU1XgZsaQ02p" Ids="Rzmk0zQoTlnL58F5IAtAIh,LzEShfSKk61LhxMpR82M3a" />
         <Link Id="DOmef095bI00rAr4jsFtGe" Ids="IovYhVM0nvQMdLNOVUz0RX,V5YwWZaRLQYktZH5Twt2yb" />
         <Link Id="HfAOMvEEdQPmHsO2692d43" Ids="Gzg4blaoPmHl5UJr3j4qnu,GqMX33rNVbFnsgSpH0x7Fl" />
@@ -318,7 +299,6 @@
         <Link Id="PZDcLksNz1hcVSacQ1CD8L" Ids="B2JLZBFRZZ8pOzduqhKvvd,SLeoSJ0mtJwpIBrN3Lo82U" />
         <Link Id="IrHtYs9a44S8uM588h6Trg" Ids="EkFs6mHHZIMujfdgEOqlk2,UYCvpRMOoaQciC5U2bKDca" />
         <Link Id="Abenbrk69WBMxtGtcfkJ26" Ids="PTFy7CVaB74mEbW20etmS8,HxtTE9CiHdY3Qy4br6O4qG" />
-        <Link Id="UzyeR46cfLAILvtHZg0Twh" Ids="MCN91kHUREiofhGBG5SMdk,Lh7hoAaAZR4lGDS8cJSPmf" />
       </Patch>
     </Node>
   </Patch>

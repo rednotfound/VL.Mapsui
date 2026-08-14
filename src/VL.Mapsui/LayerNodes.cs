@@ -36,16 +36,19 @@ public class OpenStreetMapLayerNode : IDisposable
     const string UserAgent = "VL.Mapsui/0.0.1-alpha (+https://github.com/rednotfound/VL.Mapsui)";
 
     TileLayer? _layer;
-    bool _cache;
-    string _folder = string.Empty;
+    TileDiskCache? _attached;
     string _status = "off";
 
     /// <summary>Layers built by this node.</summary>
     internal int LayersBuilt { get; private set; }
 
-    /// <summary>Where the cache went and how big it is, or why it is off.</summary>
-    internal string CacheStatus => _cache && _layer is not null
-        ? (_status.StartsWith("cannot", StringComparison.Ordinal) ? _status : TileCache.Describe(_status))
+    /// <summary>Where this layer's tiles go, or why they are not kept.</summary>
+    /// <remarks>
+    /// Read every frame rather than remembered from the build, so the count grows while tiles
+    /// arrive. The disk walk behind it is throttled to once every couple of seconds.
+    /// </remarks>
+    internal string CacheStatus => _layer is not null && _attached is { IsOn: true }
+        ? TileCache.Describe(_attached.Folder)
         : _status;
 
     /// <summary>
@@ -55,20 +58,21 @@ public class OpenStreetMapLayerNode : IDisposable
     /// Enabled defaults to off because opening a document in vvvv runs it. A layer that fetches
     /// the moment a patch is opened gives whoever opened it no chance to decline.
     ///
-    /// Cache To Disk keeps tiles that were drawn, which is what OSM's policy asks for; what it
-    /// forbids is the opposite, fetching tiles nobody is looking at. **Cache Folder is a pin
-    /// because where a node writes files is the patch author's business** — beside the project so
-    /// it travels with it, on a fast disk, shared between patches. Leave it empty for
-    /// %LOCALAPPDATA%\VL.Mapsui\tiles; <c>CacheFolder</c> shows what that resolves to.
+    /// **Cache takes the output of a <c>TileCache</c> node, and nothing else decides where tiles
+    /// go.** Leave it unconnected for the default location; wire a TileCache node to move the
+    /// folder or switch caching off. Keeping tiles that were drawn is what OSM's policy asks for;
+    /// what it forbids is the opposite, fetching tiles nobody is looking at.
     ///
-    /// It is a Path rather than a string so the IOBox offers a directory chooser on
-    /// SHIFT+rightclick. The default is deliberately *not* the pin's initial value: it cannot be
-    /// (a C# default has to be a compile-time constant, CS1736) and it should not be, since a
-    /// literal would ship one machine's path inside the node.
+    /// There is no folder pin here on purpose. It used to be one, typed as a Path, with "leave it
+    /// empty for the default" written on it — and an empty Path IOBox is not empty. VL resolves it
+    /// against the document and hands the node the patch's own folder, so 444 tiles were written
+    /// next to two repositories while every guard reported success. A folder is now decided in one
+    /// place, by a node whose whole job that is.
     ///
-    /// Cache Status reports the folder actually in use and how much is in it, or the reason the
-    /// cache is off. A path that cannot be used does **not** silently fall back to the default:
-    /// files appearing somewhere nobody asked for, with nothing to say so, is the worse outcome.
+    /// Cache Status reports the folder this layer actually writes to and how much is in it, or the
+    /// reason nothing is kept. A folder that cannot be used does **not** silently fall back to the
+    /// default: files appearing somewhere nobody asked for, with nothing to say so, is the worse
+    /// outcome.
     ///
     /// **Watch Layers Built.** It should settle at 1 and stay there. A number that climbs frame
     /// after frame means an input is changing every frame, and every rebuild starts a fresh
@@ -80,8 +84,7 @@ public class OpenStreetMapLayerNode : IDisposable
         out int layersBuilt,
         out string cacheStatus,
         bool enabled = false,
-        bool cacheToDisk = true,
-        VLPath? cacheFolder = null)
+        TileDiskCache? cache = null)
     {
         if (!enabled)
         {
@@ -91,16 +94,20 @@ public class OpenStreetMapLayerNode : IDisposable
             return null;
         }
 
-        // Only a change to what the tile source *is* rebuilds, and the cache folder is part of
-        // that: it is attached at construction. Where the map looks is the navigator's business
-        // and never reaches this node.
-        var folder = TileCache.Resolve(cacheFolder?.Value);
-        if (_layer is null || cacheToDisk != _cache || !string.Equals(folder, _folder, StringComparison.OrdinalIgnoreCase))
+        // Nothing connected means the default cache, which is the policy-compliant answer: not
+        // caching would refetch the same view on every restart. A TileCache node that is switched
+        // off hands over a cache that is off rather than null, so the two cases stay apart.
+        var wanted = cache ?? TileCache.Default();
+
+        // Only a change to what the tile source *is* rebuilds, and the cache is part of that: it
+        // is attached at construction. Compared by reference, because that is what a cache's
+        // identity is now - a node hands out the same instance every frame. Where the map looks is
+        // the navigator's business and never reaches this node.
+        if (_layer is null || !ReferenceEquals(wanted, _attached))
         {
             Release();
-            _layer = Build(cacheToDisk, folder, out _status);
-            _cache = cacheToDisk;
-            _folder = folder;
+            _layer = Build(wanted, out _status);
+            _attached = wanted;
             LayersBuilt++;
         }
 
@@ -109,31 +116,29 @@ public class OpenStreetMapLayerNode : IDisposable
         return _layer;
     }
 
-    static TileLayer Build(bool cache, string folder, out string status)
+    static TileLayer Build(TileDiskCache cache, out string status)
     {
         var layer = OpenStreetMap.CreateTileLayer(UserAgent);
-        status = "off";
+
+        // Switched off, or a folder that did not work. Both arrive as a cache that is not on, and
+        // both are reported rather than quietly replaced by the default.
+        if (!cache.IsOn)
+        {
+            status = TileCache.Describe(cache);
+            return layer;
+        }
 
         // Mapsui's factory takes a user agent and nothing else, so the disk cache is attached
         // afterwards. Keeping Mapsui's own definition of the OSM source is worth more than
         // rebuilding one here out of BruTile primitives.
-        if (!cache) return layer;
-
         if (layer.TileSource is not BruTile.Web.HttpTileSource http)
         {
             status = "cannot cache: the tile source is not an HttpTileSource";
             return layer;
         }
 
-        var fileCache = TileCache.TryCreate(folder, out var problem);
-        if (fileCache is null)
-        {
-            status = $"cannot cache to {folder}: {problem}";
-            return layer;
-        }
-
-        http.PersistentCache = fileCache;
-        status = folder;
+        http.PersistentCache = cache.Cache;
+        status = cache.Folder;      // CacheStatus re-reads the size every frame from here on
         return layer;
     }
 
@@ -144,8 +149,7 @@ public class OpenStreetMapLayerNode : IDisposable
         _layer?.AbortFetch();
         _layer?.Dispose();
         _layer = null;
-        _cache = false;
-        _folder = string.Empty;
+        _attached = null;
         _status = "off";
     }
 

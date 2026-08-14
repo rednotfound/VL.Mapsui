@@ -7,6 +7,50 @@ using BruTile.Cache;
 namespace VL.Mapsui;
 
 /// <summary>
+/// A tile cache on disk: a folder, and the BruTile cache attached to it.
+/// </summary>
+/// <remarks>
+/// This is a **value a patch passes around** rather than a setting on the layer node, which is what
+/// <c>TileCache</c> produces and <c>OpenStreetMap</c> consumes. The shape matters: it used to be two
+/// pins on the layer node (Cache To Disk, Cache Folder) *and* a separate node showing the default,
+/// and the two disagreed — one read a pin, the other read nothing at all. One node owns it now.
+/// </remarks>
+public sealed class TileDiskCache
+{
+    internal TileDiskCache(string folder, FileCache? cache, string? problem = null)
+    {
+        Folder = folder;
+        Cache = cache;
+        Problem = problem;
+    }
+
+    /// <summary>The folder tiles are written to.</summary>
+    public string Folder { get; }
+
+    /// <summary>Why this cache is off, when it is off because something went wrong.</summary>
+    public string? Problem { get; }
+
+    /// <summary>Whether this cache is switched on. A cache that is off is still a value.</summary>
+    /// <remarks>
+    /// **"Off" has to be something rather than nothing, and so does "this folder did not work".**
+    /// An unconnected pin hands a node null, and so would a connected node that returned null when
+    /// switched off or when the folder was unusable — the three would be indistinguishable, and a
+    /// layer could not tell "nobody said anything, use the default" from "somebody said no". That
+    /// is the same ambiguity that let an empty Path IOBox pass for an empty pin and put 444 tiles
+    /// next to two repositories, so it is worth not rebuilding one level up. A test caught exactly
+    /// that regression here: a failed folder came back as null and the layer fell back to the
+    /// default, silently, which is the one thing this package promises not to do.
+    /// </remarks>
+    public bool IsOn => Cache is not null;
+
+    /// <summary>What actually gets attached to the tile source, or null when this cache is off.</summary>
+    internal FileCache? Cache { get; }
+
+    /// <summary>The folder, and whether it is being written to.</summary>
+    public override string ToString() => IsOn ? Folder : $"{Folder} (off)";
+}
+
+/// <summary>
 /// The on-disk tile cache: where it goes, how big it is, and how to describe it.
 /// </summary>
 /// <remarks>
@@ -17,12 +61,11 @@ namespace VL.Mapsui;
 /// pre-seeding areas or zoom levels. Nothing here fetches anything; it only keeps what the map
 /// already asked for, so restarting vvvv stops meaning downloading the same view again.
 ///
-/// Scale, measured rather than guessed: one 256x256 tile is roughly 5 to 50 KB, a window at one
-/// zoom level is about a dozen of them, and a working session that pans and zooms a fair amount
-/// came out at 1,163 tiles and 24 MB. The whole world at zoom 12 would be 16.7 million tiles and
-/// hundreds of gigabytes, and is exactly what the policy forbids.
+/// Scale, measured rather than guessed: one 256x256 tile is roughly 5 to 50 KB, and a session over
+/// Tokyo at zoom 12 came out at 16 tiles and 736 KB. The whole world at zoom 12 would be 16.7
+/// million tiles and hundreds of gigabytes, and is exactly what the policy forbids.
 ///
-/// **The folder is a pin, not a constant in here.** Where a node writes files is the patch
+/// **The folder is a node, not a constant in here.** Where a node writes files is the patch
 /// author's business: an installation may want the cache beside the project so it travels with
 /// it, on a fast disk, or shared between several patches. Deciding that for them would be the
 /// same mistake as deciding what the mouse means.
@@ -30,7 +73,7 @@ namespace VL.Mapsui;
 static class TileCache
 {
     /// <summary>
-    /// Where tiles go when the pin is left empty. Under LOCALAPPDATA rather than in a repository,
+    /// Where tiles go when nothing is connected. Under LOCALAPPDATA rather than in a repository,
     /// so it cannot be committed by accident and deleting one folder resets everything.
     /// </summary>
     public static string DefaultDirectory { get; } = Path.Combine(
@@ -44,18 +87,18 @@ static class TileCache
     static readonly TimeSpan Expiry = TimeSpan.FromDays(7);
 
     /// <summary>
-    /// An empty or blank pin means the default location.
+    /// The folder a pin asks for, or the default when nothing is connected.
     /// </summary>
     /// <remarks>
-    /// **The default cannot be the pin's initial value, and that is a language rule rather than a
-    /// preference**: a C# default parameter value must be a compile-time constant (CS1736), and
-    /// LOCALAPPDATA is only known at runtime. Hardcoding a literal would bake one machine's path
-    /// into the node definition — which VL.Audio does, shipping a Filename pin that reads
-    /// <c>C:\temp\foo.wav</c>.
+    /// **Only <c>null</c> means "the default", and only an unconnected pin produces null.** An
+    /// empty Path IOBox does *not*: VL stores it as an empty path relative to the document and
+    /// hands the node the document's own folder, absolute. That is not a theory — it is what put
+    /// 444 tiles next to two repositories, with every guard here reporting success, because from
+    /// this method's point of view somebody had named a perfectly good folder. See NOTES.md,
+    /// 2026-08-14.
     ///
-    /// vvvv's own answer for a machine-dependent path is a node that yields it: <c>SystemFolder</c>
-    /// in category IO takes a SpecialFolder and outputs a Path. <see cref="CacheNodes.CacheFolder"/>
-    /// does the same for this one, so the default is discoverable by patching instead of pre-filled.
+    /// So there is no "empty means default" rule any more. There cannot be one: on a Path pin,
+    /// empty has no representation.
     /// </remarks>
     public static string Resolve(string? folder)
         => string.IsNullOrWhiteSpace(folder) ? DefaultDirectory : folder!.Trim();
@@ -69,42 +112,59 @@ static class TileCache
     /// for, and nothing would say so. This reports the problem instead and leaves the cache off,
     /// which the node surfaces on its status pin.
     /// </remarks>
-    public static FileCache? TryCreate(string path, out string? problem)
+    public static TileDiskCache Create(string path)
     {
-        problem = null;
-
         // A Path IOBox stores a relative path whenever it can and hides that from you (the Gray
         // Book says so outright). If a relative one ever reaches here, there is no honest way to
         // root it: relative to the document, to vvvv's install folder, to whatever the working
         // directory happens to be? CreateDirectory would pick the last of those and write tiles
         // somewhere nobody could predict. Say so instead.
         if (!Path.IsPathRooted(path))
-        {
-            problem = "a relative path has no defined location here - give an absolute folder";
-            return null;
-        }
+            return new TileDiskCache(path, null, "a relative path has no defined location here - give an absolute folder");
 
         try
         {
             // Fails fast and with a readable message on illegal characters, a missing drive, or a
             // path the process may not write to.
             Directory.CreateDirectory(path);
-            return new FileCache(path, "png", Expiry);
+            return new TileDiskCache(path, new FileCache(path, "png", Expiry));
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException
                                   or ArgumentException or NotSupportedException)
         {
-            problem = e.Message;
-            return null;
+            return new TileDiskCache(path, null, e.Message);
         }
     }
+
+    // ── The default cache ─────────────────────────────────────────────────────
+    //
+    // Built once and handed out by reference, because the layer node compares caches by reference
+    // to decide whether to rebuild. A fresh instance per frame would rebuild the tile layer sixty
+    // times a second, which is the failure this package was rebuilt to undo.
+
+    /// <summary>A cache that is switched off, remembering the folder it would have used.</summary>
+    public static TileDiskCache Off(string folder) => new(folder, null);
+
+    static TileDiskCache? _default;
+
+    /// <summary>
+    /// The cache used when nothing is connected to a layer's Cache pin. Built once and handed out
+    /// by reference; it is off, with a problem, if LOCALAPPDATA itself cannot be written to.
+    /// </summary>
+    public static TileDiskCache Default() => _default ??= Create(DefaultDirectory);
+
+    /// <summary>One line for a status pin: where this cache writes, or why it does not.</summary>
+    public static string Describe(TileDiskCache cache)
+        => cache.Problem is not null ? $"cannot cache to {cache.Folder}: {cache.Problem}"
+         : !cache.IsOn               ? $"off - every restart refetches the same view ({cache.Folder})"
+         :                             Describe(cache.Folder);
 
     // ── Size, without hammering the disk ──────────────────────────────────────
     //
     // Walking a directory is cheap once and ruinous sixty times a second, which is the same
     // mistake that took a network down wearing different clothes. Read it rarely and remember the
-    // answer - per folder, since the pin means two nodes can be looking at different ones and a
-    // single remembered value would have them reading each other's numbers.
+    // answer - per folder, since two nodes can be looking at different ones and a single
+    // remembered value would have them reading each other's numbers.
 
     static readonly Stopwatch Since = Stopwatch.StartNew();
     static readonly TimeSpan MinimumInterval = TimeSpan.FromSeconds(2);
@@ -115,6 +175,11 @@ static class TileCache
     /// Tiles on disk and the bytes they occupy, re-read at most every couple of seconds per
     /// folder.
     /// </summary>
+    /// <remarks>
+    /// Counts <c>*.png</c> and nothing else. It used to count every file, which is how a folder
+    /// holding one patch and no tiles at all reported "1 tiles" — a wrong number that looked
+    /// plausible enough to read past.
+    /// </remarks>
     public static (int tiles, long bytes) Stats(string path)
     {
         var now = Since.Elapsed;
@@ -125,7 +190,7 @@ static class TileCache
         var bytes = 0L;
         try
         {
-            foreach (var f in new DirectoryInfo(path).EnumerateFiles("*", SearchOption.AllDirectories))
+            foreach (var f in new DirectoryInfo(path).EnumerateFiles("*.png", SearchOption.AllDirectories))
             {
                 tiles++;
                 bytes += f.Length;
@@ -142,7 +207,7 @@ static class TileCache
     }
 
     /// <summary>
-    /// One line for the status pin: where the cache is and how much is in it.
+    /// One line for a status pin: where the cache is and how much is in it.
     /// </summary>
     public static string Describe(string path)
     {

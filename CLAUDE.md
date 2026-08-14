@@ -20,10 +20,12 @@ Node count is the honest measure of how far this is from finished: **Mapsui expo
 types and we wrap a few dozen**. See [docs/MAPSUI-SURFACE.md](docs/MAPSUI-SURFACE.md) for what is
 wrapped, what is not, and what will not be.
 
-**One open bug, and it writes files:** the tile cache lands next to whatever document vvvv was
-launched from rather than in the cache folder — 444 stray tiles across two repositories, 38 of
-which reached a commit. `.gitignore` now covers the shape and they have been removed, but the
-cause is unknown and it is the first thing to fix. See NOTES.md, 2026-08-14.
+**The stray-tile bug is fixed, and its cause is worth carrying: an empty Path IOBox is not empty.**
+`Value=""` in a `.vl` means *relative to this document*, and the empty relative path is the
+document's own folder — so the layer was handed a perfectly good folder and wrote 444 tiles next to
+two repositories while every guard reported success. Only an **unconnected** pin produces the `null`
+that can mean "the default". The cache is a value now (`TileCache` produces it, `OpenStreetMap`
+consumes it) and no patch here contains a Path IOBox. See NOTES.md, 2026-08-14, and rule 8 below.
 
 Measurements and their dates live in [NOTES.md](NOTES.md). Claims without a measurement behind
 them do not belong there or here.
@@ -57,13 +59,21 @@ writing any node; the four questions at the top of it would have prevented both.
    parameter value must be a compile-time constant (`CS1736`), so a folder built from
    `Environment.GetFolderPath` cannot be one — and hardcoding a literal would ship this machine's
    path inside the node, which is what `VL.Audio.vl`'s `Filename` pin does (`C:\temp\foo.wav`).
-   vvvv's own answer is `SystemFolder [IO]`, a node that *yields* the path; `Mapsui.Layers.CacheFolder`
-   copies it. Type the pin `VLPath?` with `= null` (`null` is a constant) and resolve empty
-   internally. Details in `NOTES.md`, 2026-08-13.
+   vvvv's own answer is `SystemFolder [IO]`, a node that *yields* the path; `Mapsui.Layers.TileCache`
+   copies it. Type the pin `VLPath?` with `= null` (`null` is a constant). Details in `NOTES.md`,
+   2026-08-13.
 7. **Adding a pin is not finished until an IOBox reaches it.** A pin with no pad connected is
    unreachable in the patch, and `vvvvc` compiles it without complaint as a literal
    (`string Cache_Folder_11 = @"";`). A compile proving the pin exists proves nothing about
    whether anyone can set it — that cost a whole test round here.
+8. **An empty Path IOBox is not empty, and "off" is not `null`.** `Value=""` in a `.vl` means the
+   path *relative to the document*, so VL hands the node the patch's own folder, absolute — which is
+   how 444 tiles were written next to two repositories with `IsPathRooted`, `CreateDirectory` and
+   the status pin all reporting success. Only an **unconnected** pin gives the `null` that can mean
+   "the default", so never wire an empty Path IOBox in a shipped patch and never write "leave it
+   empty" on a pin. The same ambiguity repeats one level up wherever `null` would have to mean three
+   things at once — unconnected, switched off, and failed — so a thing that can be off needs a value
+   saying so (`TileDiskCache.IsOn`), not an absence. Details in `NOTES.md`, 2026-08-14.
 
 ## Node design rules inherited from VL.GIS
 
@@ -102,18 +112,23 @@ see [`docs/RULES.md`](docs/RULES.md).
 
 ## The tile cache
 
-`%LOCALAPPDATA%\VL.Mapsui\tiles`, as `{zoom}/{x}/{y}.png`, expiring after 7 days. Delete the
-folder to reset; `Cache To Disk` turns it off and `Cache Folder` moves it — empty means the default
-above, and `Mapsui.Layers.CacheFolder` shows what that resolved to without switching a layer on.
+`%LOCALAPPDATA%\VL.Mapsui\tiles`, as `{zoom}/{x}/{y}.png`, expiring after 7 days. Delete the folder
+to reset.
 
-The folder is part of the layer's **rebuild identity** (the cache is attached at construction), so
-changing it rebuilds once — compared case-insensitively and trimmed, since Windows paths that differ
-only in case are the same folder and refetching every tile for that would be absurd. Two failures
-are deliberately *not* silent: an unusable folder and a **relative** one are both reported on
-`Cache Status` with the cache left off, rather than falling back to the default. Files appearing
-somewhere nobody asked for, with nothing to say so, is the worse outcome — and a relative path
-cannot be honestly rooted here, which matters because a Path IOBox stores relative whenever it can
-and hides that from you.
+**One node owns it.** `Mapsui.Layers.TileCache` produces a `TileDiskCache` and `OpenStreetMap`
+consumes it on a `Cache` pin; the layer node has no folder pin at all. Leave `Cache` unconnected for
+the default, and leave `TileCache`'s `Folder` unconnected for the same — **unconnected is the only
+thing that means "the default"**, which is why there used to be two places to set the folder and no
+guarantee they agreed. `TileCache` reads the disk and never the network, so it still answers "where
+do tiles go, and how much is there?" with the layer switched off.
+
+The cache is part of the layer's **rebuild identity** (it is attached at construction) and is
+compared by reference, since one node hands out one instance; the folder inside it is compared
+case-insensitively and trimmed, because Windows paths differing only in case are the same folder and
+refetching every tile for that would be absurd. Three failures are deliberately *not* silent: an
+unusable folder, a **relative** one, and a cache that is simply switched off are each reported
+rather than replaced by the default. They are also three distinct **values** rather than `null`,
+because a consumer must be able to tell "nobody said anything" from "somebody said no".
 
 **Only tiles that were drawn are stored**, which is what OSM's policy requires; the thing it
 forbids is pre-emptive fetching of tiles nobody is looking at. Measured: a session over Tokyo at

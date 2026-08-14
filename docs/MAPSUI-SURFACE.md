@@ -22,9 +22,9 @@ out to be sitting in a Mapsui dependency we already ship.
 
 | node | category | what it is |
 |---|---|---|
-| `OpenStreetMap` | `Mapsui.Layers` | `TileLayer` over the OSM tile source, with the disk cache |
+| `OpenStreetMap` | `Mapsui.Layers` | `TileLayer` over the OSM tile source, taking a cache |
 | `Geometry` | `Mapsui.Layers` | `MemoryLayer` + `GeometryFeature` + `VectorStyle`, from NTS geometry |
-| `CacheFolder` | `Mapsui.Layers` | where tiles go and how much is there |
+| `TileCache` | `Mapsui.Layers` | the disk cache itself: where tiles go and how much is there |
 | `Map` | `Mapsui` | the `Map` and its layer collection |
 | `ViewportInfo`, `LayerInfo` | `Mapsui` | readers — centre, resolution, size; layer count and busy |
 | `CenterOn`, `ZoomToLevel`, `ZoomAt`, `ZoomByWheel`, `DragBetween`, `Refresh` | `Mapsui.Navigate` | the navigator |

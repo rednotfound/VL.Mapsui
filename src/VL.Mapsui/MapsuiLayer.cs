@@ -143,8 +143,8 @@ sealed class MapsuiLayer : ILayer, IDisposable
             .Any(l => l.TileSource is BruTile.Web.HttpTileSource { PersistentCache: BruTile.Cache.FileCache });
 
         // Whether one is attached, not where it is: a FileCache does not expose its folder, and
-        // the layer node reports that on its Cache Status pin - which is the better place for it
-        // anyway, being something a patch can read and act on.
+        // both the TileCache node and the layer node report that on a pin - which is the better
+        // place for it anyway, being something a patch can read and act on.
         Line(attached
             ? "cache      on (see the layer node's Cache Status pin)"
             : "cache      off - every restart refetches the same view");
