@@ -122,6 +122,10 @@ Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
 - **Fluent operations** (return type equals the first parameter type) get an output pin named
   `Output`; everything else gets `Result`. `vvvvc` rejects the wrong one, which is how this was
   established rather than guessed.
+- **Before editing a `.vl` by hand, read [`VL-PATCH-XML.md`](VL-PATCH-XML.md).** It is the verified
+  serialization of every construct used here — records, fragments, pads, regions, interfaces — with
+  the failure each rule prevents, and the validation gate that catches the mechanical ones. Almost
+  nothing you can get wrong in a `.vl` produces an XML error.
 - **Read a patched record through `IVLObject`, never through `System.Reflection`.** A record has
   **two runtime shapes**: exported by `vvvvc` it has real `public string Name;` fields, but **inside
   the vvvv editor its values live in `__State` and it exposes no CLR members for them at all** — a
@@ -158,6 +162,14 @@ Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
 - **A check that has never gone red is not a check.** The `.gitignore` rule added to stop stray
   tiles did not work on the first attempt — a pattern containing a slash is anchored to the
   repository root — and only planting a file and watching git ignore it caught that.
+- **Compile every help patch, not the one you edited.** Deleting a node that another patch still
+  used produced `Not found: ToAttributes` in a file nobody had touched, and compiling only the
+  changed patch would have shipped it. `tools\Compile-HelpPatches.ps1` with no `-Patch` filter takes
+  a few minutes and is the only thing that sees a cross-patch break.
+- **When a check finds one instance, run it over everything before believing that was the only one.**
+  The "empty IOBox connected to nothing" check was written for one leftover pad and immediately
+  found a second — a `Cache Status` readout in another patch that had never been wired at all, and
+  had been shipping blank.
 - **Run the negative test *after* the fix, not only before it.** A test that goes red on the broken
   code can still be measuring the wrong thing once the code is fixed: the flicker fix kept the layer
   alive, which made the counter the test asserted on stay at 1 whether or not the fix was present.

@@ -14,7 +14,7 @@ is its own library.
 
 **Current state (2026-08-14): a working package, not yet published.** A map renders in vvvv 7.4,
 pans, zooms and takes geometry from any NTS source. `VL.Mapsui.nuspec`, `build.ps1`, `pack.ps1`,
-`tools\Test-VLPackage.ps1` and **167 tests** exist. Nothing is on nuget.org.
+`tools\Test-VLPackage.ps1` and **186 tests** exist. Nothing is on nuget.org.
 
 Node count is the honest measure of how far this is from finished: **Mapsui exposes 306 public
 types and we wrap a few dozen**. See [docs/MAPSUI-SURFACE.md](docs/MAPSUI-SURFACE.md) for what is
@@ -170,6 +170,7 @@ vl-mapsui/
 ├── docs/RULES.md                 # ⭐ the rules carried over from VL.GIS - read before any node
 ├── docs/ARCHITECTURE.md          # the pipeline, the NTS boundary, why a node holds state
 ├── docs/MAPSUI-SURFACE.md        # what Mapsui offers, what we wrap, what we will not
+├── docs/VL-PATCH-XML.md          # ⭐ hand-authoring a .vl - read before editing one
 ├── VL.Mapsui.vl / .nuspec        # the package. .vl is hand-edited but never regenerated
 ├── src/VL.Mapsui/
 │   ├── LayerNodes.cs             # [ProcessNode] OpenStreetMap - tile layer, cache, attribution
@@ -187,8 +188,8 @@ vl-mapsui/
 │   ├── MapsuiLayer.cs            # VL.Skia.ILayer - draws it, plus the diagnostics overlay
 │   ├── PixelSpace.cs             # pixel/VL space bridge
 │   └── TileCache.cs              # the disk cache, its folder and its size
-├── help/VL.Mapsui/               # Explanation Overview + 6 HowTos + Help.xml (ordering and tags)
-├── test/VL.Mapsui.Tests/         # 167 xunit tests, no network, no vvvv
+├── help/VL.Mapsui/               # Explanation Overview + 8 HowTos + Help.xml (ordering and tags)
+├── test/VL.Mapsui.Tests/         # 186 xunit tests, no network, no vvvv
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org
 └── tools/
@@ -201,7 +202,7 @@ vl-mapsui/
 
 ## Tests
 
-`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 167 tests, well under a second. No
+`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 186 tests, well under a second. No
 network and no vvvv: the tile source is faked, and the geometry tests use a MemoryLayer.
 
 They exist because the expensive bug here was a **lifetime** bug, not an arithmetic one, so
