@@ -111,6 +111,38 @@ public class GeometryLayerNode : IDisposable
         }
     }
 
+    /// <summary>
+    /// The same geometry back in WGS84 longitude and latitude — the inverse of <see cref="ToMercator"/>.
+    /// </summary>
+    /// <remarks>
+    /// **The boundary has to be crossed in both directions, or it is not a boundary.** Geometry
+    /// enters this package as WGS84 and is projected on the way in; anything handed back out — a
+    /// picked feature, most obviously — has to arrive in the coordinates the patch speaks, or the
+    /// patch is left holding metres it never asked for and no node to convert them.
+    ///
+    /// On a copy, for the same reason as the way in.
+    /// </remarks>
+    internal static Geometry ToLonLat(Geometry geometry)
+    {
+        var projected = geometry.Copy();
+        projected.Apply(new MercatorToLonLat());
+        projected.GeometryChanged();
+        return projected;
+    }
+
+    sealed class MercatorToLonLat : ICoordinateSequenceFilter
+    {
+        public bool Done => false;
+        public bool GeometryChanged => true;
+
+        public void Filter(CoordinateSequence seq, int i)
+        {
+            var (lon, lat) = SphericalMercator.ToLonLat(seq.GetX(i), seq.GetY(i));
+            seq.SetX(i, lon);
+            seq.SetY(i, lat);
+        }
+    }
+
     /// <summary>Releases the layer it composed.</summary>
     public void Dispose() => _layer.Dispose();
 }

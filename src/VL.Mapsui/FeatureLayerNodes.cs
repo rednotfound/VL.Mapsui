@@ -83,7 +83,14 @@ public class FeatureLayerNode : IDisposable
         // identity is what a Map compares - handing out a new layer is what makes a map rebuild.
         if (_layer is null)
         {
-            _layer = new MemoryLayer(name);
+            _layer = new MemoryLayer(name)
+            {
+                // Mapsui hit-tests only layers that opted in, and the default is FALSE - measured
+                // 2026-08-14: with it off, Pick over the dead centre of a square returns no
+                // feature and no error anywhere. A data layer exists to be asked about, so it is
+                // switched on here rather than left as a pin nobody would know to look for.
+                IsMapInfoLayer = true,
+            };
             _name = name;
             LayersBuilt++;
         }
