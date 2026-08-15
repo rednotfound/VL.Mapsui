@@ -5,6 +5,55 @@ them do not belong here.
 
 ---
 
+## 2026-08-15 — picking, and four facts read off Mapsui before anything was designed
+
+`Pick` is the first node here that hands something **back**. Everything before it took data in and
+drew it. The design was settled by measurement rather than by reading Mapsui's examples, and every
+number below comes from a test that is now in the suite (`MapsuiHitTestFacts`), so a Mapsui upgrade
+cannot change any of them quietly.
+
+### The four measurements, and what each one decided
+
+| measured | result | what it decided |
+|---|---|---|
+| `ILayer.IsMapInfoLayer` | **defaults to `false`**; with it off, a hit on the dead centre of a square returns no feature and no error | `FeatureLayer` sets it to `true`, rather than leaving a pin nobody would know to look for |
+| the hit edge | screen x 300 hits, **301 misses** — the geometry exactly | `Pick` promises no tolerance |
+| Mapsui's `margin` | **0, 4, 8, 32 all miss** five pixels outside a polygon | not exposed as a pin: a tolerance that does nothing is worse than none |
+| a miss | still carries `WorldPosition` | `ScreenToWorld` is its own node, not an output of `Pick` |
+
+The first of these is the important one. It is a **silent** failure: no exception, no log line, and a
+result — "nothing is there" — indistinguishable from an honest miss. Exactly the class this
+repository keeps paying for, and the fifth instance of it recorded here.
+
+### The node has no Pressed pin, deliberately
+
+`Pick` answers about a **position**, not about a click. Gate it with `Sample and Hold` on
+`Left Pressed` and it becomes click-to-select; leave it alone and it is hover. This is the rule
+already applied to `Drag.Dragging` and to `Click`, and it is what the note of 2026-08-14 was about —
+*"把点击的事件在内部消化了肯定是有问题了"*.
+
+### `Split` exists because `Pick` was unreadable without it
+
+Caught while writing the help patch, not while writing the node: `Pick` returns an NTS `Feature`,
+whose attributes live in an `IAttributesTable` — **and VL has no nodes for that type**.
+VL.NetTopologySuite has none either; it wraps geometry only. So the node would have handed a patch
+the very thing that makes a feature interesting, with no way to open it.
+
+`FeatureNodes.Split` converts them to VL's own `ImmutableDictionary`, where `TryGetValue` is waiting.
+It is the exact inverse of `Feature`, which is why it is named `Split` — the convention
+VL.NetTopologySuite already uses for taking a `Coordinate` apart.
+
+**The test that would have caught it asserts on the attribute, not on the feature object.** A test
+that had only checked `Assert.NotNull(picked)` would have passed all the way to the GUI.
+
+### The projection boundary only worked one way
+
+`ToMercator` existed; `ToLonLat` did not. Geometry could get in and not back out — which nothing
+noticed for as long as nothing came back. A picked feature arrives in degrees now, the same
+coordinates it was written in.
+
+---
+
 ## 2026-08-14 — attributes in a patch, and four patches that shipped switched on
 
 ### A patch can build the attribute dictionary, and this was not obvious

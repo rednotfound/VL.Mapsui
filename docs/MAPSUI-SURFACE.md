@@ -124,12 +124,26 @@ Two tile sources are wrapped now — `OpenStreetMap` and the general `XYZ` templ
 most public raster services. Still missing: TMS (`TmsTileSourceBuilder` exists, and its Y axis is
 flipped, which is the whole reason it is a separate thing) and WMS-as-tiles.
 
-**Interaction is now the largest gap**, and it is the one with the most to gain: see below.
+**Editing is now the largest gap.** Picking is done; drawing and editing geometry on the map is not.
 
-### Interaction — 0
+### Interaction — 1 of 2
 
-- `MapInfo` / `MapInfoWidget` / `Map.OnInfo` — what did I click on. The line between a map you can
-  look at and one you can use.
+`Pick` wraps the hit test, through `IRenderInfo.GetMapInfo` rather than through `Map.Info` — the
+event route is what a UI control uses, and an event is the wrong shape for a patch that wants a
+value per frame. `ScreenToWorld` / `WorldToScreen` sit beside it on `ViewportExtensions`.
+
+Four things had to be measured first, and each is asserted in `MapsuiHitTestFacts`: a layer must set
+`IsMapInfoLayer` (default **false**, silent when off), the hit edge is exact, `margin` does not widen
+a geometry hit, and a miss still carries a world position. Details and dates in `NOTES.md`,
+2026-08-15.
+
+Not wrapped: `MapInfoWidget` (Mapsui's own on-map readout — a patch that has `Pick` can draw its own,
+and better), and `MapInfo.MapInfoRecords`, the full stack of everything under the point. `Pick`
+returns the topmost; the rest is one pin away the day something needs it.
+
+- `Mapsui.Nts.Editing` — `EditManager`, `EditMode`, `Geomorpher`, `AddInfo`, `DragInfo`,
+  `RotateInfo`: drawing and editing geometry on the map with the mouse. Nine types, and it is the
+  most patch-shaped feature Mapsui has. **This is the gap now.**
 - `Mapsui.Nts.Editing` — `EditManager`, `EditMode`, `Geomorpher`, `AddInfo`, `DragInfo`,
   `RotateInfo`: drawing and editing geometry on the map with the mouse. Nine types, and it is the
   most patch-shaped feature Mapsui has.

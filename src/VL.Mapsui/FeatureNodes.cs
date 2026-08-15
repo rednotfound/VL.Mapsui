@@ -53,4 +53,38 @@ public static class FeatureNodes
 
         return new NtsFeature(geometry!, table);
     }
+
+    /// <summary>
+    /// A feature taken apart again: its geometry, and its attributes as a Dictionary.
+    /// </summary>
+    /// <remarks>
+    /// **Without this, `Pick` would hand back something a patch cannot open.** NTS keeps attributes
+    /// in an `IAttributesTable`, which VL has no nodes for — so a picked feature would arrive
+    /// carrying the very thing that makes it interesting and no way to read it. This converts to
+    /// VL's own Dictionary, where `TryGetValue` is waiting.
+    ///
+    /// The exact inverse of <see cref="Feature"/>, and named `Split` because that is what the
+    /// ecosystem calls taking a value apart — VL.NetTopologySuite splits a `Coordinate` the same
+    /// way.
+    ///
+    /// An empty dictionary rather than nothing when a feature has no attributes: absence would have
+    /// to be checked before every lookup, and there is nothing to distinguish here — a feature with
+    /// no attributes and a feature with an empty table say the same thing.
+    /// </remarks>
+    public static void Split(
+        NtsFeature? feature,
+        out NtsGeometry? geometry,
+        out ImmutableDictionary<string, object> attributes)
+    {
+        geometry = feature?.Geometry;
+
+        var builder = ImmutableDictionary.CreateBuilder<string, object>();
+
+        if (feature?.Attributes is { } table)
+            foreach (var name in table.GetNames())
+                if (table[name] is { } value)
+                    builder[name] = value;
+
+        attributes = builder.ToImmutable();
+    }
 }
