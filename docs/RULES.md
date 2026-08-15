@@ -122,6 +122,29 @@ Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
 - **Fluent operations** (return type equals the first parameter type) get an output pin named
   `Output`; everything else gets `Result`. `vvvvc` rejects the wrong one, which is how this was
   established rather than guessed.
+- **Read a patched record through `IVLObject`, never through `System.Reflection`.** A record has
+  **two runtime shapes**: exported by `vvvvc` it has real `public string Name;` fields, but **inside
+  the vvvv editor its values live in `__State` and it exposes no CLR members for them at all** — a
+  `Landmark` with `Name`, `Type` and `Geometry` reported `__State:Object, Context:NodeContext,
+  Identity:UInt32, __Program__:VLObjectProgram`. Reflection therefore works in every place you can
+  test and fails in the only place that ships. Use `IVLObject.Type.Properties`, and
+  `IVLPropertyInfo.Type.ClrType` when you need the declared type; key attributes by `OriginalName`
+  (`Name` is `[Obsolete]`, and VL's own message says to prefer it because it can contain spaces).
+  All three shipped libraries that consume user records do exactly this. Cost here: a patch that
+  drew nothing while every static check passed, including **reading the generated C#** — which
+  showed the exported shape. `NOTES.md`, 2026-08-15.
+- **A test double that is easier than the real thing tests the wrong thing.** The double for the
+  above had real public fields, so it passed while the patch was broken. It now hides its values in
+  a private field and exposes only `__State`, mirroring the editor — and the negative test (remove
+  the `IVLObject` branch) turns it red, which the old one could not.
+- **"Runs once" is `ParticipatingElements` on the Create fragment**, a comma-separated list of
+  **Node or Link Ids**; everything unnamed runs in Update. The idiom is to name the *link* that
+  writes a value into a `Pad`, and the producing subgraph is pulled in with it. A `Pad` with a
+  `SlotId` is the storage that carries the value from Create into Update — several `Pad` glyphs
+  sharing one `<Slot>` are one variable. Measured across the shipped packs: 2423 process definitions
+  have an empty Create (everything every frame), 288 use `ParticipatingElements`. Never put
+  `isIOBox="true"` and `SlotId` on the same `Pad`; that combination appears zero times in 22959
+  shipped pads.
 
 ---
 

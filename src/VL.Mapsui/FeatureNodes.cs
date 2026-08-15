@@ -1,9 +1,14 @@
+using System;
 using System.Collections.Immutable;
+using System.Linq;
+using System.Reflection;
+using VL.Core;
 using VL.Core.Import;
 
 using NtsFeature = NetTopologySuite.Features.Feature;
 using AttributesTable = NetTopologySuite.Features.AttributesTable;
 using NtsGeometry = NetTopologySuite.Geometries.Geometry;
+using VLName = VL.Core.Import.NameAttribute;
 
 namespace VL.Mapsui;
 

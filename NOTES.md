@@ -5,6 +5,305 @@ them do not belong here.
 
 ---
 
+## 2026-08-15 — two hundred features from one ForEach, and the yellow pad explained
+
+`HowTo Draw many features.vl` drew three, each costing its own `Landmark.Create` node — which proves
+the type and not the name. It now generates **Count** of them (200 by default) from two
+`RandomSpread`s through a hand-authored **ForEach region**, and the patch does not grow with the
+data.
+
+### The region serialization, since regions are the one construct that breaks silently
+
+Verified across **2,920 shipped `ForEach` regions**:
+
+```xml
+<Node Bounds="x,y,w,h" Id="…">                       <!-- regions carry FOUR-value Bounds -->
+  <p:NodeReference LastCategoryFullName="Primitive" LastDependency="Builtin">
+    <Choice Kind="StatefulRegion" Name="Region (Stateful)" Fixed="true" />
+    <Choice Kind="ApplicationStatefulRegion" Name="ForEach" />
+  </p:NodeReference>
+  <Pin Id="…" Name="Break" Kind="OutputPin" />        <!-- exactly one, in 2920 of 2920 -->
+  <ControlPoint Id="…" Alignment="Top" />             <!-- one per spliced input spread -->
+  <ControlPoint Id="…" Alignment="Bottom" />          <!-- one per collected output spread -->
+  <Patch Id="…" ManuallySortedPins="true">
+    <Patch Name="Create"/><Patch Name="Update"/><Patch Name="Dispose"/>
+    …inner Nodes only…
+  </Patch>
+</Node>
+```
+
+- **A control point Id is one graph node**: the outer link points *at* it, the inner links come
+  *from* it. There is no "item" element and **no attribute marks a splice** — splicing is purely
+  topological, and `VL.Lang`'s `IsSplicer` / `SplicerControlPoint` never reach the file.
+- **Every link lives in the enclosing patch's list**, outer, inner and border-crossing alike. A
+  region's `<Patch>` contains no `<Link>` and no `<Canvas>`.
+- **A value that must not be spliced crosses directly**, outer pin → inner pin, no control point.
+  1,844 shipped links do this; there are **zero** direct inner→outer links, so getting a value out
+  must go through a Bottom control point.
+- A Bottom control point paired to a Top one by `IsFeedback="true"` becomes a fold instead. Leave it
+  unpaired and it collects a `Spread<T>`.
+- `Index`, `Keep` and `Break` are optional `<Pin>`s of the region's inner `Update` fragment, not of
+  the region node.
+
+Copied from `packs\VL.Stride\help\Misc\Example World Cities.vl` (region `CJC9JEn2v8CPwY46s8RHrJ`),
+which is the exact precedent: a spread in, a **record built per item**, `Spread<TheRecord>` out.
+
+The generated C# is what the design claimed:
+
+```csharp
+while (enumerator_16.MoveNext() && enumerator_18.MoveNext())   // the two spreads zip
+{
+    double X_22 = (double)splicer_17;                          // VL widens Float32→Float64 itself
+    var Result_24 = GeometryNodes.Coordinate(x: X_22, y: Y_23);
+    var Output_28 = Landmark_R.Create(…, Geometry_In: Result_26);
+    builder_29.Add(Output_28);                                 // the Bottom splicer is a builder
+}
+this.Landmarks = output_30;                                    // all of it inside __Create__
+```
+
+The float-to-double question was left for the compiler to settle and it settled it: an explicit
+`(double)` cast appears, so no conversion node was needed.
+
+### Deleting elements creates dangling references of its own
+
+Removing the three old chains removed the `Cons` node, which made the Create fragment's seed link
+dangle, which the dangling-link sweep then deleted — leaving
+`ParticipatingElements="HP6tjLsgFQVMTwxcjYZR08"` pointing at nothing. Caught by validating
+`Patch@ParticipatingElements` afterwards, which only exists because the previous round added it.
+**A cleanup pass needs the same validation as an edit pass.**
+
+### The yellow pad: `This field could mutate at runtime.`
+
+Read out of `VL.Lang.dll`. It is emitted by `PatchedSlotSymbol::CollectMessages` with severity
+`ldc.i4.2` = **Warning** (`.warning { stroke: #FFB200 }` in the shipped stylesheet), from the
+predicate *"the slot is in a Record AND its type is classified mutable"*. An imported .NET `class`
+is mutable unless it is a C# `record`, is assignable to `DynamicEnum`, or its **name starts with
+`Immutable`** — a literal `String.StartsWith` in `ImportedConcreteTypeSymbol::GetKind`. NTS
+`Geometry` is none of those, and VL is factually right: `SRID`, `UserData`, `Apply`, `Normalize`
+all mutate.
+
+**It is advisory and nothing reads it but the editor.** `ViolatesImmutability` is referenced from
+exactly one place in all of `VL.Lang.dll` — that diagnostics pass. No codegen path consumes it.
+Shipped records do this constantly: `VL.Skia`'s `SkiaPaint.Shader : SKShader`, HDE widgets holding
+`SKImage`, `VL.TPL.Dataflow`'s record holding a Stride `Texture`, `ColorTheme.Custom Colors :
+Dictionary`.
+
+The one real hazard is **serialization**, and the one thing shipped code does about it is tag the
+slot `NonSerialized` — `VL.Skia` does exactly that on `SkiaPaint.Shader`. `Landmark.Geometry` now
+carries it. There is no way to suppress the mark itself short of an "Immutable Forward" of
+`Geometry`, which would change type resolution globally for cosmetics; not worth it.
+
+The real consequence to respect is aliasing: VL records have **no `Equals` override**, so they
+compare by reference, and two `Landmark`s made from one share the same `Geometry` instance. Mutate
+it and both change while every change signal downstream stays quiet.
+
+---
+
+## 2026-08-15 — a patched record has two shapes, and the exported one is the lie
+
+`HowTo Draw many features.vl` drew nothing. The `Status` output built into `ToFeatures` said what
+CLR reflection could see of a `Landmark` record **inside the vvvv editor**:
+
+```
+Landmark_R has no property of type Geometry - it has
+__State:Object, Context:NodeContext, Identity:UInt32, __Program__:VLObjectProgram
+```
+
+No `Name`, no `Type`, no `Geometry`. **In the editor a patched record keeps its values inside
+`__State` and exposes no CLR members for them at all.** Only `IVLObject.Type.Properties` can see
+them.
+
+### Why reading the generated C# did not catch it
+
+Because `vvvvc` emits the *other* shape. The exported `Landmark_R` has
+
+```csharp
+public string Name;
+public n12.Geometry Geometry;      // n12 = NetTopologySuite.Geometries
+this.Geometry = Geometry_In;       // Create really does store it
+```
+
+so every check this repository trusts said the record was correct — and it was, in the form that
+was checked. **One record, two runtime shapes; the editor's is the one that has to work, and it is
+the one `vvvvc` never shows you.** That makes six recorded cases of a green check that could not
+have gone red (`docs/RULES.md`, "False proofs") and the first where the false proof was *reading the
+generated code*.
+
+### The rule that follows
+
+**Read a patched value through `IVLObject`, never through `System.Reflection`.** This is not a style
+preference: it is why all three shipped libraries that consume user records —
+`VL.Serialization.MessagePack`, `VL.ImGui.Editors`, the built-in `Serialize` — use `IVLPropertyInfo`
+and none uses CLR reflection. That was noticed a round earlier and mistaken for taste.
+
+`ToFeaturesNode` now picks its reader from the first *value*, not from `typeof(T)`:
+`IVLObject` → `Type.Properties` (using `IVLPropertyInfo.Type.ClrType` to find the geometry, so a
+null first instance still resolves); anything else → reflection, which still serves imported .NET
+types and exported records.
+
+### The test double was easier than the real thing, so it tested the wrong thing
+
+`ToFeaturesTests`' fake record had real public fields. CLR reflection found them, the test passed,
+the patch drew nothing. The double now mirrors the editor: values in a private `_state`, public
+surface limited to `__State` and `Identity`. **Negative-tested after the fix** — removing the
+`IVLObject` branch turns it red, which the old double could not do.
+
+---
+
+## 2026-08-15 — a thousand features, and the number that answers the whole question
+
+The question behind the question: *a user with hundreds or thousands of features cannot wire a node
+per feature — does a rigorous record definition help, and should this package offer that?*
+
+### Two numbers settle it
+
+1,000 features of 500 vertices each, through `FeatureLayerNode.Update` (`ScaleTests`):
+
+| | ms/frame |
+|---|---|
+| the same feature objects every frame — a spread built once | **0.013** |
+| new feature objects every frame, saying the same thing | **52.9** — of which **43.3 building them**, **9.6 comparing them** |
+
+**A factor of four thousand, decided entirely by whether the patch builds its data once.** Nothing
+inside these nodes can recover it; a patch that rebuilds a thousand features per frame has spent two
+and a half frames before anything is drawn.
+
+**The planned optimisation was dropped because of this measurement.** The plan called for a
+spread-level `ReferenceEquals` fast path in `FeatureLayer`. Unnecessary: `SameFeatures` already opens
+with a per-*item* `ReferenceEquals`, and a spread built once hands over the same items even when the
+enclosing array is rebuilt — hence 0.013 ms. The fast path would have saved an 8 KB allocation and
+bought a new way to be wrong.
+
+**The first version of that benchmark was itself wrong**, and instructively so: it reused the same
+feature objects in the "expensive" case too and reported 0.013 ms for both rows. A benchmark that
+does not do the expensive thing reports that the expensive thing is cheap.
+
+### Why identity is the whole story
+
+Read out of the IL: `CacheManager.InputsChanged` compares with `ValueTuple.Equals` →
+`EqualityComparer<T>.Default`. `Spread<T>` is a **class with no `Equals` override** — verified, two
+`Spread<int>` over `{1,2,3}` compare `False` — so that is `ReferenceEquals`. `Changed` and
+`ChannelFlange.CopyFromUpstream` reduce to the same thing. **There is no version, revision, dirty
+flag or invalidate on any VL data type**; `IChannel.Revision` and `IVideoSource2.ChangedTicket` are
+the only counters in VL.Core and both are subsystem-specific.
+
+The contract the ecosystem runs on is therefore *immutable values from producers that are cached, so
+they hand out the same instance*. VL.Skia states it in its own help: *"Usually it's better to put all
+the path construction nodes into a Cache region, so that the path will be rebuilt only on changes."*
+VL.Stride's buffer nodes wrap allocation in `Cache` and gate upload behind an explicit `Apply` pin.
+VL.Buffers copies unconditionally.
+
+**`SameFeatures` is unique in the whole install** — no other C# node library structurally compares an
+incoming collection. It exists because our `Feature` is a static node that mints a new object every
+frame, which is exactly the contract the ecosystem expects producers to keep. It stays as the
+fallback that cured the flicker; the fix for scale is upstream, in how the patch builds its data.
+
+### So the record is not a matter of taste
+
+A record spread built once keeps its identity; three hand-wired `Feature` chains do not. That makes
+`ToFeatures` + a record the shape that scales, and `HowTo Draw many features.vl` the patch that says
+so with the two numbers in it.
+
+### The four ways to accept a user's own type, and what each costs
+
+| | user pays | we pay |
+|---|---|---|
+| **reflection over a generic `T`** ← chosen | nothing: name a slot `Geometry` | one C# node, fully testable without vvvv |
+| C# interface | **one getter operation per property** — a Slot does *not* satisfy a C# property member (proved on `PersonEditor`, `EditMode`, `IReadOnlyTreeNode`) | one interface |
+| `.vl` interface declaring `Split` | nothing — a record's auto-`Split` satisfies it (the `ITooltip` pattern in VL.HDE) | hand-written interface plus patched glue, and **it cannot be a C# pin type** |
+| adaptive node — VL's real type class | one matching operation | **declaration must live in a `.vl`, no documentation exists anywhere**, and the marker that makes an operation adaptive is not visibly serialised |
+
+Adaptive nodes are genuinely VL's answer to "any type that can do X" — 151 `IAdaptive*` interfaces in
+`VL.CoreLib.vl.dll`, compiled to C# 11 `static abstract` members plus witness structs, and
+third-party packs (VL.AlchemX, VL.Elementa, VL.Kairos) declare their own. `VL.ImGui`'s
+`CreateObjectEditor (Adaptive)` is structurally exactly our case. It was still the wrong choice here:
+a mechanism with no documentation, whose declaration rule we would have to reverse-engineer, in a
+package aimed at people new to vvvv.
+
+### Three of my own mistakes this round, all caught by something other than me
+
+- **`Landmark is no Feature [NetTopologySuite.Features]!`** — rewiring the patch left the old
+  `Cons → FeatureLayer.Features` link in place, because **both of its endpoints still existed**, so a
+  dangling-link check could not see it. The layer had two sources of different types. Caught by
+  `vvvvc`. The lesson for the validation: *a link can be wrong without being dangling.*
+- The benchmark that measured the short circuit instead of the comparison, above.
+- Claiming "220 `[ProcessNode]` types, 92 generic" from a scan that counted DLLs present at two
+  paths twice. The de-duplicated figures are **110 distinct, 46 generic**.
+
+---
+
+## 2026-08-15 — records vs the attribute dictionary, and what the ecosystem actually does
+
+The question was whether VL's **records** should replace the `Dictionary` `Add` chain that
+`HowTo Label your data.vl` uses to build a feature's attributes. Asked out of curiosity rather than
+dissatisfaction, so the survey came before any opinion. Measured across the shipped assemblies and
+**1,558 `.vl` files** (815 shipped, 743 installed).
+
+### The answer is "keep the dictionary, and add one node"
+
+Three things said so, none of them recalled:
+
+- **The Gray Book's design guidelines already describe the current shape.** *"If the datatype you
+  create is more or less used as a container for a bunch of properties, it is often useful to have a
+  pair of join/split nodes."* `Feature` + `Split` is that pair.
+- **The ecosystem's flagship data example does exactly what our help patch does.**
+  `packs\VL.Stride\help\Misc\Example World Cities.vl` defines record `City` with typed slots **and a
+  `Dictionary<String,String>` slot side by side**, and builds the dictionary with `Dictionary.Add`
+  and hard-typed string keys — the CSV header row is thrown away (`Skip 1`). Records and
+  dictionaries are not rivals there; they are two halves of one model.
+- **No node anywhere converts a record into named key/value pairs.** Not in 1,558 `.vl` files, not in
+  any DLL. `VL.ExtendedTutorials` states the prevailing advice outright: *"Don't mess around with
+  generics just code it to handle your datatype directly."*
+
+The dictionary has to stay because Mapsui's feature *is* a bag of named values, `LabelColumn` is a
+runtime string, and a GeoJSON or Shapefile reader learns its columns when it opens the file. A
+record cannot describe that. What a record can do is remove the retyping one step earlier — hence
+`ToAttributes`.
+
+### Three shipped libraries read a user's record, and all three do it the same way
+
+`VL.Serialization.MessagePack` (`IVLObjectFormatter<T>`), `VL.ImGui.Editors` (the property grid), and
+the built-in `Serialize [Serialization]`. **A generic `T` pin plus `IVLTypeInfo` / `IVLPropertyInfo`
+— never an `object` pin.** `ToAttributes<T>` copies that shape.
+
+An earlier reading of the same evidence said "nobody consumes `IVLObject`, so there is no precedent".
+That was true of the *pin type* and wrong about the *pattern*: the precedent is generic `T`, and the
+reflection happens inside.
+
+### The name question, settled by the compiler rather than by a GUI round
+
+A patched record's property `Some Field` becomes a **public field** `Some_Field` carrying
+`[VL.Core.Import.Name("Some Field")]` — verified on a real compiled record (`ColorTheme_R`). Which
+of `Name` / `OriginalName` / `NameForTextualCode` to key on was going to need vvvv, until the build
+answered it: **`IVLPropertyInfo.Name` is `[Obsolete]`**, and the message reads *"Got replaced by
+NameForTextualCode. Also consider using OriginalName, which can contain spaces."*
+
+So `OriginalName` it is. `Serialize [Serialization]` writes the escaped form instead
+(`<ADSR_Settings Attack_Curve="Expo" …>` in its shipped sample output) — but only because an XML
+attribute name cannot contain a space. A dictionary key can, and the point of the node is that the
+name read off the record is the name that can be looked up. Negative-tested: keying on
+`NameForTextualCode` turns 3 tests red.
+
+### `AppHost.CurrentOrGlobal` is null outside vvvv
+
+Measured. It rules out `TypeRegistry` for anything that has to stay testable — but `IVLObject.Type`
+is an instance property the object carries, so the node needs no `AppHost` and a hand-written
+`IVLObject` double covers the mapping with no runtime. **The double is honest about its limits:** it
+tests our key selection, not VL's.
+
+### Hand-authoring a record in `.vl`
+
+`Create` and `Split` are **real patched operations with wired bodies, not auto-generated** — checked
+across 203 shipped records with slots, and zero of them have slots without links. Per property: 1
+`Slot`, 1 `Pad SlotId`, 2 `ControlPoint`, 4 `Link`, 2 `Pin`. The `Landmark` record here was copied
+whole from `VL.ExtendedTutorials`' `MyDataRecord` and edited down, per the rule that copying a proven
+patch beats composing one.
+
+Two reference kinds appear that no earlier patch here had, so the validation grew to match:
+`Pad@SlotId` and `Fragment@Patch` must both resolve, alongside link endpoints.
+
+---
+
 ## 2026-08-15 — picking, and four facts read off Mapsui before anything was designed
 
 `Pick` is the first node here that hands something **back**. Everything before it took data in and

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Document xmlns:p="property" xmlns:r="reflection" Id="VLHxnsZzcEC6MBNW1IZZxG" LanguageVersion="2025.7.4" Version="0.128">
+<Document xmlns:p="property" xmlns:r="reflection" Id="JVFMzrtTIhFhp68f77n65y" LanguageVersion="2025.7.4" Version="0.128">
   <NugetDependency Id="SIMDywDLwNbQ5UdOPHQxYD" Location="VL.CoreLib" Version="2025.7.4" />
   <NugetDependency Id="Sm17wEPgUJCVB75op3gzPF" Location="VL.Skia" Version="2025.7.4" />
   <NugetDependency Id="CCoTJSCcdlnfZwmjUnPFVB" Location="VL.Mapsui" Version="0.0.0" />
@@ -31,7 +31,7 @@
       </p:NodeReference>
       <Patch Id="T1yChjTcVpcQLJ4rxMEL44">
         <Canvas Id="VxYLn5bECvkjhyGerEE3sc" CanvasType="Group">
-          <Pad Id="VaZNqihOnpwz6dORWEdpu0" Bounds="60,30,620,180" ShowValueBox="true" isIOBox="true" Value="Labelling your data - letting the map write the words for you.&#xD;&#xA;&#xD;&#xA;A LABEL IS NOT TEXT YOU PLACE. LabelStyle's Attribute pin names an ATTRIBUTE, and every feature that carries one gets its own word, in its own place, at its own zoom. Two features here, one style, two different labels - and adding a third feature adds a third label with nothing else to change. That is why it is worth learning: the alternative, one text node per label, stops working the moment the data has a hundred rows.&#xD;&#xA;&#xD;&#xA;THIS IS WHAT THE OTHER HALF OF A FEATURE IS FOR. A Feature is geometry PLUS attributes, and the attributes have been empty in every other patch here. Dictionary Add builds one: leave its Input UNCONNECTED and you start from an empty dictionary, because that is the type's default. Each feature here carries TWO - name and type - and the second Add takes the first one's Output as its Input. Only the first Add in a chain has a free Input, which is the whole rule.&#xD;&#xA;&#xD;&#xA;THE PAYOFF IS ONE PIN. Change LabelStyle's Attribute from Name to Type and the map relabels itself station and temple - same features, same style, same layer, nothing else touched. That is a thousand rows relabelled by one word, and it is the reason a label names a column instead of carrying text.&#xD;&#xA;&#xD;&#xA;THIS IS THE RIGHT SHAPE WHEN THE COLUMNS ARE ONLY KNOWN AT RUNTIME - a GeoJSON file, a service, a CSV whose header you have not read yet. When the data already HAS a shape, say so once with a record instead: HowTo Draw many features does that, and the map cannot tell the difference because both arrive as attributes.&#xD;&#xA;&#xD;&#xA;The key is the contract between the two halves. &quot;name&quot; is written in the attribute, &quot;name&quot; is written on LabelStyle, and they have to match - change one and the labels go blank. Nothing warns you, so change both.&#xD;&#xA;&#xD;&#xA;Try: type into the value IOBoxes - the labels change as you type, and Layers Built stays at 1, because a feature's contents are replaced rather than its layer rebuilt. Empty LabelStyle's Attribute pin - the labels vanish and the fill stays, since a style with nothing named has nothing to write. Change Label Size - the text grows while the shapes do not, because a label is drawn in pixels and geometry in metres.&#xD;&#xA;&#xD;&#xA;STYLE TAKES A STYLE. LabelStyle's Style pin holds the VectorStyle, and the two arrive at the layer as one thing - a layer takes a single style, so combining is how you get both. The order in the chain is the order they draw in: fill first, then the word on top of it.&#xD;&#xA;&#xD;&#xA;The shapes come from VL.NetTopologySuite, as everywhere else here: this package draws geometry, it does not create it. Read WKT is one source of it and a file reader would be another.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF on the tile layer. Opening a document in vvvv runs it, so a map that fetched on open would give you no chance to decline.&#xD;&#xA;&#xD;&#xA;Watch Layers Built: it should settle at 1 and stay. A number climbing frame after frame means something rebuilds the layer every frame, and every rebuild starts a fresh round of tile requests. Close vvvv if you see it climb.&#xD;&#xA;&#xD;&#xA;Where to go next: HowTo Draw your own shapes for the chain without labels, HowTo Stack several layers for layer order and ZoomToLayer, HowTo Add widgets to the map for the scale bar and the attribution the tile policy asks for.">
+          <Pad Id="VaZNqihOnpwz6dORWEdpu0" Bounds="60,30,620,200" ShowValueBox="true" isIOBox="true" Value="Drawing many features - define the type once, and every place is an instance.&#xD;&#xA;&#xD;&#xA;THE PATCH DOES NOT GROW WITH THE DATA, AND THIS ONE PROVES IT. Turn Count up to 2000 and restart: two thousand places appear and not one node, not one link changes. That is the claim, and a patch that wired three places by hand could only assert it.&#xD;&#xA;&#xD;&#xA;A RECORD IS THE TYPE, AN INSTANCE IS A PLACE. Landmark is defined on the right - right-click the canvas and pick Record to make one of your own. It has a Geometry and two words about it. Add a property to the record and every instance has it, including the two thousand.&#xD;&#xA;&#xD;&#xA;THE FOREACH IS WHERE THEY ARE MADE. Two RandomSpreads scatter Count longitudes and Count latitudes; the region takes one of each per iteration and builds one Landmark, and the splicer at the bottom collects them into a Spread. Name and Type cross the border WITHOUT a splicer, so every instance shares them - that is what a link straight through the edge means.&#xD;&#xA;&#xD;&#xA;TOFEATURES IS THE ONLY THING BETWEEN YOUR TYPE AND THE MAP. It reads each value's properties: the one whose type is Geometry is the shape, and every other property becomes an attribute under the name the record gives it. So LabelStyle looks up &quot;Name&quot; and the record is the only place that word is written. Watch Status - it says how many it made and, if a type has no geometry or two and no way to choose, it says that instead of drawing nothing.&#xD;&#xA;&#xD;&#xA;WHAT RUNS ONCE, AND HOW YOU CAN TELL. The generator, the record constructors and the spread all sit in the CREATE operation. They run when the patch starts and never again; the spread lands in a Pad - storage that survives to the next frame - and Update only reads it. CONVERSIONS COUNTS THE PROOF: it reaches 1 and stays at 1 no matter how long you drag and zoom. Move the same nodes into Update and it climbs once per frame.&#xD;&#xA;&#xD;&#xA;How that is expressed in the document: the Create operation names ONE thing, the link that writes the spread into the Pad. Everything that link depends on comes along with it. Everything not named runs every frame - which is what an empty Create means, and what most patches have.&#xD;&#xA;&#xD;&#xA;WHY IT MATTERS AT THIS SIZE. Measured on 1000 features of 500 vertices each: when the same spread arrives every frame, everything downstream costs 0.013 ms per frame. When the features are rebuilt every frame instead, just MAKING them costs 43 ms - two and a half frames, before anything is drawn. Four thousand times, decided by nothing but where the construction sits.&#xD;&#xA;&#xD;&#xA;The price of building once is that it does not react: changing Count or a Name does nothing until you restart with F8 then F5. That is the correct trade for data read from a file. If you want it to rebuild when its inputs change - and only then - that is what a Cache region is for.&#xD;&#xA;&#xD;&#xA;Labels at two hundred points are noise. Empty LabelStyle's Attribute pin to turn them off; a style with nothing named has nothing to write.&#xD;&#xA;&#xD;&#xA;The Geometry slot in the record is marked yellow: &quot;This field could mutate at runtime&quot;. It is a warning and nothing more - a Record is immutable and NetTopologySuite's Geometry is an ordinary class, so VL is right to say so, and vvvv's own shipped records do the same (VL.Skia's paint holds an SKShader). Just never modify a Geometry after it is inside a Landmark.&#xD;&#xA;&#xD;&#xA;Geometry comes from VL.NetTopologySuite, as everywhere here: this package draws geometry and does not create it. Coordinate and Point are two of its nodes; a GeoJSON or Shapefile reader would be where a real two thousand came from.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF on the tile layer. Opening a document in vvvv runs it, so a map that fetched on open would give you no chance to decline.&#xD;&#xA;&#xD;&#xA;Watch Layers Built: it should settle at 1 and stay. A number climbing frame after frame means something rebuilds the layer every frame, and every rebuild starts a fresh round of tile requests. Close vvvv if you see it climb.&#xD;&#xA;&#xD;&#xA;Where to go next: HowTo Label your data for attributes built by hand, which is the right shape when the columns are only known at runtime. HowTo Pick what you clicked to ask the map which of these you are pointing at.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -101,23 +101,10 @@
             HowTo Create a polygon shows that. Either way what arrives here is the same type, which
             is the point: geometry is a TYPE, not a format.
           -->
-          <Pad Id="IrotR4gFylcZ62ydUXjBUC" Comment="WKT - the station" Bounds="300,430,420,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((135.7565 34.9848, 135.7597 34.9848, 135.7597 34.9870, 135.7565 34.9870, 135.7565 34.9848))">
-            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
-              <Choice Kind="TypeFlag" Name="String" />
-            </p:TypeAnnotation>
-          </Pad>
 
-          <Node Bounds="300,470,90,19" Id="F5vfpYSEn6YZY4v3D0jivA">
-            <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Read WKT" />
-            </p:NodeReference>
-            <Pin Id="Kb4sXPGCYJ0jU6Zyvu99Tv" Name="WKT" Kind="InputPin" />
-            <Pin Id="UtvFvoNAEkKql434eX5gs6" Name="Factory" Kind="InputPin" />
-            <Pin Id="E0X52rFVPedYg2yFKnLn8M" Name="Result" Kind="OutputPin" />
-            <Pin Id="OgXXHEYRAmZYPBiQSUUGoM" Name="Success" Kind="OutputPin" />
-          </Node>
-          <Pad Id="RS6Hqm6oVzhIG8hIyXH2eJ" Comment="parsed?" Bounds="420,470,60,15" ShowValueBox="true" isIOBox="true" />
+
+
+
 
           <!--
             ***** what makes a label possible *****
@@ -129,64 +116,20 @@
             The key is what LabelStyle will look up. Change "name" to something else in both places
             and the map labels itself with that instead.
           -->
-          <Pad Id="HGP1rmsjVxPDxnOTru8beX" Comment="key" Bounds="620,470,110,15" ShowValueBox="true" isIOBox="true" Value="Name">
-            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
-              <Choice Kind="TypeFlag" Name="String" />
-            </p:TypeAnnotation>
-          </Pad>
-          <Pad Id="LGtwJci1BGc0aQ6Vd7RgiK" Comment="value" Bounds="620,495,110,15" ShowValueBox="true" isIOBox="true" Value="Kyoto Station">
-            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
-              <Choice Kind="TypeFlag" Name="String" />
-            </p:TypeAnnotation>
-          </Pad>
-          <Node Bounds="620,520,53,26" Id="RWIfEsRqDpp3Rlackc7ZjC">
-            <p:NodeReference LastCategoryFullName="Collections.Dictionary" LastDependency="VL.Collections.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Add" />
-              <CategoryReference Kind="RecordType" Name="Dictionary" NeedsToBeDirectParent="true" />
-            </p:NodeReference>
-            <Pin Id="MZ7L8rlVq8PgUM4iexhZzS" Name="Input" Kind="StateInputPin" />
-            <Pin Id="A2MwBQcBrOEBq5qt2zSLmS" Name="Key" Kind="InputPin" />
-            <Pin Id="PQmavk7r4bugSLYvWQ29Ch" Name="Value" Kind="InputPin" />
-            <Pin Id="Px8c9IZ8rmzrxsLDzpiJBe" Name="Output" Kind="StateOutputPin" />
-          </Node>
+
+
+
 
           <!--
             A SECOND attribute: the first Add's Output goes into the second Add's Input, and one
             feature now carries two. Only the FIRST Add in a chain leaves its Input unconnected -
             that is where the empty dictionary comes from.
           -->
-          <Pad Id="KLvSfosYiB7QogYuRtcpbk" Comment="key 2" Bounds="620,570,110,15" ShowValueBox="true" isIOBox="true" Value="Type">
-            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
-              <Choice Kind="TypeFlag" Name="String" />
-            </p:TypeAnnotation>
-          </Pad>
-          <Pad Id="AeBfzFC7yMsUDLilNXrSVB" Comment="value 2" Bounds="620,595,110,15" ShowValueBox="true" isIOBox="true" Value="station">
-            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
-              <Choice Kind="TypeFlag" Name="String" />
-            </p:TypeAnnotation>
-          </Pad>
-          <Node Bounds="620,620,53,26" Id="PqMpFhUvRub3j7B6UzJzdm">
-            <p:NodeReference LastCategoryFullName="Collections.Dictionary" LastDependency="VL.Collections.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Add" />
-              <CategoryReference Kind="RecordType" Name="Dictionary" NeedsToBeDirectParent="true" />
-            </p:NodeReference>
-            <Pin Id="AO9qtL79u94vYlpD0qRXGu" Name="Input" Kind="StateInputPin" />
-            <Pin Id="KFEKyP19UcTz7YdC4F8ZsV" Name="Key" Kind="InputPin" />
-            <Pin Id="Bx4Bc7fGhOjf8z5qyFkRip" Name="Value" Kind="InputPin" />
-            <Pin Id="QBcQPULvEtLTXAlkr6cySk" Name="Output" Kind="StateOutputPin" />
-          </Node>
 
-          <Node Bounds="300,510,110,19" Id="LKlHCGkEW27uDksjQ03tsc">
-            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Feature" />
-            </p:NodeReference>
-            <Pin Id="VZkOsrOFuCUESnjJOlfiv8" Name="Geometry" Kind="InputPin" />
-            <Pin Id="T4DyhbpJF7z3MVEDGgU1l4" Name="Attributes" Kind="InputPin" />
-            <Pin Id="T3xaP10ssIBu1W84JenuLS" Name="Result" Kind="OutputPin" />
-          </Node>
+
+
+
+
 
           <!--
             ***** a second feature on the SAME layer *****
@@ -194,72 +137,15 @@
             One layer, two features, one style - and two different labels, because LabelColumn names
             an attribute rather than carrying the text. That is the whole point of it.
           -->
-          <Pad Id="L3sCYKzDqfJ1Ln07iscIZJ" Comment="WKT - the temple" Bounds="760,430,420,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((135.7470 34.9800, 135.7502 34.9800, 135.7502 34.9822, 135.7470 34.9822, 135.7470 34.9800))">
-            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
-              <Choice Kind="TypeFlag" Name="String" />
-            </p:TypeAnnotation>
-          </Pad>
-          <Node Bounds="760,470,90,19" Id="Mvw0wWq7iYh07qtlWO9SOS">
-            <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Read WKT" />
-            </p:NodeReference>
-            <Pin Id="VC6eiuumEU9ZF15v0tCeBi" Name="WKT" Kind="InputPin" />
-            <Pin Id="KQcx3XRZOrrtlXSlXLN7di" Name="Factory" Kind="InputPin" />
-            <Pin Id="PbQtP61o3GOyrsTd5H7060" Name="Result" Kind="OutputPin" />
-            <Pin Id="QCKEsIDkpLyLbuB4i2Aedh" Name="Success" Kind="OutputPin" />
-          </Node>
-          <Pad Id="SPoGHPkhHTTJMpNpdvn5vM" Comment="key" Bounds="1000,470,110,15" ShowValueBox="true" isIOBox="true" Value="Name">
-            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
-              <Choice Kind="TypeFlag" Name="String" />
-            </p:TypeAnnotation>
-          </Pad>
-          <Pad Id="ELTkm3wJi1QIrMhJjqHMPH" Comment="value" Bounds="1000,495,110,15" ShowValueBox="true" isIOBox="true" Value="Toji Temple">
-            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
-              <Choice Kind="TypeFlag" Name="String" />
-            </p:TypeAnnotation>
-          </Pad>
-          <Node Bounds="1000,520,53,26" Id="IlAfU7YYtPaBvzMkbB19JD">
-            <p:NodeReference LastCategoryFullName="Collections.Dictionary" LastDependency="VL.Collections.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Add" />
-              <CategoryReference Kind="RecordType" Name="Dictionary" NeedsToBeDirectParent="true" />
-            </p:NodeReference>
-            <Pin Id="Js6Ftw4EWi7LsyjVQtgem5" Name="Input" Kind="StateInputPin" />
-            <Pin Id="HFhtow0YTfDoYcgKG1nenI" Name="Key" Kind="InputPin" />
-            <Pin Id="VDTknQYGfwMggmvCG14oBT" Name="Value" Kind="InputPin" />
-            <Pin Id="JhiUpC16QLwmysryQygVUO" Name="Output" Kind="StateOutputPin" />
-          </Node>
-          <Pad Id="QK0QagMxVl8KzH5G4C8sPk" Comment="key 2" Bounds="1000,570,110,15" ShowValueBox="true" isIOBox="true" Value="Type">
-            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
-              <Choice Kind="TypeFlag" Name="String" />
-            </p:TypeAnnotation>
-          </Pad>
-          <Pad Id="SrGHPl2mVtCzAkYvodCfkD" Comment="value 2" Bounds="1000,595,110,15" ShowValueBox="true" isIOBox="true" Value="temple">
-            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
-              <Choice Kind="TypeFlag" Name="String" />
-            </p:TypeAnnotation>
-          </Pad>
-          <Node Bounds="1000,620,53,26" Id="TOun4SRPqKXmrc9Nq73FM4">
-            <p:NodeReference LastCategoryFullName="Collections.Dictionary" LastDependency="VL.Collections.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Add" />
-              <CategoryReference Kind="RecordType" Name="Dictionary" NeedsToBeDirectParent="true" />
-            </p:NodeReference>
-            <Pin Id="QP2rxkw92Q4SiH3VLMGsl6" Name="Input" Kind="StateInputPin" />
-            <Pin Id="INbhiKbjeNqroBjiT1mVQf" Name="Key" Kind="InputPin" />
-            <Pin Id="N54kIv7rN0J1hN3Qzo8p3s" Name="Value" Kind="InputPin" />
-            <Pin Id="HJHDCrUQpmWaLMi47xnQaV" Name="Output" Kind="StateOutputPin" />
-          </Node>
-          <Node Bounds="760,560,110,19" Id="HcC4GmxTQkOX0h9f1QBHMp">
-            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Feature" />
-            </p:NodeReference>
-            <Pin Id="PNKrWr4KJbpUT0gsGW7XhA" Name="Geometry" Kind="InputPin" />
-            <Pin Id="Tz1zq6vR6pQ7JbgqkEZRcD" Name="Attributes" Kind="InputPin" />
-            <Pin Id="RrfmPdrt92ItSEVnLBtEmd" Name="Result" Kind="OutputPin" />
-          </Node>
+
+
+
+
+
+
+
+
+
 
           <!--
 
@@ -275,6 +161,102 @@
             columns are only known at runtime - a GeoJSON file, a service, a Shapefile. This is the
             right shape when the data already has one.
 -->
+          <Node Name="Landmark" Bounds="1340,430" Id="FeJlDEUULfslHALSuuik7c">
+            <p:NodeReference LastCategoryFullName="Primitive" LastDependency="Builtin">
+              <Choice Kind="RecordDefinition" Name="Record" />
+            </p:NodeReference>
+            <Patch Id="TzPaxkDm79YTHGYrVvNDF1">
+              <Canvas Id="O0rvVBY3J5g54gWSEG3x1C" CanvasType="Group">
+                <Pad Id="HszeGVhlk5Lnu9yvCsBUdK" SlotId="Rb1iAAA719wzKFpoEnacUw" Bounds="949,738" />
+                <Pad Id="EqHYCvXAychZiD2bmOvD2W" SlotId="B8TrRsdCNGWxPaGbJ2Sm8M" Bounds="1065,739" />
+                <Pad Id="GCY5MpeTOxYFLDDWGcNXoU" SlotId="MNKi6jBQtpEpBeS6vlaC9s" Bounds="1181,739" />
+                <ControlPoint Id="KhlpdPEKP0HEDszyuhiRjI" Bounds="949,708" />
+                <ControlPoint Id="GqiX0KtU6KATE2l0qUZw3X" Bounds="949,768" />
+                <ControlPoint Id="CtFCDrxrYEse7jDSlwmX5H" Bounds="1065,709" />
+                <ControlPoint Id="TvAx8OHx8pCGDCd2Pp2Ndl" Bounds="1065,769" />
+                <ControlPoint Id="Tyor7YBRlosbsQOIR8IdBS" Bounds="1181,709" />
+                <ControlPoint Id="LXyxdN2h2emR6PEujSEy84" Bounds="1181,769" />
+              </Canvas>
+              <Patch Id="DRhrVEWa1bfkJfyEhU7Ss0" Name="Create">
+                <Pin Id="GNiTW5CyddsxtvLTy47vNG" Name="Name" Kind="InputPin" />
+                <Pin Id="G6hzrhGYS4JVMZofYbIp23" Name="Type" Kind="InputPin" />
+                <Pin Id="KTuTZdm2cMfM7PnnmpqvPe" Name="Geometry" Kind="InputPin" />
+              </Patch>
+              <ProcessDefinition Id="Fm2Qy6jSBt8Pizj1X8yF1q" IsHidden="true">
+                <Fragment Id="DRCQY08KG2fE4NGbHFMb14" Patch="DRhrVEWa1bfkJfyEhU7Ss0" Enabled="true" />
+                <Fragment Id="RCenCNm9HPdS06c3Zts9io" Patch="S7UsB6wWmD2poxvHlhONMD" />
+              </ProcessDefinition>
+              <Slot Id="Rb1iAAA719wzKFpoEnacUw" Name="Name">
+                <p:TypeAnnotation p:Type="TypeReference">
+                  <Choice Kind="TypeFlag" Name="String" />
+                </p:TypeAnnotation>
+              </Slot>
+              <Slot Id="B8TrRsdCNGWxPaGbJ2Sm8M" Name="Type">
+                <p:TypeAnnotation p:Type="TypeReference">
+                  <Choice Kind="TypeFlag" Name="String" />
+                </p:TypeAnnotation>
+              </Slot>
+              <!--
+                This slot is marked YELLOW in the editor: "This field could mutate at runtime."
+                A Record is immutable, and NetTopologySuite's Geometry is an ordinary .NET class
+                with SRID, Apply and Normalize on it, so VL is right. It is a WARNING and nothing
+                more - the check is read by the editor's diagnostics and by no other part of the
+                compiler, and vvvv's own shipped records do the same thing constantly (VL.Skia's
+                SkiaPaint holds an SKShader, HDE's widgets hold SKImage, VL.Stride holds a Texture).
+
+                The one real hazard is serialization, and NonSerialized below is exactly how
+                VL.Skia guards its SKShader slot. Do not mutate a Geometry after putting it in a
+                Landmark: records are shared by reference, so two Landmarks made from one would
+                both change and nothing downstream would notice.
+              -->
+              <Slot Id="MNKi6jBQtpEpBeS6vlaC9s" Name="Geometry">
+                <p:Attributes>
+                  <AttributeData>
+                    <p:TypeReference LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                      <Choice Kind="TypeFlag" Name="NonSerializedAttribute" />
+                    </p:TypeReference>
+                  </AttributeData>
+                </p:Attributes>
+                <p:TypeAnnotation p:Type="TypeReference">
+                  <Choice Kind="TypeFlag" Name="Geometry" />
+                </p:TypeAnnotation>
+              </Slot>
+              <Link Id="N5yRnA1Ntnnny7R8LadEcY" Ids="GNiTW5CyddsxtvLTy47vNG,KhlpdPEKP0HEDszyuhiRjI" IsHidden="true" />
+              <Link Id="HeSI6hSu9UPqcqQYwEsSrm" Ids="KhlpdPEKP0HEDszyuhiRjI,HszeGVhlk5Lnu9yvCsBUdK" />
+              <Patch Id="S7UsB6wWmD2poxvHlhONMD" Name="Split">
+                <Pin Id="FFdYICEEPchy4zxczWK3f5" Name="Name" Kind="OutputPin" />
+                <Pin Id="MRmpPCtSq0Hr26JwHXUEJy" Name="Type" Kind="OutputPin" />
+                <Pin Id="C29zuRg8UwYfjzDePhQK60" Name="Geometry" Kind="OutputPin" />
+              </Patch>
+              <Link Id="EZtjyncf5FeVr79h1fLKkV" Ids="GqiX0KtU6KATE2l0qUZw3X,FFdYICEEPchy4zxczWK3f5" IsHidden="true" />
+              <Link Id="OOo4xQD36e0HF9vUNHQtil" Ids="HszeGVhlk5Lnu9yvCsBUdK,GqiX0KtU6KATE2l0qUZw3X" />
+              <Link Id="EHMgdJqA2tG1YT4yYiCQgU" Ids="G6hzrhGYS4JVMZofYbIp23,CtFCDrxrYEse7jDSlwmX5H" IsHidden="true" />
+              <Link Id="TtdrXiJOSuuNZboLSMTYpn" Ids="CtFCDrxrYEse7jDSlwmX5H,EqHYCvXAychZiD2bmOvD2W" />
+              <Link Id="QRt1E25EQREL989Uwuun9z" Ids="TvAx8OHx8pCGDCd2Pp2Ndl,MRmpPCtSq0Hr26JwHXUEJy" IsHidden="true" />
+              <Link Id="CVA5gHMCX7IpjBgngJIgQo" Ids="EqHYCvXAychZiD2bmOvD2W,TvAx8OHx8pCGDCd2Pp2Ndl" />
+              <Link Id="JEBonRGgoIUFYxE5cEOKro" Ids="KTuTZdm2cMfM7PnnmpqvPe,Tyor7YBRlosbsQOIR8IdBS" IsHidden="true" />
+              <Link Id="MiWxzmVpCe89EjfAk7gFLl" Ids="Tyor7YBRlosbsQOIR8IdBS,GCY5MpeTOxYFLDDWGcNXoU" />
+              <Link Id="GYyZIN4sUcDmOvyXPFtt6k" Ids="LXyxdN2h2emR6PEujSEy84,C29zuRg8UwYfjzDePhQK60" IsHidden="true" />
+              <Link Id="Nzu3RJUPnc0aDANyzL7Goa" Ids="GCY5MpeTOxYFLDDWGcNXoU,LXyxdN2h2emR6PEujSEy84" />
+            </Patch>
+          </Node>
+
+
+
+
+          <Pad Id="Oul3T6VWihMkGR8vkoY0vO" Comment="Name" Bounds="1580,510,120,15" ShowValueBox="true" isIOBox="true" Value="Nijo Castle">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Pad Id="FZ12eSIDP9mGP0FmE5IcsR" Comment="Type" Bounds="1580,535,120,15" ShowValueBox="true" isIOBox="true" Value="castle">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+
+
+          <!-- the second and third places: the same type again, nothing new wired -->
 
 
 
@@ -283,6 +265,141 @@
 
 
 
+          <!--
+            ***** the one node between your data and the map *****
+
+            ToFeatures reads each value's properties: the one typed Geometry is the shape, every
+            other one becomes an attribute under the name the record gives it. So LabelStyle looks up
+            "Name" and the record is the only place that word appears.
+
+            Its Status output says what it found - and says so out loud if a type has no geometry, or
+            has two and cannot tell which to draw.
+
+            THIS IS WHERE A THOUSAND WOULD GO. The pin takes a spread, so the patch does not grow
+            with the data: three instances here, or ten thousand rows read from a file, arrive the
+            same way and the node count is identical.
+          -->
+          <Node Bounds="1180,660,110,19" Id="Gwsi9PjdKOE9Li7A6rkWd5">
+            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="ToFeatures" />
+            </p:NodeReference>
+            <Pin Id="SAorVJSP3Q1oFhAqIQdvLD" Name="Values" Kind="InputPin" />
+            <Pin Id="G69LMqZBByDHYApccyPL9W" Name="Result" Kind="OutputPin" />
+            <Pin Id="JrM5Yua7jXqgKQWbu3hp06" Name="Status" Kind="OutputPin" />
+            <Pin Id="R8Tfi6mnlNJT9S92pM4vwh" Name="Conversions" Kind="OutputPin" />
+          </Node>
+          <!--
+            THE NUMBER THAT PROVES IT. Conversions counts how often the data was actually converted.
+            With the construction in the Create fragment it reaches 1 and stays there forever. Move
+            the same nodes back into Update and it climbs once per frame - which is invisible with
+            three landmarks and fatal with three thousand.
+          -->
+          <Pad Id="He1dSPYXLNpYKCZhEgRUzP" Comment="Conversions - should stay at 1" Bounds="1310,690,200,15" ShowValueBox="true" isIOBox="true" />
+          <!--
+            ***** where the many come from *****
+
+            Two RandomSpreads scatter Count longitudes and Count latitudes around Kyoto. Turn Count
+            up to 2000 and nothing below changes - not one node, not one link. That is the claim
+            this patch exists to make, and it is the only honest way to make it.
+
+            Count is read in the CREATE operation, so it takes effect when the patch starts. Change
+            it and restart (F8 then F5) to see a different number of places. A patch that wanted to
+            react while running would put this in a Cache region instead.
+          -->
+          <Pad Id="FS4AuQsy1yhpQm29QMxTOW" Comment="Count" Bounds="1180,300,62,15" ShowValueBox="true" isIOBox="true" Value="200">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Integer32" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Node Bounds="1180,340,85,19" Id="QJONevYEsEhWvYNwgjgCte">
+            <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.Collections.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="RandomSpread" />
+            </p:NodeReference>
+            <Pin Id="NpJYqcpgq1CmI7VfR278ab" Name="Center" Kind="InputPin" DefaultValue="135.7581" />
+            <Pin Id="IUm0cVo55Xegij17cvboFB" Name="Width" Kind="InputPin" DefaultValue="0.06" />
+            <Pin Id="CE3EjND4ORVmCYQHSb22FU" Name="Seed" Kind="InputPin" DefaultValue="1" />
+            <Pin Id="C5fDhFs0AeGhEzStRM7z44" Name="Count" Kind="InputPin" />
+            <Pin Id="O33XlNRRiKrpKlhAeg0FQq" Name="Output" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="1320,340,85,19" Id="CuJvFLiMLgcRmSC33iY3fg">
+            <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.Collections.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="RandomSpread" />
+            </p:NodeReference>
+            <Pin Id="SXWf1zHLLS3WdT7ZeJ1CQR" Name="Center" Kind="InputPin" DefaultValue="34.9859" />
+            <Pin Id="K29L5uVl0nBOPSBJuQBbQo" Name="Width" Kind="InputPin" DefaultValue="0.045" />
+            <Pin Id="OZoEFV8IOht41Zuwzm8mEo" Name="Seed" Kind="InputPin" DefaultValue="2" />
+            <Pin Id="CJ00WE6fttBHGvd1Zsrkls" Name="Count" Kind="InputPin" />
+            <Pin Id="AvOGKbZt7UoNXcEl2PZI00" Name="Output" Kind="OutputPin" />
+          </Node>
+
+          <!--
+            ***** one Landmark per item *****
+
+            A ForEach region: the two spreads enter through the splicers at the top and arrive
+            inside as ONE longitude and ONE latitude, and each Landmark leaving through the splicer
+            at the bottom is collected into a Spread of them.
+
+            Name and Type are linked straight through the border with no splicer, so every instance
+            shares them. Give the record more properties and they all ride along the same way.
+          -->
+          <Node Bounds="1180,400,300,240" Id="Jzl9NudfyluYfv0G0qX93v">
+            <p:NodeReference LastCategoryFullName="Primitive" LastDependency="Builtin">
+              <Choice Kind="StatefulRegion" Name="Region (Stateful)" Fixed="true" />
+              <Choice Kind="ApplicationStatefulRegion" Name="ForEach" />
+              <CategoryReference Kind="Category" Name="Primitive" />
+            </p:NodeReference>
+            <Pin Id="HnUO06eRXmM2VNI7AFYtY5" Name="Break" Kind="OutputPin" />
+            <ControlPoint Id="TagwBtA8domnoQuutAfeFt" Bounds="1200,407" Alignment="Top" />
+            <ControlPoint Id="BQLocIaeu6O5JOHxRU8yCF" Bounds="1260,407" Alignment="Top" />
+            <ControlPoint Id="D5yQwnSl1RsXaPGRjJvip5" Bounds="1220,635" Alignment="Bottom" />
+            <Patch Id="CNcjz6LmHUgKTjlMev57kt" ManuallySortedPins="true">
+              <Patch Id="SV7ICrQSGViCVcxUipKOyb" Name="Create" ManuallySortedPins="true" />
+              <Patch Id="IB1Q5klGXJM1x50uhb4tcl" Name="Update" ManuallySortedPins="true" />
+              <Patch Id="USHp8q8MAlgV2HRAyeMyCk" Name="Dispose" ManuallySortedPins="true" />
+              <Node Bounds="1200,440,90,19" Id="C6Zk8J5iInoOYiZmzLRj47">
+                <p:NodeReference LastCategoryFullName="NTS.Geometry" LastDependency="VL.NetTopologySuite.vl">
+                  <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+                  <Choice Kind="OperationCallFlag" Name="Coordinate" />
+                </p:NodeReference>
+                <Pin Id="QicmLxPzpH8ZPEwABemout" Name="X" Kind="InputPin" />
+                <Pin Id="Gpekl2H3WZpR476VSHZGna" Name="Y" Kind="InputPin" />
+                <Pin Id="A3bTqin2azJurJhoTXU3Ni" Name="Result" Kind="OutputPin" />
+              </Node>
+              <Node Bounds="1200,490,90,19" Id="FHIYCgsznAsRCIoJOlCUkm">
+                <p:NodeReference LastCategoryFullName="NTS.Geometry" LastDependency="VL.NetTopologySuite.vl">
+                  <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+                  <Choice Kind="OperationCallFlag" Name="Point" />
+                </p:NodeReference>
+                <Pin Id="RpQEJHH8CV3xfCaci2eMhy" Name="Coordinate" Kind="InputPin" />
+                <Pin Id="BSL7BHiHkDY5InF5Mc7C2J" Name="Factory" Kind="InputPin" />
+                <Pin Id="O1ZPv09XG3VR60XDGs3tjW" Name="Result" Kind="OutputPin" />
+              </Node>
+              <Node Bounds="1200,555,68,26" Id="LgTPbxeA9eUZhKCIsH6mgu">
+                <p:NodeReference LastCategoryFullName="Main.Landmark" LastDependency="HowTo Draw many features.vl">
+                  <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+                  <CategoryReference Kind="RecordType" Name="Landmark" />
+                  <Choice Kind="OperationCallFlag" Name="Create" />
+                </p:NodeReference>
+                <Pin Id="JkWuum19uzeoYOsIHUx0lQ" Name="Name" Kind="InputPin" />
+                <Pin Id="RbMTocnzHVCmKwnWkOICPG" Name="Type" Kind="InputPin" />
+                <Pin Id="Njdew2GbXNIg7fVSpjdiNY" Name="Geometry" Kind="InputPin" />
+                <Pin Id="JhdMfjS8Ju8fDYHyv6uLb7" Name="Output" Kind="StateOutputPin" />
+              </Node>
+            </Patch>
+          </Node>
+
+          <!--
+            ***** the Pad that separates building from drawing *****
+
+            This glyph is a SLOT of the patch - storage that survives from one frame to the next.
+            The Create fragment writes the spread into it once; Update only ever reads it. A Pad is
+            the thing that connects the two halves, and there is no other way across.
+          -->
+          <Pad Id="TKlMWlp4NMGpF95VUsojMR" SlotId="HWyJRgqNRQNyYeiUzbABL8" Bounds="1180,700" />
+          <Pad Id="KZ4GwssylmGNgVu7iyB3xu" Comment="Status" Bounds="1310,660,260,15" ShowValueBox="true" isIOBox="true" />
 
           <!--
             ToAttributes reads the record's property names. Name and Type up there become the keys
@@ -322,17 +439,7 @@
             <Pin Id="AzHYShl1Cy0Pdw52S7C5ZT" Name="Result" Kind="OutputPin" />
           </Node>
 
-          <Node Bounds="300,550,39,19" Id="A4jSu2sjauZP2s8LlxSayy">
-            <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Cons" />
-              <CategoryReference Kind="RecordType" Name="Spread" NeedsToBeDirectParent="true" />
-            </p:NodeReference>
-            <Pin Id="Hv9nORTiBeD0FjRJwQP1zt" Name="Input" Kind="InputPin" />
-            <Pin Id="LVp2NShI38PM2uwngTMRoZ" Name="Input 2" Kind="InputPin" />
-            <Pin Id="ASuxsf8ItV1MqKnZJkxP17" Name="Input 3" Kind="InputPin" />
-            <Pin Id="PAwh0bTqOnKYu3GBgYxASP" Name="Result" Kind="OutputPin" />
-          </Node>
+
 
           <!--
             The style is a value of its own, and a node rather than pins on the layer. Leave it
@@ -549,7 +656,18 @@
           <Pad Id="Sn0IFyPbF1sneJyHMkVp7A" Comment="Cache Folder" Bounds="560,375,300,15" ShowValueBox="true" isIOBox="true" />
           <Pad Id="GoA5ugmSeRASmqqlJuk5hE" Comment="Tiles Cached" Bounds="634,400,80,15" ShowValueBox="true" isIOBox="true" />
         </Canvas>
-        <Patch Id="Qn1Yqox3GN8OqwchBUvODO" Name="Create" />
+        <!--
+          ***** what runs once, and what runs every frame *****
+
+          ParticipatingElements names the single link that writes the spread into the Landmarks
+          slot. Naming that link pulls everything it depends on - Cons, the three Landmark.Create
+          nodes, the three Read WKT nodes and their IOBoxes - into Create, which runs ONCE.
+
+          Everything not named here lands in Update. That is the whole rule, and an empty Create
+          fragment (which is what most patches have) means everything runs every frame.
+        -->
+        <Slot Id="HWyJRgqNRQNyYeiUzbABL8" Name="Landmarks" />
+        <Patch Id="Qn1Yqox3GN8OqwchBUvODO" Name="Create" ParticipatingElements="HP6tjLsgFQVMTwxcjYZR08" />
         <Patch Id="OFfMGxxvZQSpMkYjxF7dnh" Name="Update" />
         <ProcessDefinition Id="DhaIijSYwD4pO8zOSvysI5">
           <Fragment Id="FjiroYIuFc7C6Eo74EFsKw" Patch="Qn1Yqox3GN8OqwchBUvODO" Enabled="true" />
@@ -560,30 +678,29 @@
         <Link Id="A1AwFIAycdcFWjykRiUKiv" Ids="MVGJGduk0mPWJznoGv9YVX,RgIIgaq8NiTBppqeaxZgPe" />
         <Link Id="UyrJAnXQ1yBHJA6DLjynKu" Ids="VE109xy4WqBycyAwxMeCrD,FitnqKKJuItGI6PwD5m2Mp" />
         <Link Id="Baf7eVHFobPlz4w9svzMrn" Ids="Obo0KlAOX8uJTLEhkSgG4Y,H1dkptL5CUJAlSE1SJXIiL" />
-        <Link Id="RzMOfQrICgTgolrUB3EXn5" Ids="IrotR4gFylcZ62ydUXjBUC,Kb4sXPGCYJ0jU6Zyvu99Tv" />
-        <Link Id="QjbSCtLDZpq69nV3rM0F7Z" Ids="E0X52rFVPedYg2yFKnLn8M,VZkOsrOFuCUESnjJOlfiv8" />
-        <Link Id="JXVN1i305ManttJcPP1nv1" Ids="OgXXHEYRAmZYPBiQSUUGoM,RS6Hqm6oVzhIG8hIyXH2eJ" />
-        <Link Id="DTPQJefyRW74Itu3WTLkG8" Ids="T3xaP10ssIBu1W84JenuLS,Hv9nORTiBeD0FjRJwQP1zt" />
-        <Link Id="BoHqfeHAOk4llpsoMSZCZw" Ids="PAwh0bTqOnKYu3GBgYxASP,AMeaHKeDjwSfsDqswpSIBi" />
+
+
+
+
         <Link Id="RqjAlj5y7JKAALPXuqGjwi" Ids="VMyWIw2DDLYJnnMn4lhUAv,QNGu1JxjXlXVk8x5Vzah2L" />
         <Link Id="Hs93yVrVtspMpjll2Y7TEd" Ids="AzHYShl1Cy0Pdw52S7C5ZT,Sb8LY47ypOqKRxpyRAwgiA" />
         <Link Id="Mse5NJYgY9nckAkn4XwosT" Ids="RZzJ7ARmOHcsPdJWcCLoP3,ULIbppmgrRmENEkrSodKrP" />
         <Link Id="HYBIIHzwzFgWtC4jzKgugh" Ids="LKQjuhfaOhae1zpNGMpoU2,D4vCbMFhMY5ij6p7V7EUj9" />
-        <Link Id="OUin8BwfwRW8FtprPeEb8y" Ids="HGP1rmsjVxPDxnOTru8beX,A2MwBQcBrOEBq5qt2zSLmS" />
-        <Link Id="LfmlGiuJj7e5TWXPHk8YuX" Ids="LGtwJci1BGc0aQ6Vd7RgiK,PQmavk7r4bugSLYvWQ29Ch" />
-        <Link Id="Ahjo7MOX1BX1L5yiHVW2tr" Ids="Px8c9IZ8rmzrxsLDzpiJBe,AO9qtL79u94vYlpD0qRXGu" />
-        <Link Id="M9vrAPZcddLqu3YVw80I4A" Ids="L3sCYKzDqfJ1Ln07iscIZJ,VC6eiuumEU9ZF15v0tCeBi" />
-        <Link Id="AX4PC1ZbWOpS0jDMobsiyK" Ids="PbQtP61o3GOyrsTd5H7060,PNKrWr4KJbpUT0gsGW7XhA" />
-        <Link Id="JtUCvEjXAb24pYdNp5Z21z" Ids="SPoGHPkhHTTJMpNpdvn5vM,HFhtow0YTfDoYcgKG1nenI" />
-        <Link Id="BPQuKrptf5CCmJFDsDBRYr" Ids="ELTkm3wJi1QIrMhJjqHMPH,VDTknQYGfwMggmvCG14oBT" />
-        <Link Id="UlHmNt2if0TC2x5g97KOZg" Ids="JhiUpC16QLwmysryQygVUO,QP2rxkw92Q4SiH3VLMGsl6" />
-        <Link Id="K1XwTaBHH8WcaZKlZpI4zl" Ids="RrfmPdrt92ItSEVnLBtEmd,LVp2NShI38PM2uwngTMRoZ" />
-        <Link Id="NXYaILjtnWc6d6bDFTwlGY" Ids="KLvSfosYiB7QogYuRtcpbk,KFEKyP19UcTz7YdC4F8ZsV" />
-        <Link Id="RLvOXz80S6J9s2SsORR16Y" Ids="AeBfzFC7yMsUDLilNXrSVB,Bx4Bc7fGhOjf8z5qyFkRip" />
-        <Link Id="SZ1wP5y6v4EZdN0ThAw1be" Ids="QBcQPULvEtLTXAlkr6cySk,T4DyhbpJF7z3MVEDGgU1l4" />
-        <Link Id="Ixu1bt3NDqTL4ipVFkwHTI" Ids="QK0QagMxVl8KzH5G4C8sPk,INbhiKbjeNqroBjiT1mVQf" />
-        <Link Id="HkXQG9yXyMceEJ3eYd7P9A" Ids="SrGHPl2mVtCzAkYvodCfkD,N54kIv7rN0J1hN3Qzo8p3s" />
-        <Link Id="K1FueWZgAPK1wThLKGnsRH" Ids="HJHDCrUQpmWaLMi47xnQaV,Tz1zq6vR6pQ7JbgqkEZRcD" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -619,6 +736,33 @@
         <Link Id="UZX1mywk6V3MXXAQSglT3i" Ids="PDfAZ7dDcrkFW1pQwiJ9x4,ARy89W2GJw4s60rzwfmBsV" />
         <Link Id="GEqsNpmBuxct8MoUzAqSxR" Ids="FRGL7PazfZpBv73noSDRaO,Sn0IFyPbF1sneJyHMkVp7A" />
         <Link Id="PclhoIhHEmjZvJGPjU662Y" Ids="Ddqg0xhHjdkgJZ68fhWmTD,GoA5ugmSeRASmqqlJuk5hE" />
+
+
+
+
+
+
+
+
+
+
+
+        <Link Id="GLQ9ZmA4DtJ9sQox71PzFg" Ids="TKlMWlp4NMGpF95VUsojMR,SAorVJSP3Q1oFhAqIQdvLD" />
+        <Link Id="HP6tjLsgFQVMTwxcjYZR08" Ids="D5yQwnSl1RsXaPGRjJvip5,TKlMWlp4NMGpF95VUsojMR" />
+        <Link Id="AQRe18HUIq0LHCFif0nEn2" Ids="FS4AuQsy1yhpQm29QMxTOW,C5fDhFs0AeGhEzStRM7z44" />
+        <Link Id="MLzcziLBV6YwlekPTppjlR" Ids="FS4AuQsy1yhpQm29QMxTOW,CJ00WE6fttBHGvd1Zsrkls" />
+        <Link Id="VK2EJQwvqjMr2JwNcFlPPN" Ids="O33XlNRRiKrpKlhAeg0FQq,TagwBtA8domnoQuutAfeFt" />
+        <Link Id="A1siLKRbdbzfJ60GpDRRfC" Ids="AvOGKbZt7UoNXcEl2PZI00,BQLocIaeu6O5JOHxRU8yCF" />
+        <Link Id="E1HelfBboe46xSTKkNc8Jq" Ids="TagwBtA8domnoQuutAfeFt,QicmLxPzpH8ZPEwABemout" />
+        <Link Id="MN1sTgtCnAATtOVhBjD67s" Ids="BQLocIaeu6O5JOHxRU8yCF,Gpekl2H3WZpR476VSHZGna" />
+        <Link Id="CAfK4zXFo3i9JzJ0F26kGd" Ids="A3bTqin2azJurJhoTXU3Ni,RpQEJHH8CV3xfCaci2eMhy" />
+        <Link Id="HZyje000hFEmncZYj16Yvu" Ids="O1ZPv09XG3VR60XDGs3tjW,Njdew2GbXNIg7fVSpjdiNY" />
+        <Link Id="B7nAmHrPEHO2Q5PMcBJvLS" Ids="Oul3T6VWihMkGR8vkoY0vO,JkWuum19uzeoYOsIHUx0lQ" />
+        <Link Id="RZ2KjxmZoXHBJZVqwTvioP" Ids="FZ12eSIDP9mGP0FmE5IcsR,RbMTocnzHVCmKwnWkOICPG" />
+        <Link Id="Ck3q9uKXBQHhChwJXiD8Nl" Ids="JhdMfjS8Ju8fDYHyv6uLb7,D5yQwnSl1RsXaPGRjJvip5" />
+        <Link Id="Tyor7YBRlosbsQOIR8Id08" Ids="G69LMqZBByDHYApccyPL9W,AMeaHKeDjwSfsDqswpSIBi" />
+        <Link Id="Tyor7YBRlosbsQOIR8Id09" Ids="JrM5Yua7jXqgKQWbu3hp06,KZ4GwssylmGNgVu7iyB3xu" />
+        <Link Id="UK3pjDzLMUWes6GXGzpgFY" Ids="R8Tfi6mnlNJT9S92pM4vwh,He1dSPYXLNpYKCZhEgRUzP" />
       </Patch>
     </Node>
   </Patch>

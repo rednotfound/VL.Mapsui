@@ -218,6 +218,78 @@ foreach ($helpDoc in $helpDocs) {
             Fail "help\$name pins $($pin.Groups[1].Value) $($pin.Groups[2].Value); it must be 0.0.0 or it will ask for that exact version forever. Run tools\Normalize-HelpPatches.ps1."
         }
     }
+
+    # ------------------------------------------------------------------------------------
+    # Every internal reference resolves.
+    #
+    # A .vl is a graph held together by 22-character strings, and every one of these has
+    # broken at least once while editing by hand. None of them is an XML error: the document
+    # parses, vvvv loads it, and the patch is quietly wrong.
+    #
+    #   Link@Ids                    a wire with no endpoint
+    #   Pad@SlotId                  a pad glyph belonging to no slot
+    #   Fragment@Patch              an operation registered against a patch that is not there
+    #   Patch@ParticipatingElements what runs in Create - and this is the one that bit us:
+    #                               DELETING nodes made the Create fragment's seed link dangle,
+    #                               the dangling-link sweep removed it, and Create was left
+    #                               naming an element that no longer existed. A cleanup pass
+    #                               needs the same validation as an edit pass.
+    # ------------------------------------------------------------------------------------
+    try { $helpXml = [xml]$helpRaw } catch { Fail "help\$name is not well-formed XML: $($_.Exception.Message)"; continue }
+
+    $known = [System.Collections.Generic.HashSet[string]]::new(
+        [string[]]@($helpXml.SelectNodes('//@Id') | ForEach-Object { $_.Value }))
+
+    $unresolved = [System.Collections.Generic.List[string]]::new()
+    foreach ($link in $helpXml.SelectNodes('//Link')) {
+        foreach ($end in ($link.Ids -split ',')) {
+            if (-not $known.Contains($end)) { $unresolved.Add("Link $($link.Id) -> $end") }
+        }
+    }
+    foreach ($pad in $helpXml.SelectNodes('//Pad[@SlotId]')) {
+        if (-not $known.Contains($pad.SlotId)) { $unresolved.Add("Pad $($pad.Id) -> Slot $($pad.SlotId)") }
+    }
+    foreach ($fragment in $helpXml.SelectNodes('//Fragment[@Patch]')) {
+        if (-not $known.Contains($fragment.Patch)) { $unresolved.Add("Fragment $($fragment.Id) -> Patch $($fragment.Patch)") }
+    }
+    foreach ($operation in $helpXml.SelectNodes('//Patch[@ParticipatingElements]')) {
+        foreach ($element in ($operation.ParticipatingElements -split ',')) {
+            if (-not $known.Contains($element)) {
+                $unresolved.Add("Patch '$($operation.Name)' ParticipatingElements -> $element")
+            }
+        }
+    }
+
+    foreach ($reference in $unresolved) {
+        Fail "help\$name has an unresolved reference: $reference"
+    }
+
+    # Ids are the same 22-character shape everywhere, and a hand-typed one has slipped through
+    # three times because the format looked right - see docs\RULES.md on tools\New-VLId.ps1.
+    $malformed = @($helpXml.SelectNodes('//@Id') | Where-Object { $_.Value -notmatch '^[A-V][0-9A-Za-z]{21}$' })
+    foreach ($id in $malformed) {
+        Fail "help\$name has a malformed Id '$($id.Value)'. Generate them with tools\New-VLId.ps1."
+    }
+
+    $duplicates = @($helpXml.SelectNodes('//@Id') | Group-Object { $_.Value } | Where-Object Count -gt 1)
+    foreach ($group in $duplicates) {
+        Fail "help\$name uses Id $($group.Name) $($group.Count) times; ids must be unique within a document."
+    }
+
+    # A readout left behind. When a node is deleted its links go with it, but the IOBox that
+    # displayed its output stays on the canvas showing nothing forever - which is what a reader
+    # then asks about, quite reasonably. A WARNING rather than a failure: an IOBox carrying a
+    # value is a constant or an annotation and is unconnected on purpose, so only a *labelled,
+    # empty* one with no link is debris.
+    $linked = [System.Collections.Generic.HashSet[string]]::new()
+    foreach ($link in $helpXml.SelectNodes('//Link')) {
+        foreach ($end in ($link.Ids -split ',')) { [void]$linked.Add($end) }
+    }
+    foreach ($box in $helpXml.SelectNodes('//Pad[@isIOBox="true"][@Comment]')) {
+        if (-not $linked.Contains($box.Id) -and [string]::IsNullOrEmpty($box.Value)) {
+            Write-Host "  warn  help\$name has an empty IOBox '$($box.Comment)' connected to nothing" -ForegroundColor DarkYellow
+        }
+    }
 }
 
 if ($helpDocs.Count -eq 0) {
