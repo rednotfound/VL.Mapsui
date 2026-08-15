@@ -99,8 +99,15 @@ build `Feature`'s attribute dictionary at all. `Collections.Dictionary`'s `Add` 
 unconnected `Input` for the empty one to start from — measured 2026-08-14, and
 `HowTo Label your data.vl` is the example.
 
-`SymbolStyle` is the next one worth doing, and it is what points currently lack: `VectorStyle`
-draws lines and fills, so a `POINT` handed to `FeatureLayer` today is labelled but not marked.
+`SymbolStyle` is the next one worth doing, but **not** for the reason written here until 2026-08-15:
+a `POINT` handed to `FeatureLayer` today *is* marked. Measured — a point drawn with a `VectorStyle`
+puts down the same 180 pixels as one drawn with a `SymbolStyle`, because Mapsui's point renderer
+falls back to a default symbol rather than drawing nothing (`PointRenderingFacts`). What
+`SymbolStyle` buys is *choosing* the marker — size, colour, shape, a bitmap — not visibility.
+
+The claim it replaces was written from memory about how Mapsui divides work between its renderers,
+in a document whose whole purpose is to be trusted about exactly that. Left as a marker: plausible
+and wrong is the failure mode this file is most exposed to.
 
 ### Layers — 2 of ~10
 

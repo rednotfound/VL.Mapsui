@@ -46,6 +46,23 @@ VL.NetTopologySuite already uses for taking a `Coordinate` apart.
 **The test that would have caught it asserts on the attribute, not on the feature object.** A test
 that had only checked `Assert.NotNull(picked)` would have passed all the way to the GUI.
 
+### `MouseState.Position` is in device pixels — confirmed on screen, and it had never been tested
+
+`Pick` takes view pixels, and so do `Drag` and `Click`, which have shipped since 2026-08-14 wired
+straight to `MouseState.Position` with no conversion. That wiring was never actually *verified*:
+**dragging cannot detect a scale error**, because it uses only the difference between two positions,
+so a position in VL's ~2.8-by-2 unit space would have dragged the map slowly rather than wrongly.
+The widget `Click` was weak evidence — the zoom buttons are ~40 px, so a large error would have made
+them unclickable — but nothing had ever depended on an absolute pixel being right.
+
+Picking does. The hit edge is exact, so a coordinate space that is off by any factor misses
+*everything*, always, silently. Pointing at a shape and reading its name back is therefore the first
+real test of that assumption, and it passes: the labels appear under the pointer.
+
+Worth keeping as a pattern rather than as a fact about the mouse: **a green result can be produced by
+a design that cannot fail.** Drag was never evidence for the coordinate space, and treating it as
+evidence for three weeks would have been the easy mistake.
+
 ### The projection boundary only worked one way
 
 `ToMercator` existed; `ToLonLat` did not. Geometry could get in and not back out — which nothing
