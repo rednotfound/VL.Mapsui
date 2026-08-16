@@ -193,6 +193,7 @@ vl-mapsui/
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org
 └── tools/
+    ├── Open-HelpPatch.ps1        # the ONLY way to launch vvvv here - three package repositories
     ├── Test-VLPackage.ps1        # static package validator
     ├── Normalize-HelpPatches.ps1 # run after any GUI session - vvvv repins deps AND saves Enabled=True
     ├── Compile-HelpPatches.ps1   # headless vvvvc over every help patch; needs pack.ps1 first
@@ -248,6 +249,12 @@ the better API and returns with the nuspec.
 # vvvv must be closed first - it holds the built assembly open
 dotnet build src\VL.Mapsui\VL.Mapsui.csproj -c Release
 .\tools\Build-SpikePatch.ps1
+
+# NEVER type the vvvv launch by hand. THREE package repositories are needed - dist\, deps\ and
+# ..\vl-nettopologysuite\dist\ - and omitting one produces an error naming something else
+# entirely ("The referenced symbol source 'Mapsui.dll' couldn't be found", or "Missing package"
+# followed by 25 ambiguous Point candidates). Two launches were lost to this on 2026-08-16.
+.\tools\Open-HelpPatch.ps1 "Draw many features"     # -List shows them all
 
 # Compile every help patch headlessly, then READ THE GENERATED C# before opening any window:
 #   new OpenStreetMapNode() must appear in Create, never in Update

@@ -189,9 +189,15 @@ foreach ($pkg in $Packages) {
 
 Write-Host "`n== 5/5 done ==" -ForegroundColor Green
 
+# Never print a launch command here. THREE package repositories are needed - dist\, deps\ and the
+# sibling vl-nettopologysuite\dist\ - and omitting any one produces an error naming something else
+# entirely: "The referenced symbol source 'Mapsui.dll' couldn't be found" for deps\, or "Missing
+# package: VL.NetTopologySuite" plus 25 ambiguous Point candidates for the third. This block named
+# dist\ alone, then dist\ and deps\, and cost a launch each time on 2026-08-16. The list lives in
+# Open-HelpPatch.ps1 now, which is the only thing that should ever assemble it.
 Write-Host @"
 
 Next:
   .\tools\Test-VLPackage.ps1            static checks, no vvvv needed
-  vvvv.exe <patch> --package-repositories $Dist
+  .\tools\Open-HelpPatch.ps1 -List      open one in vvvv - never type the launch by hand
 "@ -ForegroundColor Yellow

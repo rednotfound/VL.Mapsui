@@ -162,6 +162,35 @@ Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
 - **A check that has never gone red is not a check.** The `.gitignore` rule added to stop stray
   tiles did not work on the first attempt — a pattern containing a slash is anchored to the
   repository root — and only planting a file and watching git ignore it caught that.
+- **Test the composition, not the piece.** Ten green tests on `SymbolStyle` — four of them counting
+  actual pixels — coexisted with two hundred invisible markers, because every one of them put a
+  single style on a layer while the patch wires `SymbolStyle → LabelStyle → FeatureLayer`. The bug
+  was in the pair. **Whatever shape the help patch builds is the shape at least one test must
+  build.**
+- **Assert the invariant, not the number.** Nobody would have written "the marker must be 952
+  pixels", and such a test would break on the next SkiaSharp. What caught the bug is a sentence
+  anyone would agree with before seeing the code: *a label may only add ink*. Monotonicity,
+  ordering, "this is bigger than that" — these survive a version bump and still fail on a real
+  fault.
+- **A double that cannot exercise the failure is not a test of it.** The first composition test
+  passed against the broken code: its feature had no attributes, so the label had nothing to write,
+  so nothing was painted over the marker. The same mistake as the record double whose values sat in
+  real public fields — twice now, a stand-in too simple to reach the bug.
+- **A pin that does nothing is worse than no pin.** `SymbolStyle.UnitType` selects pixels or world
+  units and Mapsui's Skia renderer never reads it — measured, four renders, all 1156 pixels. The pin
+  was written, measured and removed. Shipping it would have been a promise the patch cannot keep,
+  failing silently, which is the failure mode this whole document exists for. **Before wrapping a
+  property, render it.** `LabelStyle.CollisionDetection` was the second: 763 pixels with it on, 763
+  with it off. A property that exists is not a property that works, and this library has two.
+- **A metadata scan is a hint, never a verdict.** Searching `Mapsui.Rendering.Skia.dll` for
+  `UnitType` and finding zero occurrences was good corroboration — but `LabelColumn` scores zero
+  there too and works perfectly, because the read happens one assembly along. A zero means *go and
+  measure*, and the measurement is the answer.
+- **Derive it instead of asking for it, when the node is already holding the answer.** `LabelStyle`
+  needed the label to clear the marker, which looks like an offset pin and is not: the node already
+  receives the `SymbolStyle` on its `Style` input, so it can read the scale and work the clearance
+  out. No pin, no arithmetic for the patch author, and the correct result by default. **Check what
+  a node can already see before adding an input for it.**
 - **Compile every help patch, not the one you edited.** Deleting a node that another patch still
   used produced `Not found: ToAttributes` in a file nobody had touched, and compiling only the
   changed patch would have shipped it. `tools\Compile-HelpPatches.ps1` with no `-Patch` filter takes

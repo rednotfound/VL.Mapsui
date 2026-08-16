@@ -79,10 +79,10 @@ NOTES.md, 2026-08-14. vvvv's own statement of the idiom is in `VL.Skia`'s *Expla
 Keyboard*: the Mouse node is connected to the Renderer it interacts with, and its position is wired
 onward.
 
-### Styles — 3 of 28
+### Styles — 4 of 28
 
-`VectorStyle` and `LabelStyle` are their own nodes, which was the fix for the geometry layer's pin
-count and the Mapsui-idiomatic shape. Mapsui also has `SymbolStyle`, `CalloutStyle`, `RasterStyle`,
+`VectorStyle`, `LabelStyle` and `SymbolStyle` are their own nodes, which was the fix for the geometry
+layer's pin count and the Mapsui-idiomatic shape. Mapsui also has `CalloutStyle`, `RasterStyle`,
 `ThemeStyle`, plus `Pen`, `Brush`, `Font`, `Offset`, `Sprite`, `SymbolType`, `PenStyle`,
 `PenStrokeCap`, `StrokeJoin`, `UnitType`. `StyleCollection` is used but not exposed: it is how
 `LabelStyle` carries an upstream style through, since a layer takes one style and two were needed.
@@ -99,11 +99,65 @@ build `Feature`'s attribute dictionary at all. `Collections.Dictionary`'s `Add` 
 unconnected `Input` for the empty one to start from — measured 2026-08-14, and
 `HowTo Label your data.vl` is the example.
 
-`SymbolStyle` is the next one worth doing, but **not** for the reason written here until 2026-08-15:
-a `POINT` handed to `FeatureLayer` today *is* marked. Measured — a point drawn with a `VectorStyle`
-puts down the same 180 pixels as one drawn with a `SymbolStyle`, because Mapsui's point renderer
-falls back to a default symbol rather than drawing nothing (`PointRenderingFacts`). What
-`SymbolStyle` buys is *choosing* the marker — size, colour, shape, a bitmap — not visibility.
+`SymbolStyle` is wrapped now: `Shape` (our own `SymbolShape` — Ellipse, Rectangle, Triangle),
+`Scale`, `Fill Color`, `Outline Color`. It is the style **for points** and takes `VectorStyle`'s
+place in the chain rather than sitting beside it, because Mapsui's `SymbolStyle` *derives from*
+`VectorStyle`.
+
+What it buys is not visibility but *choosing* — and the measurement behind that sentence was
+sharpened on 2026-08-16. A point with no symbol style is drawn as a **ring**: the fallback covers
+**180 pixels** where a filled marker covers **952**, which is a 32-pixel disc plus its outline. So
+"a point is already drawn" was true and misleading; against a busy basemap a ring is close to
+invisible, and this node is five times the ink before anyone picks a colour. `Scale` multiplies
+`SymbolStyle.DefaultWidth`, which is **32** — doubling it quadruples the area, asserted as a ratio
+in `SymbolStyleTests` because antialiasing moves the exact count.
+
+`SymbolType.Image` is deliberately absent from our enum: it needs a `BitmapId` from Mapsui's
+`BitmapRegistry`, so loading, ownership and disposal of an image come with it, and none of that is a
+style decision. A marker made from a file is its own node when it exists.
+
+**`UnitType` is in the list above but will not be wrapped, and the reason is measured rather than
+chosen.** It offers `Pixel` and `WorldUnit`, which is exactly the marker-versus-measurement switch a
+map wants, and `SymbolStyle.UnitType` selects between them. The Skia renderer never reads it: a
+rectangle at scale 1 draws **1156 pixels under both settings at both zoom levels**, and the string
+`UnitType` appears **zero times** in `Mapsui.Rendering.Skia.dll`. The pin was written, measured and
+removed — a pin that does nothing is worse than no pin. `SymbolStyleTests` keeps the finding as an
+assertion that goes red if a future Mapsui implements it.
+
+The way to get a shape whose size means something is to **buffer the point into a polygon** and
+style it with `VectorStyle`. That is not a workaround so much as the better answer: it scales with
+the map because it is on the map, and it is pickable, intersectable and measurable, which a symbol
+never is. Spherical mercator stretches with latitude, so a "unit" is a metre only at the equator and
+about 0.82 of one at Kyoto — buffer in a metric projection when the number has to be metres.
+
+**`LabelStyle.BackColor` defaults to opaque white**, which is the one Mapsui default we override
+without exposing. Left alone it paints a solid box behind every label, centred on the feature being
+labelled — it hid two hundred markers on 2026-08-16 and cut the drawn pixels by 71%. A halo and a
+box do the same job and we already ship the halo.
+
+**`Offset`, `HorizontalAlignment` and `VerticalAlignment` are used but not exposed either**, and
+they are how a label gets out of its marker's way. Mapsui centres a label on its feature —
+`Offset (0,0)`, both alignments `Center` — which is right for a polygon and wrong for a point with
+a symbol on it. `LabelStyleNode` looks for a `SymbolStyle` on its `Style` input (recursively, since
+`StyleCollection` nests), reads `SymbolScale`, and lifts the label by `16 × scale + outline/2 + 4`
+pixels. **No pin, because nothing needs to be asked** — the node is already holding the symbol whose
+size is the answer, and a patch that adds nothing gets the cartographically correct result. No
+symbol upstream and nothing moves, which keeps a polygon's label at its centroid where it belongs.
+
+`VerticalAlignment.Bottom` is what makes the arithmetic simple: measured 2026-08-16, it pins the
+text's *bottom edge* to the offset point, so a 10-point and a 30-point label both end at y 199 and
+the clearance never has to include half a text height.
+
+**`CollisionDetection` is not set, and that absence is a measurement.** Eight labels three pixels
+apart draw 763 pixels with it `true` and 763 with it `false` — inert on our render path, like
+`UnitType`. Nothing here declutters labels; the answer for dense ones is not to draw them, which is
+what `IStyle.MinVisible` / `MaxVisible` are for and is not wrapped yet.
+
+**Before wrapping any Mapsui property, render it.** Three have now turned out to be inert
+(`SymbolStyle.UnitType`, `LabelStyle.CollisionDetection`) or to behave differently from their name.
+And the cheap check is only a hint: `LabelColumn` appears **zero times** in
+`Mapsui.Rendering.Skia.dll` and works perfectly, because the read happens inside `Mapsui.dll`. A
+zero in a metadata scan is a reason to measure, never a verdict.
 
 The claim it replaces was written from memory about how Mapsui divides work between its renderers,
 in a document whose whole purpose is to be trusted about exactly that. Left as a marker: plausible
@@ -148,9 +202,6 @@ Not wrapped: `MapInfoWidget` (Mapsui's own on-map readout — a patch that has `
 and better), and `MapInfo.MapInfoRecords`, the full stack of everything under the point. `Pick`
 returns the topmost; the rest is one pin away the day something needs it.
 
-- `Mapsui.Nts.Editing` — `EditManager`, `EditMode`, `Geomorpher`, `AddInfo`, `DragInfo`,
-  `RotateInfo`: drawing and editing geometry on the map with the mouse. Nine types, and it is the
-  most patch-shaped feature Mapsui has. **This is the gap now.**
 - `Mapsui.Nts.Editing` — `EditManager`, `EditMode`, `Geomorpher`, `AddInfo`, `DragInfo`,
   `RotateInfo`: drawing and editing geometry on the map with the mouse. Nine types, and it is the
   most patch-shaped feature Mapsui has.

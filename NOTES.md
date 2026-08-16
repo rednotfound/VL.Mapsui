@@ -5,6 +5,242 @@ them do not belong here.
 
 ---
 
+## 2026-08-16 — the label steps aside, and the node already knew how far
+
+With the white box gone the markers came back, and the label was still sitting **on top of the
+point it names**. That is not a leftover of the same bug: `Mapsui.Styles.LabelStyle` ships with
+`Offset (0,0)`, `HorizontalAlignment.Center` and `VerticalAlignment.Center`, so a label is centred
+on its feature by design. Correct for a polygon. Wrong for a point wearing a marker.
+
+Cartography has settled this for a century: **the marker says where, the label says what, and they
+do not share pixels.** A point label goes beside its symbol, clear of it by a small gap, with a
+halo so it survives whatever is underneath.
+
+### Four measurements, because the last two properties we trusted were dead
+
+| question | measured |
+|---|---|
+| does `Offset` move the label? | yes — `(0,-20)` moved the ink from y 194..205 to y 174..185. **Negative Y is up** |
+| does `Offset` X work? | yes — `(30,0)` moved x 186..215 to 216..245 |
+| what does `VerticalAlignment` measure from? | `Top` puts the text below the anchor, `Center` across it, **`Bottom` puts it above** |
+| does the font size move it? | at `Center` yes, at **`Bottom` no**: a 10-point label draws to y 199 and a 30-point one *also* to y 199, growing upward |
+| how big is a marker really? | scale 1 covers y 183..216 about a centre of 199.5 — radius **16.5**, which is `32/2 × scale` plus half the 2-pixel outline |
+| is `CollisionDetection` honoured? | **no.** Eight labels three pixels apart: **763 px with it on, 763 with it off** |
+
+The `VerticalAlignment.Bottom` result is the one that shaped the code. It pins the text's *bottom
+edge* to the offset point, so the clearance arithmetic never has to know the font size — otherwise
+every size change would need half a text height added back in.
+
+### The change: no pin, because nothing needs to be asked
+
+`LabelStyleNode` already receives the symbol on its `Style` pin — that is why the node exists, since
+a layer takes one style and something has to merge the pair. So it reads `SymbolScale`, computes
+`16 × scale + outline/2 + 4`, and lifts the label by that much. A patch adds nothing and gets the
+right answer.
+
+**No `SymbolStyle` upstream, nothing moves.** The rule keys on what is actually there rather than
+on a guess about the geometry: a `VectorStyle` fill or an empty input leaves Mapsui's centred
+default alone, which is where a polygon's label belongs.
+
+### The test that says it, and why the previous one could not
+
+`Adding_a_label_never_reduces_what_is_drawn` stays, but it cannot express this. Total ink can rise
+while the marker is still half buried — a label overlapping the top of a disc adds text pixels
+outside it and removes marker pixels inside it, and the sum goes either way.
+
+So the new one counts only the pixels **inside the marker's own square**, and requires them
+unchanged:
+
+| | marker alone | with a label |
+|---|---|---|
+| scale 0.5 | 248 | 248 |
+| scale 1 | 952 | 952 |
+| scale 2 | 3718 | 3718 |
+
+Not one pixel differs. Negative-tested against the finished code: removing the `Place` call turns
+two tests red, and the clearance follows the marker rather than being a constant that fits one size
+(offset **−13** at scale 0.5, **−37** at scale 2).
+
+### `CollisionDetection` was a third dead property, and it was ours
+
+We set it to `true`. It does nothing on our render path, and now it is not set at all, with the
+measurement in the comment. Three in two days — `SymbolStyle.UnitType`, and this — is enough to
+make the rule explicit: **before wrapping a Mapsui property, render it.**
+
+The corollary matters just as much, and it is why the string scan is only ever corroboration:
+`LabelColumn` also appears **zero times** in `Mapsui.Rendering.Skia.dll` and demonstrably works,
+because the read happens inside `Mapsui.dll`. A zero in the scan is a reason to measure, never a
+verdict.
+
+**What this means for dense labels:** nothing declutters them. Two hundred labels overlap each
+other wherever each one sits, and no pin fixes that. The real answer is to stop drawing them —
+`IStyle` carries `MinVisible` / `MaxVisible`, so labels can appear only past a zoom level. Whether
+that becomes a pin or its own node is deliberately left open.
+
+199 tests.
+
+---
+
+## 2026-08-16 — two hundred markers behind two hundred white boxes
+
+`SymbolStyle` shipped with ten tests, four of them counting actual pixels, all green — and no
+symbol appeared in `HowTo Draw many features.vl`. A minimal probe (one point, `SymbolStyle`
+straight into `FeatureLayer`) drew correctly through the real `Map → ToSkiaLayer` path, so both the
+node and our rendering were fine. **The bug was in the composition, which nothing tested.**
+
+### The measurement that named it
+
+Bisected offline in seconds rather than in GUI rounds — a throwaway test rendering the same
+combinations the patch builds:
+
+| | before | after |
+|---|---|---|
+| 1 point, scale 2, no label | 3718 | 3718 |
+| 1 point, scale 2, **with label** | 3292 | 3696 |
+| 1 point, scale 0.5, no label | 248 | 248 |
+| 1 point, scale 0.5, **with label** | **106** | **269** |
+| 200 points, scale 0.5, no label | 29967 | 29967 |
+| 200 points, scale 0.5, **with label** | **8666** | **26286** |
+
+Adding a label *reduced* the drawn pixels by 71%. That is not a subtle number and it is not a
+plausible one: **ink is monotone — drawing a word on top of a circle cannot leave less on the
+canvas.** Something was painting white.
+
+### The cause
+
+`Mapsui.Styles.LabelStyle.BackColor` defaults to **opaque white**. Our node set `ForeColor`, `Font`
+and `Halo` and never touched it, so every label painted a solid box centred on the feature it was
+naming. Two hundred labels, two hundred boxes, two hundred markers gone. Fixed with
+`BackColor = null` — we had already chosen the halo, and a halo and a box do the same job.
+
+The 200-point case is still 12% under its no-label count, and that part is *not* a bug: with
+markers 16 pixels apart, one label's white halo overlaps its neighbours' markers. It is legible on
+screen; it is noted here so the number is not mistaken for a residue of the same fault.
+
+### What the suite was doing wrong, twice
+
+The first attempt at a composition test **passed against the broken code**, because its feature had
+no attributes: the label had nothing to write, so nothing was painted, so nothing was covered. A
+double that cannot exercise the failure is not a test of it.
+
+What replaced it asserts the invariant rather than a number:
+
+```
+Assert.True(combined >= alone, "a label covered the marker")
+```
+
+Nobody would have written "the marker must be 952 pixels", but everybody can agree a label may only
+*add* ink. Negative-tested — restoring `BackColor` turns it red on the spot.
+
+### And the pin that was written, measured, and taken back out
+
+The obvious next feature was a `Unit` pin: pixels for a marker, world units for a measurement.
+Mapsui appears to offer exactly that — `Mapsui.Styles.UnitType { Pixel, WorldUnit }`, selected by
+`SymbolStyle.UnitType`. It was implemented, and then rendered:
+
+| | resolution 1 | zoomed in 2× |
+|---|---|---|
+| `UnitType.Pixel` | 1156 px | 1156 px |
+| `UnitType.WorldUnit` | 1156 px | 1156 px |
+
+All four identical — 34×34, a 32-pixel square plus its outline. The property is **inert**: the
+string `UnitType` occurs **zero times** in `Mapsui.Rendering.Skia.dll` (three times in
+`Mapsui.dll`, where it is merely declared). So the pin came out again, because **a pin that does
+nothing is worse than no pin** — it is a promise the patch cannot keep, and it breaks silently.
+
+The finding is kept as a test that goes red if a future Mapsui implements it, which is the only
+event that could change the answer. The way to get a shape sized on the ground today is to
+**buffer the point into a polygon** and style it with `VectorStyle`: it scales with the map because
+it is on the map, and unlike a symbol it is pickable, intersectable and measurable. Mercator caveat
+worth carrying — a "world unit" is a metre only at the equator and about 0.82 of one at Kyoto.
+
+196 tests.
+
+### Two launches lost to `--package-repositories`, and the script that ends it
+
+Opening the patch by hand failed twice in ten minutes, each time with an error naming something
+that was not wrong.
+
+**First, with `dist\` alone**, thrown by VL's symbol loader before any window appeared:
+
+```
+The referenced symbol source 'Mapsui.dll' couldn't be found.
+```
+
+**Then with `dist\` and `deps\`:**
+
+```
+Missing package: VL.NetTopologySuite
+The reference is ambiguous: Point   … 25 candidates out of NetTopologySuite.dll
+```
+
+The ambiguity is worth reading correctly, because it looks like a second, separate fault and is
+not: with `VL.NetTopologySuite` absent there is no `NTS.Geometry.Point`, so VL matches the bare
+.NET members instead and finds twenty-five of them. **One missing repository, two error messages,
+neither naming it.**
+
+There are **three** package repositories and every one is load bearing:
+
+| folder | what it holds | who puts it there |
+|---|---|---|
+| `dist\` | VL.Mapsui itself | `pack.ps1` |
+| `deps\` | Mapsui, Mapsui.Tiling, BruTile … | `build.ps1` |
+| `..\vl-nettopologysuite\dist\` | the package the help patches *create* geometry with | packing that repo |
+
+Every headless compile was green throughout, because `tools\Compile-HelpPatches.ps1` builds all
+three. The hand-typed command came from `build.ps1`'s own "Next:" block, which named `dist\` alone.
+**A script that prints the wrong instruction is worse than one that prints none** — its output
+carries the authority of having just succeeded.
+
+Both are fixed, and the second fix is the one that matters: the list now lives in
+`tools\Open-HelpPatch.ps1` rather than in a hint, a README or anyone's memory. It resolves the
+patch by name, refuses an ambiguous one, checks each repository exists (vvvv ignores a repository
+that does not, which is exactly how a missing folder disguises itself as a missing package), and
+refuses to start a second vvvv. **Getting the same command wrong twice is a script-shaped problem,
+not a discipline-shaped one.**
+
+---
+
+## 2026-08-16 — the default point marker is a ring, and now you can fill it in
+
+`SymbolStyle` is wrapped: `Shape` / `Scale` / `Fill Color` / `Outline Color`. It is the style **for
+points** and replaces `VectorStyle` in the chain rather than joining it, because Mapsui's
+`SymbolStyle` *derives from* `VectorStyle` — it inherits `Fill` and `Outline` and adds the shape and
+the size.
+
+### The measurement that sharpened an earlier one
+
+On 2026-08-15 this log recorded that a `POINT` with a plain `VectorStyle` draws **180 px**, the same
+as one with a `SymbolStyle`, and concluded "points are visible today; `SymbolStyle` buys *choosing*".
+True, and it hid something. `SymbolStyle.DefaultWidth` is **32**, so a filled 32-pixel disc should be
+about 804 px² — nowhere near 180. Measured rather than reasoned:
+
+| | px |
+|---|---|
+| plain `VectorStyle` on a point (the fallback) | **180** |
+| `SymbolStyle` with a fill | **952** |
+| a filled 32 px disc, for arithmetic | 804 |
+
+**The fallback draws a ring, not a disc.** 180 is what a 2-pixel stroke around a 32-pixel circle
+comes to, and 952 is the disc plus that stroke. So "a point is already drawn" was accurate and
+misleading in the same breath: against a busy basemap an unfilled ring is close to invisible, and
+this node is five times the ink before anyone changes a colour.
+
+Also pinned, because "scale" without a unit is a guess: **Scale 1 = 32 pixels**, and doubling it
+quadruples the area — measured at **3.91×**, asserted as a ratio rather than a count because
+antialiasing moves the exact number. The three shapes differ as they should: rectangle 1156 >
+ellipse 952 > triangle 610, which is also the check that the shape pin reaches the renderer at all.
+
+### Two decisions worth their reasons
+
+- **`SymbolType.Image` is not in our enum.** It needs a `BitmapId` from Mapsui's `BitmapRegistry` —
+  loading, ownership and disposal of an image — and none of that is a style decision.
+- **Four input pins**, which `docs/RULES.md` says wants a reason: shape, size and two colours are
+  what "what does a point look like" consists of. `SymbolRotation` would have been a fifth and
+  belongs to data-driven markers, not to choosing one.
+
+---
+
 ## 2026-08-16 — the install path, measured at last
 
 The one assumption on the publishing path that had only ever been reasoned about: **does a
@@ -174,7 +410,7 @@ this.Geometry = Geometry_In;       // Create really does store it
 so every check this repository trusts said the record was correct — and it was, in the form that
 was checked. **One record, two runtime shapes; the editor's is the one that has to work, and it is
 the one `vvvvc` never shows you.** That makes six recorded cases of a green check that could not
-have gone red (`docs/RULES.md`, "False proofs") and the first where the false proof was *reading the
+have gone red (`docs/RULES.md`, "Working style") and the first where the false proof was *reading the
 generated code*.
 
 ### The rule that follows
