@@ -10,16 +10,22 @@
     <license type="expression">MIT</license>
     <projectUrl>https://github.com/rednotfound/VL.Mapsui</projectUrl>
     <description>
-      EARLY - not ready for real work yet.
-
-      Mapsui as nodes for vvvv gamma: a tile layer, a map that holds layers, navigation
-      operations, and a node that draws the map into VL.Skia.
+      A real map engine as nodes for vvvv gamma. Tile layers from OpenStreetMap or any XYZ
+      service, your own geometry drawn on top, labels taken from your data, and a Pick node
+      that tells you which feature you are pointing at.
 
       Deliberately not one all-in-one map node. The pieces are Mapsui's own - Map, layers,
       Navigator - so a patch composes them, decides for itself how the mouse drives the map,
       and can put its own layers on it. That is what a patching environment is for.
 
-      Requires vvvv gamma 7.4 or newer (.NET 8).
+      Geometry crosses the boundary as NetTopologySuite, so whatever produced it - a file, a
+      service, VL.NetTopologySuite - never has to know that Mapsui will draw it. A spread of
+      your own record type can be drawn directly.
+
+      Nine help patches, from the smallest working map to drawing a thousand features.
+
+      EARLY: the API can still change, and Mapsui's editing and WMS/WFS surfaces are not
+      wrapped yet. Requires vvvv gamma 7.4 or newer (.NET 8).
     </description>
     <summary>Mapsui map engine as composable nodes for vvvv gamma.</summary>
     <releaseNotes>

@@ -8,7 +8,7 @@
 
         vvvvc SomeDoc.vl --export-package-sources <repo>\dist\feed
 
-    That is what test\verify.ps1 -EndToEnd does, and it is the closest automated
+    That is what tools\Test-Install.ps1 does, and it is the closest automated
     equivalent to a user installing the package from nuget.org.
 
     Uses the NuGet.exe that ships with vvvv, so nothing extra needs installing.
@@ -92,7 +92,7 @@ foreach ($package in $Packages) {
 
     # NuGet treats a version as immutable and will happily reuse an already-extracted copy
     # from the global cache, so repacking 0.2.0 with different contents is invisible to any
-    # consumer that resolved it earlier. Evict our own entry; without this, verify.ps1's
+    # consumer that resolved it earlier. Evict our own entry; without this, Test-Install.ps1's
     # consumer test silently validates a stale package.
     $meta    = ([xml](Get-Content $Nuspec -Raw)).package.metadata
     $cached  = Join-Path $env:USERPROFILE ".nuget\packages\$($meta.id.ToLowerInvariant())\$($meta.version)"
@@ -118,5 +118,5 @@ foreach ($nupkg in Get-ChildItem $FeedDir -Filter '*.nupkg' | Sort-Object Name) 
 Write-Host @"
 
 Next:
-  .\test\verify.ps1 -EndToEnd            consume the packed nupkg from a separate document
+  .\tools\Test-Install.ps1               install it for real and compile its help patches
 "@ -ForegroundColor Yellow

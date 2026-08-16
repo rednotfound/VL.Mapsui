@@ -5,6 +5,54 @@ them do not belong here.
 
 ---
 
+## 2026-08-16 — the install path, measured at last
+
+The one assumption on the publishing path that had only ever been reasoned about: **does a
+`<dependency>` in the nuspec actually mean the dependency gets installed?** Specifically
+`VL.NetTopologySuite`, which every geometry help patch needs and which nothing in the working-tree
+setup proves is reachable — `--package-repositories dist;deps;<sibling>\dist` hands vvvv every
+folder we happen to have, and a user has none of them.
+
+Measured with vvvv's own `NuGet.exe`, resolving `VL.Mapsui 0.0.1-alpha` from `dist\feed` into a
+throwaway folder:
+
+```
+ok    Mapsui came along
+ok    Mapsui.Tiling came along
+ok    NetTopologySuite came along
+ok    NetTopologySuite.Features came along
+ok    VL.NetTopologySuite came along        <- the one in question
+ok    Mapsui.Rendering.Skia came along
+      (34 packages in total)
+```
+
+**It works**, and the folder it produces is `<id>.<version>\lib\…` — the same shape as vvvv's own
+`%LOCALAPPDATA%\vvvv\gamma\nugets\`. So the installed folder can be handed straight to
+`--package-repositories`, and the help patches that shipped *inside the package* can be compiled
+against it. A red node in vvvv is an unresolved node, and an unresolved node fails the compile, so
+that is the strongest evidence available short of publishing.
+
+`tools\Test-Install.ps1` does both halves and is what `pack.ps1` now points at. It previously
+pointed at `test\verify.ps1 -EndToEnd` in three places — **a script that does not exist**. A tool
+telling you to run something that was never written is its own small lesson: the instruction was
+plausible, printed on every pack, and had never been followed.
+
+### What it still does not prove
+
+- that the patches **run** — resolution and node existence only; a GUI round is still the check
+- that **nuget.org behaves like a local folder feed** — indexing delay and prerelease resolution
+  rules differ, and that gap can only be closed by publishing
+
+### An ordering constraint that publishing makes irreversible
+
+`VL.Mapsui` declares `<dependency id="VL.NetTopologySuite" version="0.0.1-alpha" />`, and
+VL.NetTopologySuite is **not on nuget.org** (its repository has no tags at all). Publishing
+VL.Mapsui first would put a package on nuget.org that nobody can install — and a version there can
+be unlisted but never deleted. **VL.NetTopologySuite goes first**, and doubles as the cheap test of
+the nuget.org half: it has fewer dependencies and less to go wrong.
+
+---
+
 ## 2026-08-15 — two hundred features from one ForEach, and the yellow pad explained
 
 `HowTo Draw many features.vl` drew three, each costing its own `Landmark.Create` node — which proves
