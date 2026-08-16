@@ -102,7 +102,7 @@ public class LabelStyleTests
             }));
 
         for (int frame = 0; frame < 100; frame++)
-            layer.Update(out _, new[] { feature }, label.Update(vector.Update(), "name"));
+            layer.Update(out _, out _, new[] { feature }, label.Update(vector.Update(), "name"));
 
         Assert.Equal(1, layer.LayersBuilt);
         Assert.Equal(1, label.StylesBuilt);

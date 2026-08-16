@@ -27,6 +27,55 @@ NTS Geometry ──► Feature ──┐           ├──► Map ──► To
 
 ---
 
+## Draw order: two stacks, both ordered, neither indexed
+
+A 2D map is a stack, so what covers what is the medium rather than an edge case. There are **two
+stacking levels here and they are different things**, which the word "layer" hides by meaning both:
+
+```
+Renderer
+  └─ Group                     VL.Skia layers — the whole map is ONE of them
+       ├─ ToSkiaLayer(Map)
+       │    └─ Map.Layers      Mapsui layers — a second stack, inside the map
+       │         ├─ [0] tiles        bottom, drawn first
+       │         └─ [n] data         top, drawn last
+       └─ your own Skia drawing      above the map: legends, readouts, UI
+```
+
+**Neither level has a z-index.** `Mapsui.Layers.ILayer` has thirteen properties and none of them is
+ordering; the string `ZIndex` occurs zero times in `VL.Skia.dll`. Order is position — the index in
+`Map.Layers` inside, the spread or pin order in `Group` outside. Mapsui's layer *groups* are a v5
+feature; 4.1.9 offers `Add`, `Insert(index, …)` and `Move(index, layer)` and nothing more.
+
+**`Cons` is this chain's group node**, which is why there is no `Mapsui.Group`:
+
+```
+VL.Skia:  Group(layers…) ───────────────→ ILayer → Renderer
+here:     Cons(layers…) → Spread<ILayer> → Map   → ToSkiaLayer → ILayer → Group → Renderer
+```
+
+`Group` exists to composite — it has `Debug` and `Enabled` pins and returns a *single* layer so
+groups nest. On this chain the compositor is `Map` itself, and `Cons` supplies the pin group. A
+Mapsui-flavoured `Group` would add nothing; folding the pin group into `Map` would cost the spread,
+and a spread is what lets layers be generated, concatenated in bands, and sorted with `OrderBy`
+when there are many of them.
+
+**The conventional order, bottom to top:** raster → polygon → line → point → labels and
+decoration. Build the spread in those bands and concatenate them; that is the v5 layer group done
+by hand, and it makes the order legible instead of accidental.
+
+**Two things order alone will not do**, both measured on 2026-08-16 (`NOTES.md`):
+
+- **Labels do not float to the top.** A label belongs to a feature's style *inside* a layer, so an
+  upper layer's fill covers a lower layer's labels — label ink went from 28 pixels to 0 with a
+  polygon layer above it. The fix is the one Mapbox uses: a **label-only layer, same features,
+  last in the spread**.
+- **Order does not reduce anything.** Twenty layers all draw whatever the order. `VisibleRange`
+  does — it gives a layer the zoom levels it belongs to, and outside them Mapsui skips it entirely
+  (a hard cut, measured: 91204 pixels inside the range, 0 outside).
+
+---
+
 ## The boundary that matters
 
 **Geometry crosses package lines as NetTopologySuite, never as ours and never as Mapsui's.**

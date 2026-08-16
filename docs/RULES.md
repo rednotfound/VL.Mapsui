@@ -186,6 +186,25 @@ Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
   `UnitType` and finding zero occurrences was good corroboration — but `LabelColumn` scores zero
   there too and works perfectly, because the read happens one assembly along. A zero means *go and
   measure*, and the measurement is the answer.
+- **A mechanism the community proposed and did not adopt is data, not a gap.** A numeric z-index
+  for Skia layers was written up as `GroupOrder`, posted for feedback, and drew one Like and no
+  replies before the thread auto-closed; a second thread asking for the same thing got "would love
+  to see that too!". Twice wished for, never shipped, and no library in the ecosystem sorts layers
+  by a number — they all use pin order or spread order. Building it here would make this package
+  the odd one out for a problem `OrderBy` already solves visibly.
+- **Before adding a node, check whether an existing one already plays that part.** A Mapsui `Group`
+  was nearly built for stacking layers; `Cons` already was it, and `Map` was already the compositor.
+  The way to see it was to draw the two chains side by side rather than to reason about the words.
+- **Look for the mechanism before inventing one.** `SymbolStyle` cannot draw a polygon, so a `Style`
+  pin was added to stack a `VectorStyle` under it. Mapsui already had `ThemeStyle` — style chosen
+  per feature — which is the same shape as OpenLayers' style function, Leaflet's `pointToLayer` and
+  Mapbox GL's layer types. Half an hour of searching would have replaced a day of building the
+  wrong thing. **When a problem is one every library in the field has, the field has an answer, and
+  so probably does the library you are wrapping.**
+- **A fix that adds an artifact is not a fix.** Stacking rescued the polygons and put a second
+  concentric circle on every point, and made `Scale` below 1 mean nothing. It passed its tests: the
+  polygon drew. Nobody had asked "and what does this do to the things that already worked" — which
+  is the question a fix owes, every time.
 - **Derive it instead of asking for it, when the node is already holding the answer.** `LabelStyle`
   needed the label to clear the marker, which looks like an offset pin and is not: the node already
   receives the `SymbolStyle` on its `Style` input, so it can read the scale and work the clearance

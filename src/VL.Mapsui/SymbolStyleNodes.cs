@@ -36,10 +36,24 @@ public enum SymbolShape
 /// What a point looks like on the map: its shape, its size and its colours.
 /// </summary>
 /// <remarks>
-/// **This is the style for points, not an addition to `VectorStyle`.** Mapsui's `SymbolStyle`
-/// *derives from* `VectorStyle` — it inherits `Fill` and `Outline` and adds the shape and the size —
-/// so in a patch it takes `VectorStyle`'s place rather than sitting next to it. It still feeds
-/// `LabelStyle` the same way, and the layer still takes one style.
+/// **This is the style for POINTS, and only for points — measured, after getting it wrong.** The
+/// claim here used to be that `SymbolStyle` takes `VectorStyle`'s place in a chain, since Mapsui's
+/// `SymbolStyle` *derives from* `VectorStyle`. Inheritance said yes and the renderer says no: a
+/// polygon under a `SymbolStyle` draws **0 pixels** where the same polygon under a `VectorStyle`
+/// draws 14884, and where even *no style at all* manages 956. Mapsui's Skia renderer dispatches on
+/// the style's runtime type rather than on what it inherits, and a raw `Mapsui.Styles.SymbolStyle`
+/// behaves the same way, so this is the library's shape and not something we set (2026-08-16).
+///
+/// **A map holding more than points therefore needs `StyleByGeometry`**, which hands each feature
+/// the style for its own kind of geometry: this into `Point`, a `VectorStyle` into `Polygon` and
+/// `Line`. That is how OpenLayers, Mapbox GL, Leaflet and QGIS all do it, and Mapsui's
+/// `ThemeStyle` is the mechanism underneath.
+///
+/// **Stacking a `VectorStyle` under this one is not the answer, though it looks like one.** It was
+/// tried for an afternoon: the polygon comes back, and every point gets two concentric circles,
+/// because a `VectorStyle` draws its own 32-pixel marker there as well. `Scale` below 1 then
+/// shrinks nothing — 0.6 measured 22 pixels across alone and 34 with a `VectorStyle` behind it,
+/// which is simply the default. Dispatch, do not stack.
 ///
 /// **Without it a point is still drawn — as a ring.** Mapsui's point renderer falls back to a
 /// default symbol, so nothing is invisible, but measured 2026-08-16 that fallback covers **180

@@ -48,7 +48,7 @@ public class PickTests
     public void A_pick_over_a_shape_returns_it_with_its_attributes()
     {
         using var layerNode = new FeatureLayerNode();
-        var layer = layerNode.Update(out _, new[] { Square("probe") })!;
+        var layer = layerNode.Update(out _, out _, new[] { Square("probe") })!;
 
         var (_, map) = MapOver(layer);
         var pick = new PickNode();
@@ -65,7 +65,7 @@ public class PickTests
     public void A_pick_over_nothing_returns_nothing()
     {
         using var layerNode = new FeatureLayerNode();
-        var layer = layerNode.Update(out _, new[] { Square("probe") })!;
+        var layer = layerNode.Update(out _, out _, new[] { Square("probe") })!;
 
         var (_, map) = MapOver(layer);
         var pick = new PickNode();
@@ -90,7 +90,7 @@ public class PickTests
     public void A_layer_that_did_not_opt_in_is_never_hit()
     {
         using var layerNode = new FeatureLayerNode();
-        var layer = (MemoryLayer)layerNode.Update(out _, new[] { Square("probe") })!;
+        var layer = (MemoryLayer)layerNode.Update(out _, out _, new[] { Square("probe") })!;
 
         layer.IsMapInfoLayer = false;      // what Mapsui's own default would have left it as
 
@@ -107,7 +107,7 @@ public class PickTests
     public void What_comes_back_is_in_the_coordinates_that_went_in()
     {
         using var layerNode = new FeatureLayerNode();
-        var layer = layerNode.Update(out _, new[] { Square("probe") })!;
+        var layer = layerNode.Update(out _, out _, new[] { Square("probe") })!;
 
         var (_, map) = MapOver(layer);
         var pick = new PickNode();
@@ -126,8 +126,8 @@ public class PickTests
         using var lowerNode = new FeatureLayerNode();
         using var upperNode = new FeatureLayerNode();
 
-        var lower = lowerNode.Update(out _, new[] { Square("big", 0.5) }, name: "lower")!;
-        var upper = upperNode.Update(out _, new[] { Square("small", 0.1) }, name: "upper")!;
+        var lower = lowerNode.Update(out _, out _, new[] { Square("big", 0.5) }, name: "lower")!;
+        var upper = upperNode.Update(out _, out _, new[] { Square("small", 0.1) }, name: "upper")!;
 
         var mapNode = new MapNode();
         var map = mapNode.Update(new[] { lower, upper });
@@ -155,7 +155,7 @@ public class PickTests
         for (var frame = 0; frame < 100; frame++)
         {
             // Fresh feature objects every frame, which is what a patch actually does.
-            var layer = layerNode.Update(out _, new[] { Square("probe") })!;
+            var layer = layerNode.Update(out _, out _, new[] { Square("probe") })!;
             map = mapNode.Update(new[] { layer });
             map.Navigator.SetSize(400, 400);
             map.Navigator.CenterOn(0, 0);
@@ -174,7 +174,7 @@ public class PickTests
     public void Before_the_first_frame_a_pick_says_so_rather_than_missing()
     {
         using var layerNode = new FeatureLayerNode();
-        var layer = layerNode.Update(out _, new[] { Square("probe") })!;
+        var layer = layerNode.Update(out _, out _, new[] { Square("probe") })!;
 
         var mapNode = new MapNode();
         var map = mapNode.Update(new[] { layer });   // never sized: nothing has been drawn
@@ -191,7 +191,7 @@ public class PickTests
     public void Screen_to_world_answers_where_there_is_no_feature()
     {
         using var layerNode = new FeatureLayerNode();
-        var layer = layerNode.Update(out _, new[] { Square("probe") })!;
+        var layer = layerNode.Update(out _, out _, new[] { Square("probe") })!;
         var (_, map) = MapOver(layer);
 
         ProjectNodes.ScreenToWorld(map, out var longitude, out var latitude, 5, 5);
@@ -206,7 +206,7 @@ public class PickTests
     public void Screen_and_world_are_inverses_of_each_other()
     {
         using var layerNode = new FeatureLayerNode();
-        var layer = layerNode.Update(out _, new[] { Square("probe") })!;
+        var layer = layerNode.Update(out _, out _, new[] { Square("probe") })!;
         var (_, map) = MapOver(layer);
 
         ProjectNodes.ScreenToWorld(map, out var longitude, out var latitude, 137, 251);

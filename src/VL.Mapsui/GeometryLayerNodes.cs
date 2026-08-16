@@ -79,7 +79,11 @@ public class GeometryLayerNode : IDisposable
             _geometries = incoming;
         }
 
-        return _layer.Update(out layersBuilt, _features, _style.Update(fillColor, lineColor, lineWidth), name: "Geometry");
+        // Status is swallowed here on purpose: this node only ever draws geometry the patch handed
+        // it as geometry, with a VectorStyle it built itself, so the mixed-style warning cannot
+        // apply. Exposing it would be a pin that always says the same thing.
+        return _layer.Update(out layersBuilt, out _, _features,
+            _style.Update(fillColor, lineColor, lineWidth), name: "Geometry");
     }
 
     /// <summary>

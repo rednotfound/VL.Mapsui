@@ -9,7 +9,11 @@ using GeometryFeature = global::Mapsui.Nts.GeometryFeature;
 using MapsuiFeature = global::Mapsui.IFeature;
 using IStyle = global::Mapsui.Styles.IStyle;
 using NtsFeature = NetTopologySuite.Features.Feature;
+using NtsGeometry = NetTopologySuite.Geometries.Geometry;
 using IAttributesTable = NetTopologySuite.Features.IAttributesTable;
+using MapsuiSymbolStyle = global::Mapsui.Styles.SymbolStyle;
+using MapsuiVectorStyle = global::Mapsui.Styles.VectorStyle;
+using StyleCollection = global::Mapsui.Styles.StyleCollection;
 
 namespace VL.Mapsui;
 
@@ -64,6 +68,7 @@ public class FeatureLayerNode : IDisposable
     /// </remarks>
     public ILayer? Update(
         out int layersBuilt,
+        out string status,
         IEnumerable<NtsFeature>? features = null,
         IStyle? style = null,
         bool enabled = true,
@@ -71,6 +76,8 @@ public class FeatureLayerNode : IDisposable
     {
         var incoming = features?.Where(f => f?.Geometry is not null).ToArray() ?? Array.Empty<NtsFeature>();
         var wanted = style ?? Styles.Default;
+
+        status = Describe(incoming, wanted);
 
         if (incoming.Length == 0)
         {
@@ -174,6 +181,96 @@ public class FeatureLayerNode : IDisposable
     /// an <c>AttributesTable</c>. Neither is the other's, so they are copied one name at a time —
     /// read off the assemblies rather than from an example, since Mapsui ships no XML docs.
     /// </remarks>
+    /// <summary>
+    /// What the layer holds, and — the reason this pin exists — <b>what of it will not be drawn</b>.
+    /// </summary>
+    /// <remarks>
+    /// This node is the only place that sees the features and the style at the same time, which
+    /// makes it the only place that can notice a combination guaranteeing an empty screen. Mapsui's
+    /// renderer dispatches on the style's runtime type: a `SymbolStyle` draws points and refuses
+    /// polygons and lines outright — 0 pixels, measured 2026-08-16, no exception and nothing in any
+    /// log. A whole GeoJSON file's worth of shapes can go missing this way while every other
+    /// readout in the patch says the data arrived, which is exactly what happened the first time
+    /// these three packages were joined.
+    ///
+    /// A `SymbolStyle` with a `VectorStyle` beside it in the same collection is fine, because the
+    /// polygon renderer finds the second one. So the check is not "is there a SymbolStyle" but
+    /// "is there a SymbolStyle and nothing else that can draw a shape".
+    /// </remarks>
+    static string Describe(NtsFeature[] features, IStyle style)
+    {
+        if (features.Length == 0) return "nothing connected";
+
+        var shapes = features.Count(f => f.Geometry is not null && !IsPointLike(f.Geometry));
+        var plural = features.Length == 1 ? "feature" : "features";
+
+        // A bare SymbolStyle over anything but points: the shapes are simply absent.
+        if (shapes > 0 && DrawsPointsOnly(style))
+            return $"{features.Length} {plural}, but {shapes} of them are not points and a "
+                 + "SymbolStyle draws NOTHING for those. Use StyleByGeometry.";
+
+        // A StyleByGeometry with a pin nobody wired does the same thing one level up, and Mapsui
+        // does not object to it either - measured 2026-08-16, a null from GetStyle draws 0 pixels
+        // and throws nothing. Naming the empty pin is the difference between a minute and an hour.
+        if (FindTheme(style) is { } theme)
+        {
+            var missing = features
+                .Where(f => f.Geometry is not null && !theme.CanDraw(f.Geometry))
+                .GroupBy(f => GeometryTheme.Name(f.Geometry))
+                .Select(g => $"{g.Count()} {(g.Count() == 1 ? "feature needs" : "features need")} StyleByGeometry's {g.Key} pin")
+                .ToArray();
+
+            if (missing.Length > 0)
+                return $"{features.Length} {plural}, but nothing is wired for some: {string.Join("; ", missing)}.";
+        }
+
+        return $"{features.Length} {plural}";
+    }
+
+    /// <summary>The geometry theme in a style, however deeply a LabelStyle has wrapped it.</summary>
+    static GeometryTheme? FindTheme(IStyle style)
+    {
+        switch (style)
+        {
+            case GeometryTheme theme:
+                return theme;
+            case StyleCollection collection:
+                foreach (var inner in collection.Styles)
+                    if (FindTheme(inner) is { } found) return found;
+                return null;
+            default:
+                return null;
+        }
+    }
+
+    static bool IsPointLike(NtsGeometry geometry)
+        => geometry is NetTopologySuite.Geometries.Point or NetTopologySuite.Geometries.MultiPoint;
+
+    /// <summary>A SymbolStyle somewhere, and nothing alongside it that can draw a shape.</summary>
+    static bool DrawsPointsOnly(IStyle style)
+    {
+        var symbol = false;
+        var other = false;
+        Walk(style);
+        return symbol && !other;
+
+        void Walk(IStyle s)
+        {
+            switch (s)
+            {
+                case MapsuiSymbolStyle:
+                    symbol = true;
+                    break;
+                case MapsuiVectorStyle:          // a plain one - SymbolStyle is caught above
+                    other = true;
+                    break;
+                case StyleCollection collection:
+                    foreach (var inner in collection.Styles) Walk(inner);
+                    break;
+            }
+        }
+    }
+
     internal static MapsuiFeature ToMapsui(NtsFeature feature)
     {
         var converted = new GeometryFeature(GeometryLayerNode.ToMercator(feature.Geometry));

@@ -41,6 +41,39 @@ here at least once.
 **A cleanup pass needs the same validation as an edit pass.** Deleting elements creates dangling
 references of its own.
 
+### Write multi-step edits into a script FILE, never an inline command block
+
+On 2026-08-16 a here-string terminator was followed by an argument on the same line:
+
+```powershell
+$t = Swap $t $anchor @'
+   …replacement XML…
+'@ 'what this step does'          # <-- the terminator is not alone on its line
+```
+
+PowerShell did not error. It swallowed **the rest of the script as here-string content** and wrote
+it into the `.vl`, so the patch ended up containing lines of PowerShell source. Then:
+
+- the **XML still parsed** — it landed inside element content;
+- **`vvvvc` compiled it**, exit 0, no warning;
+- only `tools\Test-VLPackage.ps1` objected, and only because the swallowed text happened to repeat
+  an id: *"uses Id UX2Q4zuDSJ3FicIQjybU4g 3 times"*.
+
+Two rules from it. **Put the edit in a `.ps1` under the scratchpad and run the file** — a real file
+gets parsed as a whole before anything executes, so this failure becomes a syntax error instead of
+a corrupted patch. And **assign every here-string to a variable first**, so the terminator is
+always alone on its line:
+
+```powershell
+$replacement = @'
+   …replacement XML…
+'@
+$t = Swap $t $anchor $replacement 'what this step does'
+```
+
+The corrupted file was deleted and rebuilt from the donor rather than repaired: it was twenty
+minutes old, and "excise the damage" needs to know the extent of the damage.
+
 ---
 
 ## Skeleton

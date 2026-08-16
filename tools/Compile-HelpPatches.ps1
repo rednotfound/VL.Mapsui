@@ -40,7 +40,10 @@
 #>
 param(
     [string]$OutputDirectory,
-    [string]$Patch = '*'
+    [string]$Patch = '*',
+    # Also compile examples\, which is not packed and needs sibling packages. Off by default so a
+    # plain run still answers "is the PACKAGE sound".
+    [switch]$IncludeExamples
 )
 
 Set-StrictMode -Version Latest
@@ -51,6 +54,10 @@ $Vvvvc    = 'C:\Program Files\vvvv\vvvv_gamma_7.4-win-x64\vvvvc.exe'
 
 # The sibling package that MAKES geometry. Help patches here consume it; this one draws.
 $NtsRepo  = 'D:\2026_Projects\vl-nettopologysuite'
+
+# The sibling that READS geometry out of a file. Only examples\ needs it - no help patch here may
+# depend on it, because VL.Mapsui's nuspec does not and must not declare it.
+$GeoRepo  = 'D:\2026_Projects\vl-geojson'
 
 if (-not (Test-Path $Vvvvc)) {
     Write-Host "vvvvc not found at $Vvvvc" -ForegroundColor Red
@@ -72,6 +79,8 @@ New-Item -ItemType Directory $OutputDirectory -Force | Out-Null
 $sources = @("    <add key=""mapsui-dist"" value=""$feed"" />")
 $ntsFeed = Join-Path $NtsRepo 'dist\feed'
 if (Test-Path $ntsFeed) { $sources += "    <add key=""nts-dist"" value=""$ntsFeed"" />" }
+$geoFeed = Join-Path $GeoRepo 'dist\feed'
+if (Test-Path $geoFeed) { $sources += "    <add key=""geojson-dist"" value=""$geoFeed"" />" }
 
 @"
 <?xml version="1.0" encoding="utf-8"?>
@@ -84,11 +93,26 @@ $($sources -join "`n")
 
 # (1): package *folders*, not the feed.
 $repositories = @((Join-Path $RepoRoot 'dist'), (Join-Path $RepoRoot 'deps'))
-$ntsDist = Join-Path $NtsRepo 'dist'
-if (Test-Path $ntsDist) { $repositories += $ntsDist }
+foreach ($sibling in @($NtsRepo, $GeoRepo)) {
+    foreach ($sub in @('dist', 'deps')) {
+        $candidate = Join-Path $sibling $sub
+        if (Test-Path $candidate) { $repositories += $candidate }
+    }
+}
 $repositories = ($repositories | Where-Object { Test-Path $_ }) -join ';'
 
-$patches = @(Get-ChildItem (Join-Path $RepoRoot 'help') -Recurse -File -Filter *.vl |
+# help\ by default and nothing else, because help\ IS the packaged surface and that is what a
+# release has to be true of. -IncludeExamples adds examples\, which is not packed and needs
+# packages this repository does not depend on - checking it is worth doing, but never by default:
+# a green run must keep meaning "the package is fine", not "the package plus my sibling checkouts".
+$roots = @(Join-Path $RepoRoot 'help')
+if ($IncludeExamples) {
+    $exampleDir = Join-Path $RepoRoot 'examples'
+    if (Test-Path $exampleDir) { $roots += $exampleDir }
+    else { Write-Host "  (no examples\ folder)" -ForegroundColor DarkGray }
+}
+
+$patches = @($roots | ForEach-Object { Get-ChildItem $_ -Recurse -File -Filter *.vl } |
              Where-Object { $_.BaseName -like $Patch })
 if ($patches.Count -eq 0) {
     Write-Host "no help patch matches '$Patch'" -ForegroundColor Red

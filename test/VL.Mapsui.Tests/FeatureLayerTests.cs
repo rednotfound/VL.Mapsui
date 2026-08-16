@@ -10,6 +10,88 @@ using NtsFeature = NetTopologySuite.Features.Feature;
 namespace VL.Mapsui.Tests;
 
 /// <summary>
+/// The Status pin: the layer is the only node that sees the features and the style together.
+/// </summary>
+public class FeatureLayerStatusTests
+{
+    static NtsFeature Wkt(string wkt) =>
+        new(new NetTopologySuite.IO.WKTReader().Read(wkt), new NetTopologySuite.Features.AttributesTable());
+
+    /// <summary>
+    /// **A SymbolStyle over a polygon is a silent empty screen, and this is where it stops being
+    /// silent.**
+    /// </summary>
+    /// <remarks>
+    /// Mapsui draws nothing for a non-point under a `SymbolStyle` — no exception, no log line, and
+    /// every other readout in the patch still says the data arrived. That is how one polygon went
+    /// missing out of a six-feature GeoJSON file on 2026-08-16 while `Parses` read 1 and
+    /// `Layers Built` read 1 and both were telling the truth.
+    /// </remarks>
+    [Fact]
+    public void A_polygon_under_a_points_only_style_is_reported_rather_than_lost()
+    {
+        var features = new[] { Wkt("POINT (0 0)"), Wkt("POLYGON ((0 0, 1 0, 1 1, 0 0))") };
+
+        new FeatureLayerNode().Update(out _, out var pointsOnly, features, new SymbolStyleNode().Update());
+        Assert.Contains("SymbolStyle", pointsOnly);
+        Assert.Contains("StyleByGeometry", pointsOnly);
+
+        // Dispatching by geometry type is the fix, so there is nothing left to say.
+        var theme = new StyleByGeometryNode().Update(
+            point: new SymbolStyleNode().Update(), polygon: new VectorStyleNode().Update());
+        new FeatureLayerNode().Update(out _, out var dispatched, features, theme);
+        Assert.Equal("2 features", dispatched);
+
+        // Points only: a SymbolStyle is exactly right and must not be nagged about.
+        new FeatureLayerNode().Update(out _, out var allPoints, new[] { Wkt("POINT (0 0)") },
+            new SymbolStyleNode().Update());
+        Assert.Equal("1 feature", allPoints);
+    }
+
+    /// <summary>
+    /// **A pin nobody wired is the same disappearance one level up, and is named the same way.**
+    /// </summary>
+    /// <remarks>
+    /// `StyleByGeometry` returning null for a geometry type draws nothing and throws nothing —
+    /// measured 2026-08-16. So a patch that styles points and forgets polygons looks exactly like a
+    /// patch whose polygons failed to load, and the status line is the only thing that can tell the
+    /// author which it is. It names the pin, because "wire the Polygon pin" is an instruction and
+    /// "some features are missing" is not.
+    /// </remarks>
+    [Fact]
+    public void An_unwired_geometry_pin_is_reported_by_name()
+    {
+        var pointsOnly = new StyleByGeometryNode().Update(point: new SymbolStyleNode().Update());
+
+        new FeatureLayerNode().Update(out _, out var status,
+            new[] { Wkt("POINT (0 0)"), Wkt("POLYGON ((0 0, 1 0, 1 1, 0 0))") }, pointsOnly);
+
+        Assert.Contains("Polygon pin", status);
+        Assert.Contains("1 feature needs", status);
+    }
+
+    /// <summary>A LabelStyle wrapping the theme must not hide it from the check.</summary>
+    [Fact]
+    public void The_label_in_the_chain_does_not_hide_the_theme()
+    {
+        var theme = new StyleByGeometryNode().Update(point: new SymbolStyleNode().Update());
+        var chain = new LabelStyleNode().Update(theme, "name");
+
+        new FeatureLayerNode().Update(out _, out var status,
+            new[] { Wkt("POLYGON ((0 0, 1 0, 1 1, 0 0))") }, chain);
+
+        Assert.Contains("Polygon pin", status);
+    }
+
+    [Fact]
+    public void Nothing_connected_says_so()
+    {
+        new FeatureLayerNode().Update(out _, out var status, null, null);
+        Assert.Equal("nothing connected", status);
+    }
+}
+
+/// <summary>
 /// Geometry, style and layer as three things instead of one, and the seams between them.
 /// </summary>
 /// <remarks>
@@ -126,7 +208,7 @@ public class FeatureLayerTests
         var features = new[] { At(0, 0), At(1, 1) };
 
         for (int frame = 0; frame < 100; frame++)
-            layer.Update(out _, features, style.Update());
+            layer.Update(out _, out _, features, style.Update());
 
         Assert.Equal(1, layer.LayersBuilt);
     }
@@ -141,15 +223,15 @@ public class FeatureLayerTests
         using var node = new FeatureLayerNode();
         var features = new[] { At(0, 0) };
 
-        var on = node.Update(out _, features, enabled: true);
-        var off = node.Update(out _, features, enabled: false);
+        var on = node.Update(out _, out _, features, enabled: true);
+        var off = node.Update(out _, out _, features, enabled: false);
 
         Assert.Same(on, off);
         Assert.False(off!.Enabled);
         Assert.Equal(1, node.LayersBuilt);
         Assert.Equal(1, node.FeatureSetsBuilt);
 
-        Assert.True(node.Update(out _, features, enabled: true)!.Enabled);
+        Assert.True(node.Update(out _, out _, features, enabled: true)!.Enabled);
         Assert.Equal(1, node.FeatureSetsBuilt);   // nothing was rebuilt on the way back
     }
 
@@ -159,8 +241,8 @@ public class FeatureLayerTests
         // So a Map can be wired up before there is anything to draw.
         using var node = new FeatureLayerNode();
 
-        Assert.Null(node.Update(out _, Array.Empty<NtsFeature>()));
-        Assert.Null(node.Update(out _, null));
+        Assert.Null(node.Update(out _, out _, Array.Empty<NtsFeature>()));
+        Assert.Null(node.Update(out _, out _, null));
     }
 
     [Fact]
@@ -169,7 +251,7 @@ public class FeatureLayerTests
         // Good defaults are public API: a feature layer with nothing but features must be visible.
         using var node = new FeatureLayerNode();
 
-        var layer = node.Update(out _, new[] { At(0, 0) });
+        var layer = node.Update(out _, out _, new[] { At(0, 0) });
 
         Assert.NotNull(layer);
         Assert.NotNull(((global::Mapsui.Layers.MemoryLayer)layer!).Style);
@@ -184,8 +266,8 @@ public class FeatureLayerTests
         var first = new[] { At(0, 0) };
         var second = new[] { At(0, 0), At(1, 1) };
 
-        for (int frame = 0; frame < 10; frame++) node.Update(out _, first);
-        for (int frame = 0; frame < 10; frame++) node.Update(out _, second);
+        for (int frame = 0; frame < 10; frame++) node.Update(out _, out _, first);
+        for (int frame = 0; frame < 10; frame++) node.Update(out _, out _, second);
 
         Assert.Equal(1, node.LayersBuilt);
         Assert.Equal(2, node.FeatureSetsBuilt);
@@ -213,7 +295,7 @@ public class FeatureLayerTests
             // Exactly what the patch computes per frame: a fresh geometry, a fresh feature.
             var geometry = Factory.CreatePoint(new Coordinate(139.7671, 35.6812));
             var feature = FeatureNodes.Feature(geometry);
-            layer.Update(out _, new[] { feature }, style.Update());
+            layer.Update(out _, out _, new[] { feature }, style.Update());
         }
 
         Assert.Equal(1, layer.LayersBuilt);
@@ -233,8 +315,8 @@ public class FeatureLayerTests
         var style = new VectorStyleNode();
         using var node = new FeatureLayerNode();
 
-        var first = node.Update(out _, new[] { At(0, 0) }, style.Update());
-        var second = node.Update(out _, new[] { At(0, 0) }, style.Update());
+        var first = node.Update(out _, out _, new[] { At(0, 0) }, style.Update());
+        var second = node.Update(out _, out _, new[] { At(0, 0) }, style.Update());
 
         Assert.Same(first, second);
     }
@@ -257,7 +339,7 @@ public class FeatureLayerTests
         using var layer = new FeatureLayerNode();
 
         for (int frame = 0; frame < 60; frame++)
-            layer.Update(out _, features, style.Update());
+            layer.Update(out _, out _, features, style.Update());
 
         Assert.Equal(1, layer.LayersBuilt);
         Assert.Equal(1, style.StylesBuilt);

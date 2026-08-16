@@ -24,7 +24,7 @@ public class FrameTests
     {
         var node = new FeatureLayerNode();
         var feature = FeatureNodes.Feature(Factory.CreatePoint(new Coordinate(lon, lat)));
-        return node.Update(out _, new[] { feature })!;
+        return node.Update(out _, out _, new[] { feature })!;
     }
 
     [Fact]

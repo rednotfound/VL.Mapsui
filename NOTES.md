@@ -5,6 +5,300 @@ them do not belong here.
 
 ---
 
+## 2026-08-16 — draw order, and the node that was not built
+
+A 2D map is a stack, so occlusion is the medium rather than an edge case. The question was what
+this package should offer for it, and the answer turned out to be **nothing new** — plus one node
+about something else entirely.
+
+### There is no z-index anywhere, at either level
+
+| | mechanism |
+|---|---|
+| `Mapsui.Layers.ILayer` | 13 properties, **not one of them ordering** |
+| `LayerCollection` (4.1.9) | `Add`, `Insert(index, …)`, `Move(index, layer)`. Layer **groups are v5** |
+| `VL.Skia.dll` | the string `ZIndex` occurs **0 times** |
+| `VL.Skia.Group` | variadic pin group — order is pin order |
+| `VL.Skia.Group (Spectral)` | one spread — order is spread order |
+| `VL.LayerX.Stacker (PinGroup)` / `Stacker` | the same pair again |
+
+**The numeric ordering people remember is real, and it never shipped.** A community `GroupOrder` —
+"a wrapper over Group that sorts layers on the basis of their z-index, 0 if not defined" — was
+posted for feedback, got one Like and no replies, and auto-closed a year later. Another thread
+asking for Skia layer ordering drew "would love to see that too!". Twice wished for, never adopted.
+
+### Two stacking levels, and `Cons` is already the group node
+
+```
+Renderer
+  └─ Group                     VL.Skia layers - the map is ONE of them
+       ├─ ToSkiaLayer(Map)
+       │    └─ Map.Layers      Mapsui layers - a second stack, inside
+       │         ├─ [0] tiles        bottom
+       │         └─ [n] data         top
+       └─ your own Skia drawing      above the map
+```
+
+The first instinct was a pin group on `Map.Layers`, so it would look like `Group`. **That was the
+weaker idea and the user said so.** The analogy shows why:
+
+```
+VL.Skia:  Group(layers…) ───────────────→ ILayer → Renderer
+here:     Cons(layers…) → Spread<ILayer> → Map   → ToSkiaLayer → ILayer → Group → Renderer
+```
+
+`Group` exists to *composite* — `Debug` and `Enabled` pins, and it returns a **single** layer so
+groups nest. On this chain the compositor is **`Map` itself**, and `Cons` is already playing the
+pin-group half. So a Mapsui `Group` node would do nothing `Cons` does not, and folding the pin
+group into `Map` would cost the **spread** — which is the half that matters when layers are
+generated, concatenated in bands, or sorted. A numeric z-index would be inventing a mechanism the
+field does not use; VL has `OrderBy`, and one visible sorting node beats an ordering hidden inside
+a compositor.
+
+**No stacking node was built. The looking is the result.**
+
+### Three measurements that were overdue
+
+**An upper layer buries a lower layer's labels.** Label ink, counted as black pixels:
+
+| | drawn | label ink |
+|---|---|---|
+| labelled point alone | 1088 px | **28** |
+| the same point with a polygon layer **above** it | 91204 px | **0** |
+| the same point **above** the polygon layer | 91204 px | 28 |
+
+Confirmed, and structural: Mapsui draws layer by layer, and a label is part of a *feature's style
+inside a layer* rather than a layer of its own. So "labels on top", which every cartography text
+states as a rule, is not something layer order gives you for free. The fix is Mapbox's: **a
+label-only layer, same features, last in the spread.**
+
+**`MinVisible` / `MaxVisible` are honoured, and they are a hard cut.** They read exactly like dead
+properties — `get_MinVisible` occurs **zero times** in `Mapsui.Rendering.Skia.dll`, the same
+reading as `LabelColumn` (works) and `UnitType` (dead). Rendered instead:
+
+| resolution | with MinVisible 0.5, MaxVisible 2.0 | with no range |
+|---|---|---|
+| 0.25 | **0 px** | 160000 px |
+| 1.0 | 91204 px | 91204 px |
+| 4.0 | **0 px** | 6084 px |
+
+**A disabled layer draws nothing**, and `get_Enabled` *does* appear in the Skia renderer, so it is
+checked there rather than one assembly along.
+
+### `VisibleRange`, which is the actual answer to "many layers"
+
+Order decides what covers what; it does not reduce anything. A layer that should not be drawn at
+this zoom is the only thing that does, and it is what every GIS uses. Three inputs — `Layer`,
+`From Zoom`, `To Zoom` — returning **the same layer instance**, so it chains as
+`FeatureLayer → VisibleRange → Cons` and rebuilds nothing.
+
+Three things shaped it, all found by reading before writing:
+
+- **`MinVisible`/`MaxVisible` are read-only on `ILayer`** and settable only on `BaseLayer`. The node
+  casts, and says so on `Status` when it cannot — rather than accepting a range and ignoring it.
+- **Zoom and resolution run in opposite directions**, so `From Zoom` sets `MaxVisible` and `To Zoom`
+  sets `MinVisible`. That inversion belongs inside a node, not in everyone's patch.
+- **Each end is widened by half a level** (×√2 and ÷√2), so a layer asked for 4 to 8 draws at 4 and
+  at 8 and vanishes at 3 and 9 — measured. Setting the boundary exactly would leave whether the
+  comparison is inclusive as something a patch author discovers by zooming.
+
+A backwards range is refused and reported rather than obeyed: obeying it hides the layer at every
+zoom, which looks exactly like data that failed to load, and getting two inverted pins the wrong
+way round is the predictable mistake.
+
+The resolution ladder comes from BruTile's own `GlobalSphericalMercator` level 0 rather than the
+widely-copied `156543.03392804` literal — the same number, checked against the formula to ten
+decimal places, but taken from the library that also decides which tile a zoom level means.
+
+218 tests. Negative-tested: swapping the two ends inside the node turns three red.
+
+### And a test that was passing on four pixels
+
+The first version of the visibility test used a 300-unit square, which at zoom 4 is smaller than
+one pixel of ground: it drew **4 px** and the assertion `> 0` passed. True, and one antialiasing
+change away from a mystery failure. The square is a thousand kilometres across now and fills the
+viewport at every zoom tested. **A visibility test must fail because the layer is hidden, never
+because the shape got too small to see.**
+
+---
+
+## 2026-08-16 — three packages meet, and the fault is in our style model
+
+`VL.GeoJSON` had never been run against anything. One patch — read a GeoJSON string, draw it —
+joined it to `VL.Mapsui`, and the interesting part is **where the trouble was not**.
+
+### The join itself was correct before it was tested
+
+| | measured |
+|---|---|
+| `Read GeoJSON` returns | `Spread<NetTopologySuite.Features.Feature>` |
+| `FeatureLayer` accepts | `IEnumerable<NetTopologySuite.Features.Feature>` |
+| the link, in the generated C# | `n15.IEnumerable<n14.Feature> Features_30 = (n15.IEnumerable<n14.Feature>)Features_26;` — **`n14` is one alias**, so both packages' `Feature` resolved to one type, and VL inserted the upcast itself |
+| coordinates | GeoJSON is WGS84 by mandate (RFC 7946); `FeatureLayer.ToMapsui` projects WGS84 → mercator. Two packages, one convention, no adapter |
+| frame loop | `Parses` and `Layers Built` both settled at 1 and stayed |
+
+Six features parsed and drew on the first run. **Neither package references the other**; they
+compose because both speak NetTopologySuite, which is a library they share rather than an agreement
+they made. That is the whole design working, and it is worth saying because everything below is
+about what was wrong *on our side of it*.
+
+Worth noting about VL.GeoJSON's own suite: its `InteropTests` **transcribe** VL.Mapsui's signature
+rather than referencing it, and say so in a comment — *"if VL.Mapsui ever changes those signatures,
+these tests keep passing while the real thing breaks."* Honest, and it means this patch was the
+first time the two assemblies were in one process.
+
+### Predictions, scored
+
+Written down before the run, per the plan.
+
+| # | prediction | outcome |
+|---|---|---|
+| 1 | headless compile is green | ✅ and the generated C# proved the link exists |
+| 2 | `Read GeoJSON` fails in vvvv with a status that reads like a parse error | ❌ **wrong twice over** |
+| 3 | moving `NetTopologySuite.Features 2.0.0` aside fixes it | ⬜ never needed |
+| 4 | `System.Text.Json` conflicts | ⬜ did not happen |
+
+Prediction 2 was wrong in both halves and both are worth keeping. **The status would not have
+misled**: `Defaults.Describe` prints `$"{exception.GetType().Name}: {exception.Message}"`, so a
+loader fault would have named `TypeLoadException` first. VL.GeoJSON got that right and I assumed it
+had not. **And the failure never happened at all** — see below.
+
+### The landmine that did not fire, because I defused it while predicting it would
+
+`%LOCALAPPDATA%\vvvv\gamma\nugets\` holds `NetTopologySuite.Features` **2.0.0**; all three packages
+declare **2.1.0**. 2.1.0 differs by addition only — `FeatureExtensions.GetOptionalId` and `IUnique`
+— and a metadata scan finds both names referenced by `NetTopologySuite.IO.GeoJSON4STJ 4.0.0` *and*
+by `VL.GeoJSON.dll`. Every feature in `cities.geojson` carries an `id`, which is the path that uses
+them.
+
+Reproduced offline in seconds, one variable:
+
+```
+NTS.Features 2.0.0 -> TypeLoadException: Could not load type 'NetTopologySuite.Features.IUnique'
+NTS.Features 2.1.0 -> 6 features, SRID 4326, attributes intact
+```
+
+**And then it did not happen in vvvv**, because `tools\Open-HelpPatch.ps1` passes
+`vl-geojson\deps` as a package repository and that folder holds 2.1.0. I wrote the launcher and the
+prediction in the same session and did not notice one disarmed the other.
+
+That refines a line in `CLAUDE.md` rather than contradicting it: the flat folder wins over *a copy
+sitting next to an assembly*; **an explicitly passed `--package-repositories` folder wins over the
+flat folder.** Whether a real install — which has no `deps\` — hits it is still unmeasured, and is
+the one experiment left over from this round.
+
+**Where the 2.0.0 came from, since "why are we still affected by VL.GIS" deserved an answer rather
+than a shrug:** `VL.GIS.nuspec` declares `NetTopologySuite.IO.GeoJSON 3.0.0`, whose own nuspec
+requires `NetTopologySuite.Features [2.0.0, 3.0.0-A)`. **NuGet takes the floor of a range**, so
+2.0.0 was installed — machine-wide, on 2026-02-28 22:05:57, in the same second as ProjNET, SQLite,
+Newtonsoft 9 and System.Reactive. The sharp detail: `NetTopologySuite` has the *same* range and
+resolved to 2.6.0, because something else asked for 2.6.0 explicitly. Nobody asked for a
+`NetTopologySuite.Features` version, so it got the floor. **One missing explicit declaration, five
+months of consequences, and uninstalling never touches it** because the folder lives in the user
+profile.
+
+### The real bug: `SymbolStyle` erases everything that is not a point
+
+Five cities drew. The one polygon in the file did not, silently.
+
+| polygon under | pixels |
+|---|---|
+| `VectorStyle` | 14884 |
+| **`SymbolStyle`** | **0** |
+| no style at all | 956 |
+
+It draws *less than nothing*. A raw `Mapsui.Styles.SymbolStyle` behaves identically, so the
+renderer dispatches on the style's runtime type and `SymbolStyle : VectorStyle` does not help. Our
+own documentation had said the opposite — *"it takes VectorStyle's place in the chain"* — reasoned
+from the inheritance and never rendered against a polygon.
+
+### The wrong turn, and what it looked like on screen
+
+The first fix was a `Style` input on `SymbolStyle`, stacking a `VectorStyle` underneath so the
+polygon renderer would find one. The polygon came back. So did an artifact the user spotted
+immediately: **a second circle on every point.**
+
+| Scale | symbol alone | with a VectorStyle behind it |
+|---|---|---|
+| **0.6** | 22 px wide | **34 px wide** |
+| 1 | 34 px | 34 px |
+| 2 | 68 px | 68 px |
+
+A `VectorStyle` draws its own 32-pixel marker on a point. Two concentric circles in one colour, and
+a `Scale` pin that had stopped meaning anything below 1. The user's objection was the correct one
+and it was the industry's: **points get a point style, lines get a line style, polygons get a fill.
+You dispatch; you do not stack.**
+
+**Searched rather than assumed**, and not one of them stacks:
+
+| | mechanism |
+|---|---|
+| OpenLayers | a style function returning `styles[feature.getGeometry().getType()]` |
+| Mapbox GL / MapLibre | separate layer *types* — `circle`, `line`, `fill`, `symbol` |
+| Leaflet | `pointToLayer` for points, `style` for the rest |
+| QGIS / ArcGIS | a layer is single-geometry-type; the renderer hangs off the layer |
+| **Mapsui** | `Mapsui.Styles.Thematics.ThemeStyle(Func<IFeature, IStyle>)` |
+
+Mapsui had the OpenLayers shape all along. I invented a worse mechanism without looking for the
+one that existed.
+
+### `ThemeStyle`, measured before anything was built on it
+
+`ThemeStyle` appears **zero times** in `Mapsui.Rendering.Skia.dll` — the same reading as
+`LabelColumn`, which works, and as `UnitType`, which is dead. The scan cannot tell those apart, so
+it was rendered:
+
+| | via `ThemeStyle` | the style used directly |
+|---|---|---|
+| POINT | 352 px, 22 px wide | 352 px, 22 px wide |
+| LINESTRING | 802 px | 802 px |
+| POLYGON | 14884 px | 14884 px |
+
+Identical in every case. Also settled in the same pass: **a `null` from `GetStyle` draws nothing and
+throws nothing** — a silent disappearance, which is why `FeatureLayer`'s `Status` now names an
+unwired pin.
+
+So `StyleByGeometry` wraps it. Two implementation facts worth carrying:
+
+- **`ThemeStyle.GetStyle` cannot be overridden.** Reflection reports it `IsVirtual = true`, which
+  is only how an interface implementation looks; the compiler says `CS0506`. The dispatch goes to
+  the base constructor as a function over the *parameters*, since C# forbids `this` in a
+  base-constructor argument.
+- **`GeometryTheme` carries its three styles as properties as well as using them.** A `ThemeStyle`
+  is a function and therefore opaque, but `LabelStyle` has to find the marker to lift a label clear
+  of it, and `FeatureLayer` has to know what cannot be drawn. Neither has a feature to call the
+  function with.
+
+### And a latent bug found on the way: a nested `StyleCollection` draws nothing
+
+`VectorStyle → SymbolStyle → LabelStyle` is three styles and two combining nodes, which nests one
+collection inside another. Mapsui walks a collection's members and does not recurse:
+
+| | polygon |
+|---|---|
+| flat `{ Vector, Symbol }` | 14884 px |
+| nested `{ { Vector, Symbol }, Label }` | **156 px** — the label text and none of the shape |
+
+`Styles.Combine` splices instead of wrapping. **This could not have appeared while chains were two
+nodes long**, and the chain that found it has since been replaced — which is exactly why the test
+stays: the next person to add a fourth style node gets a red test instead of a blank screen.
+
+### Score for the round
+
+Two nodes gained a job, one lost one it never should have had:
+
+- **`StyleByGeometry`** — new, three pins, one style per geometry type
+- **`FeatureLayer.Status`** — new output pin. It is the only node that sees the features and the
+  style at once, so it is the only one that can say "1 feature needs StyleByGeometry's Polygon pin"
+  or "a SymbolStyle draws NOTHING for those"
+- **`SymbolStyle`** — the `Style` pin added and removed within the day; back to four inputs and to
+  saying plainly that it is for points
+
+212 tests. Negative-tested: making the theme return the point style for every geometry turns two
+red; reverting `Styles.Combine` to nesting turns another one red.
+
+---
+
 ## 2026-08-16 — the label steps aside, and the node already knew how far
 
 With the white box gone the markers came back, and the label was still sitting **on top of the

@@ -180,19 +180,31 @@ foreach ($package in $Packages) {
     Write-Host ''
 }
 
-# 10. help patches -----------------------------------------------------------
-# These are shipped documents too -- each nuspec packs help\<Package>\**\*.vl straight out of the
-# repo -- so they carry the same load-silently-fail risks as an entry point itself.
+# 10. help patches, and the examples that are not packed ----------------------
+# help\ patches are shipped documents -- each nuspec packs help\<Package>\**\*.vl straight out of
+# the repo -- so they carry the same load-silently-fail risks as an entry point itself.
+#
+# examples\ is NOT packed and must not be: a patch there may need packages this one does not
+# depend on, which is the whole reason the folder exists (Example GeoJSON on a map.vl needs
+# VL.GeoJSON, and VL.Mapsui neither declares nor should declare it). It is checked here all the
+# same. A hand-authored .vl breaks the same way wherever it lives, and an example nobody
+# validates is an example that rots quietly - it is not even covered by a default help compile.
 $helpDir = Join-Path $RepoRoot 'help'
+$exampleDir = Join-Path $RepoRoot 'examples'
 # The @() must wrap the whole if-expression: PowerShell unwraps a single-element array on
 # the way out of one, and StrictMode then throws on .Count. Same trap as Get-Child above.
 $helpDocs = @(if (Test-Path $helpDir) { Get-ChildItem $helpDir -File -Recurse -Filter *.vl })
+$exampleDocs = @(if (Test-Path $exampleDir) { Get-ChildItem $exampleDir -File -Recurse -Filter *.vl })
 
-foreach ($helpDoc in $helpDocs) {
+foreach ($helpDoc in @($helpDocs) + @($exampleDocs)) {
+    # The label is what every message below is prefixed with, so a failure says which folder it
+    # is in. Derived from the path rather than passed alongside, because the two lists are
+    # otherwise treated identically and a parallel array would be one more thing to keep in step.
     $name = $helpDoc.Name
+    $label = if ($helpDoc.FullName.StartsWith($exampleDir, [StringComparison]::OrdinalIgnoreCase)) { "examples\$name" } else { "help\$name" }
     $head = Get-Content $helpDoc.FullName -AsByteStream -TotalCount 3
     if ($head.Count -lt 3 -or $head[0] -ne 0xEF -or $head[1] -ne 0xBB -or $head[2] -ne 0xBF) {
-        Fail "help\$name has no UTF-8 BOM."
+        Fail "$label has no UTF-8 BOM."
     }
 
     $helpRaw = Get-Content $helpDoc.FullName -Raw
@@ -200,7 +212,7 @@ foreach ($helpDoc in $helpDocs) {
     # A ProjectDependency points at a .csproj that is not in the package, and forces
     # everything downstream to stay editable. It belongs only in test\DevLoop.vl.
     if ($helpRaw -match '<ProjectDependency\b') {
-        Fail "help\$name contains a <ProjectDependency>. Shipped documents must not reference a .csproj."
+        Fail "$label contains a <ProjectDependency>. Shipped documents must not reference a .csproj."
     }
 
     # Every dependency on a package from this repository must be the 0.0.0 sentinel, not
@@ -211,11 +223,11 @@ foreach ($helpDoc in $helpDocs) {
         Where-Object { $_.Groups[1].Value -in $localNames })
 
     if ($pins.Count -eq 0) {
-        Fail "help\$name declares no dependency on any package in this repository, so none of its nodes will resolve."
+        Fail "$label declares no dependency on any package in this repository, so none of its nodes will resolve."
     }
     foreach ($pin in $pins) {
         if ($pin.Groups[2].Value -ne '0.0.0') {
-            Fail "help\$name pins $($pin.Groups[1].Value) $($pin.Groups[2].Value); it must be 0.0.0 or it will ask for that exact version forever. Run tools\Normalize-HelpPatches.ps1."
+            Fail "$label pins $($pin.Groups[1].Value) $($pin.Groups[2].Value); it must be 0.0.0 or it will ask for that exact version forever. Run tools\Normalize-HelpPatches.ps1."
         }
     }
 
@@ -235,7 +247,7 @@ foreach ($helpDoc in $helpDocs) {
     #                               naming an element that no longer existed. A cleanup pass
     #                               needs the same validation as an edit pass.
     # ------------------------------------------------------------------------------------
-    try { $helpXml = [xml]$helpRaw } catch { Fail "help\$name is not well-formed XML: $($_.Exception.Message)"; continue }
+    try { $helpXml = [xml]$helpRaw } catch { Fail "$label is not well-formed XML: $($_.Exception.Message)"; continue }
 
     $known = [System.Collections.Generic.HashSet[string]]::new(
         [string[]]@($helpXml.SelectNodes('//@Id') | ForEach-Object { $_.Value }))
@@ -261,19 +273,19 @@ foreach ($helpDoc in $helpDocs) {
     }
 
     foreach ($reference in $unresolved) {
-        Fail "help\$name has an unresolved reference: $reference"
+        Fail "$label has an unresolved reference: $reference"
     }
 
     # Ids are the same 22-character shape everywhere, and a hand-typed one has slipped through
     # three times because the format looked right - see docs\RULES.md on tools\New-VLId.ps1.
     $malformed = @($helpXml.SelectNodes('//@Id') | Where-Object { $_.Value -notmatch '^[A-V][0-9A-Za-z]{21}$' })
     foreach ($id in $malformed) {
-        Fail "help\$name has a malformed Id '$($id.Value)'. Generate them with tools\New-VLId.ps1."
+        Fail "$label has a malformed Id '$($id.Value)'. Generate them with tools\New-VLId.ps1."
     }
 
     $duplicates = @($helpXml.SelectNodes('//@Id') | Group-Object { $_.Value } | Where-Object Count -gt 1)
     foreach ($group in $duplicates) {
-        Fail "help\$name uses Id $($group.Name) $($group.Count) times; ids must be unique within a document."
+        Fail "$label uses Id $($group.Name) $($group.Count) times; ids must be unique within a document."
     }
 
     # A readout left behind. When a node is deleted its links go with it, but the IOBox that
@@ -287,7 +299,7 @@ foreach ($helpDoc in $helpDocs) {
     }
     foreach ($box in $helpXml.SelectNodes('//Pad[@isIOBox="true"][@Comment]')) {
         if (-not $linked.Contains($box.Id) -and [string]::IsNullOrEmpty($box.Value)) {
-            Write-Host "  warn  help\$name has an empty IOBox '$($box.Comment)' connected to nothing" -ForegroundColor DarkYellow
+            Write-Host "  warn  $label has an empty IOBox '$($box.Comment)' connected to nothing" -ForegroundColor DarkYellow
         }
     }
 }
@@ -296,6 +308,25 @@ if ($helpDocs.Count -eq 0) {
     Write-Host "  warn  no help patches" -ForegroundColor DarkYellow
 } elseif (-not ($errors | Where-Object { $_ -like 'help\*' })) {
     Ok "$($helpDocs.Count) help patch(es) valid"
+}
+if ($exampleDocs.Count -gt 0 -and -not ($errors | Where-Object { $_ -like 'examples\*' })) {
+    Ok "$($exampleDocs.Count) example(s) valid - not packed, checked anyway"
+}
+
+# examples\ must never reach the package. The nuspec globs help\<Package>\**\*.vl and build.ps1
+# copies only help\<Package>, so this cannot happen today - which is exactly when to nail it down,
+# because the day someone widens a glob to help\** or examples\** the package silently starts
+# demanding a package it does not declare, and the symptom lands on a user rather than here.
+if ($exampleDocs.Count -gt 0) {
+    $leaked = @($Packages | ForEach-Object {
+        [xml]$n = Get-Content (Join-Path $RepoRoot "$($_.BaseName).nuspec") -Raw
+        @(Get-Child (@(Get-Child $n.DocumentElement 'files') | Select-Object -First 1) 'file') |
+            Where-Object { (Get-Attr $_ 'src') -like '*examples*' } |
+            ForEach-Object { "$($_.BaseName): $(Get-Attr $_ 'src')" }
+    })
+    if ($leaked) {
+        Fail "a nuspec packs examples\: $($leaked -join '; '). Examples may need packages this one does not depend on; they must stay out."
+    } else { Ok "no nuspec packs examples\" }
 }
 
 # 11. stray map tiles -------------------------------------------------------

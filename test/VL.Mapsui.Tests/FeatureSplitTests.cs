@@ -66,7 +66,7 @@ public class FeatureSplitTests
             Attributes(("name", "probe")));
 
         using var layerNode = new FeatureLayerNode();
-        var layer = layerNode.Update(out _, new[] { feature })!;
+        var layer = layerNode.Update(out _, out _, new[] { feature })!;
 
         var map = new MapNode().Update(new[] { layer });
         map.Navigator.SetSize(400, 400);

@@ -69,11 +69,11 @@ public class ScaleTests
         var data = Dataset(Features, Vertices);
         using var layer = new FeatureLayerNode();
 
-        layer.Update(out _, data);          // frame 1 builds it
+        layer.Update(out _, out _, data);          // frame 1 builds it
 
         var watch = Stopwatch.StartNew();
         for (var frame = 0; frame < Frames; frame++)
-            layer.Update(out _, data);
+            layer.Update(out _, out _, data);
         watch.Stop();
 
         var perFrame = watch.Elapsed.TotalMilliseconds / Frames;
@@ -107,11 +107,11 @@ public class ScaleTests
 
         var data = Dataset(Features, Vertices);
         using var layer = new FeatureLayerNode();
-        layer.Update(out _, data);
+        layer.Update(out _, out _, data);
 
         var watch = Stopwatch.StartNew();
         for (var frame = 0; frame < Frames; frame++)
-            layer.Update(out _, Dataset(Features, Vertices));   // equal contents, new objects
+            layer.Update(out _, out _, Dataset(Features, Vertices));   // equal contents, new objects
         watch.Stop();
 
         var perFrame = watch.Elapsed.TotalMilliseconds / Frames;
@@ -145,12 +145,12 @@ public class ScaleTests
     {
         using var layer = new FeatureLayerNode();
 
-        layer.Update(out _, Dataset(10, 8));
+        layer.Update(out _, out _, Dataset(10, 8));
         Assert.Equal(1, layer.FeatureSetsBuilt);
 
         var moved = Dataset(10, 8);
         moved[3] = new NtsFeature(Ring(999, 8), new AttributesTable { { "name", "moved" } });
-        layer.Update(out _, moved);
+        layer.Update(out _, out _, moved);
 
         Assert.Equal(2, layer.FeatureSetsBuilt);
         Assert.Equal(1, layer.LayersBuilt);

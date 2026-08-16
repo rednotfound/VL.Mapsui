@@ -41,9 +41,9 @@ public class SymbolStyleTests
         var node = new SymbolStyleNode();
 
         var style = (MapsuiSymbolStyle)node.Update(
-            SymbolShape.Triangle, 2.5f,
-            new Color4(0f, 1f, 0f, 1f),
-            new Color4(0f, 0f, 1f, 1f));
+            shape: SymbolShape.Triangle, scale: 2.5f,
+            fillColor: new Color4(0f, 1f, 0f, 1f),
+            outlineColor: new Color4(0f, 0f, 1f, 1f));
 
         Assert.Equal(MapsuiSymbolType.Triangle, style.SymbolType);
         Assert.Equal(2.5, style.SymbolScale);
@@ -80,10 +80,10 @@ public class SymbolStyleTests
         var node = new SymbolStyleNode();
         IStyle? last = null;
 
-        for (var frame = 0; frame < 100; frame++) last = node.Update(SymbolShape.Rectangle, 1.5f);
+        for (var frame = 0; frame < 100; frame++) last = node.Update(shape: SymbolShape.Rectangle, scale: 1.5f);
 
         Assert.Equal(1, node.StylesBuilt);
-        Assert.Same(last, node.Update(SymbolShape.Rectangle, 1.5f));
+        Assert.Same(last, node.Update(shape: SymbolShape.Rectangle, scale: 1.5f));
     }
 
     [Fact]
@@ -91,10 +91,10 @@ public class SymbolStyleTests
     {
         var node = new SymbolStyleNode();
 
-        node.Update(SymbolShape.Ellipse, 1f);
-        node.Update(SymbolShape.Rectangle, 1f);                              // shape
-        node.Update(SymbolShape.Rectangle, 2f);                              // scale
-        node.Update(SymbolShape.Rectangle, 2f, fillColor: new Color4(1f, 1f, 1f, 1f));  // fill
+        node.Update(shape: SymbolShape.Ellipse, scale: 1f);
+        node.Update(shape: SymbolShape.Rectangle, scale: 1f);                              // shape
+        node.Update(shape: SymbolShape.Rectangle, scale: 2f);                              // scale
+        node.Update(shape: SymbolShape.Rectangle, scale: 2f, fillColor: new Color4(1f, 1f, 1f, 1f));  // fill
 
         Assert.Equal(4, node.StylesBuilt);
     }
@@ -149,8 +149,8 @@ public class SymbolStyleTests
     {
         var node = new SymbolStyleNode();
 
-        var one = PixelsDrawn(node.Update(SymbolShape.Ellipse, 1f, fillColor: new Color4(0f, 0f, 0f, 1f)));
-        var two = PixelsDrawn(node.Update(SymbolShape.Ellipse, 2f, fillColor: new Color4(0f, 0f, 0f, 1f)));
+        var one = PixelsDrawn(node.Update(shape: SymbolShape.Ellipse, scale: 1f, fillColor: new Color4(0f, 0f, 0f, 1f)));
+        var two = PixelsDrawn(node.Update(shape: SymbolShape.Ellipse, scale: 2f, fillColor: new Color4(0f, 0f, 0f, 1f)));
 
         _out.WriteLine($"scale 1 -> {one} px, scale 2 -> {two} px, ratio {(double)two / one:0.00}");
 
@@ -174,7 +174,7 @@ public class SymbolStyleTests
     public void The_fallback_marker_is_a_ring_and_a_symbol_fills_it_in()
     {
         var fallback = PixelsDrawn(new global::Mapsui.Styles.VectorStyle());
-        var filled = PixelsDrawn(new SymbolStyleNode().Update(SymbolShape.Ellipse, 1f, fillColor: new Color4(0f, 0f, 0f, 1f)));
+        var filled = PixelsDrawn(new SymbolStyleNode().Update(shape: SymbolShape.Ellipse, scale: 1f, fillColor: new Color4(0f, 0f, 0f, 1f)));
 
         _out.WriteLine($"plain VectorStyle on a point : {fallback} px");
         _out.WriteLine($"SymbolStyle with a fill      : {filled} px");
@@ -207,7 +207,7 @@ public class SymbolStyleTests
     [Fact]
     public void Adding_a_label_never_reduces_what_is_drawn()
     {
-        var symbol = new SymbolStyleNode().Update(SymbolShape.Ellipse, 0.5f, fillColor: new Color4(0f, 0f, 0f, 1f));
+        var symbol = new SymbolStyleNode().Update(shape: SymbolShape.Ellipse, scale: 0.5f, fillColor: new Color4(0f, 0f, 0f, 1f));
         var alone = PixelsDrawn(symbol);
 
         var labelled = new LabelStyleNode().Update(symbol, "Name");
@@ -321,7 +321,7 @@ public class SymbolStyleTests
     {
         foreach (var scale in new[] { 0.5f, 1f, 2f })
         {
-            var symbol = new SymbolStyleNode().Update(SymbolShape.Ellipse, scale, fillColor: new Color4(0f, 0f, 0f, 1f));
+            var symbol = new SymbolStyleNode().Update(shape: SymbolShape.Ellipse, scale: scale, fillColor: new Color4(0f, 0f, 0f, 1f));
             var bare = PixelsInsideTheMarker(symbol, scale);
 
             var labelled = new LabelStyleNode().Update(symbol, "Name")!;
@@ -342,7 +342,7 @@ public class SymbolStyleTests
     {
         static double OffsetOf(float scale)
         {
-            var symbol = new SymbolStyleNode().Update(SymbolShape.Ellipse, scale);
+            var symbol = new SymbolStyleNode().Update(shape: SymbolShape.Ellipse, scale: scale);
             var collection = (global::Mapsui.Styles.StyleCollection)new LabelStyleNode().Update(symbol, "Name")!;
             var label = (global::Mapsui.Styles.LabelStyle)collection.Styles.Last();
             return label.Offset.Y;
@@ -383,15 +383,124 @@ public class SymbolStyleTests
         }
     }
 
+    // ---------- points only, and what that costs a map holding both ----------
+
+    /// <summary>Non-white pixels for one feature of any WKT, at a scale that fills the canvas.</summary>
+    static int PixelsFor(IStyle style, string wkt)
+    {
+        var f = new GeometryFeature { Geometry = new WKTReader().Read(wkt) };
+        f["Name"] = "Kanto";
+
+        using var surface = SKSurface.Create(new SKImageInfo(400, 400));
+        surface.Canvas.Clear(SKColors.White);
+
+        new MapRenderer().Render(
+            surface.Canvas, new Viewport(0, 0, 1, 0, 400, 400),
+            new List<ILayer> { new MemoryLayer { Features = new[] { (IFeature)f }, Style = style } },
+            new List<global::Mapsui.Widgets.IWidget>(), global::Mapsui.Styles.Color.White);
+
+        using var image = surface.Snapshot();
+        using var bmp = SKBitmap.FromImage(image);
+        var n = 0;
+        for (var x = 0; x < bmp.Width; x++)
+        for (var y = 0; y < bmp.Height; y++)
+            if (bmp.GetPixel(x, y) != SKColors.White) n++;
+        return n;
+    }
+
+    const string ABox = "POLYGON ((-60 -60, 60 -60, 60 60, -60 60, -60 -60))";
+
+    /// <summary>
+    /// **A SymbolStyle draws points and NOTHING else** — not less of a polygon, none of it.
+    /// </summary>
+    /// <remarks>
+    /// Inheritance says otherwise and inheritance is wrong here: Mapsui's `SymbolStyle` derives
+    /// from `VectorStyle`, so "it takes VectorStyle's place in the chain" was written into this
+    /// node's own documentation and believed for a day. The renderer dispatches on the runtime
+    /// type. A raw `Mapsui.Styles.SymbolStyle` behaves identically, so this is the library's shape
+    /// rather than something the node sets.
+    ///
+    /// It cost a real screen: the first patch joining VL.GeoJSON to VL.Mapsui drew five cities and
+    /// silently dropped the one polygon in the file (2026-08-16).
+    /// </remarks>
+    [Fact]
+    public void A_symbol_style_draws_no_polygon_at_all()
+    {
+        var withVector = PixelsFor(new VectorStyleNode().Update(), ABox);
+        var withSymbol = PixelsFor(new SymbolStyleNode().Update(), ABox);
+        var withNothing = PixelsFor(new global::Mapsui.Styles.VectorStyle(), ABox);
+
+        _out.WriteLine($"POLYGON: VectorStyle {withVector} px, SymbolStyle {withSymbol} px, bare default {withNothing} px");
+
+        Assert.True(withVector > 10000, "a VectorStyle must fill the polygon");
+        Assert.Equal(0, withSymbol);
+        Assert.True(withNothing > 0, "even no style at all outdraws a SymbolStyle here");
+    }
+
+    /// <summary>
+    /// <c>StyleByGeometry</c> is what fixes it — see <c>GeometryThemeTests</c> for the whole story.
+    /// </summary>
+    /// <remarks>
+    /// Kept here beside the failure it answers, because the two belong together: the test above
+    /// says a `SymbolStyle` erases a polygon, and this says what to do instead. The route that was
+    /// tried and rejected in between — a `VectorStyle` stacked underneath — is recorded in
+    /// `NOTES.md`, 2026-08-16, along with the two concentric circles it drew on every point.
+    /// </remarks>
+    [Fact]
+    public void Dispatching_by_geometry_type_brings_the_polygon_back()
+    {
+        var theme = new StyleByGeometryNode().Update(
+            point: new SymbolStyleNode().Update(), polygon: new VectorStyleNode().Update());
+
+        var polygon = PixelsFor(theme, ABox);
+        var point = PixelsFor(theme, "POINT (0 0)");
+
+        _out.WriteLine($"StyleByGeometry: polygon {polygon} px, point {point} px");
+
+        Assert.True(polygon > 10000, $"the polygon must draw through the theme: {polygon} px");
+        Assert.True(point > 0, "and the point must still have its marker");
+    }
+
+    /// <summary>
+    /// **A nested StyleCollection draws nothing, so the combination has to be flat.**
+    /// </summary>
+    /// <remarks>
+    /// Mapsui's renderer walks a collection's members and does not recurse into a member that is
+    /// itself a collection: measured 2026-08-16, a nested `{ { Vector, Symbol }, Label }` put down
+    /// 156 pixels over a polygon — the label text and none of the shape — where the flat form drew
+    /// 14884. `Styles.Combine` splices instead of wrapping, and this is what says so.
+    ///
+    /// The chain that found it has since been replaced by `StyleByGeometry`, so nothing in the
+    /// package nests today. **That is exactly why the test stays.** It could not have shown up
+    /// while chains were two nodes long, and it will not show up again until someone adds a fourth
+    /// style node — at which point this fails instead of the screen going quietly blank.
+    /// </remarks>
+    [Fact]
+    public void Combining_stays_flat_however_deep_the_chain()
+    {
+        var chain = new LabelStyleNode().Update(
+            Styles.Combine(new VectorStyleNode().Update(), new SymbolStyleNode().Update()), "Name")!;
+
+        var collection = Assert.IsType<global::Mapsui.Styles.StyleCollection>(chain);
+        Assert.All(collection.Styles, s =>
+            Assert.False(s is global::Mapsui.Styles.StyleCollection, "a nested collection draws nothing"));
+
+        var polygon = PixelsFor(chain, ABox);
+        _out.WriteLine($"Vector -> Symbol -> Label over a polygon: {collection.Styles.Count} flat styles, {polygon} px");
+
+        Assert.Equal(3, collection.Styles.Count);
+        Assert.True(polygon > 10000, $"the flattened chain must still fill the polygon: {polygon} px");
+    }
+
     [Fact]
     public void Each_shape_draws_something_and_they_differ()
     {
         var node = new SymbolStyleNode();
         var black = new Color4(0f, 0f, 0f, 1f);
 
-        var ellipse = PixelsDrawn(node.Update(SymbolShape.Ellipse, 1f, fillColor: black));
-        var rectangle = PixelsDrawn(node.Update(SymbolShape.Rectangle, 1f, fillColor: black));
-        var triangle = PixelsDrawn(node.Update(SymbolShape.Triangle, 1f, fillColor: black));
+        var ellipse = PixelsDrawn(node.Update(shape: SymbolShape.Ellipse, scale: 1f, fillColor: black));
+        var rectangle = PixelsDrawn(node.Update(shape: SymbolShape.Rectangle, scale: 1f, fillColor: black));
+        var triangle = PixelsDrawn(node.Update(shape: SymbolShape.Triangle, scale: 1f, fillColor: black));
 
         _out.WriteLine($"ellipse {ellipse} px, rectangle {rectangle} px, triangle {triangle} px");
 

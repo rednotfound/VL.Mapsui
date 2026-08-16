@@ -1,0 +1,563 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document xmlns:p="property" xmlns:r="reflection" Id="BNbGDWf9LGKUwwEUmkp0PF" LanguageVersion="2025.7.4" Version="0.128">
+  <NugetDependency Id="SIMDywDLwNbQ5UdOPHQxYD" Location="VL.CoreLib" Version="2025.7.4" />
+  <NugetDependency Id="Sm17wEPgUJCVB75op3gzPF" Location="VL.Skia" Version="2025.7.4" />
+  <NugetDependency Id="CCoTJSCcdlnfZwmjUnPFVB" Location="VL.Mapsui" Version="0.0.0" />
+  <!--
+    VL.GeoJSON is why this patch lives in examples\ and not in help\. VL.Mapsui's nuspec does not
+    depend on it and must not: a map engine has no business requiring a GeoJSON reader. So this
+    document needs THREE packages and no single package can promise them, which is exactly the
+    case help\ cannot carry - every .vl under help\VL.Mapsui\ is packed and would then open red
+    for anyone who installed VL.Mapsui alone.
+  -->
+  <NugetDependency Id="LUclKBQE7acCfczRZ0kpoW" Location="VL.GeoJSON" Version="0.0.0" />
+  <!--
+    NetTopologySuite is declared HERE so that a reader can extend this patch. Nothing below calls
+    an NTS node - the geometry arrives already built, which is the point of the example - but the
+    moment you add one, this line is what makes it resolve rather than show up "Not found". A
+    package declaring NTS is not the same as this document declaring it.
+  -->
+  <NugetDependency Id="KkbVvAgR3UtmSGnGV4pAoR" Location="NetTopologySuite" Version="2.6.0" />
+  <!--
+    VL.NetTopologySuite is the package that MAKES geometry. This patch does not need it either -
+    the GeoJSON file is where the geometry comes from - but VL.Mapsui's nuspec depends on it, so it
+    is present regardless, and declaring it keeps the door open the same way the line above does.
+  -->
+  <NugetDependency Id="QVnZMbPyNO4lv6YFocyiqT" Location="VL.NetTopologySuite" Version="0.0.1-alpha" />
+  <Patch Id="FJzZkKqVfW12i9kQk6L0hz">
+    <Canvas Id="N0E8bKG5vqG1aLaGsfcogC" DefaultCategory="Main" CanvasType="FullCategory" />
+    <!--
+
+    ************************ Application ************************
+
+-->
+    <Node Name="Application" Bounds="100,100" Id="Pt4eKK7Ag0dikcitT4Vmar">
+      <p:NodeReference>
+        <Choice Kind="ContainerDefinition" Name="Process" />
+        <FullNameCategoryReference ID="Primitive" />
+      </p:NodeReference>
+      <Patch Id="T1yChjTcVpcQLJ4rxMEL44">
+        <Canvas Id="VxYLn5bECvkjhyGerEE3sc" CanvasType="Group">
+          <Pad Id="VaZNqihOnpwz6dORWEdpu0" Bounds="60,30,620,300" ShowValueBox="true" isIOBox="true" Value="GeoJSON on a map - three packages that were never built together.&#xD;&#xA;&#xD;&#xA;THE WHOLE JOIN IS ONE LINK. Read GeoJSON hands back a Spread of NetTopologySuite Features; FeatureLayer takes IEnumerable of exactly that type. No adapter, no converter, no node in between - and VL.GeoJSON and VL.Mapsui do not reference each other at all. They compose because both speak NetTopologySuite, which is a library they SHARE rather than an agreement they made.&#xD;&#xA;&#xD;&#xA;COORDINATES LINE UP FOR THE SAME REASON. GeoJSON is WGS84 longitude and latitude by mandate (RFC 7946 section 4), and FeatureLayer's contract is that geometry arrives in WGS84 and is projected to spherical mercator on the way in. Two packages, one convention, and nothing to reproject.&#xD;&#xA;&#xD;&#xA;PROPERTIES BECOME LABELS WITH NOTHING IN BETWEEN. Label Attribute says &quot;name&quot;, and &quot;name&quot; is a key in the file's properties. Change it to &quot;country&quot; and the map relabels itself. No schema, no mapping, no node that knows what a city is.&#xD;&#xA;&#xD;&#xA;WHAT TO WATCH, AND WHY EACH ONE IS THERE:&#xD;&#xA;  Parses       should reach 1 and stay. It counts what the frame loop costs you - the text is the same object every frame, so it is parsed once. If it climbs, something upstream is rebuilding the string.&#xD;&#xA;  Layers Built should reach 1 and stay. Same discipline, one level down.&#xD;&#xA;  Status       says how many features, or what went wrong. It names the exception TYPE first, which is the difference between a five-second diagnosis and an afternoon.&#xD;&#xA;&#xD;&#xA;THIS PATCH IS NOT IN help\ AND THAT IS DELIBERATE. It needs three packages, and no single package can promise the other two - VL.Mapsui's nuspec does not depend on VL.GeoJSON and should not, because a map engine has no business requiring a GeoJSON reader. Everything under help\VL.Mapsui\ is packed and would open red for anyone who installed VL.Mapsui alone, so a patch spanning packages lives in examples\ instead, which nothing packs.&#xD;&#xA;&#xD;&#xA;THE GEOJSON IS A STRING HERE, NOT A FILE, and that is also deliberate. A Path IOBox is the quietest failure in this ecosystem - an empty one is not empty, it means the document's own folder - so it is one hazard too many for a patch whose job is to test a join. VL.GeoJSON's own HowTo Read a GeoJSON file covers reading from disk.&#xD;&#xA;&#xD;&#xA;Six features: five Points and one Polygon, worldwide. Both geometry kinds go down the same wire, because a Feature carries a Geometry and does not care which kind.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF on the tile layer. Opening a document in vvvv runs it, so a map that fetched on open would give you no chance to decline. Switch it on to see the basemap; the features draw either way.&#xD;&#xA;&#xD;&#xA;If Layers Built climbs frame after frame, close vvvv. Every rebuild starts a fresh round of tile requests, and that once exhausted a machine of ephemeral ports and took a home network down.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">11</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="UnaIkq8cPr0a4UZQVn7ji7" Comment="Enabled" Bounds="79,280,35,35" ShowValueBox="true" isIOBox="true" Value="false">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="CNYLiTg3BUtmCJlFwHyUjv" Comment="Cache To Disk" Bounds="207,280,35,35" ShowValueBox="true" isIOBox="true" Value="true">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Node Bounds="79,340,150,19" Id="JqwwJBWIvaSJq4DTAz8vuN">
+            <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="OpenStreetMap" />
+            </p:NodeReference>
+            <Pin Id="Usi9xynIVqJWvRhEvGVOYQ" Name="Enabled" Kind="InputPin" />
+            <Pin Id="ARy89W2GJw4s60rzwfmBsV" Name="Cache" Kind="InputPin" />
+            <Pin Id="VE109xy4WqBycyAwxMeCrD" Name="Result" Kind="OutputPin" />
+            <Pin Id="MVGJGduk0mPWJznoGv9YVX" Name="Layers Built" Kind="OutputPin" />
+            <Pin Id="HwRnfleRlGfpKEI7pXlafv" Name="Cache Status" Kind="OutputPin" />
+          </Node>
+          <Pad Id="RgIIgaq8NiTBppqeaxZgPe" Comment="Layers Built" Bounds="153,391,80,15" ShowValueBox="true" isIOBox="true" />
+          <Node Bounds="87,523,39,19" Id="IuHPlniMpFcdUZg9WNt7Xp">
+            <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Cons" />
+              <CategoryReference Kind="RecordType" Name="Spread" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="FitnqKKJuItGI6PwD5m2Mp" Name="Input" Kind="InputPin" />
+            <Pin Id="Udad8igNKGlXkj4SIfvVV8" Name="Input 2" Kind="InputPin" />
+            <Pin Id="Obo0KlAOX8uJTLEhkSgG4Y" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Pad Id="QTNlTyezfmbasb8gEcPG61" Comment="Initial Longitude" Bounds="140,583,62,15" ShowValueBox="true" isIOBox="true" Value="0">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Float64" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Pad Id="I8MAlGEJKxag8SUuQTLx71" Comment="Initial Latitude" Bounds="229,544,62,15" ShowValueBox="true" isIOBox="true" Value="20">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Float64" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Pad Id="MU5GcscWwFrk45xrCPm07u" Comment="Initial Zoom Level" Bounds="329,583,50,15" ShowValueBox="true" isIOBox="true" Value="1">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Integer32" />
+            </p:TypeAnnotation>
+          </Pad>
+          <!--
+            ***** GeoJSON in, features out *****
+
+            This is the whole join. Read GeoJSON hands back a Spread of
+            NetTopologySuite.Features.Feature; FeatureLayer's Features pin takes
+            IEnumerable of exactly that type. Nothing sits between them - no adapter, no
+            converter node, and neither package references the other. They compose because both
+            speak NetTopologySuite, which is a LIBRARY they share rather than an agreement they
+            made.
+
+            Coordinates line up for the same reason and it is worth knowing why. GeoJSON is WGS84
+            longitude and latitude by mandate (RFC 7946), and FeatureLayer's contract is that
+            geometry arrives in WGS84 and gets projected to spherical mercator on the way in. Two
+            packages, one convention, no reprojection node.
+
+            WATCH STATUS. Read GeoJSON never throws - half-typed text is the normal state of an
+            IOBox somebody is editing - so failure arrives as Success going false and a sentence
+            on Status. It names the exception type first, which is what turned a loader problem
+            into a five-second diagnosis on 2026-08-16.
+          -->
+          <Pad Id="DTGz82nvLLVFjt44xg5IZR" Comment="GeoJSON - edit me" Bounds="220,400,500,180" ShowValueBox="true" isIOBox="true" Value="{&#xD;&#xA;  &quot;type&quot;: &quot;FeatureCollection&quot;,&#xD;&#xA;  &quot;features&quot;: [&#xD;&#xA;    {&#xD;&#xA;      &quot;type&quot;: &quot;Feature&quot;,&#xD;&#xA;      &quot;id&quot;: &quot;tokyo&quot;,&#xD;&#xA;      &quot;geometry&quot;: { &quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [139.6917, 35.6895] },&#xD;&#xA;      &quot;properties&quot;: { &quot;name&quot;: &quot;Tokyo&quot;, &quot;country&quot;: &quot;JP&quot;, &quot;population&quot;: 13960000, &quot;capital&quot;: true }&#xD;&#xA;    },&#xD;&#xA;    {&#xD;&#xA;      &quot;type&quot;: &quot;Feature&quot;,&#xD;&#xA;      &quot;id&quot;: &quot;berlin&quot;,&#xD;&#xA;      &quot;geometry&quot;: { &quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [13.405, 52.52] },&#xD;&#xA;      &quot;properties&quot;: { &quot;name&quot;: &quot;Berlin&quot;, &quot;country&quot;: &quot;DE&quot;, &quot;population&quot;: 3677472, &quot;capital&quot;: true }&#xD;&#xA;    },&#xD;&#xA;    {&#xD;&#xA;      &quot;type&quot;: &quot;Feature&quot;,&#xD;&#xA;      &quot;id&quot;: &quot;paris&quot;,&#xD;&#xA;      &quot;geometry&quot;: { &quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [2.3522, 48.8566] },&#xD;&#xA;      &quot;properties&quot;: { &quot;name&quot;: &quot;Paris&quot;, &quot;country&quot;: &quot;FR&quot;, &quot;population&quot;: 2165423, &quot;capital&quot;: true }&#xD;&#xA;    },&#xD;&#xA;    {&#xD;&#xA;      &quot;type&quot;: &quot;Feature&quot;,&#xD;&#xA;      &quot;id&quot;: &quot;osaka&quot;,&#xD;&#xA;      &quot;geometry&quot;: { &quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [135.5023, 34.6937] },&#xD;&#xA;      &quot;properties&quot;: { &quot;name&quot;: &quot;Osaka&quot;, &quot;country&quot;: &quot;JP&quot;, &quot;population&quot;: 2691185, &quot;capital&quot;: false }&#xD;&#xA;    },&#xD;&#xA;    {&#xD;&#xA;      &quot;type&quot;: &quot;Feature&quot;,&#xD;&#xA;      &quot;id&quot;: &quot;hamburg&quot;,&#xD;&#xA;      &quot;geometry&quot;: { &quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [9.9937, 53.5511] },&#xD;&#xA;      &quot;properties&quot;: { &quot;name&quot;: &quot;Hamburg&quot;, &quot;country&quot;: &quot;DE&quot;, &quot;population&quot;: 1841179, &quot;capital&quot;: false }&#xD;&#xA;    },&#xD;&#xA;    {&#xD;&#xA;      &quot;type&quot;: &quot;Feature&quot;,&#xD;&#xA;      &quot;id&quot;: &quot;kanto&quot;,&#xD;&#xA;      &quot;geometry&quot;: {&#xD;&#xA;        &quot;type&quot;: &quot;Polygon&quot;,&#xD;&#xA;        &quot;coordinates&quot;: [[[138.9, 35.2], [140.3, 35.2], [140.3, 36.2], [138.9, 36.2], [138.9, 35.2]]]&#xD;&#xA;      },&#xD;&#xA;      &quot;properties&quot;: { &quot;name&quot;: &quot;Kanto (rough box)&quot;, &quot;country&quot;: &quot;JP&quot;, &quot;capital&quot;: false }&#xD;&#xA;    }&#xD;&#xA;  ]&#xD;&#xA;}&#xD;&#xA;">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">8</p:fontsize>
+            </p:ValueBoxSettings>
+          </Pad>
+
+          <Node Bounds="220,600,120,19" Id="C7RfCD4XD0tUPKOsYDn6cs">
+            <p:NodeReference LastCategoryFullName="GeoJSON" LastDependency="VL.GeoJSON.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Read GeoJSON" />
+            </p:NodeReference>
+            <Pin Id="SAdNEzJRiKr0Wx1baT1tk6" Name="GeoJSON" Kind="InputPin" />
+            <Pin Id="GDqSZ5TfLa4dhqHqzi4u5Y" Name="Factory" Kind="InputPin" />
+            <Pin Id="FywYp6YSYYyK6xUW73PX7K" Name="Success" Kind="OutputPin" />
+            <Pin Id="HhM4jB39lzJaKtQhDxmz9I" Name="Status" Kind="OutputPin" />
+            <Pin Id="Gh6V4caVbsZ2rRFw3C7app" Name="Parses" Kind="OutputPin" />
+            <Pin Id="U4uOgY9bxwsAbnpsJsrDO5" Name="Features" Kind="OutputPin" />
+          </Node>
+          <Pad Id="RS6Hqm6oVzhIG8hIyXH2eJ" Comment="Success" Bounds="360,600,50,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="HG9MiC7FCbDPJaxMATUMCh" Comment="Status" Bounds="420,600,260,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="LcUO5WfOEfuzvz6BQ2KCxl" Comment="Parses - should stay at 1" Bounds="420,625,180,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="LcUO5WfOEfuzvz6BQ2KCxm" Comment="Layer Status - what will NOT be drawn" Bounds="420,650,420,15" ShowValueBox="true" isIOBox="true" />
+          <!--
+            The style is a value of its own, and a node rather than pins on the layer. Leave it
+            unconnected and the layer still draws something visible - good defaults are part of the
+            public API.
+          -->
+          <Pad Id="EsoJaRP1I65f0rJfLdwzWW" Comment="Shape" Bounds="760,470,110,15" ShowValueBox="true" isIOBox="true" Value="Ellipse">
+            <p:TypeAnnotation LastCategoryFullName="Mapsui.Styles" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="TypeFlag" Name="SymbolShape" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Pad Id="E2tJMBZkwB64ZplxWXqbUf" Comment="Scale - 1 is 32 pixels" Bounds="760,495,150,15" ShowValueBox="true" isIOBox="true" Value="0.6">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Float32" />
+            </p:TypeAnnotation>
+          </Pad>
+          <!--
+            ***** what a polygon is filled with *****
+
+            This VectorStyle goes to StyleByGeometry's Polygon pin, and to Line if you add one.
+            Fill Color fills a polygon; Line Color and Line Width stroke a line. It is the same
+            node either way - which pins matter depends on the geometry, which is Mapsui's model.
+
+            THE CIRCLE ON EACH CITY IS A MARKER, NOT A SHAPE. A GeoJSON Point has no size - it is
+            one coordinate - so something has to stand in for it. Every mapping library does this:
+            Mapsui's own documentation says "points are rendered as a circle", Leaflet defaults to
+            a circleMarker, OpenLayers to a circle, Mapbox GL has a whole circle layer type.
+            Nobody buffered anything.
+
+            The way to tell a marker from a real shape is to ZOOM. A marker keeps its size in
+            PIXELS while the ground moves under it; the Kanto box grows, because it is on the
+            ground. If you want a circle whose size MEANS something, buffer the point into a
+            polygon with VL.NetTopologySuite and send it to the Polygon pin - then it is data.
+          -->
+          <Node Bounds="920,440,130,19" Id="L3Qi7nS8uAqVbeXSLBmt9z">
+            <p:NodeReference LastCategoryFullName="Mapsui.Styles" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="VectorStyle" />
+            </p:NodeReference>
+            <Pin Id="Fe3YN7CQitgbrnkmtbJJck" Name="Fill Color" Kind="InputPin" />
+            <Pin Id="PWXHpNoeUsONZLzQsW5PLZ" Name="Line Color" Kind="InputPin" />
+            <Pin Id="Q0SgEdfc29axVosMbEzkGl" Name="Line Width" Kind="InputPin" />
+            <Pin Id="NJPJIe8uDfEaNa9SaAg9fL" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="920,510,130,19" Id="T4PA3iOraHVrJGn6DvQeiR">
+            <p:NodeReference LastCategoryFullName="Mapsui.Styles" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="SymbolStyle" />
+            </p:NodeReference>
+            <Pin Id="TyQdZgTtemihQDtdTArRzO" Name="Shape" Kind="InputPin" />
+            <Pin Id="Hi8HbKmtdTSgvaR4xUm0gZ" Name="Scale" Kind="InputPin" />
+            <Pin Id="RCFOdPirbEB8H7XNNlycYR" Name="Fill Color" Kind="InputPin" />
+            <Pin Id="C5ZflBD4w9puJqzqVcE4hc" Name="Outline Color" Kind="InputPin" />
+            <Pin Id="VMyWIw2DDLYJnnMn4lhUAv" Name="Result" Kind="OutputPin" />
+          </Node>
+
+          <!--
+            ***** one style per geometry type *****
+
+            This is how a map with mixed data is styled, in every library there is. OpenLayers
+            takes a style function returning styles[feature.getGeometry().getType()]; Mapbox GL
+            splits circle, line and fill into separate layer types; Leaflet has pointToLayer
+            beside style; a QGIS layer is single-geometry-type with a renderer of its own.
+            StyleByGeometry is Mapsui's version - each feature is handed the style for the kind of
+            geometry it carries, and drawn once.
+
+            THE FILE HAS FIVE POINTS AND ONE POLYGON, which is what real data looks like, and it
+            is why this node is here rather than a single style. A SymbolStyle draws points and
+            NOTHING else: measured, a polygon under one covers 0 pixels, where a VectorStyle covers
+            14884 and no style at all still manages 956.
+
+            Unwire the Polygon pin and Kanto vanishes - and FeatureLayer''s Status names the pin
+            you unplugged, because a geometry type with no style draws nothing and Mapsui does not
+            complain about it.
+          -->
+          <Node Bounds="1120,510,150,19" Id="BGaqvRC4MElrp0JTGZqZS6">
+            <p:NodeReference LastCategoryFullName="Mapsui.Styles" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="StyleByGeometry" />
+            </p:NodeReference>
+            <Pin Id="I6WyRuzI4KKr7dc1hjwvN7" Name="Point" Kind="InputPin" />
+            <Pin Id="O1w6N9lFrBJJ5hf2DOGjEq" Name="Line" Kind="InputPin" />
+            <Pin Id="GX5IGC2zL2N3MZ96i7FQH7" Name="Polygon" Kind="InputPin" />
+            <Pin Id="K8NLNKRTcQvzNPLxdPvIgz" Name="Result" Kind="OutputPin" />
+          </Node>
+
+          <!--
+            ***** the payoff *****
+
+            Attribute is the word "name", and "name" is a key in the GeoJSON file's properties.
+            Nothing between the two: no schema, no mapping table, no node that knows what a city
+            is. Change it to "country" and the map relabels itself, because the properties came
+            across as attributes and LabelStyle looks a column up per feature.
+
+            The label lifts itself clear of the marker - LabelStyle reads the SymbolStyle wired
+            into it and offsets by the marker's radius. Turn Scale up and watch the labels move.
+          -->
+          <Pad Id="RZzJ7ARmOHcsPdJWcCLoP3" Comment="Label Attribute - a key in properties" Bounds="760,560,220,15" ShowValueBox="true" isIOBox="true" Value="name">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Pad Id="LKQjuhfaOhae1zpNGMpoU2" Comment="Label Size" Bounds="760,585,62,15" ShowValueBox="true" isIOBox="true" Value="14">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Float32" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Node Bounds="920,590,130,19" Id="T23qWAurpyrgoRh8fLKCdS">
+            <p:NodeReference LastCategoryFullName="Mapsui.Styles" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="LabelStyle" />
+            </p:NodeReference>
+            <Pin Id="QNGu1JxjXlXVk8x5Vzah2L" Name="Style" Kind="InputPin" />
+            <Pin Id="ULIbppmgrRmENEkrSodKrP" Name="Attribute" Kind="InputPin" />
+            <Pin Id="MdXpohRLjhyLuWsCdwFoHx" Name="Color" Kind="InputPin" />
+            <Pin Id="D4vCbMFhMY5ij6p7V7EUj9" Name="Size" Kind="InputPin" />
+            <Pin Id="AzHYShl1Cy0Pdw52S7C5ZT" Name="Result" Kind="OutputPin" />
+          </Node>
+
+          <Node Bounds="300,590,150,19" Id="RYg4JjkLhluvFy6irExfYD">
+            <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="FeatureLayer" />
+            </p:NodeReference>
+            <Pin Id="AMeaHKeDjwSfsDqswpSIBi" Name="Features" Kind="InputPin" />
+            <Pin Id="Sb8LY47ypOqKRxpyRAwgiA" Name="Style" Kind="InputPin" />
+            <Pin Id="U7vVs30TfyVg6lNRtRKCvd" Name="Name" Kind="InputPin" />
+            <Pin Id="UX2Q4zuDSJ3FicIQjybU4g" Name="Layers Built" Kind="OutputPin" />
+            <Pin Id="UxtZxjLIeKDxsB9BbErgbY" Name="Status" Kind="OutputPin" />
+            <Pin Id="Ck0b9Fm6W6GxEbNGJgeI05" Name="Result" Kind="OutputPin" />
+          </Node>
+
+          <Node Bounds="87,643,110,19" Id="Uap6qMPmqPyqpm6OmKwWZU">
+            <p:NodeReference LastCategoryFullName="Mapsui.Maps" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Map" />
+            </p:NodeReference>
+            <Pin Id="H1dkptL5CUJAlSE1SJXIiL" Name="Layers" Kind="InputPin" />
+            <Pin Id="Dc7rTes8gEFct080wrJNsg" Name="Initial Center Longitude" Kind="InputPin" />
+            <Pin Id="LpWIQOKhRMT4Jt3tKQLG58" Name="Initial Center Latitude" Kind="InputPin" />
+            <Pin Id="JXjk0f1EzodWnmeV9gOzZp" Name="Initial Zoom Level" Kind="InputPin" />
+            <Pin Id="SHAzWUqXFUmNiPpi2L0l9h" Name="Result" Kind="OutputPin" />
+          </Node>
+
+          <!--
+            ***** let the data say where to look *****
+
+            The first version of this patch hardcoded a centre and a zoom, computed as the midpoint
+            of the coordinates - and landed on CENTRAL ASIA, where none of the data is. The file
+            holds two clusters, Europe and Japan, with four thousand kilometres of nothing between
+            them, so their midpoint is precisely the place neither of them occupies. An average is
+            not a location.
+
+            ZoomToLayer is the node that makes hardcoding unnecessary: it frames a layer's actual
+            extent. Press Frame The Data.
+
+            It is TRIGGERED, not continuous, and that is a safety property rather than a
+            convenience. Applied every frame it would pin the view to the layer and the map could
+            not be dragged at all - which is exactly what CenterOn running every frame once did to
+            a help patch. An empty layer has no extent and moves nothing, so a bang that lands
+            before the data has arrived is harmless.
+          -->
+          <Pad Id="FrAAoKuMOh5K0ye1ORqZKd" Comment="Frame The Data" Bounds="300,700,35,35" ShowValueBox="true" isIOBox="true" Value="false">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Bang</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Node Bounds="67,723,130,19" Id="G1sVNBOMrFRqz660KYYB4K">
+            <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="ZoomToLayer" />
+            </p:NodeReference>
+            <Pin Id="Nh33CkLj3g3JIZQ1Wtqa84" Name="Map" Kind="InputPin" />
+            <Pin Id="T8FlHZCGgcBI0InyFmfool" Name="Layer" Kind="InputPin" />
+            <Pin Id="NFHGqRAp95Ibg5stwUPuv2" Name="Trigger" Kind="InputPin" />
+            <Pin Id="VzHH0x8bPl6DDD7xQ0GWM5" Name="Margin" Kind="InputPin" />
+            <Pin Id="UMcwMKzEE7Q6aJK6u5yUzN" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="-207,850,110,19" Id="BtM6e71LrPauAI1Lu5QMUn">
+            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="ViewportInfo" />
+            </p:NodeReference>
+            <Pin Id="TIjKhLd4rTZDn2dSnszv01" Name="Map" Kind="InputPin" />
+            <Pin Id="RkfLJEI1nD6Jqo2WEFBeYS" Name="Center Longitude" Kind="OutputPin" />
+            <Pin Id="UUT74iRejEUw8kpEAa6dHx" Name="Center Latitude" Kind="OutputPin" />
+            <Pin Id="NHrVzYogipFEDxC3IV2qWZ" Name="Resolution" Kind="OutputPin" />
+            <Pin Id="NIsTrVwZSBOI2ZxVDBGylo" Name="Width" Kind="OutputPin" />
+            <Pin Id="Ai21lXxwGlrZ63Z4TigeFN" Name="Height" Kind="OutputPin" />
+          </Node>
+          <Pad Id="FFjk3xX3QUXJDZcekXlKZa" Comment="Actual Longitude" Bounds="-205,898,90,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="IhsKJMIfZsfYF6xUlVucLc" Comment="Actual Latitude" Bounds="-205,927,90,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="C3LbWfwVElJKvc3TxkWobj" Comment="m per pixel" Bounds="-205,958,90,15" ShowValueBox="true" isIOBox="true" />
+          <!--
+            ***** enough mouse to see the point *****
+
+            Drag and ZoomByWheel are gestures, not per-frame commands: they move the map only when
+            you actually drag or scroll, so the view stays yours. That is what lets this patch show
+            the one thing it is about - the shape staying on its ground while the map moves under
+            it. The wiring is copied from HowTo Drive the map with the mouse, which is where the
+            reasoning behind each link lives.
+          -->
+          <Node Bounds="480,700,90,19" Id="FCFHOaQxJF6hICTzgc0kV2">
+            <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Console" />
+            </p:NodeReference>
+            <Pin Id="EkFs6mHHZIMujfdgEOqlk2" Name="Output" Kind="OutputPin" />
+            <Pin Id="RO8aBSYCJdhlqHJCEIyLAA" Name="Mouse" Kind="OutputPin" />
+            <Pin Id="MwdWPjIgy6Udsm4trupS2X" Name="Keyboard" Kind="OutputPin" />
+            <Pin Id="BXefzE2nNAcdukZNFHUU3Y" Name="Notifications" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="480,740,185,19" Id="SNTO2Jhhli4U4wWW3wUbhZ">
+            <p:NodeReference LastCategoryFullName="IO.Mouse" LastSymbolSource="CoreLibBasics.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="MouseState" />
+            </p:NodeReference>
+            <Pin Id="CYRfJkATXB3MULFJurXl7J" Name="Mouse Device" Kind="InputPin" />
+            <Pin Id="PzHgZmzlnFRzQmgZ5zVIXX" Name="Position" Kind="OutputPin" />
+            <Pin Id="VaHlWDCnWB4hR4qvgBc3TJ" Name="Left Pressed" Kind="OutputPin" />
+            <Pin Id="J0gfkk0GswK2eKFcxk8pcp" Name="Wheel State" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="480,780,46,19" Id="TL0SFaf72g8sO6VrYaRpNi">
+            <p:NodeReference LastCategoryFullName="2D.Vector2" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Vector (Split)" />
+              <CategoryReference Kind="Vector2Type" Name="Vector2" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="FPvEbPKx0Q2bgiWWgJ3KuF" Name="Input" Kind="StateInputPin" />
+            <Pin Id="ICl6Jwe2HfP8e3frWTbgFE" Name="X" Kind="OutputPin" />
+            <Pin Id="FkHVEB8lFqL5MmqkqXCmNk" Name="Y" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="480,820,91,19" Id="A8qFsyFNdhgTauPVcsAyQS">
+            <p:NodeReference LastCategoryFullName="Animation.FrameBased" LastDependency="CoreLibBasics.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="FrameDifference" />
+            </p:NodeReference>
+            <Pin Id="BOEcqqbX9zI4aeoBawrpYz" Name="Value" Kind="InputPin" />
+            <Pin Id="Pq6PXhDc30Y73OLApgMjM0" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="67,763,110,19" Id="CNgVHFYfkEkPUuBiYN3M8T">
+            <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Drag" />
+            </p:NodeReference>
+            <Pin Id="ORtzkXwQGw7OVYDzpI5bZ9" Name="Map" Kind="InputPin" />
+            <Pin Id="Cc6xgbnGsU368CM3MrUcbN" Name="X" Kind="InputPin" />
+            <Pin Id="DEhbqpKlwjTgV2nzO22wfj" Name="Y" Kind="InputPin" />
+            <Pin Id="G88um6CokkWEKxBIVZBAaM" Name="Dragging" Kind="InputPin" />
+            <Pin Id="GqniStYYxec691wpuoGqOX" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="67,803,150,19" Id="PNvSFuqfxYH1W7SRfNzqsD">
+            <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="ZoomByWheel" />
+            </p:NodeReference>
+            <Pin Id="O44OyRhtxJ6Z4CIvpXlQh1" Name="Map" Kind="InputPin" />
+            <Pin Id="VuvytF8oSOM1ZXfvpw62Rm" Name="X" Kind="InputPin" />
+            <Pin Id="C7raymyT76ZJBj3ILHLxZW" Name="Y" Kind="InputPin" />
+            <Pin Id="NWUw1wkpZWuyw2DccxwAOd" Name="Wheel Delta" Kind="InputPin" />
+            <Pin Id="T2SknmUw1M4vcmqQsQPFoK" Name="Notch Size" Kind="InputPin" />
+            <Pin Id="OKMRQq7ARgCNQ0DguHEGvA" Name="Output" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="67,940,105,19" Id="RtnmcH4UMTsIMECMtAlloC">
+            <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Group" />
+              <CategoryReference Kind="Category" Name="Skia" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="SLeoSJ0mtJwpIBrN3Lo82U" Name="Input" Kind="InputPin" />
+            <Pin Id="UYCvpRMOoaQciC5U2bKDca" Name="Input 2" Kind="InputPin" />
+            <Pin Id="PTFy7CVaB74mEbW20etmS8" Name="Output" Kind="OutputPin" />
+          </Node>
+
+          <!--
+            No CenterOn and no ZoomToLevel here on purpose, and that is worth a sentence.
+
+            Those two are operations: they run every frame, so a patch holding them pins the view on
+            every frame and the map cannot be dragged - which is exactly what HowTo Show a map is
+            for, where driving the view from IOBoxes is the lesson.
+
+            This patch is about a shape sitting on the map, and you cannot see that unless you can
+            move the map. So the starting view comes from the Map node's Initial pins instead: they
+            are applied once, through Home, and then leave the viewport alone.
+          -->
+          <Pad Id="JXt620dcIwTNKf5ghwhaGp" Comment="Diagnostics" Bounds="236,873,35,15" ShowValueBox="true" isIOBox="true" Value="True">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Node Bounds="67,903,172,19" Id="BVYQzg89VCAIpTtlnx3tws">
+            <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
+            </p:NodeReference>
+            <Pin Id="DQROUBK64s5ONRgS27ZRF9" Name="Map" Kind="InputPin" />
+            <Pin Id="MNVbxnjPDHRRznJSzJnEPX" Name="Diagnostics" Kind="InputPin" />
+            <Pin Id="U5emzVQ6EofWagaekCXGH2" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="18,970,227,19" Id="DietAlM1nEjoBZVmG0FHgE">
+            <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Renderer" />
+            </p:NodeReference>
+            <Pin Id="Sj87CPJKGDWPdR4OW6sDzr" Name="Node Context" Kind="InputPin" IsHidden="true" />
+            <Pin Id="Gdo6UhaomT1XZfvOU56A8c" Name="Bounds" Kind="InputPin" DefaultValue="952, 63, 900, 640">
+              <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
+                <Choice Kind="TypeFlag" Name="Rectangle" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="EWlzVWkOJ3EPuct0fwwbf3" Name="Save Bounds" Kind="InputPin" IsHidden="true" />
+            <Pin Id="U05w0C2neWetrphmTEtIOA" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Boolean" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="N4H3bABnueyMKV1c3meMwm" Name="Dialog If Document Changed" Kind="InputPin" IsHidden="true" />
+            <Pin Id="SE29wCVCUvVN8JEXTE3qOx" Name="Always On Top" Kind="InputPin" IsHidden="true" />
+            <Pin Id="MOAUjs1e5DINZD1urLjEWd" Name="Extend Into Title Bar" Kind="InputPin" IsHidden="true" />
+            <Pin Id="D8REAWAkQaAbVGkxlquS0L" Name="Input" Kind="InputPin" />
+            <Pin Id="Q8JS36Crj3eLMmRka08P1p" Name="Title" Kind="InputPin" />
+            <Pin Id="LT1e8KtEiJgL8TznQqt7Ee" Name="Title Bar Interaction Width" Kind="InputPin" IsHidden="true" />
+            <Pin Id="Dexd8lRZeZXqLjsaUCSXaS" Name="Color" Kind="InputPin" />
+            <Pin Id="ARpZedwbamWspdXEDFoCjg" Name="Clear" Kind="InputPin" />
+            <Pin Id="HdnhWae9EPwZUs6z3FuJ5L" Name="Space" Kind="InputPin" />
+            <Pin Id="Gm6HNJugtFgtkj9HrJMZVx" Name="Show Cursor" Kind="InputPin" />
+            <Pin Id="I6puDMwNYK7JpJ2t5Vhcj7" Name="VSync" Kind="InputPin" />
+            <Pin Id="EW6ImNCjBqyL2LNpLuDUsu" Name="Commands" Kind="InputPin" IsHidden="true" />
+            <Pin Id="F1txhLkd9O1MRGa4FemVvS" Name="Enable Keyboard Shortcuts" Kind="InputPin" IsHidden="true" />
+            <Pin Id="UTYhce2ouWDKuARMSXgV0p" Name="Enabled" Kind="InputPin" />
+            <Pin Id="NAbLf3d0ZNzMvMBYMXcWu2" Name="Form Bounds Notifications" Kind="OutputPin" IsHidden="true" />
+            <Pin Id="SFAG2KU9Uz5jBlEugcqusy" Name="Form" Kind="OutputPin" />
+            <Pin Id="TF7Alj4tttAAVkY9lW5nHi" Name="ClientBounds" Kind="OutputPin" />
+            <Pin Id="QIcTPHhbeLC2apLEctN44C" Name="Render Time" Kind="OutputPin" />
+          </Node>
+          <Pad Id="H1yv1JBLijwVmMX34e3Fzf" Comment="Cache Status" Bounds="226,430,300,15" ShowValueBox="true" isIOBox="true" />
+          <Node Bounds="300,282,150,19" Id="LiTqhjEAEzU3PZESW3B35q">
+            <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="TileCache" />
+            </p:NodeReference>
+            <Pin Id="ULh17fD8cDxRi4lqa2hYtY" Name="Enabled" Kind="InputPin" />
+            <Pin Id="Q2PNoFSapPeFXxtamnrI4n" Name="Folder" Kind="InputPin" />
+            <Pin Id="PDfAZ7dDcrkFW1pQwiJ9x4" Name="Result" Kind="OutputPin" />
+            <Pin Id="FRGL7PazfZpBv73noSDRaO" Name="Status" Kind="OutputPin" />
+            <Pin Id="Ddqg0xhHjdkgJZ68fhWmTD" Name="Tiles" Kind="OutputPin" />
+            <Pin Id="CVRaaziqPOJpNW7u2ror8A" Name="Size MB" Kind="OutputPin" />
+          </Node>
+          <Pad Id="Sn0IFyPbF1sneJyHMkVp7A" Comment="Cache Folder" Bounds="560,375,300,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="GoA5ugmSeRASmqqlJuk5hE" Comment="Tiles Cached" Bounds="634,400,80,15" ShowValueBox="true" isIOBox="true" />
+        </Canvas>
+        <Patch Id="Qn1Yqox3GN8OqwchBUvODO" Name="Create" />
+        <Patch Id="OFfMGxxvZQSpMkYjxF7dnh" Name="Update" />
+        <ProcessDefinition Id="DhaIijSYwD4pO8zOSvysI5">
+          <Fragment Id="FjiroYIuFc7C6Eo74EFsKw" Patch="Qn1Yqox3GN8OqwchBUvODO" Enabled="true" />
+          <Fragment Id="I4BnpGUL4mYEGtIdqDHclf" Patch="OFfMGxxvZQSpMkYjxF7dnh" Enabled="true" />
+        </ProcessDefinition>
+        <Link Id="GuXEmbNFUOCrTx2lsy5vDC" Ids="UnaIkq8cPr0a4UZQVn7ji7,Usi9xynIVqJWvRhEvGVOYQ" />
+        <Link Id="B8o38upRBCpnGJcCCYjsuY" Ids="CNYLiTg3BUtmCJlFwHyUjv,ULh17fD8cDxRi4lqa2hYtY" />
+        <Link Id="A1AwFIAycdcFWjykRiUKiv" Ids="MVGJGduk0mPWJznoGv9YVX,RgIIgaq8NiTBppqeaxZgPe" />
+        <Link Id="UyrJAnXQ1yBHJA6DLjynKu" Ids="VE109xy4WqBycyAwxMeCrD,FitnqKKJuItGI6PwD5m2Mp" />
+        <Link Id="Baf7eVHFobPlz4w9svzMrn" Ids="Obo0KlAOX8uJTLEhkSgG4Y,H1dkptL5CUJAlSE1SJXIiL" />
+        <Link Id="UxtZxjLIeKDxsB9BbErgbx" Ids="DTGz82nvLLVFjt44xg5IZR,SAdNEzJRiKr0Wx1baT1tk6" />
+        <Link Id="KBisvNHDlkfAsyKQ8IgcY4" Ids="U4uOgY9bxwsAbnpsJsrDO5,AMeaHKeDjwSfsDqswpSIBi" />
+        <Link Id="JXVN1i305ManttJcPP1nv1" Ids="FywYp6YSYYyK6xUW73PX7K,RS6Hqm6oVzhIG8hIyXH2eJ" />
+        <Link Id="QjbSCtLDZpq69nV3rM0F7Z" Ids="HhM4jB39lzJaKtQhDxmz9I,HG9MiC7FCbDPJaxMATUMCh" />
+        <Link Id="DTPQJefyRW74Itu3WTLkG8" Ids="Gh6V4caVbsZ2rRFw3C7app,LcUO5WfOEfuzvz6BQ2KCxl" />
+        <Link Id="ShLaaaArZWcxPrjqwXrHoW" Ids="EsoJaRP1I65f0rJfLdwzWW,TyQdZgTtemihQDtdTArRzO" />
+        <Link Id="Sirc0UPYOWZG8hMCtWUQtN" Ids="E2tJMBZkwB64ZplxWXqbUf,Hi8HbKmtdTSgvaR4xUm0gZ" />
+        <Link Id="RqjAlj5y7JKAALPXuqGjwi" Ids="VMyWIw2DDLYJnnMn4lhUAv,I6WyRuzI4KKr7dc1hjwvN7" />
+        <Link Id="Ka8KsT7lHq1oC1aiJrbg3w" Ids="K8NLNKRTcQvzNPLxdPvIgz,QNGu1JxjXlXVk8x5Vzah2L" />
+        <Link Id="Mse5NJYgY9nckAkn4XwosT" Ids="RZzJ7ARmOHcsPdJWcCLoP3,ULIbppmgrRmENEkrSodKrP" />
+        <Link Id="HYBIIHzwzFgWtC4jzKgugh" Ids="LKQjuhfaOhae1zpNGMpoU2,D4vCbMFhMY5ij6p7V7EUj9" />
+<Link Id="Hs93yVrVtspMpjll2Y7TEd" Ids="AzHYShl1Cy0Pdw52S7C5ZT,Sb8LY47ypOqKRxpyRAwgiA" />
+        <Link Id="Sirc0UPYOWZG8hMCtWUQtM" Ids="NJPJIe8uDfEaNa9SaAg9fL,GX5IGC2zL2N3MZ96i7FQH7" />
+        <Link Id="Sirc0UPYOWZG8hMCtWUQtL" Ids="UxtZxjLIeKDxsB9BbErgbY,LcUO5WfOEfuzvz6BQ2KCxm" />
+        <Link Id="Lm9ZrpqdLFEJS702uLGM3a" Ids="Ck0b9Fm6W6GxEbNGJgeI05,Udad8igNKGlXkj4SIfvVV8" />
+        <Link Id="QidfCpHBqpkDne4OKX6vcN" Ids="QTNlTyezfmbasb8gEcPG61,Dc7rTes8gEFct080wrJNsg" />
+        <Link Id="A8smptVfsCuuj3w1qPOuv3" Ids="I8MAlGEJKxag8SUuQTLx71,LpWIQOKhRMT4Jt3tKQLG58" />
+        <Link Id="I1BIG0Uj3rcncCROrgGQfL" Ids="MU5GcscWwFrk45xrCPm07u,JXjk0f1EzodWnmeV9gOzZp" />
+        <Link Id="NKHL3IfT3wQC5VqexlCKu1" Ids="RkfLJEI1nD6Jqo2WEFBeYS,FFjk3xX3QUXJDZcekXlKZa" />
+        <Link Id="OUi2Hx35XgWOH3LXMRXw5i" Ids="UUT74iRejEUw8kpEAa6dHx,IhsKJMIfZsfYF6xUlVucLc" />
+        <Link Id="SXnWnvVyAgZJ9sjiEYzfYS" Ids="NHrVzYogipFEDxC3IV2qWZ,C3LbWfwVElJKvc3TxkWobj" />
+        <Link Id="LBF4zZQyXrarkPAldO2API" Ids="JXt620dcIwTNKf5ghwhaGp,MNVbxnjPDHRRznJSzJnEPX" />
+        <Link Id="EC4EEDHPTaRQnGAQEVWjbK" Ids="U5emzVQ6EofWagaekCXGH2,SLeoSJ0mtJwpIBrN3Lo82U" />
+        <Link Id="IrHtYs9a44S8uM588h6Trg" Ids="EkFs6mHHZIMujfdgEOqlk2,UYCvpRMOoaQciC5U2bKDca" />
+        <Link Id="Abenbrk69WBMxtGtcfkJ26" Ids="PTFy7CVaB74mEbW20etmS8,D8REAWAkQaAbVGkxlquS0L" />
+        <Link Id="PDcZPUTzHkiOBO68bBuBb7" Ids="OKMRQq7ARgCNQ0DguHEGvA,DQROUBK64s5ONRgS27ZRF9" />
+        <Link Id="N816ccdxMED1kPJyrIDNBP" Ids="SHAzWUqXFUmNiPpi2L0l9h,Nh33CkLj3g3JIZQ1Wtqa84" />
+        <Link Id="H7vdUbwxCS3uFkODg1sNoX" Ids="UMcwMKzEE7Q6aJK6u5yUzN,ORtzkXwQGw7OVYDzpI5bZ9" />
+        <Link Id="E0gJgG6Y0F3bCI3wAs4Ybh" Ids="Ck0b9Fm6W6GxEbNGJgeI05,T8FlHZCGgcBI0InyFmfool" />
+        <Link Id="JCkPfZand1iyeLafBew7J9" Ids="FrAAoKuMOh5K0ye1ORqZKd,NFHGqRAp95Ibg5stwUPuv2" />
+        <Link Id="JbPqeKlMdgwB5oJRJK9eKF" Ids="GqniStYYxec691wpuoGqOX,O44OyRhtxJ6Z4CIvpXlQh1" />
+        <Link Id="RNnxLmBfW2OMg4RuO8W2CA" Ids="RO8aBSYCJdhlqHJCEIyLAA,CYRfJkATXB3MULFJurXl7J" />
+        <Link Id="D37wN4jL5Qu5fhmgsa8Ml0" Ids="PzHgZmzlnFRzQmgZ5zVIXX,FPvEbPKx0Q2bgiWWgJ3KuF" />
+        <Link Id="GmAddHy1EAw0UoNkcmrrMI" Ids="ICl6Jwe2HfP8e3frWTbgFE,Cc6xgbnGsU368CM3MrUcbN" />
+        <Link Id="O3v4IE3U0Co0RUqdoCZRJb" Ids="FkHVEB8lFqL5MmqkqXCmNk,DEhbqpKlwjTgV2nzO22wfj" />
+        <Link Id="DFJUOgooKmvkgufX72TuGp" Ids="VaHlWDCnWB4hR4qvgBc3TJ,G88um6CokkWEKxBIVZBAaM" />
+        <Link Id="Eg0LdBJBMmmtGbRLahe06N" Ids="ICl6Jwe2HfP8e3frWTbgFE,VuvytF8oSOM1ZXfvpw62Rm" />
+        <Link Id="RVgVNWNmVQLnFgPVaTLD4h" Ids="FkHVEB8lFqL5MmqkqXCmNk,C7raymyT76ZJBj3ILHLxZW" />
+        <Link Id="MJPxOqaVZ7UTft18l5TfHN" Ids="J0gfkk0GswK2eKFcxk8pcp,BOEcqqbX9zI4aeoBawrpYz" />
+        <Link Id="LXHbj8zMvZhJkwh5Fy5oh6" Ids="Pq6PXhDc30Y73OLApgMjM0,NWUw1wkpZWuyw2DccxwAOd" />
+        <Link Id="F1tlkRJYExsO8dJq96tCfK" Ids="OKMRQq7ARgCNQ0DguHEGvA,TIjKhLd4rTZDn2dSnszv01" />
+        <Link Id="JwT1G22UtV44dBwf7C3qpK" Ids="HwRnfleRlGfpKEI7pXlafv,H1yv1JBLijwVmMX34e3Fzf" />
+        <Link Id="UZX1mywk6V3MXXAQSglT3i" Ids="PDfAZ7dDcrkFW1pQwiJ9x4,ARy89W2GJw4s60rzwfmBsV" />
+        <Link Id="GEqsNpmBuxct8MoUzAqSxR" Ids="FRGL7PazfZpBv73noSDRaO,Sn0IFyPbF1sneJyHMkVp7A" />
+        <Link Id="PclhoIhHEmjZvJGPjU662Y" Ids="Ddqg0xhHjdkgJZ68fhWmTD,GoA5ugmSeRASmqqlJuk5hE" />
+      </Patch>
+    </Node>
+  </Patch>
+</Document>

@@ -109,7 +109,7 @@ public class LabelStyleNode
 
             Place(label, style);
 
-            _built = style is null ? label : Combined(style, label);
+            _built = style is null ? label : Styles.Combine(style, label);
             _upstream = style;
             _attribute = name;
             _color = ink;
@@ -160,8 +160,13 @@ public class LabelStyleNode
     /// The first <c>SymbolStyle</c> anywhere in the style handed to us, or null.
     /// </summary>
     /// <remarks>
-    /// Recursive because this node's own <c>Combined</c> wraps styles in a <c>StyleCollection</c>,
-    /// so a chain two nodes long already arrives nested.
+    /// Recursive because a style arrives wrapped: this node combines into a `StyleCollection`, and
+    /// `StyleByGeometry` puts the marker behind a `ThemeStyle`.
+    ///
+    /// **A `GeometryTheme` is opened by reading its `Point` property, not by calling it.** A
+    /// `ThemeStyle` is a function of a feature and there is no feature here — placement is decided
+    /// once, when the style is built, not per feature. That is why `StyleByGeometry` carries its
+    /// three styles as properties as well as using them.
     /// </remarks>
     static MapsuiSymbolStyle? FindSymbol(IStyle? style)
     {
@@ -169,6 +174,8 @@ public class LabelStyleNode
         {
             case MapsuiSymbolStyle symbol:
                 return symbol;
+            case GeometryTheme theme:
+                return FindSymbol(theme.Point);
             case StyleCollection collection:
                 foreach (var inner in collection.Styles)
                 {
@@ -181,12 +188,4 @@ public class LabelStyleNode
         }
     }
 
-    /// <summary>Both styles as one, because a layer takes a single style.</summary>
-    static IStyle Combined(IStyle first, IStyle second)
-    {
-        var collection = new StyleCollection();
-        collection.Styles.Add(first);
-        collection.Styles.Add(second);
-        return collection;
-    }
 }

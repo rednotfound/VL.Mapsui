@@ -22,6 +22,9 @@
       dist\                             VL.Mapsui itself     (.\pack.ps1 stages it)
       deps\                             Mapsui and friends   (build.ps1 installs them)
       <vl-nettopologysuite>\dist\       the geometry package the help patches create shapes with
+      <vl-geojson>\dist\                only examples\ needs it, and only if it is packed
+
+    Four now. The list has grown twice since it was three, which is the argument for the script.
 
     OPENING A DOCUMENT IN VVVV IS RUNNING IT. Read what you came for and close the window. Never
     leave it running unattended - that is how 17,000 TCP connections happened.
@@ -48,18 +51,32 @@ $ErrorActionPreference = 'Stop'
 $RepoRoot = Split-Path $PSScriptRoot -Parent
 $Vvvv     = 'C:\Program Files\vvvv\vvvv_gamma_7.4-win-x64\vvvv.exe'
 $NtsRepo  = 'D:\2026_Projects\vl-nettopologysuite'
+$GeoRepo  = 'D:\2026_Projects\vl-geojson'
 
 if (-not (Test-Path $Vvvv)) {
     Write-Host "vvvv not found at $Vvvv" -ForegroundColor Red
     exit 1
 }
 
+# help\ and examples\ both. An example is the thing most likely to need opening by hand - it is
+# the one that needs packages this repository does not depend on, so it is the one nobody can
+# launch from memory.
 $helpDir = Join-Path $RepoRoot 'help'
-$patches = @(Get-ChildItem $helpDir -Recurse -File -Filter *.vl | Sort-Object Name)
+$exampleDir = Join-Path $RepoRoot 'examples'
+$patches = @(
+    @(if (Test-Path $helpDir) { Get-ChildItem $helpDir -Recurse -File -Filter *.vl }) +
+    @(if (Test-Path $exampleDir) { Get-ChildItem $exampleDir -Recurse -File -Filter *.vl })
+) | Sort-Object Name
 
 if ($List -or (-not $Patch -and -not $Path)) {
-    Write-Host "`nhelp patches in $helpDir`n"
-    $patches | ForEach-Object { Write-Host "  $($_.BaseName)" }
+    Write-Host "`nhelp\"
+    @($patches | Where-Object { -not $_.FullName.StartsWith($exampleDir, [StringComparison]::OrdinalIgnoreCase) }) |
+        ForEach-Object { Write-Host "  $($_.BaseName)" }
+    $examples = @($patches | Where-Object { $_.FullName.StartsWith($exampleDir, [StringComparison]::OrdinalIgnoreCase) })
+    if ($examples) {
+        Write-Host "`nexamples\  (not packed - these need other packages too)"
+        $examples | ForEach-Object { Write-Host "  $($_.BaseName)" }
+    }
     Write-Host "`nusage: .\tools\Open-HelpPatch.ps1 ""Draw many features""`n"
     exit 0
 }
@@ -89,6 +106,8 @@ $wanted = @(
     @{ Name = 'dist (VL.Mapsui)';        Path = (Join-Path $RepoRoot 'dist') }
     @{ Name = 'deps (Mapsui, BruTile…)'; Path = (Join-Path $RepoRoot 'deps') }
     @{ Name = 'VL.NetTopologySuite';     Path = (Join-Path $NtsRepo 'dist') }
+    @{ Name = 'VL.GeoJSON';              Path = (Join-Path $GeoRepo 'dist') }
+    @{ Name = 'VL.GeoJSON deps';         Path = (Join-Path $GeoRepo 'deps') }
 )
 
 $missing = @($wanted | Where-Object { -not (Test-Path $_.Path) })

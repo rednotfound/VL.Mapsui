@@ -36,6 +36,10 @@ out to be sitting in a Mapsui dependency we already ship.
 | `ZoomToLayer`, `ZoomToLayers` | `Mapsui.Navigate` | put the view where the data is, on a trigger. Framing every frame would pin the view and the map could not be moved |
 | `Drag`, `ZoomIn`, `ZoomOut` | `Mapsui.Navigate` | stateful gestures — they remember the previous frame |
 | `ScaleBar`, `Attribution`, `ZoomButtons` | `Mapsui.Widgets` | Mapsui's own furniture, added to a map once each |
+| `SymbolStyle`, `StyleByGeometry` | `Mapsui.Styles` | what a point looks like, and one style per geometry type |
+| `VisibleRange` | `Mapsui.Layers` | the zoom levels a layer is drawn at — the only thing that reduces a busy map |
+| `Pick`, `ScreenToWorld`, `WorldToScreen` | `Mapsui` | asking the map what is under a coordinate, and back |
+| `ToFeatures`, `Split` | `Mapsui` | a patch's own records in, geometry and attributes out |
 | `ToSkiaLayer` | `Mapsui.Skia` | the bridge into VL.Skia's scene graph, including the press a widget gets |
 
 ---
@@ -79,13 +83,54 @@ NOTES.md, 2026-08-14. vvvv's own statement of the idiom is in `VL.Skia`'s *Expla
 Keyboard*: the Mouse node is connected to the Renderer it interacts with, and its position is wired
 onward.
 
-### Styles — 4 of 28
+### Layers — draw order and visibility
 
-`VectorStyle`, `LabelStyle` and `SymbolStyle` are their own nodes, which was the fix for the geometry
-layer's pin count and the Mapsui-idiomatic shape. Mapsui also has `CalloutStyle`, `RasterStyle`,
-`ThemeStyle`, plus `Pen`, `Brush`, `Font`, `Offset`, `Sprite`, `SymbolType`, `PenStyle`,
-`PenStrokeCap`, `StrokeJoin`, `UnitType`. `StyleCollection` is used but not exposed: it is how
-`LabelStyle` carries an upstream style through, since a layer takes one style and two were needed.
+**`LayerCollection` is an ordered list and nothing else.** `Add`, `Insert(index, …)`,
+`Move(index, layer)`. No `MoveToTop`, no priority, no groups — Mapsui's layer **groups are a v5
+feature** and 4.1.9 does not have them. `ILayer` carries thirteen properties and not one of them is
+ordering. Index 0 is the bottom.
+
+So order is position, which in a patch means the spread handed to `Map`. See
+`docs/ARCHITECTURE.md` for why that is right and why no `Mapsui.Group` node exists: `Cons` is
+already the group node on this chain.
+
+**`MinVisible` / `MaxVisible` are wrapped as `VisibleRange`**, and they were worth checking before
+wrapping: `get_MinVisible` occurs **zero times** in `Mapsui.Rendering.Skia.dll`, the same reading as
+`LabelColumn` (works) and `UnitType` (dead). Rendered, they are a hard cut — 91204 pixels inside the
+range, **0** outside. Two facts the node exists to hide: they are **read-only on the `ILayer`
+interface** and settable only on `BaseLayer`, and they are **resolutions**, so a higher zoom level
+is a smaller number and the two ends swap over.
+
+**`Enabled` is checked in the Skia renderer itself** (`get_Enabled` appears there), so a disabled
+layer costs nothing and draws nothing.
+
+**`Layer.Opacity` is not wrapped yet.** It is the third dimension of stacking after order and
+visibility, and it is one settable double.
+
+**Labels do not rise to the top, and no ordering will make them.** A label is part of a feature's
+style inside a layer, so a layer above covers the labels of a layer below — measured 2026-08-16,
+label ink 28 pixels alone and 0 under a polygon layer. Cartography says labels go last; Mapsui says
+layers go in order. The way to have both is a **label-only layer placed last**, which is what
+Mapbox GL does with its symbol layers.
+
+### Styles — 5 of 28
+
+`VectorStyle`, `LabelStyle`, `SymbolStyle` and `StyleByGeometry` are their own nodes, which was the
+fix for the geometry layer's pin count and the Mapsui-idiomatic shape. Mapsui also has
+`CalloutStyle`, `RasterStyle`, `GradientTheme`, plus `Pen`, `Brush`, `Font`, `Offset`, `Sprite`,
+`SymbolType`, `PenStyle`, `PenStrokeCap`, `StrokeJoin`, `UnitType`. `StyleCollection` is used but
+not exposed: it is how `LabelStyle` carries an upstream style through, since a layer takes one style
+and two were needed.
+
+**`StyleByGeometry` is `Mapsui.Styles.Thematics.ThemeStyle`** — one style per geometry type, chosen
+per feature as it is drawn. It exists because `SymbolStyle` draws points and **nothing else**, which
+makes every map read from a real file a mixed-geometry problem. Three pins: Point, Line, Polygon.
+See "styling mixed geometry" below; it is the one design decision in this package that was taken
+twice.
+
+`Mapsui.Styles.Thematics.GradientTheme` is the value-driven sibling — style interpolated across a
+numeric attribute, which is what a choropleth is. Not wrapped; it is the obvious next thematic node
+and the mechanism is already proven by `StyleByGeometry`.
 
 **A style node is stateful, and the reason is worth carrying to the next one.** It holds no
 resource, but its *identity* is compared downstream twice: a layer treats a new style object as a
@@ -157,7 +202,46 @@ what `IStyle.MinVisible` / `MaxVisible` are for and is not wrapped yet.
 (`SymbolStyle.UnitType`, `LabelStyle.CollisionDetection`) or to behave differently from their name.
 And the cheap check is only a hint: `LabelColumn` appears **zero times** in
 `Mapsui.Rendering.Skia.dll` and works perfectly, because the read happens inside `Mapsui.dll`. A
-zero in a metadata scan is a reason to measure, never a verdict.
+zero in a metadata scan is a reason to measure, never a verdict — `ThemeStyle` also scores zero and
+also works, which is exactly the pair that makes the scan useless on its own.
+
+### Styling mixed geometry — the decision taken twice
+
+**`SymbolStyle` draws points and erases everything else**, measured 2026-08-16: a polygon under one
+covers **0 pixels**, where a `VectorStyle` covers 14884 and *no style at all* still manages 956. A
+raw `Mapsui.Styles.SymbolStyle` behaves the same, so the renderer dispatches on the style's runtime
+type and `SymbolStyle : VectorStyle` buys nothing. Any file with more than one geometry kind — which
+is any real file — loses half its contents to this, silently.
+
+**The first fix was wrong and shipped for an afternoon.** A `Style` pin on `SymbolStyle` stacked a
+`VectorStyle` underneath so the polygon renderer would find one. Polygons returned; every point
+gained a second concentric circle, because a `VectorStyle` draws its own 32-pixel marker there too,
+and `Scale` below 1 stopped doing anything — 0.6 measured 22 pixels across alone and 34 stacked,
+which is simply the default. **A fix that adds an artifact is not a fix.**
+
+**The right answer already existed in Mapsui and in every other mapping library**: dispatch by
+geometry type. OpenLayers takes a style function returning
+`styles[feature.getGeometry().getType()]`; Mapbox GL splits `circle` / `line` / `fill` / `symbol`
+into layer types; Leaflet has `pointToLayer` beside `style`; a QGIS layer is single-geometry-type
+with its own renderer. Mapsui's version is `ThemeStyle`, and `StyleByGeometry` wraps it. Each
+feature is drawn once, by the style meant for it — every geometry type through the node puts down
+exactly the pixels its style puts down alone.
+
+Two facts about `ThemeStyle` worth knowing before touching it:
+
+- **`GetStyle` cannot be overridden.** Reflection reports it virtual, which is only how an interface
+  implementation looks; the compiler answers `CS0506`. Pass the dispatch to the base constructor as
+  a function over the constructor's *parameters* — C# forbids `this` there.
+- **A `null` from `GetStyle` draws nothing and throws nothing.** So an unwired geometry pin is a
+  silent disappearance, and `FeatureLayer`'s `Status` names it: *"1 feature needs StyleByGeometry's
+  Polygon pin"*.
+
+### `FeatureLayer.Status`
+
+An output pin, added because this node is **the only one that sees the features and the style at the
+same time**. Everything else in a patch can be truthful while the screen is empty: `Parses` reads 1,
+`Layers Built` reads 1, and a polygon is missing because the style cannot draw it. It reports the
+count normally, and otherwise says which features will not be drawn and what to wire.
 
 The claim it replaces was written from memory about how Mapsui divides work between its renderers,
 in a document whose whole purpose is to be trusted about exactly that. Left as a marker: plausible

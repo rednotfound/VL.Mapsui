@@ -46,7 +46,10 @@ writing any node; the four questions at the top of it would have prevented both.
    agreed to anything yet. OpenStreetMap runs on donated hardware and its tile policy forbids
    bulk downloading; we send a User-Agent naming this package.
 3. **Never leave vvvv running unattended, and never start it in the background.** Launch, read
-   the value, close. Leaks accumulate across sessions — this one grew over several.
+   the value, close. Leaks accumulate across sessions — this one grew over several. **Launch only
+   through `tools\Open-HelpPatch.ps1`** — there are five package repository folders now, and every
+   one omitted produces an error naming something else entirely. Two launches were lost to that in
+   one afternoon.
 4. **Only a change to what the tile source *is* may rebuild the map.** Where it looks goes
    through `Navigator.CenterOn` / `ZoomToLevel`, because dragging changes the centre on every
    frame and a rebuild-on-move design becomes a per-frame rebuild the moment interaction exists.
@@ -177,7 +180,8 @@ vl-mapsui/
 │   ├── FeatureNodes.cs           # Feature and Split - NTS geometry + attributes, the neutral type
 │   ├── PickNodes.cs              # [ProcessNode] Pick + ScreenToWorld - the only nodes handing data BACK
 │   ├── FeatureLayerNodes.cs      # [ProcessNode] FeatureLayer - THE NTS to Mapsui adapter
-│   ├── StyleNodes.cs             # [ProcessNode] VectorStyle - stateful for its identity, not a resource
+│   ├── StyleNodes.cs             # [ProcessNode] VectorStyle + Styles.Combine (FLATTENS - nested draws nothing)
+│   ├── GeometryThemeNodes.cs     # [ProcessNode] StyleByGeometry - one style per geometry type
 │   ├── GeometryLayerNodes.cs     # [ProcessNode] Geometry - the shortcut, composed from those three
 │   ├── MapNode.cs                # [ProcessNode] Map + ViewportInfo / LayerInfo readers
 │   ├── NavigateNodes.cs          # CenterOn, ZoomToLevel, ZoomByWheel, Refresh …
@@ -189,6 +193,8 @@ vl-mapsui/
 │   ├── PixelSpace.cs             # pixel/VL space bridge
 │   └── TileCache.cs              # the disk cache, its folder and its size
 ├── help/VL.Mapsui/               # Explanation Overview + 8 HowTos + Help.xml (ordering and tags)
+├── examples/                     # patches needing MORE than this package - never packed
+│   └── Example GeoJSON on a map.vl   # VL.GeoJSON + VL.Mapsui, the three-repository one
 ├── test/VL.Mapsui.Tests/         # 186 xunit tests, no network, no vvvv
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org
