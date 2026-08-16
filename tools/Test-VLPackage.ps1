@@ -180,28 +180,22 @@ foreach ($package in $Packages) {
     Write-Host ''
 }
 
-# 10. help patches, and the examples that are not packed ----------------------
-# help\ patches are shipped documents -- each nuspec packs help\<Package>\**\*.vl straight out of
-# the repo -- so they carry the same load-silently-fail risks as an entry point itself.
+# 10. help patches -------------------------------------------------------------
+# These are shipped documents -- the nuspec packs help\<Package>\**\*.vl straight out of the repo
+# -- so they carry the same load-silently-fail risks as the entry point itself.
 #
-# examples\ is NOT packed and must not be: a patch there may need packages this one does not
-# depend on, which is the whole reason the folder exists (Example GeoJSON on a map.vl needs
-# VL.GeoJSON, and VL.Mapsui neither declares nor should declare it). It is checked here all the
-# same. A hand-authored .vl breaks the same way wherever it lives, and an example nobody
-# validates is an example that rots quietly - it is not even covered by a default help compile.
+# There is no examples\ folder any more, and that is the point of the cross-package check below: a
+# patch needing a package this one does not depend on has a home now, in VL.Cartography, whose
+# nuspec declares the whole family. An examples\ folder here could never be packed, so nobody who
+# installed VL.Mapsui would ever see what was in it.
 $helpDir = Join-Path $RepoRoot 'help'
-$exampleDir = Join-Path $RepoRoot 'examples'
 # The @() must wrap the whole if-expression: PowerShell unwraps a single-element array on
 # the way out of one, and StrictMode then throws on .Count. Same trap as Get-Child above.
 $helpDocs = @(if (Test-Path $helpDir) { Get-ChildItem $helpDir -File -Recurse -Filter *.vl })
-$exampleDocs = @(if (Test-Path $exampleDir) { Get-ChildItem $exampleDir -File -Recurse -Filter *.vl })
 
-foreach ($helpDoc in @($helpDocs) + @($exampleDocs)) {
-    # The label is what every message below is prefixed with, so a failure says which folder it
-    # is in. Derived from the path rather than passed alongside, because the two lists are
-    # otherwise treated identically and a parallel array would be one more thing to keep in step.
+foreach ($helpDoc in $helpDocs) {
     $name = $helpDoc.Name
-    $label = if ($helpDoc.FullName.StartsWith($exampleDir, [StringComparison]::OrdinalIgnoreCase)) { "examples\$name" } else { "help\$name" }
+    $label = "help\$name"
     $head = Get-Content $helpDoc.FullName -AsByteStream -TotalCount 3
     if ($head.Count -lt 3 -or $head[0] -ne 0xEF -or $head[1] -ne 0xBB -or $head[2] -ne 0xBF) {
         Fail "$label has no UTF-8 BOM."
@@ -224,6 +218,25 @@ foreach ($helpDoc in @($helpDocs) + @($exampleDocs)) {
 
     if ($pins.Count -eq 0) {
         Fail "$label declares no dependency on any package in this repository, so none of its nodes will resolve."
+    }
+
+    # THE CROSS-PACKAGE RULE, the half of it that lives here.
+    #
+    # Everything under help\ is PACKED. A patch that needs a package this one does not depend on
+    # opens red for anyone who installed VL.Mapsui alone - and VL.Mapsui must not gain a dependency
+    # on a GeoJSON reader just so an example can exist, because a map engine has no business
+    # requiring one.
+    #
+    # So: one package, and it belongs here. Two or more, and it belongs in VL.Cartography, whose
+    # nuspec declares them all and whose validator enforces the mirror image of this check.
+    # VL.NetTopologySuite is exempt: this package's own nuspec depends on it, so a patch using it
+    # resolves for every installer.
+    $allowed = @($localNames) + @('VL.CoreLib', 'VL.Skia', 'VL.NetTopologySuite')
+    $foreign = @([regex]::Matches($helpRaw, '<NugetDependency\b[^>]*\bLocation="(VL\.[^"]*)"') |
+        ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -notin $allowed } | Sort-Object -Unique)
+
+    if ($foreign) {
+        Fail "$label needs $($foreign -join ', '), which this package does not depend on, so it would open red for anyone installing VL.Mapsui alone. A patch spanning packages belongs in VL.Cartography."
     }
     foreach ($pin in $pins) {
         if ($pin.Groups[2].Value -ne '0.0.0') {
@@ -309,25 +322,14 @@ if ($helpDocs.Count -eq 0) {
 } elseif (-not ($errors | Where-Object { $_ -like 'help\*' })) {
     Ok "$($helpDocs.Count) help patch(es) valid"
 }
-if ($exampleDocs.Count -gt 0 -and -not ($errors | Where-Object { $_ -like 'examples\*' })) {
-    Ok "$($exampleDocs.Count) example(s) valid - not packed, checked anyway"
-}
-
-# examples\ must never reach the package. The nuspec globs help\<Package>\**\*.vl and build.ps1
-# copies only help\<Package>, so this cannot happen today - which is exactly when to nail it down,
-# because the day someone widens a glob to help\** or examples\** the package silently starts
-# demanding a package it does not declare, and the symptom lands on a user rather than here.
-if ($exampleDocs.Count -gt 0) {
-    $leaked = @($Packages | ForEach-Object {
-        [xml]$n = Get-Content (Join-Path $RepoRoot "$($_.BaseName).nuspec") -Raw
-        @(Get-Child (@(Get-Child $n.DocumentElement 'files') | Select-Object -First 1) 'file') |
-            Where-Object { (Get-Attr $_ 'src') -like '*examples*' } |
-            ForEach-Object { "$($_.BaseName): $(Get-Attr $_ 'src')" }
-    })
-    if ($leaked) {
-        Fail "a nuspec packs examples\: $($leaked -join '; '). Examples may need packages this one does not depend on; they must stay out."
-    } else { Ok "no nuspec packs examples\" }
-}
+# An examples\ folder must not come back. Anything under it could never be packed - the nuspec
+# globs help\<Package>\**\*.vl - so it would be invisible to everyone who installed the package,
+# which is precisely what happened to Example GeoJSON on a map.vl before it moved to
+# VL.Cartography. A cross-package patch has a home; this repository is not it.
+$strayExamples = Join-Path $RepoRoot 'examples'
+if (Test-Path $strayExamples) {
+    Fail "examples\ exists again. Nothing there is packed, so no user ever sees it. A patch spanning packages belongs in VL.Cartography."
+} else { Ok "no examples\ - cross-package patches live in VL.Cartography" }
 
 # 11. stray map tiles -------------------------------------------------------
 #

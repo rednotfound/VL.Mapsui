@@ -5,12 +5,22 @@ Guidance for Claude Code (claude.ai/code) working in this repository.
 ## Project overview
 
 **VL.Mapsui** wraps [Mapsui](https://mapsui.com) — a real map engine — as nodes for
-[vvvv gamma](https://vvvv.org). It is the companion to `VL.GIS` (`D:\2026_Projects\vvvv-gis`),
-which is a *toolbox* rather than an engine: VL.GIS computes and lets the patch draw, while this
-package hands over a map that draws itself.
+[vvvv gamma](https://vvvv.org). One package per wrapped library, so this one draws maps and does
+nothing else.
 
-Separate repository on purpose. VL.GIS's rule is **one package per wrapped library**, and Mapsui
-is its own library.
+**It is one of four repositories, and knowing which does what saves guessing:**
+
+| | what it is |
+|---|---|
+| `vl-mapsui` (here) | draws maps: tiles, layers, styles, picking |
+| `D:\2026_Projects\vl-nettopologysuite` | geometry — points, lines, polygons, operations |
+| `D:\2026_Projects\vl-geojson` | reads and writes the format data arrives in |
+| `D:\2026_Projects\vl-cartography` | **the course.** No nodes; it declares the other three and holds every patch that needs more than one of them |
+
+They compose through **NetTopologySuite**, a library they share rather than an agreement they made:
+none of them references another. `D:\2026_Projects\vvvv-gis` holds the retired `VL.GIS`, whose
+published `0.2.0-alpha` still declares BruTile 6 and conflicts with this package — see
+`vl-cartography\README.md` for what a user has to delete by hand.
 
 **Current state (2026-08-14): a working package, not yet published.** A map renders in vvvv 7.4,
 pans, zooms and takes geometry from any NTS source. `VL.Mapsui.nuspec`, `build.ps1`, `pack.ps1`,
@@ -47,7 +57,7 @@ writing any node; the four questions at the top of it would have prevented both.
    bulk downloading; we send a User-Agent naming this package.
 3. **Never leave vvvv running unattended, and never start it in the background.** Launch, read
    the value, close. Leaks accumulate across sessions — this one grew over several. **Launch only
-   through `tools\Open-HelpPatch.ps1`** — there are five package repository folders now, and every
+   through `tools\Open-HelpPatch.ps1`** — there are three package repository folders, and every
    one omitted produces an error naming something else entirely. Two launches were lost to that in
    one afternoon.
 4. **Only a change to what the tile source *is* may rebuild the map.** Where it looks goes
@@ -88,6 +98,14 @@ ecosystem's nodes take three inputs or fewer, and the libraries people learn fro
 patches than nodes.
 
 `ZoomByWheel` (5 inputs) is this package's entry on that document's to-do list.
+
+**Where a patch lives: one package → this repo's `help\`; two or more → `VL.Cartography`.**
+Everything under `help\` is packed, so a patch needing a package this one does not depend on opens
+red for anyone who installed VL.Mapsui alone — and the cure is not to add the dependency, because a
+map engine has no business requiring a GeoJSON reader. `D:\2026_Projects\vl-cartography` is the
+course that owns those, declares the whole family in its nuspec, and compiles them all as a
+standing integration test. `Test-VLPackage.ps1` here refuses a help patch that names a foreign
+`VL.*` package, and refuses an `examples\` folder coming back.
 
 ## Packaging rules inherited from VL.GIS
 
@@ -193,8 +211,6 @@ vl-mapsui/
 │   ├── PixelSpace.cs             # pixel/VL space bridge
 │   └── TileCache.cs              # the disk cache, its folder and its size
 ├── help/VL.Mapsui/               # Explanation Overview + 8 HowTos + Help.xml (ordering and tags)
-├── examples/                     # patches needing MORE than this package - never packed
-│   └── Example GeoJSON on a map.vl   # VL.GeoJSON + VL.Mapsui, the three-repository one
 ├── test/VL.Mapsui.Tests/         # 186 xunit tests, no network, no vvvv
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org
@@ -260,6 +276,7 @@ dotnet build src\VL.Mapsui\VL.Mapsui.csproj -c Release
 # ..\vl-nettopologysuite\dist\ - and omitting one produces an error naming something else
 # entirely ("The referenced symbol source 'Mapsui.dll' couldn't be found", or "Missing package"
 # followed by 25 ambiguous Point candidates). Two launches were lost to this on 2026-08-16.
+# Cross-package patches are VL.Cartography's; its launcher carries six folders.
 .\tools\Open-HelpPatch.ps1 "Draw many features"     # -List shows them all
 
 # Compile every help patch headlessly, then READ THE GENERATED C# before opening any window:

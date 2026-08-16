@@ -186,6 +186,17 @@ Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
   `UnitType` and finding zero occurrences was good corroboration — but `LabelColumn` scores zero
   there too and works perfectly, because the read happens one assembly along. A zero means *go and
   measure*, and the measurement is the answer.
+- **One package → that package's `help\`. Two or more → VL.Cartography.** Everything under `help\`
+  is packed, so a patch needing a package this one does not depend on opens red for anyone who
+  installed VL.Mapsui alone — and the cure is not to add the dependency, because a map engine has
+  no business requiring a GeoJSON reader. An `examples\` folder was the first attempt and was
+  worse: nothing there is packed, so **no user ever saw it**. Both halves of the rule are checked
+  by `Test-VLPackage.ps1` in the two repositories, in opposite directions.
+- **Examples are how the design gets tested, not how it gets documented.** One cross-package patch
+  found three real defects here that 218 unit tests did not — a style that erased every polygon, a
+  fix for it that drew two markers on every point, and a nested style collection that rendered
+  nothing. None was reachable by testing one library alone. That is why the example pack is a
+  package with a compile harness rather than a folder of files.
 - **A mechanism the community proposed and did not adopt is data, not a gap.** A numeric z-index
   for Skia layers was written up as `GroupOrder`, posted for feedback, and drew one Like and no
   replies before the thread auto-closed; a second thread asking for the same thing got "would love
