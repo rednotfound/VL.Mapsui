@@ -160,7 +160,7 @@
             ***** your own shapes, from here down *****
 
             The shape has to come from somewhere, and that somewhere is NOT VL.Mapsui: this package
-            draws geometry, it does not create it. In a real patch the geometry comes from VL.GIS,
+            draws geometry, it does not create it. In a real patch the geometry comes from VL.NetTopologySuite,
             from a file, or from a service. Here it is a fixture so the example stands on its own.
 
             Read WKT is one way in and the shortest one to read on a page. VL.NetTopologySuite also
