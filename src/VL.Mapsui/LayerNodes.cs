@@ -138,7 +138,9 @@ public class OpenStreetMapLayerNode : IDisposable
             return layer;
         }
 
-        http.PersistentCache = cache.Cache;
+        // Its own folder under the cache root. Sharing one with XYZ meant whichever source drew
+        // first owned every tile, so switching basemaps did nothing at all - see TileDiskCache.CacheFor.
+        http.PersistentCache = cache.CacheFor("https://tile.openstreetmap.org/standard");
         status = cache.Folder;      // CacheStatus re-reads the size every frame from here on
         return layer;
     }

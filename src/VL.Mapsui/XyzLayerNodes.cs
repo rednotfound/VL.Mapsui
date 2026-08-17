@@ -154,7 +154,10 @@ public class XyzTileLayerNode : IDisposable
             return layer;
         }
 
-        source.PersistentCache = cache.Cache;
+        // Keyed on the template, so two services - or two styles from one service - never read
+        // each other's tiles. Without this, changing the URL changed nothing: see
+        // TileDiskCache.CacheFor for what that looked like and how long it hid.
+        source.PersistentCache = cache.CacheFor(url);
         status = cache.Folder;      // CacheStatus re-reads the size every frame from here on
         return layer;
     }

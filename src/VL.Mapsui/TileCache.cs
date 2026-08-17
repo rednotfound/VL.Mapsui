@@ -43,8 +43,32 @@ public sealed class TileDiskCache
     /// </remarks>
     public bool IsOn => Cache is not null;
 
-    /// <summary>What actually gets attached to the tile source, or null when this cache is off.</summary>
+    /// <summary>
+    /// The root cache. **Do not attach this to a tile source** — use <see cref="CacheFor"/>, which
+    /// keeps each source's tiles apart. This exists to answer <see cref="IsOn"/>.
+    /// </summary>
     internal FileCache? Cache { get; }
+
+    /// <summary>
+    /// A cache for one tile source, in its own folder under <see cref="Folder"/>.
+    /// </summary>
+    /// <remarks>
+    /// **Every source needs its own folder, and the reason is a bug this shipped with.** BruTile's
+    /// <c>FileCache</c> keys a tile on nothing but <c>{level}/{col}/{row}.png</c>. Point two
+    /// different services at one folder and the second one never fetches anything: it asks for
+    /// tile 7/63/41, the first service's copy is already there, and it is served that instead.
+    ///
+    /// The symptom is that changing <c>URL Template</c> appears to do nothing at all. The layer
+    /// really is rebuilt — <c>Layers Built</c> counts up, every guard reports success — and the
+    /// picture does not change, because no request is ever made. Found on 2026-08-17 by writing a
+    /// tutorial whose entire lesson was switching basemaps; 218 unit tests had not, because none of
+    /// them used two sources and a cache at once.
+    ///
+    /// It is worse than a wrong picture. The `Attribution` pin says one provider while the tiles on
+    /// screen came from another, so a patch can credit the wrong service in perfect good faith.
+    /// </remarks>
+    internal FileCache? CacheFor(string sourceKey)
+        => Cache is null ? null : new FileCache(Path.Combine(Folder, TileCache.Slug(sourceKey)), "png", TileCache.Expiry);
 
     /// <summary>The folder, and whether it is being written to.</summary>
     public override string ToString() => IsOn ? Folder : $"{Folder} (off)";
@@ -84,7 +108,38 @@ static class TileCache
     /// Seven days is the floor the policy sets for a cache that cannot read HTTP caching headers,
     /// which a plain file cache cannot.
     /// </summary>
-    static readonly TimeSpan Expiry = TimeSpan.FromDays(7);
+    internal static readonly TimeSpan Expiry = TimeSpan.FromDays(7);
+
+    /// <summary>
+    /// A folder name for one tile source: readable at the front, unambiguous at the back.
+    /// </summary>
+    /// <remarks>
+    /// The host is kept so that looking in the cache folder tells you who the tiles came from. The
+    /// hash is what actually separates them, because one host serves many styles — CyclOSM and
+    /// osmfr differ only in a path segment.
+    ///
+    /// **SHA-256 rather than <c>string.GetHashCode</c>, and that is not fussiness.** .NET randomises
+    /// string hash codes per process, so `GetHashCode` would name a different folder on every
+    /// launch: the cache would look like it worked, grow without bound, and never once produce a
+    /// hit. A cache that silently never hits is indistinguishable from no cache at all, which is
+    /// precisely the class of failure this file already exists to prevent.
+    /// </remarks>
+    internal static string Slug(string sourceKey)
+    {
+        var key = (sourceKey ?? string.Empty).Trim();
+
+        var host = Uri.TryCreate(key, UriKind.Absolute, out var uri) && !string.IsNullOrEmpty(uri.Host)
+            ? uri.Host
+            : "source";
+
+        foreach (var c in Path.GetInvalidFileNameChars())
+            host = host.Replace(c, '-');
+
+        var digest = System.Security.Cryptography.SHA256.HashData(
+            System.Text.Encoding.UTF8.GetBytes(key.ToLowerInvariant()));
+
+        return $"{host}-{Convert.ToHexString(digest)[..8].ToLowerInvariant()}";
+    }
 
     /// <summary>
     /// The folder a pin asks for, or the default when nothing is connected.

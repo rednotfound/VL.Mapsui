@@ -61,7 +61,12 @@ public class TileCacheTests
 
         var layer = node.Update(out _, out var status, enabled: true);
 
-        Assert.Equal(TileCache.DefaultDirectory, RootOf(AttachedCache(layer)));
+        // StartsWith rather than Equal since 2026-08-17: each source now caches into its own
+        // subfolder. The question this test exists to ask is unchanged - is it UNDER the default
+        // folder, or somewhere nobody meant?
+        var root = RootOf(AttachedCache(layer));
+        Assert.NotNull(root);
+        Assert.StartsWith(TileCache.DefaultDirectory + System.IO.Path.DirectorySeparatorChar, root);
         Assert.StartsWith(TileCache.DefaultDirectory, status);
     }
 

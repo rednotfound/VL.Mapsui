@@ -5,6 +5,72 @@ them do not belong here.
 
 ---
 
+## 2026-08-17 — one cache for every tile source, so the second one never fetched
+
+**Switching basemaps did nothing.** Reported by the user in the first minute of testing the patch
+whose entire lesson is switching basemaps: change `URL Template`, and the picture does not move.
+Their words were "我觉得这里可能有bug", and they were right.
+
+### What was on disk
+
+```
+%LOCALAPPDATA%\VL.Mapsui\tiles\
+  0  1  10  11  12  13  14  15  16  17  18  19  …      ← zoom levels, and NOTHING else
+  2250 tiles, 45.31 MB
+```
+
+`TileCache.Create` built one `FileCache(path, "png", Expiry)` and every layer node was handed it.
+**BruTile keys a tile on `{level}/{col}/{row}.png` and nothing more**, so all sources shared one
+namespace. Point a second service at it and it asks for tile 7/63/41, the first service's copy is
+already there, and it is served that. **No HTTP request is ever made.**
+
+### Why it took a human eye
+
+Every signal said fine. The layer really was rebuilt — the guard in `XyzTileLayerNode.Update`
+compares the URL and fires correctly. `Layers Built` counts up. `Cache Status` names a real folder
+with a real size. No exception, no warning, nothing in the log. The one observable that would have
+disagreed is the picture, and only a person was looking at that.
+
+**218 tests missed it because not one of them used two tile sources and a cache at the same time.**
+Every cache test used a single `OpenStreetMapLayerNode`. The bug needs two sources to exist at all,
+so a suite organised one node at a time could not have contained it — which is an argument about
+test *shape*, not test count.
+
+**It found itself the moment a tutorial existed.** First run of `Tutorial 01 Change how the world
+looks`, whose whole lesson is that the basemap is a string you own. That is the second job of
+VL.Cartography working exactly as claimed, for the second time in two days.
+
+### It is a licensing fault, not only a visual one
+
+`Attribution` carries whatever the pin says while the pixels came from whoever cached first. A
+patch can credit the wrong provider in complete good faith, and the screenshot proves compliance
+with a service it never contacted.
+
+### The fix, and the trap inside the fix
+
+`TileDiskCache.CacheFor(sourceKey)` gives each source a folder under the cache root:
+`tile.opentopomap.org-9f3a2b1c`. Host first so the folder is readable; hash second because one host
+serves many styles — `…openstreetmap.fr/hot/` and `…openstreetmap.fr/osmfr/` differ only in a path
+segment.
+
+**The hash is SHA-256 and must not be `string.GetHashCode()`.** .NET randomises string hash codes
+*per process*. A `GetHashCode`-derived folder name would change on every launch: the cache would
+grow without bound, never once hit, and report a perfectly healthy folder the whole time — the same
+species of silent failure, reintroduced by the fix for it.
+
+### Verified
+
+224 tests, up from 218. **Negative-tested**: reverting `CacheFor` to hand back the shared cache
+fails 5 of them, including `Two_sources_never_read_each_others_tiles`, which writes a tile as one
+source and asserts the other cannot find it. One existing test changed with the behaviour —
+`Nothing_connected_caches_to_the_default_folder_and_nowhere_else` now asserts the folder is *under*
+the default rather than equal to it. Its question is unchanged.
+
+**Old caches are orphaned**, not migrated. They expire in seven days; deleting the folder resets
+everything, and the user was asked rather than told.
+
+---
+
 ## 2026-08-16 — draw order, and the node that was not built
 
 A 2D map is a stack, so occlusion is the medium rather than an edge case. The question was what
