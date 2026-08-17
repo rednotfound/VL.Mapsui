@@ -28,16 +28,30 @@ sealed class MapsuiLayer : ILayer, IDisposable
     float _width = -1f;
     float _height = -1f;
 
-    // How long the layers spend fetching, measured rather than guessed.
+    // How long a layer change takes to settle, measured rather than guessed.
     //
-    // The useful question about a basemap switch is not "how long did the objects take to build" -
-    // that is object churn and lost in the noise - but "how long until the picture is complete".
-    // Busy answers exactly that, and the overlay can time it without any node telling it anything.
-    // Added 2026-08-17, when "switching is cheap" turned out to be an assertion with no number
-    // behind it, in a repository whose rule is that such claims do not belong in its documents.
-    readonly System.Diagnostics.Stopwatch _fetching = new();
-    bool _wasFetching;
-    double _lastFetchMs;
+    // **Second attempt.** The first timed how long any layer stayed Busy and printed "last burst
+    // N ms". It produced three identical readings for three different basemaps, which is not a
+    // measurement, and the flaw was not Busy's flicker - it was that the display **could not say
+    // which event its number belonged to.** A switch whose burst went undetected left the previous
+    // switch's figure on screen, looking exactly like a fresh one. A reading nobody can tell is
+    // stale is worse than no reading: it gets written into NOTES.md.
+    //
+    // So this times from the event itself - the frame the map's layer SET changes, which is what a
+    // basemap switch is - and counts completions, so a number that did not move is visibly a number
+    // that did not move.
+    readonly System.Diagnostics.Stopwatch _settling = new();
+    global::Mapsui.Layers.ILayer[] _lastLayers = Array.Empty<global::Mapsui.Layers.ILayer>();
+    bool _isSettling;
+    double _quietSince = -1;
+    double _lastSwitchMs;
+    int _switches;
+
+    // How long every layer must stay un-Busy before the picture counts as complete. Busy is
+    // propagated from TileFetchDispatcher through PropertyChanged and can drop between batches, so
+    // the first quiet frame is not the end. 300 ms is long enough to bridge that and short enough
+    // to stay inside a switch; it is subtracted back out of the reported figure.
+    const double QuietMs = 300;
 
     public MapsuiLayer(Map map) => _map = map ?? throw new ArgumentNullException(nameof(map));
 
@@ -176,17 +190,34 @@ sealed class MapsuiLayer : ILayer, IDisposable
         var placed = widgets.Count(w => w.Envelope is not null);
         Line($"widgets    {widgets.Length}, {placed} placed by the renderer");
 
-        // The cost of a basemap switch, as a number. Change the tile source and this is the time
-        // from the first request to the last tile arriving - a warm disk cache and a cold one give
-        // very different answers, which is the point of showing it rather than claiming it.
-        var fetching = _map.Layers.Any(l => l.Busy);
-        if (fetching && !_wasFetching) _fetching.Restart();
-        if (!fetching && _wasFetching) _lastFetchMs = _fetching.Elapsed.TotalMilliseconds;
-        _wasFetching = fetching;
+        // The cost of a basemap switch, as a number that says which switch it belongs to.
+        var layers = _map.Layers.ToArray();
+        if (!layers.SequenceEqual(_lastLayers))
+        {
+            _lastLayers = layers;
+            _settling.Restart();
+            _isSettling = true;
+            _quietSince = -1;
+        }
 
-        Line(fetching
-            ? $"fetching   yes, {_fetching.Elapsed.TotalMilliseconds:0} ms so far"
-            : $"fetching   no, last burst {_lastFetchMs:0} ms");
+        if (_isSettling)
+        {
+            var now = _settling.Elapsed.TotalMilliseconds;
+            if (layers.Any(l => l.Busy)) _quietSince = -1;
+            else if (_quietSince < 0) _quietSince = now;
+            else if (now - _quietSince >= QuietMs)
+            {
+                _lastSwitchMs = _quietSince;    // the quiet period itself is not part of the cost
+                _switches++;
+                _isSettling = false;
+            }
+        }
+
+        // The counter is the point. If it does not move when you change the basemap, the figure
+        // beside it belongs to an earlier change and means nothing about this one.
+        Line(_isSettling
+            ? $"switch #{_switches + 1}  settling, {_settling.Elapsed.TotalMilliseconds:0} ms so far"
+            : $"switch #{_switches}  settled in {_lastSwitchMs:0} ms");
 
     }
 

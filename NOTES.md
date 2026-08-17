@@ -67,18 +67,55 @@ real hazard: BruTile's `MemoryCache.Add` never checks `_disposed`, so a worker l
 
 ### Measured, because "cheap" was a guess
 
-The diagnostics overlay now times how long the layers stay `Busy`. That is the question worth
-asking — not how long the objects took to build, which is noise, but **how long until the picture is
-complete**.
+The diagnostics overlay times a basemap switch from the frame the map's layer set changes until
+every layer has been un-`Busy` for 300 ms continuously, and **numbers each one**. That is the
+question worth asking — not how long the objects took to build, which is noise, but **how long until
+the picture is complete**.
 
-**Observed in vvvv 7.4 on 2026-08-17, starting from an empty cache: returning to a basemap already
-visited is noticeably faster than reaching it the first time.** Reported by eye — *"切了之后确实更
-快"* — which establishes the direction and nothing else.
+### The result
 
-**The milliseconds were not read off, so there is no figure here, and none should be invented.** The
-direction was never in doubt; the useful number would have been the ratio, and it is still owed. The
-overlay prints it, so the next person to open the patch can close this out in thirty seconds:
-switch to a preset never used, read `last burst`, switch away, switch back, read it again.
+vvvv 7.4, empty cache, fixed viewport (22 tiles per basemap), one switch at a time:
+
+| basemap | cold | warm |
+|---|---|---|
+| Sentinel-2 cloudless | **2547 ms** | **0** |
+| NASA Black Marble | **2216 ms** | **0** |
+| EOX Terrain Light | **2333 ms** | — |
+
+**Cold is 2.2–2.5 s for 22 tiles across three different servers. Warm never registered as busy on
+any frame at all** — `0` here does not mean zero, it means *not observed*, so the true figure is
+under one frame, about 17 ms. **At least two orders of magnitude**, and the honest way to state it is
+as a floor rather than a ratio.
+
+Confirmed independently on disk: tiles were written in four bursts of ~1.5 s at 00:03:07, 00:03:31,
+00:03:50 and 00:04:03 — the initial load and the three cold switches, in order — and **nothing at all
+was written after 00:04:04**, which is when the two warm switches happened. They made no network
+request. The ~1.5 s of writing inside a ~2.3 s settle is the expected shape: first byte to last
+tile, plus the render.
+
+### The first instrument was wrong, and wrong in an instructive way
+
+Version one printed `last burst N ms`, timing how long any layer stayed `Busy`. It returned **2249
+three times for three different basemaps** — three servers, three tile sets, identical to the
+millisecond.
+
+The fault was not `Busy`'s flicker. It was that **the display could not say which event its number
+belonged to.** When a switch produced no detectable burst, the previous switch's figure stayed on
+screen looking exactly like a fresh reading, and nothing on screen could distinguish the two. *A
+reading nobody can tell is stale is worse than no reading, because it gets written down.*
+
+The user's first read of it — that presets 0 and 4 "did not need to load" — was half right and the
+disagreement was settled by neither of us arguing. Computing `TileCache.Slug` for all six presets and
+matching folders showed preset 4 had fetched 22 tiles, so it was cold and its 2249 was real; presets
+0 and 3 on the repeat were warm and theirs were stale. The check earned its trust by getting right a
+thing it did not have to: the three presets with **no folder** were exactly the three never selected.
+
+Version two therefore times from the **event** — the frame the layer set changes, which is
+frame-visible whether or not `Busy` ever rises — and shows a **counter**. A number beside a counter
+that did not move is visibly not about what you just did.
+
+**Generalisation worth keeping: an instrument must make its own staleness visible.** Accuracy is not
+enough if a reader cannot tell a fresh reading from an old one.
 
 ### Verified
 
