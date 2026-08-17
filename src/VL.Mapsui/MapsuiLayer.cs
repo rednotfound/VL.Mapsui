@@ -28,6 +28,17 @@ sealed class MapsuiLayer : ILayer, IDisposable
     float _width = -1f;
     float _height = -1f;
 
+    // How long the layers spend fetching, measured rather than guessed.
+    //
+    // The useful question about a basemap switch is not "how long did the objects take to build" -
+    // that is object churn and lost in the noise - but "how long until the picture is complete".
+    // Busy answers exactly that, and the overlay can time it without any node telling it anything.
+    // Added 2026-08-17, when "switching is cheap" turned out to be an assertion with no number
+    // behind it, in a repository whose rule is that such claims do not belong in its documents.
+    readonly System.Diagnostics.Stopwatch _fetching = new();
+    bool _wasFetching;
+    double _lastFetchMs;
+
     public MapsuiLayer(Map map) => _map = map ?? throw new ArgumentNullException(nameof(map));
 
     /// <summary>Print Mapsui's viewport and layer state over the map.</summary>
@@ -130,7 +141,7 @@ sealed class MapsuiLayer : ILayer, IDisposable
             Typeface = SKTypeface.FromFamilyName("Consolas"),
         };
 
-        canvas.DrawRect(SKRect.Create(0f, 0f, 480f, 186f), back);
+        canvas.DrawRect(SKRect.Create(0f, 0f, 480f, 202f), back);
 
         var y = 20f;
         void Line(string s) { canvas.DrawText(s, 8f, y, text); y += 16f; }
@@ -164,6 +175,18 @@ sealed class MapsuiLayer : ILayer, IDisposable
         var widgets = _map.Widgets.ToArray();
         var placed = widgets.Count(w => w.Envelope is not null);
         Line($"widgets    {widgets.Length}, {placed} placed by the renderer");
+
+        // The cost of a basemap switch, as a number. Change the tile source and this is the time
+        // from the first request to the last tile arriving - a warm disk cache and a cold one give
+        // very different answers, which is the point of showing it rather than claiming it.
+        var fetching = _map.Layers.Any(l => l.Busy);
+        if (fetching && !_wasFetching) _fetching.Restart();
+        if (!fetching && _wasFetching) _lastFetchMs = _fetching.Elapsed.TotalMilliseconds;
+        _wasFetching = fetching;
+
+        Line(fetching
+            ? $"fetching   yes, {_fetching.Elapsed.TotalMilliseconds:0} ms so far"
+            : $"fetching   no, last burst {_lastFetchMs:0} ms");
 
     }
 

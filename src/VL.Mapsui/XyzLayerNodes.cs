@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using VL.Core.Import;
 
 using ILayer = global::Mapsui.Layers.ILayer;
@@ -38,6 +39,32 @@ public class XyzTileLayerNode : IDisposable
     string _url = string.Empty;
     string _attribution = string.Empty;
     string _status = "off";
+
+    /// <summary>
+    /// One tile source per URL this node has been given, kept for reuse.
+    /// </summary>
+    /// <remarks>
+    /// **Layers are cheap and sources are not, and only the expensive half needs keeping.**
+    /// <c>new TileLayer(existingSource)</c> is legal and a source may back several layers, whereas
+    /// every <c>HttpTileSource</c> constructs its own <c>HttpClient</c> — and BruTile's
+    /// <c>HttpTileSource</c> is **not IDisposable**, so nothing ever releases it. Rebuilding the
+    /// source on every switch therefore leaked one connection pool per switch, reclaimed only when
+    /// a finalizer eventually ran, with pooled sockets lingering past that. That is the mechanism
+    /// behind this package's 17,000-connection incident running at a slower clock: once per
+    /// switch rather than once per frame. Harmless while a person clicks; not harmless in an
+    /// installation, or the first time somebody drives the preset index from an LFO.
+    ///
+    /// **Per node instance rather than static**, deliberately: <c>PersistentCache</c> is settable on
+    /// the source, so two nodes on the same URL but given different <c>TileCache</c> folders would
+    /// fight over one source. Per instance the count is bounded by the URLs this node has actually
+    /// been handed, which for a preset picker is the number of presets.
+    ///
+    /// **Keyed on URL *and* attribution** because BruTile bakes the attribution into the source at
+    /// construction, so a source reused under a different credit would carry the old one — and
+    /// silently crediting the wrong provider is precisely the failure this package keeps trying to
+    /// design out.
+    /// </remarks>
+    readonly Dictionary<string, HttpTileSource> _sources = new(StringComparer.Ordinal);
 
     /// <summary>Layers built by this node. It should reach 1 and stay there.</summary>
     internal int LayersBuilt { get; private set; }
@@ -137,19 +164,30 @@ public class XyzTileLayerNode : IDisposable
         return true;
     }
 
-    static TileLayer Build(string url, string attribution, TileDiskCache cache, out string status)
+    TileLayer Build(string url, string attribution, TileDiskCache cache, out string status)
     {
-        var source = new HttpTileSource(
-            new GlobalSphericalMercator(),
-            url,
-            name: "XYZ",
-            attribution: new BruTileAttribution(attribution),
-            userAgent: OpenStreetMapLayerNode.UserAgent);
+        // \n cannot occur in either half, so the pair cannot be ambiguous.
+        var key = url + "\n" + attribution;
+        if (!_sources.TryGetValue(key, out var source))
+        {
+            source = new HttpTileSource(
+                new GlobalSphericalMercator(),
+                url,
+                name: "XYZ",
+                attribution: new BruTileAttribution(attribution),
+                userAgent: OpenStreetMapLayerNode.UserAgent);
+            _sources[key] = source;
+        }
 
         var layer = new TileLayer(source) { Name = string.IsNullOrWhiteSpace(attribution) ? "XYZ" : attribution };
 
+        // PersistentCache is assigned on EVERY build, both branches, because a reused source
+        // arrives carrying whatever cache it was given last time. Returning early here without
+        // clearing it would leave the old FileCache attached, so switching the cache off would
+        // quietly keep writing - a setting that reports "off" and is not.
         if (!cache.IsOn)
         {
+            source.PersistentCache = new BruTile.Cache.NullCache();
             status = TileCache.Describe(cache);
             return layer;
         }
@@ -157,15 +195,22 @@ public class XyzTileLayerNode : IDisposable
         // Keyed on the template, so two services - or two styles from one service - never read
         // each other's tiles. Without this, changing the URL changed nothing: see
         // TileDiskCache.CacheFor for what that looked like and how long it hid.
-        source.PersistentCache = cache.CacheFor(url);
+        source.PersistentCache = cache.CacheFor(url)!;
         status = cache.Folder;      // CacheStatus re-reads the size every frame from here on
         return layer;
     }
 
     void Release()
     {
-        // AbortFetch before Dispose: a request in flight otherwise outlives the layer that asked
-        // for it, which is how connections accumulate.
+        // AbortFetch before Dispose. The ORDER is right; the reason first written here was not.
+        // AbortFetch does not cancel a download - BruTile calls GetByteArrayAsync with no
+        // CancellationToken, so up to four in-flight requests finish regardless. What it does is
+        // drain the QUEUE, which holds up to 128 tiles, and shrink the window on a real hazard:
+        // BruTile's MemoryCache.Add never checks _disposed, so a worker landing after Dispose
+        // silently refills a cache that will never be emptied again.
+        //
+        // The sources in _sources are NOT released here: they are reused across rebuilds, and
+        // BruTile offers no way to release one anyway.
         _layer?.AbortFetch();
         _layer?.Dispose();
         _layer = null;

@@ -40,6 +40,17 @@ public class OpenStreetMapLayerNode : IDisposable
     TileDiskCache? _attached;
     string _status = "off";
 
+    /// <summary>
+    /// The OSM tile source, built once and reused for every layer this node makes.
+    /// </summary>
+    /// <remarks>
+    /// See <c>XyzTileLayerNode</c> for the full reason. Short version: every
+    /// <c>HttpTileSource</c> owns an <c>HttpClient</c>, BruTile's source is not
+    /// <c>IDisposable</c>, and so nothing ever releases it. One source per node, not one per
+    /// rebuild.
+    /// </remarks>
+    global::BruTile.ITileSource? _source;
+
     /// <summary>Layers built by this node.</summary>
     internal int LayersBuilt { get; private set; }
 
@@ -117,38 +128,58 @@ public class OpenStreetMapLayerNode : IDisposable
         return _layer;
     }
 
-    static TileLayer Build(TileDiskCache cache, out string status)
+    TileLayer Build(TileDiskCache cache, out string status)
     {
-        var layer = OpenStreetMap.CreateTileLayer(UserAgent);
+        // Mapsui's factory is called ONCE and the source is kept; later rebuilds wrap it in a
+        // fresh layer. Every HttpTileSource constructs an HttpClient and BruTile's is not
+        // IDisposable, so building a new source each time toggling Enabled rebuilt the layer
+        // leaked one connection pool per toggle. Layers are cheap; sources are not.
+        var layer = _source is null
+            ? OpenStreetMap.CreateTileLayer(UserAgent)
+            : new TileLayer(_source);
+
+        _source ??= layer.TileSource;
 
         // Switched off, or a folder that did not work. Both arrive as a cache that is not on, and
         // both are reported rather than quietly replaced by the default.
-        if (!cache.IsOn)
-        {
-            status = TileCache.Describe(cache);
-            return layer;
-        }
-
+        //
         // Mapsui's factory takes a user agent and nothing else, so the disk cache is attached
         // afterwards. Keeping Mapsui's own definition of the OSM source is worth more than
         // rebuilding one here out of BruTile primitives.
         if (layer.TileSource is not BruTile.Web.HttpTileSource http)
         {
-            status = "cannot cache: the tile source is not an HttpTileSource";
+            status = cache.IsOn ? "cannot cache: the tile source is not an HttpTileSource"
+                                : TileCache.Describe(cache);
+            return layer;
+        }
+
+        // Assigned on both branches: a reused source arrives carrying whatever cache it was given
+        // last time, so an early return would leave the old FileCache attached and "off" would
+        // quietly keep writing.
+        if (!cache.IsOn)
+        {
+            http.PersistentCache = new BruTile.Cache.NullCache();
+            status = TileCache.Describe(cache);
             return layer;
         }
 
         // Its own folder under the cache root. Sharing one with XYZ meant whichever source drew
         // first owned every tile, so switching basemaps did nothing at all - see TileDiskCache.CacheFor.
-        http.PersistentCache = cache.CacheFor("https://tile.openstreetmap.org/standard");
+        http.PersistentCache = cache.CacheFor("https://tile.openstreetmap.org/standard")!;
         status = cache.Folder;      // CacheStatus re-reads the size every frame from here on
         return layer;
     }
 
     void Release()
     {
-        // AbortFetch before Dispose: a request in flight otherwise outlives the layer that asked
-        // for it, which is how connections accumulate.
+        // AbortFetch before Dispose. The ORDER is right; the reason first written here was not.
+        // AbortFetch does not cancel a download - BruTile calls GetByteArrayAsync with no
+        // CancellationToken, so up to four in-flight requests finish regardless. What it does is
+        // drain the QUEUE, which holds up to 128 tiles, and shrink the window on a real hazard:
+        // BruTile's MemoryCache.Add never checks _disposed, so a worker landing after Dispose
+        // silently refills a cache that will never be emptied again.
+        //
+        // The source is NOT released here. It is reused, and BruTile gives no way to release it.
         _layer?.AbortFetch();
         _layer?.Dispose();
         _layer = null;

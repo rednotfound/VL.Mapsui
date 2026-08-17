@@ -5,6 +5,84 @@ them do not belong here.
 
 ---
 
+## 2026-08-17 — every basemap switch leaked a connection pool
+
+Asked whether destroying and rebuilding the layer on each switch was best practice. The answer to
+the question is "it is fine". The answer found while checking is that we were also rebuilding
+something else, and that part was not fine.
+
+### What everyone else does
+
+| | tiles kept while hidden | requests while hidden |
+|---|---|---|
+| Leaflet — `removeLayer` | **no**, `_removeAllTiles()` deletes the `<img>`s | — |
+| OpenLayers — `setVisible(false)` | **yes**, the renderer's 512-tile LRU survives | zero |
+| MapLibre — `visibility: none` | **yes**, retired into `SourceCache._cache` | zero |
+| Mapbox — `setStyle()` | **no**, full teardown | — |
+| Mapsui — keep in collection, toggle `Enabled` | **yes** | zero (`TileLayer.cs:105` short-circuits) |
+| Mapsui — remove from collection | **no**, `LayerCollection` calls `ClearCache()` | — |
+
+**Destroy-and-rebuild is not disqualifying**: Leaflet does it and nobody calls Leaflet broken. Where
+a library *can* keep layers alive it does, but that is an optimisation. Note also that swapping which
+layer is in the collection buys nothing in Mapsui — `LayerCollection.cs:175-179` calls `AbortFetch()`
+**and `ClearCache()`** on every removed layer. Only staying in the collection preserves anything.
+
+### The defect, which is in the other half
+
+```csharp
+// BruTile 5.0.6, Web/HttpTileSource.cs:15
+private readonly HttpClient _httpClient = HttpClientBuilder.Build();
+```
+
+`HttpTileSource` is **not `IDisposable`** and nothing releases that client. Every switch therefore
+left a connection pool for a finalizer to find, with pooled sockets outliving even that. **It is the
+17,000-connection incident's mechanism at a slower clock** — once per switch instead of once per
+frame. Six clicks by hand is nothing; an installation, or a preset index wired to an LFO, is not.
+
+**The asymmetry that decides the fix: layers are cheap, sources are not.**
+`new TileLayer(existingSource)` is legal and a source may back several layers. So keep the source
+and rebuild only the layer.
+
+### The trap inside the fix
+
+`PersistentCache` is settable **on the source**, so a reused source arrives carrying whatever cache
+it was handed last time. Returning early on "the cache is off" would leave the old `FileCache`
+attached — a setting that reports off and keeps writing. It is assigned on every build now, in both
+branches, and a test asserts it.
+
+The source cache is keyed on **URL *and* attribution**, because BruTile bakes the attribution into
+the source at construction. Keyed on URL alone, a reused source would carry the previous credit —
+silently crediting the wrong provider, which is the failure this package keeps designing against.
+Per node instance rather than static, because two nodes on one URL with different `TileCache` roots
+would otherwise fight over one source.
+
+### A comment that was wrong about its own mechanism
+
+`Release()` said *"AbortFetch before Dispose: a request in flight otherwise outlives the layer"*. The
+**order is right and the reason was not.** `AbortFetch` cancels between tiles; the download is
+`GetByteArrayAsync` with **no CancellationToken**, so up to four in-flight requests finish anyway.
+What it buys is draining the queue — `MaxTilesInOneRequest` is 128 — and shrinking the window on a
+real hazard: BruTile's `MemoryCache.Add` never checks `_disposed`, so a worker landing after
+`Dispose` refills a cache that is never emptied again.
+
+### Measured, because "cheap" was a guess
+
+The diagnostics overlay now times how long the layers stay `Busy`. That is the question worth
+asking — not how long the objects took to build, which is noise, but **how long until the picture is
+complete**. A warm disk cache and a cold one give very different answers, which is why it is shown
+rather than asserted.
+
+*(Figure from the GUI pass to be filled in here. Until then this section states a method, not a
+result — see the rule at the top of this file.)*
+
+### Verified
+
+229 tests, up from 224. **Negative-tested**: reverting the source reuse fails 4 of the 5 new ones,
+and reverting the OpenStreetMap half separately fails the fifth — it had to be done in two passes,
+because the first revert left that test green and therefore unproven.
+
+---
+
 ## 2026-08-17 — one cache for every tile source, so the second one never fetched
 
 **Switching basemaps did nothing.** Reported by the user in the first minute of testing the patch

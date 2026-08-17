@@ -104,6 +104,30 @@ is a smaller number and the two ends swap over.
 **`Enabled` is checked in the Skia renderer itself** (`get_Enabled` appears there), so a disabled
 layer costs nothing and draws nothing.
 
+**`Enabled` is also the zero-cost way to switch basemaps, and the only one.** `TileLayer.RefreshData`
+short-circuits on `if (Enabled …)` (`TileLayer.cs:105`), so a disabled layer in the collection issues
+no requests **and keeps its 200–300 tile memory cache** (`MemoryCache<IFeature?>(200, 300)`, created
+per layer in the `TileLayer` constructor). Switching back is then instant and touches neither disk
+nor network.
+
+Three things make this worth writing down rather than leaving to instinct:
+
+- **Removing a layer from the collection does *not* preserve it.** `LayerCollection.cs:175-179`
+  calls `AbortFetch()` **and `ClearCache()`** on everything it removes, and `Clear()` does the same.
+  So "swap which layer is in the map" throws the memory cache away exactly as rebuilding does.
+- **There is no `SetSource`.** `TileLayer.TileSource` is a get-only property over a `private
+  readonly` field, and the schema, extent and attribution are all baked in at construction. Changing
+  the source means a new layer, full stop.
+- It is what everyone else does where they can: OpenLayers `setVisible(false)` keeps its 512-tile
+  LRU, MapLibre's `visibility: none` retires tiles into `SourceCache._cache`, and Mapsui's own WPF
+  `LayerList` sample toggles `Enabled` and `Opacity` and never touches the source. Leaflet cannot do
+  it at all and destroys its tiles on `removeLayer` — which is a useful reminder that rebuilding is
+  acceptable, not that keeping is unnecessary.
+
+**But reuse the tile SOURCE either way.** Every `HttpTileSource` owns an `HttpClient`, is not
+`IDisposable`, and is never released; one per rebuild is a leaked connection pool per rebuild. Both
+layer nodes cache their sources for this reason — see NOTES.md, 2026-08-17.
+
 **`Layer.Opacity` is not wrapped yet.** It is the third dimension of stacking after order and
 visibility, and it is one settable double.
 
