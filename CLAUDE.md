@@ -63,6 +63,12 @@ writing any node; the four questions at the top of it would have prevented both.
 4. **Only a change to what the tile source *is* may rebuild the map.** Where it looks goes
    through `Navigator.CenterOn` / `ZoomToLevel`, because dragging changes the centre on every
    frame and a rebuild-on-move design becomes a per-frame rebuild the moment interaction exists.
+   **And when that rebuild does happen, it must not rebuild the tile source.** `HttpTileSource`
+   owns an `HttpClient`, is not `IDisposable`, and is released by nothing, so one per rebuild is
+   one leaked connection pool per rebuild — rule 1's incident at a slower clock. Both layer nodes
+   cache their sources; `new TileLayer(existingSource)` is legal and cheap. Ask of anything a
+   rebuild creates: **if a thousand of these exist, who frees them?** See `docs/RULES.md` rule 12
+   and NOTES.md, 2026-08-17.
 5. **The overlay's first line is the smoke alarm.** It turns red on a rebuild across **two
    consecutive frames**, which nothing done by hand can produce. A raw count is not the alarm —
    toggling `Enabled` rebuilds, quite correctly, and an earlier version cried wolf for it. If

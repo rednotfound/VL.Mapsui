@@ -58,7 +58,8 @@ transitive closure.
    file handle, GPU resource, cache, thread or subscription must be a `[ProcessNode]` class,
    built once and rebuilt only when an input actually changes. Written as a static method, a map
    node opened **17,000 TCP connections in 13 minutes**, exhausted the machine's 16,384 ephemeral
-   ports and took down a home network.
+   ports and took down a home network. **Rule 12 is the other half of this**: being a `[ProcessNode]`
+   only decides *when* you rebuild, not *what* you are entitled to rebuild.
 9. **Never block on a task inside a node.** vvvv's runtime thread owns a `SynchronizationContext`,
    so `.Result` / `.Wait()` deadlocks it — the window closes without the process exiting. Return
    `IObservable`, or wrap in `Task.Run`. Testing sync-over-async in a host without a context
@@ -69,6 +70,25 @@ transitive closure.
     to anything yet.
 11. **Never leave vvvv running unattended, and never start it in the background.** Launch, read
     the value, close. Leaks accumulate across sessions.
+12. **When a node rebuilds, do not rebuild what you cannot release.** Rule 8 stops the rebuild
+    happening sixty times a second; this one is about the rebuild that is *supposed* to happen.
+    Split what the node owns into the part that is cheap to remake and the part that holds an
+    unmanaged resource, and keep the second. Ask of every object created in a rebuild: **if I make
+    a thousand of these, who frees them?** If the answer is "a finalizer, eventually" or "nobody",
+    it must be cached and reused.
+
+    Measured here on 2026-08-17: `BruTile.Web.HttpTileSource` constructs its own `HttpClient`, is
+    not `IDisposable`, and is released by nothing — so changing a basemap leaked a whole connection
+    pool per switch. Meanwhile `new TileLayer(existingSource)` is legal and a source may back
+    several layers, so **the expensive half never needed rebuilding at all.** This is rule 8's
+    incident at a slower clock: once per user action instead of once per frame, which is exactly
+    why nobody notices it during a demo.
+
+    Two traps that come with the fix, both of which shipped as bugs before the tests caught them:
+    settings that live on the *reused* object (`PersistentCache` here) must be re-applied on every
+    rebuild, or an old value survives and a pin that says "off" keeps working; and the cache key
+    must cover everything baked into the object at construction (attribution here), or a reused
+    object silently carries the previous one's identity.
 
 ---
 
@@ -162,6 +182,17 @@ Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
 - **A check that has never gone red is not a check.** The `.gitignore` rule added to stop stray
   tiles did not work on the first attempt — a pattern containing a slash is anchored to the
   repository root — and only planting a file and watching git ignore it caught that.
+- **The worst check is the one that answers plausibly and is asking something else.** A failing
+  check gets investigated; a *wrong* check closes the question. Three in one day, 2026-08-17:
+  `-match "\r\n"` reported a file as CRLF and it was mixed — the operator is true if *any* line ends
+  that way, and the lines being anchored on happened to be bare LF. `GetField("MemoryCache")`
+  returned null and was read as "there is no memory cache"; it is a private auto-property, so the
+  field is called `<MemoryCache>k__BackingField`. And a batch of tile URLs all timed out, which
+  looked like the servers until the same command failed against `example.com` — the shell had no
+  network at all. **Before believing a negative, prove the instrument can produce a positive.**
+- **A request that succeeds tells you nothing about whether you were allowed to make it.** CARTO's
+  and Esri's basemaps both return a correct, good-looking tile; neither permits the use. Reachability
+  and permission are different questions and only one of them has an error code.
 - **Test the composition, not the piece.** Ten green tests on `SymbolStyle` — four of them counting
   actual pixels — coexisted with two hundred invisible markers, because every one of them put a
   single style on a layer while the patch wires `SymbolStyle → LabelStyle → FeatureLayer`. The bug

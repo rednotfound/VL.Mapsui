@@ -69,11 +69,16 @@ real hazard: BruTile's `MemoryCache.Add` never checks `_disposed`, so a worker l
 
 The diagnostics overlay now times how long the layers stay `Busy`. That is the question worth
 asking — not how long the objects took to build, which is noise, but **how long until the picture is
-complete**. A warm disk cache and a cold one give very different answers, which is why it is shown
-rather than asserted.
+complete**.
 
-*(Figure from the GUI pass to be filled in here. Until then this section states a method, not a
-result — see the rule at the top of this file.)*
+**Observed in vvvv 7.4 on 2026-08-17, starting from an empty cache: returning to a basemap already
+visited is noticeably faster than reaching it the first time.** Reported by eye — *"切了之后确实更
+快"* — which establishes the direction and nothing else.
+
+**The milliseconds were not read off, so there is no figure here, and none should be invented.** The
+direction was never in doubt; the useful number would have been the ratio, and it is still owed. The
+overlay prints it, so the next person to open the patch can close this out in thirty seconds:
+switch to a preset never used, read `last burst`, switch away, switch back, read it again.
 
 ### Verified
 

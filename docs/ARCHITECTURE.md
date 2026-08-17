@@ -142,6 +142,35 @@ Everything else is a plain operation: `CenterOn`, `ZoomToLevel`, `Feature`, `Vie
 `Caches Built`. Those pins are not decoration: a number that climbs frame after frame is the
 signature of the failure above, and it is the first thing to look at when a map misbehaves.
 
+### A rebuild is not all-or-nothing
+
+Holding state decides *when* a node rebuilds. It does not settle **what a rebuild is entitled to
+throw away**, and that turned out to be a second, separate question.
+
+Inside a tile layer node there are two objects with very different economics:
+
+| | cost to remake | who frees it |
+|---|---|---|
+| `TileLayer` | cheap — `new TileLayer(existingSource)` is legal, and one source may back several layers | `Dispose`, which we call |
+| `HttpTileSource` | owns an `HttpClient` and therefore a connection pool | **nobody.** It is not `IDisposable` and BruTile offers no release path |
+
+So the layer nodes rebuild the layer and **keep the source**, keyed by URL. Before that, changing a
+basemap leaked a pool per switch — the 17,000-connection incident again, running at one-per-user-
+action instead of one-per-frame, which is precisely why it survived a demo.
+
+The general form, worth asking of anything a rebuild constructs: **if a thousand of these exist, who
+frees them?** "A finalizer, eventually" and "nobody" are the same answer, and both mean cache it.
+
+Two consequences that are easy to get wrong, and did ship wrong before tests caught them:
+
+- **Settings that live on the reused object must be re-applied every rebuild.** `PersistentCache`
+  sits on the source, so a reused source arrives carrying the last one — an early return on "the
+  cache is off" left the old `FileCache` attached, giving a pin that reported off while still
+  writing.
+- **The cache key must cover everything baked in at construction.** BruTile freezes the attribution
+  into the source, so a key of URL alone would hand back a source carrying the previous provider's
+  credit. Reuse must never change an object's identity behind the caller's back.
+
 ---
 
 ## What this package does not own
