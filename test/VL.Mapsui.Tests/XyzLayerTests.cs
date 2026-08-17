@@ -14,9 +14,21 @@ namespace VL.Mapsui.Tests;
 /// a Uri and compare strings, which is the whole point — a template that addresses the wrong tile
 /// is the failure that a network test would hide behind a plausible-looking image.
 /// </remarks>
-public class XyzLayerTests
+public class XyzLayerTests : IDisposable
 {
     const string Template = "https://tile.example.com/{z}/{x}/{y}.png";
+
+    /// <summary>
+    /// A cache that is switched off, for the tests that are not about caching.
+    /// </summary>
+    /// <remarks>
+    /// Since each tile source gets its own folder (2026-08-17), a test that lets the cache default
+    /// creates a directory under the real %LOCALAPPDATA%\VL.Mapsui\tiles - in the profile of
+    /// whoever ran `dotnet test`, named after a host that does not exist. Empty and harmless, and
+    /// still the wrong thing: this package has an incident about files appearing where nobody asked
+    /// for them. Passing this also states the intent, which "no cache argument" never did.
+    /// </remarks>
+    static readonly TileDiskCache NoDisk = TileCache.Off(System.IO.Path.GetTempPath());
 
     static HttpTileSource? SourceOf(global::Mapsui.Layers.ILayer? layer)
         => (layer as global::Mapsui.Tiling.Layers.TileLayer)?.TileSource as HttpTileSource;
@@ -27,7 +39,7 @@ public class XyzLayerTests
         // z, x and y land where the provider's documentation says they will. Asserted on the Uri
         // rather than on a fetch, so this says something exact and touches no network.
         using var node = new XyzTileLayerNode();
-        var layer = node.Update(out _, out _, Template, enabled: true);
+        var layer = node.Update(out _, out _, Template, enabled: true, cache: NoDisk);
 
         var uri = SourceOf(layer)!.GetUri(new TileInfo { Index = new TileIndex(3, 5, 7) });
 
@@ -42,7 +54,7 @@ public class XyzLayerTests
         // a wrong host failing on the first fetch.
         using var node = new XyzTileLayerNode();
 
-        var layer = node.Update(out _, out var status, "https://tile.example.com/tile.png", enabled: true);
+        var layer = node.Update(out _, out var status, "https://tile.example.com/tile.png", enabled: true, cache: NoDisk);
 
         Assert.Null(layer);
         Assert.StartsWith("cannot use", status);
@@ -57,7 +69,7 @@ public class XyzLayerTests
     {
         using var node = new XyzTileLayerNode();
 
-        Assert.Null(node.Update(out _, out _, template, enabled: true));
+        Assert.Null(node.Update(out _, out _, template, enabled: true, cache: NoDisk));
     }
 
     [Fact]
@@ -77,7 +89,7 @@ public class XyzLayerTests
         using var node = new XyzTileLayerNode();
 
         for (int frame = 0; frame < 100; frame++)
-            node.Update(out _, out _, Template, "© Example", enabled: true);
+            node.Update(out _, out _, Template, "© Example", enabled: true, cache: NoDisk);
 
         Assert.Equal(1, node.LayersBuilt);
     }
@@ -88,9 +100,9 @@ public class XyzLayerTests
         // The URL is what the tile source *is*, so it belongs to the layer's identity.
         using var node = new XyzTileLayerNode();
 
-        for (int frame = 0; frame < 10; frame++) node.Update(out _, out _, Template, enabled: true);
+        for (int frame = 0; frame < 10; frame++) node.Update(out _, out _, Template, enabled: true, cache: NoDisk);
         for (int frame = 0; frame < 10; frame++)
-            node.Update(out _, out _, "https://other.example.com/{z}/{x}/{y}.png", enabled: true);
+            node.Update(out _, out _, "https://other.example.com/{z}/{x}/{y}.png", enabled: true, cache: NoDisk);
 
         Assert.Equal(2, node.LayersBuilt);
     }
@@ -103,7 +115,7 @@ public class XyzLayerTests
         // the text arrives where the widget will look, not merely that the pin exists.
         using var node = new XyzTileLayerNode();
 
-        var layer = node.Update(out _, out _, Template, "© Example contributors", enabled: true);
+        var layer = node.Update(out _, out _, Template, "© Example contributors", enabled: true, cache: NoDisk);
 
         Assert.Equal("© Example contributors", layer!.Attribution.Text);
     }
@@ -113,7 +125,7 @@ public class XyzLayerTests
     {
         using var node = new XyzTileLayerNode();
 
-        var layer = node.Update(out _, out var status, Template, enabled: true);
+        var layer = node.Update(out _, out var status, Template, enabled: true, cache: TileCache.Default());
 
         Assert.NotNull(SourceOf(layer)!.PersistentCache as BruTile.Cache.FileCache);
         Assert.StartsWith(TileCache.DefaultDirectory, status);
@@ -129,5 +141,20 @@ public class XyzLayerTests
 
         Assert.Null(SourceOf(layer)!.PersistentCache as BruTile.Cache.FileCache);
         Assert.StartsWith("off", status);
+    }
+    /// <summary>
+    /// Removes the one folder <see cref="The_cache_is_attached_like_the_OpenStreetMap_layer_s"/>
+    /// creates in the real cache directory. That test is ABOUT the default folder, so it has to use
+    /// it; leaving the folder behind afterwards is a different matter.
+    /// </summary>
+    public void Dispose()
+    {
+        var stray = System.IO.Path.Combine(TileCache.DefaultDirectory, TileCache.Slug(Template));
+        try
+        {
+            if (System.IO.Directory.Exists(stray) && System.IO.Directory.GetFiles(stray).Length == 0)
+                System.IO.Directory.Delete(stray, recursive: true);
+        }
+        catch (System.IO.IOException) { /* a stray empty folder is not a test failure */ }
     }
 }
