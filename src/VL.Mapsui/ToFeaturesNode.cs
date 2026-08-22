@@ -306,7 +306,7 @@ public class ToFeaturesNode
                 if (read(value) is { } attributeValue)
                     builder[name] = attributeValue;
 
-            return FeatureNodes.Feature(geometry, builder.ToImmutable());
+            return FeatureHelper.Feature(geometry, builder.ToImmutable());
         }
 
         /// <summary>

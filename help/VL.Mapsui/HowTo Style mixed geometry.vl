@@ -145,7 +145,7 @@
             <Pin Id="N5x2BKQZkvvzcslCfsr5JZ" Name="Success" Kind="OutputPin" />
           </Node>
           <Node Bounds="300,610,110,19" Id="KjIpQa4pEu72nwqUqUXoqT">
-            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+            <p:NodeReference LastCategoryFullName="NTS.Feature" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Feature" />
             </p:NodeReference>
@@ -164,7 +164,7 @@
             <Pin Id="CZ5RnmdMDAhlDNqhBGmply" Name="Success" Kind="OutputPin" />
           </Node>
           <Node Bounds="300,690,110,19" Id="Ukf8SSszU7nia2slky6CjD">
-            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+            <p:NodeReference LastCategoryFullName="NTS.Feature" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Feature" />
             </p:NodeReference>
@@ -174,7 +174,7 @@
           </Node>
 
           <Node Bounds="300,510,110,19" Id="LKlHCGkEW27uDksjQ03tsc">
-            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+            <p:NodeReference LastCategoryFullName="NTS.Feature" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Feature" />
             </p:NodeReference>

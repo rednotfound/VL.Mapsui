@@ -23,7 +23,7 @@ public class FrameTests
     static global::Mapsui.Layers.ILayer LayerAround(double lon, double lat)
     {
         var node = new FeatureLayerNode();
-        var feature = FeatureNodes.Feature(Factory.CreatePoint(new Coordinate(lon, lat)));
+        var feature = FeatureHelper.Feature(Factory.CreatePoint(new Coordinate(lon, lat)));
         return node.Update(out _, out _, new[] { feature })!;
     }
 

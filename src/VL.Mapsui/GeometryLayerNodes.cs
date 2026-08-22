@@ -75,7 +75,7 @@ public class GeometryLayerNode : IDisposable
         // worse than having it in the open.
         if (!incoming.SequenceEqual(_geometries))
         {
-            _features = incoming.Select(g => FeatureNodes.Feature(g)).ToArray();
+            _features = incoming.Select(g => FeatureHelper.Feature(g)).ToArray();
             _geometries = incoming;
         }
 

@@ -94,7 +94,7 @@ public class LabelStyleTests
         var vector = new VectorStyleNode();
         using var layer = new FeatureLayerNode();
 
-        var feature = FeatureNodes.Feature(
+        var feature = FeatureHelper.Feature(
             Factory.CreatePoint(new Coordinate(139.7671, 35.6812)),
             ImmutableDictionary.CreateRange(new[]
             {

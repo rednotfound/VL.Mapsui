@@ -124,7 +124,7 @@
           <Pad Id="RS6Hqm6oVzhIG8hIyXH2eJ" Comment="parsed?" Bounds="420,470,60,15" ShowValueBox="true" isIOBox="true" />
 
           <Node Bounds="300,510,110,19" Id="LKlHCGkEW27uDksjQ03tsc">
-            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+            <p:NodeReference LastCategoryFullName="NTS.Feature" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Feature" />
             </p:NodeReference>

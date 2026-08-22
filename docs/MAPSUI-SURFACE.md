@@ -24,7 +24,6 @@ out to be sitting in a Mapsui dependency we already ship.
 |---|---|---|
 | `OpenStreetMap` | `Mapsui.Layers` | `TileLayer` over the OSM tile source, taking a cache |
 | `XYZ` | `Mapsui.Layers` | any slippy-map URL template — the package stops being about one basemap |
-| `Feature` | `Mapsui` | NTS geometry + attributes → `NetTopologySuite.Features.Feature`, the neutral type |
 | `FeatureLayer` | `Mapsui.Layers` | features + a style → `MemoryLayer`. **The NTS → Mapsui adapter lives here** |
 | `VectorStyle` | `Mapsui.Styles` | fill, outline, width. Stateful on purpose — see below |
 | `LabelStyle` | `Mapsui.Styles` | writes an attribute of each feature. `LabelColumn` names an attribute, so one style labels a thousand features differently |
@@ -39,8 +38,15 @@ out to be sitting in a Mapsui dependency we already ship.
 | `SymbolStyle`, `StyleByGeometry` | `Mapsui.Styles` | what a point looks like, and one style per geometry type |
 | `VisibleRange` | `Mapsui.Layers` | the zoom levels a layer is drawn at — the only thing that reduces a busy map |
 | `Pick`, `ScreenToWorld`, `WorldToScreen` | `Mapsui` | asking the map what is under a coordinate, and back |
-| `ToFeatures`, `Split` | `Mapsui` | a patch's own records in, geometry and attributes out |
+| `ToFeatures` | `Mapsui` | a patch's own records in, features out |
 | `ToSkiaLayer` | `Mapsui.Skia` | the bridge into VL.Skia's scene graph, including the press a widget gets |
+
+**`Feature` and `Split` are no longer here.** They moved to VL.NetTopologySuite's `NTS.Feature`
+category on 2026-08-22, because a feature is a data-model object that must be constructible
+without a map engine — this package only draws and picks them, converting into Mapsui's own
+`GeometryFeature` at the `FeatureLayer` boundary, exactly as Mapsui itself converts in its
+`GeoJsonProvider`. The evidence is in vl-nettopologysuite's `docs/ARCHITECTURE.md`, "Where a
+feature lives". Internally this package keeps `FeatureHelper` (not a node) for its own plumbing.
 
 ---
 
@@ -164,7 +170,8 @@ frame therefore rebuilds every layer holding it. Reverting the cache to prove it
 
 `LabelStyle` is the difference between shapes on a map and data you can read, and what unblocked it
 was not the style but the **attributes**: a label names a column, so it needed a patch to be able to
-build `Feature`'s attribute dictionary at all. `Collections.Dictionary`'s `Add` does it, with an
+build a feature's attribute dictionary at all (via `Feature [NTS.Feature]`, in VL.NetTopologySuite
+since 2026-08-22). `Collections.Dictionary`'s `Add` does it, with an
 unconnected `Input` for the empty one to start from — measured 2026-08-14, and
 `HowTo Label your data.vl` is the example.
 

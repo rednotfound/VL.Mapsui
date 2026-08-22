@@ -107,7 +107,7 @@ public class FeatureLayerTests
     static readonly GeometryFactory Factory = new();
 
     static NtsFeature At(double lon, double lat, params (string key, object value)[] attributes)
-        => FeatureNodes.Feature(
+        => FeatureHelper.Feature(
             Factory.CreatePoint(new Coordinate(lon, lat)),
             attributes.Length == 0
                 ? null
@@ -294,7 +294,7 @@ public class FeatureLayerTests
         {
             // Exactly what the patch computes per frame: a fresh geometry, a fresh feature.
             var geometry = Factory.CreatePoint(new Coordinate(139.7671, 35.6812));
-            var feature = FeatureNodes.Feature(geometry);
+            var feature = FeatureHelper.Feature(geometry);
             layer.Update(out _, out _, new[] { feature }, style.Update());
         }
 

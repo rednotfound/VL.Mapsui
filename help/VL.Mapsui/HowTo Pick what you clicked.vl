@@ -179,7 +179,7 @@
           </Node>
 
           <Node Bounds="300,510,110,19" Id="LKlHCGkEW27uDksjQ03tsc">
-            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+            <p:NodeReference LastCategoryFullName="NTS.Feature" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Feature" />
             </p:NodeReference>
@@ -252,7 +252,7 @@
             <Pin Id="HJHDCrUQpmWaLMi47xnQaV" Name="Output" Kind="StateOutputPin" />
           </Node>
           <Node Bounds="760,560,110,19" Id="HcC4GmxTQkOX0h9f1QBHMp">
-            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+            <p:NodeReference LastCategoryFullName="NTS.Feature" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Feature" />
             </p:NodeReference>
@@ -397,7 +397,7 @@
             this change with it.
           -->
           <Node Bounds="820,850,90,19" Id="CYMIRH8gTbXveoTImLcBSQ">
-            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+            <p:NodeReference LastCategoryFullName="NTS.Feature" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Split" />
             </p:NodeReference>

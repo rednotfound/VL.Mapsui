@@ -136,7 +136,7 @@ Three reasons, and the first is the expensive one:
 3. **It needs the previous frame.** `Drag`, `Click`, `ZoomIn`, `ZoomOut` — a gesture is a
    difference, and making every patch wire a `FrameDelay` for it would be noise.
 
-Everything else is a plain operation: `CenterOn`, `ZoomToLevel`, `Feature`, `ViewportInfo`.
+Everything else is a plain operation: `CenterOn`, `ZoomToLevel`, `ViewportInfo`.
 
 **Every stateful node reports how often it has rebuilt** — `Layers Built`, `Styles Built`,
 `Caches Built`. Those pins are not decoration: a number that climbs frame after frame is the
