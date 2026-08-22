@@ -5,7 +5,30 @@ them do not belong here.
 
 ---
 
-## 2026-08-17 — every basemap switch leaked a connection pool
+## 2026-08-23 — the WithinCommonSpace disappearance, reproduced with a second node
+
+The 2026-08-14 entry left a standing mystery: *"`DrawPath`'s output disappeared downstream of
+`WithinCommonSpace`. Not diagnosed, and not guessed at."* It is no longer specific to `DrawPath`.
+
+VL.Overworld's first draft of Tutorial 08 drew a VL.Skia `Circle`, positioned by `WorldToScreen`,
+through `WithinCommonSpace` set to `PixelTopLeft`, into the `Group` above `ToSkiaLayer`. Every
+static check passed — the patch compiled, the generated C# showed `WithinCommonSpace_P` updated
+with `CommonSpace.PixelTopLeft` deserialized verbatim and the circle's layer wired into the group —
+and **nothing rendered**. Same symptom, different layer node, nine days apart. Still not diagnosed;
+a plausible but unmeasured suspect is layer-bounds culling done in the outer space while the
+content draws in the inner one.
+
+Consequences, so the next reader does not pay for this a third time:
+
+- **The route is now failed twice: do not draw at a world position by converting to pixels in the
+  patch.** The working shape is the one the 2026-08-14 entry ended on — geometry stays in WGS84,
+  `Feature` → `FeatureLayer`, and the map projects. Tutorial 08 was rebuilt that way the same day
+  (it needed one `FrameDelay`, because a layer built FROM the map — via `ScreenToWorld` — and drawn
+  ON it is a genuine dataflow cycle).
+- **`WorldToScreen` still has no GUI consumer anywhere in the family.** Its arithmetic is
+  unit-tested (inverse of `ScreenToWorld`, `PickTests`), but nothing on screen has ever depended on
+  its output. If a real overlay need appears, the likely home is a VL.Mapsui node that draws inside
+  `PixelSpace.Draw` the way `MapsuiLayer` itself does — not a patch-side space conversion.
 
 Asked whether destroying and rebuilding the layer on each switch was best practice. The answer to
 the question is "it is fine". The answer found while checking is that we were also rebuilding
