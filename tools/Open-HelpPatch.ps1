@@ -24,7 +24,7 @@
       <vl-nettopologysuite>\dist\       the geometry package the help patches create shapes with
 
     Three, and it stays three: a help patch here may not need any other package - Test-VLPackage
-    refuses one that does. Cross-package patches are VL.Cartography's, and it has its own launcher
+    refuses one that does. Cross-package patches are VL.Overworld's, and it has its own launcher
     with six folders on it.
 
     OPENING A DOCUMENT IN VVVV IS RUNNING IT. Read what you came for and close the window. Never

@@ -15,12 +15,12 @@ nothing else.
 | `vl-mapsui` (here) | draws maps: tiles, layers, styles, picking |
 | `D:\2026_Projects\vl-nettopologysuite` | geometry — points, lines, polygons, operations |
 | `D:\2026_Projects\vl-geojson` | reads and writes the format data arrives in |
-| `D:\2026_Projects\vl-cartography` | **the course.** No nodes; it declares the other three and holds every patch that needs more than one of them |
+| `D:\2026_Projects\vl-overworld` | **the course.** No nodes; it declares the other three and holds every patch that needs more than one of them |
 
 They compose through **NetTopologySuite**, a library they share rather than an agreement they made:
 none of them references another. `D:\2026_Projects\vvvv-gis` holds the retired `VL.GIS`, whose
 published `0.2.0-alpha` still declares BruTile 6 and conflicts with this package — see
-`vl-cartography\README.md` for what a user has to delete by hand.
+`vl-overworld\README.md` for what a user has to delete by hand.
 
 **Current state (2026-08-14): a working package, not yet published.** A map renders in vvvv 7.4,
 pans, zooms and takes geometry from any NTS source. `VL.Mapsui.nuspec`, `build.ps1`, `pack.ps1`,
@@ -105,10 +105,10 @@ patches than nodes.
 
 `ZoomByWheel` (5 inputs) is this package's entry on that document's to-do list.
 
-**Where a patch lives: one package → this repo's `help\`; two or more → `VL.Cartography`.**
+**Where a patch lives: one package → this repo's `help\`; two or more → `VL.Overworld`.**
 Everything under `help\` is packed, so a patch needing a package this one does not depend on opens
 red for anyone who installed VL.Mapsui alone — and the cure is not to add the dependency, because a
-map engine has no business requiring a GeoJSON reader. `D:\2026_Projects\vl-cartography` is the
+map engine has no business requiring a GeoJSON reader. `D:\2026_Projects\vl-overworld` is the
 course that owns those, declares the whole family in its nuspec, and compiles them all as a
 standing integration test. `Test-VLPackage.ps1` here refuses a help patch that names a foreign
 `VL.*` package, and refuses an `examples\` folder coming back.
@@ -282,7 +282,7 @@ dotnet build src\VL.Mapsui\VL.Mapsui.csproj -c Release
 # ..\vl-nettopologysuite\dist\ - and omitting one produces an error naming something else
 # entirely ("The referenced symbol source 'Mapsui.dll' couldn't be found", or "Missing package"
 # followed by 25 ambiguous Point candidates). Two launches were lost to this on 2026-08-16.
-# Cross-package patches are VL.Cartography's; its launcher carries six folders.
+# Cross-package patches are VL.Overworld's; its launcher carries six folders.
 .\tools\Open-HelpPatch.ps1 "Draw many features"     # -List shows them all
 
 # Compile every help patch headlessly, then READ THE GENERATED C# before opening any window:

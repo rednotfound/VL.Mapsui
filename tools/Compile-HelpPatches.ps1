@@ -97,7 +97,7 @@ $repositories = ($repositories | Where-Object { Test-Path $_ }) -join ';'
 # help\ and nothing else, because help\ IS the packaged surface and that is what a release has to
 # be true of. A patch that needs a sibling package is not allowed here at all - Test-VLPackage.ps1
 # refuses it - so a green run here means "the package is fine" rather than "fine on my machine,
-# where three sibling checkouts happen to exist". VL.Cartography compiles the cross-package ones.
+# where three sibling checkouts happen to exist". VL.Overworld compiles the cross-package ones.
 $roots = @(Join-Path $RepoRoot 'help')
 
 $patches = @($roots | ForEach-Object { Get-ChildItem $_ -Recurse -File -Filter *.vl } |

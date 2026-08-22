@@ -217,7 +217,7 @@ Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
   `UnitType` and finding zero occurrences was good corroboration — but `LabelColumn` scores zero
   there too and works perfectly, because the read happens one assembly along. A zero means *go and
   measure*, and the measurement is the answer.
-- **One package → that package's `help\`. Two or more → VL.Cartography.** Everything under `help\`
+- **One package → that package's `help\`. Two or more → VL.Overworld.** Everything under `help\`
   is packed, so a patch needing a package this one does not depend on opens red for anyone who
   installed VL.Mapsui alone — and the cure is not to add the dependency, because a map engine has
   no business requiring a GeoJSON reader. An `examples\` folder was the first attempt and was

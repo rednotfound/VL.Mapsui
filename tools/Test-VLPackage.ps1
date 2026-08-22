@@ -185,7 +185,7 @@ foreach ($package in $Packages) {
 # -- so they carry the same load-silently-fail risks as the entry point itself.
 #
 # There is no examples\ folder any more, and that is the point of the cross-package check below: a
-# patch needing a package this one does not depend on has a home now, in VL.Cartography, whose
+# patch needing a package this one does not depend on has a home now, in VL.Overworld, whose
 # nuspec declares the whole family. An examples\ folder here could never be packed, so nobody who
 # installed VL.Mapsui would ever see what was in it.
 $helpDir = Join-Path $RepoRoot 'help'
@@ -227,7 +227,7 @@ foreach ($helpDoc in $helpDocs) {
     # on a GeoJSON reader just so an example can exist, because a map engine has no business
     # requiring one.
     #
-    # So: one package, and it belongs here. Two or more, and it belongs in VL.Cartography, whose
+    # So: one package, and it belongs here. Two or more, and it belongs in VL.Overworld, whose
     # nuspec declares them all and whose validator enforces the mirror image of this check.
     # VL.NetTopologySuite is exempt: this package's own nuspec depends on it, so a patch using it
     # resolves for every installer.
@@ -236,7 +236,7 @@ foreach ($helpDoc in $helpDocs) {
         ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -notin $allowed } | Sort-Object -Unique)
 
     if ($foreign) {
-        Fail "$label needs $($foreign -join ', '), which this package does not depend on, so it would open red for anyone installing VL.Mapsui alone. A patch spanning packages belongs in VL.Cartography."
+        Fail "$label needs $($foreign -join ', '), which this package does not depend on, so it would open red for anyone installing VL.Mapsui alone. A patch spanning packages belongs in VL.Overworld."
     }
     foreach ($pin in $pins) {
         if ($pin.Groups[2].Value -ne '0.0.0') {
@@ -325,11 +325,11 @@ if ($helpDocs.Count -eq 0) {
 # An examples\ folder must not come back. Anything under it could never be packed - the nuspec
 # globs help\<Package>\**\*.vl - so it would be invisible to everyone who installed the package,
 # which is precisely what happened to Example GeoJSON on a map.vl before it moved to
-# VL.Cartography. A cross-package patch has a home; this repository is not it.
+# VL.Overworld. A cross-package patch has a home; this repository is not it.
 $strayExamples = Join-Path $RepoRoot 'examples'
 if (Test-Path $strayExamples) {
-    Fail "examples\ exists again. Nothing there is packed, so no user ever sees it. A patch spanning packages belongs in VL.Cartography."
-} else { Ok "no examples\ - cross-package patches live in VL.Cartography" }
+    Fail "examples\ exists again. Nothing there is packed, so no user ever sees it. A patch spanning packages belongs in VL.Overworld."
+} else { Ok "no examples\ - cross-package patches live in VL.Overworld" }
 
 # 11. stray map tiles -------------------------------------------------------
 #
