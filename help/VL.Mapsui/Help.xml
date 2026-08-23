@@ -7,6 +7,7 @@
 		<VLDocument link="HowTo Show a map.vl" tags="map,tiles,openstreetmap,osm,cache,zoom" />
 		<VLDocument link="HowTo Draw your own shapes.vl" tags="geometry,feature,style,vector,polygon,nts,netTopologySuite,data" />
 		<VLDocument link="HowTo Style mixed geometry.vl" tags="style,geometry,point,line,polygon,mixed,styleByGeometry,theme,themeStyle,symbolStyle,vectorStyle,dispatch,marker,status" />
+		<VLDocument link="HowTo Style by a value.vl" tags="style,value,attribute,choropleth,gradient,gradientTheme,styleByValue,theme,interpolate,graduated,thematic,numeric,min,max,clamp,status,offline" />
 		<VLDocument link="HowTo Label your data.vl" tags="label,text,attribute,attributes,dictionary,feature,labelStyle,style" />
 		<VLDocument link="HowTo Draw many features.vl" tags="record,class,type,many,thousand,scale,spread,instance,toFeatures,cache,performance,symbol,marker,point,symbolStyle,label,create,pad" />
 		<VLDocument link="HowTo Stack several layers.vl" tags="layers,order,drawOrder,zorder,stacking,band,xyz,tiles,basemap,visible,visibleRange,zoom,minVisible,maxVisible,enabled,zoomToLayer,extent,labels" />

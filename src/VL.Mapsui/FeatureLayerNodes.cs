@@ -224,7 +224,44 @@ public class FeatureLayerNode : IDisposable
                 return $"{features.Length} {plural}, but nothing is wired for some: {string.Join("; ", missing)}.";
         }
 
+        // StyleByValue has two ways to draw nothing, and both are invisible from the map: a theme
+        // that refuses outright (empty attribute, an unwired pin, mismatched style kinds), and a
+        // feature whose attribute does not read as a number - which raw Mapsui would style as 0 or
+        // throw for mid-render, and this package deliberately does not draw. Say so here, because
+        // this is the only node that sees the features and the style together.
+        if (FindValueTheme(style) is { } valueTheme)
+        {
+            if (valueTheme.Refusal() is { } refusal)
+                return $"{features.Length} {plural}, but StyleByValue draws NOTHING: {refusal}.";
+
+            var unreadable = features.Count(f => !valueTheme.CanStyle(f.Attributes));
+            if (unreadable > 0)
+                return $"{features.Length} {plural}, but {unreadable} of them "
+                     + $"{(unreadable == 1 ? "has" : "have")} no numeric '{valueTheme.Attribute}' "
+                     + $"attribute and StyleByValue draws NOTHING for {(unreadable == 1 ? "it" : "those")}.";
+        }
+
         return $"{features.Length} {plural}";
+    }
+
+    /// <summary>The value theme in a style, wherever it sits — alone, in a collection, or on one of StyleByGeometry's pins.</summary>
+    static ValueTheme? FindValueTheme(IStyle style)
+    {
+        switch (style)
+        {
+            case ValueTheme theme:
+                return theme;
+            case GeometryTheme geometry:
+                foreach (var inner in new[] { geometry.Point, geometry.Line, geometry.Polygon })
+                    if (inner is not null && FindValueTheme(inner) is { } found) return found;
+                return null;
+            case StyleCollection collection:
+                foreach (var inner in collection.Styles)
+                    if (FindValueTheme(inner) is { } found) return found;
+                return null;
+            default:
+                return null;
+        }
     }
 
     /// <summary>The geometry theme in a style, however deeply a LabelStyle has wrapped it.</summary>

@@ -143,11 +143,11 @@ label ink 28 pixels alone and 0 under a polygon layer. Cartography says labels g
 layers go in order. The way to have both is a **label-only layer placed last**, which is what
 Mapbox GL does with its symbol layers.
 
-### Styles — 5 of 28
+### Styles — 6 of 28
 
-`VectorStyle`, `LabelStyle`, `SymbolStyle` and `StyleByGeometry` are their own nodes, which was the
-fix for the geometry layer's pin count and the Mapsui-idiomatic shape. Mapsui also has
-`CalloutStyle`, `RasterStyle`, `GradientTheme`, plus `Pen`, `Brush`, `Font`, `Offset`, `Sprite`,
+`VectorStyle`, `LabelStyle`, `SymbolStyle`, `StyleByGeometry` and `StyleByValue` are their own
+nodes, which was the fix for the geometry layer's pin count and the Mapsui-idiomatic shape. Mapsui
+also has `CalloutStyle`, `RasterStyle`, plus `Pen`, `Brush`, `Font`, `Offset`, `Sprite`,
 `SymbolType`, `PenStyle`, `PenStrokeCap`, `StrokeJoin`, `UnitType`. `StyleCollection` is used but
 not exposed: it is how `LabelStyle` carries an upstream style through, since a layer takes one style
 and two were needed.
@@ -158,9 +158,13 @@ makes every map read from a real file a mixed-geometry problem. Three pins: Poin
 See "styling mixed geometry" below; it is the one design decision in this package that was taken
 twice.
 
-`Mapsui.Styles.Thematics.GradientTheme` is the value-driven sibling — style interpolated across a
-numeric attribute, which is what a choropleth is. Not wrapped; it is the obvious next thematic node
-and the mechanism is already proven by `StyleByGeometry`.
+**`StyleByValue` is `Mapsui.Styles.Thematics.GradientTheme`** — the value-driven sibling, wrapped
+2026-08-23: a numeric attribute's `[Min, Max]` mapped onto the range between two styles, which is
+what a choropleth is. Five pins mirroring Mapsui's own constructor. Three raw behaviours were
+deliberately not shipped (a missing attribute styled as 0, mid-render exceptions, an
+all-transparent `Min == Max`), and the interpolated styles are quantized to 64 cached steps so
+their identities stay bounded — see NOTES.md, 2026-08-23. `ColorBlend` multi-stop ramps (Rainbow7
+and friends) remain unwrapped: the obvious next pin.
 
 **A style node is stateful, and the reason is worth carrying to the next one.** It holds no
 resource, but its *identity* is compared downstream twice: a layer treats a new style object as a

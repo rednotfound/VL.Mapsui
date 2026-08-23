@@ -5,6 +5,41 @@ them do not belong here.
 
 ---
 
+## 2026-08-23 — StyleByValue: the choropleth mechanism, and what raw GradientTheme would have shipped
+
+Gap rank 1 closed: `StyleByValue [Mapsui.Styles]` wraps `Mapsui.Styles.Thematics.GradientTheme` —
+a numeric attribute's `[Min, Max]` mapped onto the range between two styles. Same shape as
+`StyleByGeometry` (a `ThemeStyle` subclass carrying its inputs as properties so `FeatureLayer`'s
+`Status` can warn), 15 tests, one of them pixel-level: the rendered centre colour of a polygon
+moves monotonically from the min fill to the max fill as the attribute rises.
+
+**Three behaviours of the raw class were measured and deliberately not shipped**, each read from
+the 4.1.9 source and then pinned by a test:
+
+- **A missing attribute becomes 0.** `Convert.ToDouble(null)` is 0, so a feature without the
+  column would quietly wear the Min style — a wrong answer dressed as data. Here it is NOT DRAWN,
+  and `Status` counts it by name.
+- **A non-numeric attribute throws, per feature, inside the render loop** — as does a MinStyle /
+  MaxStyle type mismatch (`ArgumentException` from `GetStyle`). Both are pre-checked; both draw
+  nothing; `Status` says which.
+- **`Min == Max` divides zero by zero.** `Fraction()` returns NaN, NaN casts to 0 through
+  `Color.FromArgb`, and every feature renders transparent — invisible with every pin wired. Here
+  an empty range means the Min style.
+
+**Interpolated styles are quantized to 64 cached steps.** Raw `GetStyle` builds a fresh style per
+feature per call (`Activator.CreateInstance`), and a style's identity keys the renderer's caches —
+an unbounded identity stream is rule 12's "who frees them?" with no answer. The cache also means
+the same value returns the same object, asserted by test (1000 values → at most 64 distinct).
+
+**Upstream wart, found in source and left upstream:** `GradientTheme` switches `VectorStyle.Enabled`
+and a `SymbolStyle`'s `BitmapId`/`SymbolOffset` at the midpoint the wrong way round — `dFrac > 0.5`
+takes the MIN side (compare its own `InterpolateBool`, which is correct). Styles built by this
+package's nodes are always enabled and bitmap-free, so nothing here trips it.
+
+Negative test run against the finished code: reverting the missing-attribute guard to raw
+behaviour turns 3 tests red. `ColorBlend` ramps (Rainbow7 and friends) are not exposed yet —
+two-style interpolation is a working choropleth; multi-stop ramps are the obvious next pin.
+
 ## 2026-08-23 — the WithinCommonSpace disappearance, reproduced with a second node
 
 The 2026-08-14 entry left a standing mystery: *"`DrawPath`'s output disappeared downstream of
