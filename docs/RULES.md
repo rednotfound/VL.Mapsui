@@ -273,6 +273,12 @@ Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
 - **Before writing a node of an unfamiliar kind, read a shipped package that ships that kind.**
   `VL.ImGui.ToSkiaLayer` supplied the pixel-space approach here; `VL.IO.Redis` is the precedent
   for a `[ProcessNode]` owning a connection.
+- **The failure log is part of the reading list.** This file records what transfers; `NOTES.md`
+  records what was tried and how it died — and only one of them can stop a recorded dead end from
+  being rebuilt. VL.Overworld's Tutorial 08 first draft redrew the `WithinCommonSpace` overlay
+  nine days after NOTES.md logged it rendering nothing, and every static check passed on the way
+  (2026-08-23). Before composing nodes in a combination no shipped patch uses, grep the owning
+  repositories' NOTES.md for the nodes involved.
 - **Copy node XML verbatim from a shipped patch** rather than composing it. And an XML comment
   cannot contain `--`; that has cost three rounds.
 
