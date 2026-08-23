@@ -5,6 +5,30 @@ them do not belong here.
 
 ---
 
+## 2026-08-23 — Initial Zoom Level silently means nothing without a tile layer
+
+Defect number six found by a help patch, and by the first patch that could possibly find it:
+`HowTo Style by a value` is the first map in the family with **no tile layer at all**, and it
+opened as a full-screen solid colour with every readout healthy. The user saw it within a minute
+of opening; nothing automated ever would have.
+
+The mechanism, confirmed in Mapsui 4.1.9 source: `Navigator.ZoomToLevel(level)` looks the level up
+in `Navigator.Resolutions`, and that list is populated from a tile layer's schema. On a
+feature-only map it is empty, so `ZoomToLevel` **logs a warning and returns** — the viewport stays
+at its default resolution of 1 metre per pixel, the view is a few hundred metres wide, and the
+window is inside one 9-kilometre polygon. A solid colour is what the inside of a fill looks like.
+
+Fix in `MapNode.Home`: when the resolutions list cannot answer for the level, zoom to the number
+the list would have held — `156543.03392804097 / 2^level`, the standard WebMercator resolution for
+256-pixel tiles — so `Initial Zoom Level` means the same thing with and without tiles. Regression
+test asserts exactly that; run against the old code it goes red (viewport resolution 1), and the
+suite is 241 green with the fix.
+
+Note the shape, again: not an arithmetic error but two features meeting — a zoom level and the
+absence of the thing that usually defines it. The unit suite had maps without tile layers in
+dozens of tests and never noticed, because every one of them called `ZoomTo(resolution)` directly.
+Only a patch that wanted `Initial Zoom Level` on an offline map could trip it.
+
 ## 2026-08-23 — StyleByValue: the choropleth mechanism, and what raw GradientTheme would have shipped
 
 Gap rank 1 closed: `StyleByValue [Mapsui.Styles]` wraps `Mapsui.Styles.Thematics.GradientTheme` —

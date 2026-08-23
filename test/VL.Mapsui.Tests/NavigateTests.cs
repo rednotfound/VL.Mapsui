@@ -25,6 +25,26 @@ public class NavigateTests
     const double Lat = 35.68;
 
     [Fact]
+    public void The_initial_zoom_level_means_the_same_thing_without_a_tile_layer()
+    {
+        // Found by the first offline help patch (HowTo Style by a value, 2026-08-23):
+        // ZoomToLevel looks the level up in the resolutions list a tile layer's schema provides,
+        // and on a feature-only map that list is EMPTY - Mapsui logs a warning and does not zoom.
+        // The viewport stayed at its default 1 metre per pixel, a few hundred metres wide, and
+        // one polygon's fill filled the whole window: a full-screen solid colour with every
+        // readout healthy. The fallback must supply the number the schema would have held.
+        using var node = new MapNode();
+        var map = node.Update(initialZoomLevel: 11);   // no layers at all
+
+        map.Navigator.SetSize(896, 752);
+        map.Home!(map.Navigator);
+
+        // Standard WebMercator resolution for level 11, 256-pixel tiles - the same value an OSM
+        // tile schema supplies, so the level means one thing whether or not tiles are present.
+        Assert.Equal(156543.03392804097 / Math.Pow(2, 11), map.Navigator.Viewport.Resolution, precision: 6);
+    }
+
+    [Fact]
     public void Two_hundred_frames_of_movement_still_build_one_map()
     {
         // What a drag looks like.

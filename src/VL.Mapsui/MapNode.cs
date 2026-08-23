@@ -52,7 +52,19 @@ public class MapNode : IDisposable
             _map.Home = navigator =>
             {
                 navigator.CenterOn(center.x, center.y);
-                navigator.ZoomToLevel(initialZoomLevel);
+
+                // ZoomToLevel looks the level up in the navigator's resolutions list, and that
+                // list comes from a tile layer's schema. A map WITHOUT a tile layer has an empty
+                // list, and Mapsui answers with a log line and no zoom at all - the viewport
+                // stays at its default resolution of 1 metre per pixel, a few hundred metres
+                // wide, which on a feature map looks like one polygon's fill filling the window.
+                // Found by the first offline help patch, 2026-08-23: a full-screen solid colour
+                // with every readout healthy. The fallback is the number the list would have
+                // held: the standard WebMercator resolution for that level, 256-pixel tiles.
+                if (navigator.Resolutions.Count > initialZoomLevel && initialZoomLevel >= 0)
+                    navigator.ZoomToLevel(initialZoomLevel);
+                else
+                    navigator.ZoomTo(156543.03392804097 / Math.Pow(2, initialZoomLevel));
             };
         }
 
