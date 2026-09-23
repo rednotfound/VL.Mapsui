@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Pack>
 	<Topic title="Overview">
 		<VLDocument link="Explanation Overview of available nodes.vl" tags="map,mapsui,openstreetmap,osm,tiles,gis" />
 	</Topic>
 	<Topic title="HowTo">
+		<VLDocument link="HowTo Draw a graticule.vl" tags="graticule,grid,meridian,parallel,latitude,longitude,offline,noTiles,coordinateSystem,webMercator,layer,map" />
 		<VLDocument link="HowTo Show a map.vl" tags="map,tiles,openstreetmap,osm,cache,zoom" />
 		<VLDocument link="HowTo Draw your own shapes.vl" tags="geometry,feature,style,vector,polygon,nts,netTopologySuite,data" />
 		<VLDocument link="HowTo Style mixed geometry.vl" tags="style,geometry,point,line,polygon,mixed,styleByGeometry,theme,themeStyle,symbolStyle,vectorStyle,dispatch,marker,status" />

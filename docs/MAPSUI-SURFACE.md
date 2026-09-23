@@ -1,4 +1,4 @@
-# What Mapsui offers, and how much of it is wrapped
+﻿# What Mapsui offers, and how much of it is wrapped
 
 Measured 2026-08-14 by reflecting over the assemblies in `deps\` with an assembly resolver
 attached, because loading them without one silently drops every type that mentions
@@ -49,6 +49,15 @@ without a map engine — this package only draws and picks them, converting into
 feature lives". Internally this package keeps `FeatureHelper` (not a node) for its own plumbing.
 
 ---
+
+### Graticule — ours, not Mapsui's (added 2026-09-23)
+
+Mapsui ships no lat/lon grid at all (verified: no `Graticule` in Mapsui 4.1.9's assembly), so
+`Graticule [Mapsui.Layers]` is generated here: meridians ±180° and parallels within WebMercator's
+±85.05° at a `Degrees Spacing`, every line two vertices (both are straight in this projection),
+composed from `FeatureLayerNode` + `VectorStyleNode` like `Geometry` is. Requested by
+vl-overworld Tutorial 01, whose tile-less map window had no bearings. 5 tests; help patch
+`HowTo Draw a graticule` (offline on purpose).
 
 ## Not wrapped
 
