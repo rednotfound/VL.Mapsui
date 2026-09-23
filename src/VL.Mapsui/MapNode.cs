@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mapsui;
@@ -51,6 +51,16 @@ public class MapNode : IDisposable
             var center = SphericalMercator.FromLonLat(initialCenterLongitude, initialCenterLatitude);
             _map.Home = navigator =>
             {
+                // Without this, CenterOn is silently clamped to the extent of the layers - the
+                // default pan bounds. A tile map's schema extent is the whole world, so nobody
+                // saw it there; a feature-only map is clamped to its own features, and a map
+                // whose only layer was a single point near (0,0) swallowed its Initial Center
+                // whole (found by vl-overworld Tutorial 01, 2026-09-23: zoom applied, centre
+                // ignored, no error). The override IS the tile-world extent, so every map pans
+                // the same whether or not tiles are present.
+                navigator.OverridePanBounds = new MRect(
+                    -20037508.342789244, -20037508.342789244,
+                     20037508.342789244,  20037508.342789244);
                 navigator.CenterOn(center.x, center.y);
 
                 // ZoomToLevel looks the level up in the navigator's resolutions list, and that

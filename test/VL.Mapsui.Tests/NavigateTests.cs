@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Mapsui;
 using VL.Mapsui;
+using NtsFeature = NetTopologySuite.Features.Feature;
 
 namespace VL.Mapsui.Tests;
 
@@ -42,6 +43,36 @@ public class NavigateTests
         // Standard WebMercator resolution for level 11, 256-pixel tiles - the same value an OSM
         // tile schema supplies, so the level means one thing whether or not tiles are present.
         Assert.Equal(156543.03392804097 / Math.Pow(2, 11), map.Navigator.Viewport.Resolution, precision: 6);
+    }
+
+    [Fact]
+    public void Home_centres_a_feature_only_map_where_the_Initial_pins_say()
+    {
+        // Found by Tutorial 01's map side (vl-overworld, 2026-09-23): a map whose ONLY layer was
+        // a single point near (0,0) opened with the Initial Zoom applied but the Initial Center
+        // silently swallowed - the viewport sat centred on (0,0), and a point layer that follows
+        // the cursor never moves it again. The 2026-08-23 regression above could not see this:
+        // it asserts the RESOLUTION after Home and never the CENTRE, and its map has no layers,
+        // so nothing existed for a viewport limiter to clamp against.
+        using var layerNode = new FeatureLayerNode();
+        var layer = layerNode.Update(out _, out _,
+            new[] { new NtsFeature(new NetTopologySuite.IO.WKTReader().Read("POINT (0 0)"),
+                                   new NetTopologySuite.Features.AttributesTable()) },
+            new SymbolStyleNode().Update());
+
+        using var node = new MapNode();
+        var map = node.Update(layers: new[] { layer! },
+                              initialCenterLongitude: Lon,
+                              initialCenterLatitude: Lat,
+                              initialZoomLevel: 2);
+
+        map.Navigator.SetSize(896, 752);
+        map.Home!(map.Navigator);
+
+        var (lon, lat) = global::Mapsui.Projections.SphericalMercator.ToLonLat(
+            map.Navigator.Viewport.CenterX, map.Navigator.Viewport.CenterY);
+        Assert.Equal(Lon, lon, precision: 3);
+        Assert.Equal(Lat, lat, precision: 3);
     }
 
     [Fact]
