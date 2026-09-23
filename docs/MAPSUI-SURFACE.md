@@ -55,7 +55,7 @@ feature lives". Internally this package keeps `FeatureHelper` (not a node) for i
 Mapsui ships no lat/lon grid at all (verified: no `Graticule` in Mapsui 4.1.9's assembly), so
 `Graticule [Mapsui.Layers]` is generated here: meridians ±180° and parallels within WebMercator's
 ±85.05° at a `Degrees Spacing`, every line two vertices (both are straight in this projection),
-composed from `FeatureLayerNode` + `VectorStyleNode` like `Geometry` is. Requested by
+composed from `FeatureLayerNode` + `VectorStyleNode` like `Geometry` is; `Show Labels` adds a point feature per crossing carrying its own coordinates, dispatched through `StyleByGeometry` to a `LabelStyle` (the mixed-features fix reused). Requested by
 vl-overworld Tutorial 01, whose tile-less map window had no bearings. 5 tests; help patch
 `HowTo Draw a graticule` (offline on purpose).
 

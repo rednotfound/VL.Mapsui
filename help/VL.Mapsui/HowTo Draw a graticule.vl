@@ -12,7 +12,7 @@
       </p:NodeReference>
       <Patch Id="DckGlD4JDsLuHCT0jaJQom">
         <Canvas Id="G6qApNWKd6Su7b3MiuKNlI" CanvasType="Group">
-          <Pad Id="JfEAPRQYUI8Mk1cGGMmEnp" Bounds="-560,-40,520,420" ShowValueBox="true" isIOBox="true" Value="HowTo Draw a graticule&#xD;&#xA;&#xD;&#xA;A map with no tile layer is a blank window, and blank has no direction. The graticule is the&#xD;&#xA;oldest fix in cartography: the coordinate system itself, drawn - meridians and parallels at a&#xD;&#xA;fixed spacing. Every desktop GIS ships one; Mapsui does not, so this package does.&#xD;&#xA;&#xD;&#xA;TURN DEGREES SPACING. 10 gives the classic school-atlas grid; 30 is sparse; 1 is a mesh (and&#xD;&#xA;still cheap - every line is two vertices, because in this projection meridians and parallels&#xD;&#xA;are straight). LINES BUILT counts what the spacing produced; LAYERS stays at 1 however often&#xD;&#xA;you look, like every layer node here.&#xD;&#xA;&#xD;&#xA;No network anywhere in this patch: the map has no tiles ON PURPOSE. A graticule is exactly what&#xD;&#xA;makes a tile-less map usable - offline chapters, projection lessons, or any time the tiles are&#xD;&#xA;the distraction rather than the point.&#xD;&#xA;&#xD;&#xA;The parallels stop at +-85.05: WebMercator's own latitude limit, not ours. The poles do not&#xD;&#xA;exist on this map, and the graticule is honest about it.">
+          <Pad Id="JfEAPRQYUI8Mk1cGGMmEnp" Bounds="-560,-40,520,420" ShowValueBox="true" isIOBox="true" Value="HowTo Draw a graticule&#xD;&#xA;&#xD;&#xA;A map with no tile layer is a blank window, and blank has no direction. The graticule is the&#xD;&#xA;oldest fix in cartography: the coordinate system itself, drawn - meridians and parallels at a&#xD;&#xA;fixed spacing. Every desktop GIS ships one; Mapsui does not, so this package does.&#xD;&#xA;&#xD;&#xA;TURN DEGREES SPACING. 10 gives the classic school-atlas grid; 30 is sparse; 1 is a mesh (and&#xD;&#xA;still cheap - every line is two vertices, because in this projection meridians and parallels&#xD;&#xA;are straight). LINES BUILT counts what the spacing produced; LAYERS stays at 1 however often&#xD;&#xA;you look, like every layer node here. SHOW LABELS writes each crossing's own coordinates beside it - plain numbers, the same voice as everything else - and turning it off is the polite thing at fine spacings, where the labels become a crowd.&#xD;&#xA;&#xD;&#xA;No network anywhere in this patch: the map has no tiles ON PURPOSE. A graticule is exactly what&#xD;&#xA;makes a tile-less map usable - offline chapters, projection lessons, or any time the tiles are&#xD;&#xA;the distraction rather than the point.&#xD;&#xA;&#xD;&#xA;The parallels stop at +-85.05: WebMercator's own latitude limit, not ours. The poles do not&#xD;&#xA;exist on this map, and the graticule is honest about it.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -29,6 +29,11 @@
             <Pin Id="FEt5dZZfiCbkZcHS3cMEzg" Name="Degrees Spacing" Kind="InputPin" DefaultValue="10">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Float64" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="LdBEEVkZehPeH6GOCmymvm" Name="Show Labels" Kind="InputPin" DefaultValue="True">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
             <Pin Id="EFpgsscGcmGKFDVy9xTZ6R" Name="Line Color" Kind="InputPin" />
@@ -113,6 +118,14 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
+          <Pad Id="PMnokcYxWQORzRZeyauG3g" Comment="Show Labels" Bounds="140,20,55,28" ShowValueBox="true" isIOBox="true" Value="True">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
         </Canvas>
         <Patch Id="GBeXBTznYV7k5yLxAjbkPT" Name="Create" />
         <Patch Id="PNszjp45z4tf3NBem3B4a3" Name="Update" />
@@ -126,6 +139,7 @@
         <Link Id="UKsjWBaWrBpuCSyjglhuWL" Ids="B9E71wVDVNMpNlBBNEfuPc,KMAqHDamcbs1bGyxQiLweQ" />
         <Link Id="C1HzA7npjrsv6lEkoPcC3c" Ids="FfTbqKFqO9jtNEen0MqPlE,EGgF3hdFBDentHDHhlIbqf" />
         <Link Id="DZggY7vJZWQ5icTjq73sBF" Ids="PDW0gMO0o6lHCEbDVtCljw,PpuALE0feor4m2RJdlm7ne" />
+        <Link Id="Mzjjz2bmGrdhGOS7yzCdiP" Ids="PMnokcYxWQORzRZeyauG3g,LdBEEVkZehPeH6GOCmymvm" />
       </Patch>
     </Node>
   </Patch>
