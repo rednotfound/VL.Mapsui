@@ -1,4 +1,9 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using Mapsui;
+using Mapsui.Layers;
+using Mapsui.Rendering.Skia;
+using SkiaSharp;
 using VL.Mapsui;
 
 namespace VL.Mapsui.Tests;
@@ -50,6 +55,64 @@ public class GraticuleTests
         node.Update(out var fine, degreesSpacing: 5);
 
         Assert.True(fine > coarse);
+    }
+
+    [Fact]
+    public void The_graticule_actually_puts_pixels_on_a_world_view()
+    {
+        // Counting lines proves generation; only counting PIXELS proves rendering - the lesson of
+        // this package's first defect (0 pixels with every readout healthy). World view: the whole
+        // mercator square in a 400px canvas.
+        using var node = new GraticuleNode();
+        var layer = node.Update(out _, degreesSpacing: 10);
+
+        using var surface = SKSurface.Create(new SKImageInfo(400, 400));
+        surface.Canvas.Clear(SKColors.White);
+        new MapRenderer().Render(
+            surface.Canvas, new Viewport(0, 0, 20037508.34 * 2 / 400, 0, 400, 400),
+            new List<ILayer> { layer! }, new List<global::Mapsui.Widgets.IWidget>(),
+            global::Mapsui.Styles.Color.White);
+
+        using var image = surface.Snapshot();
+        using var bitmap = SKBitmap.FromImage(image);
+        var drawn = 0;
+        for (var x = 0; x < bitmap.Width; x++)
+        for (var y = 0; y < bitmap.Height; y++)
+            if (bitmap.GetPixel(x, y) != SKColors.White) drawn++;
+
+        // 36 meridians + 17 parallels across 400px should paint thousands of pixels, not zero.
+        Assert.True(drawn > 2000, $"only {drawn} pixels drawn");
+    }
+
+    [Fact]
+    public void Labels_add_pixels_and_the_toggle_removes_them()
+    {
+        // The label text rides point features dispatched by StyleByGeometry; only pixels prove
+        // the dispatch reached the renderer (a nested StyleCollection renders nothing - this
+        // package's third defect, and the reason this is a pixel test).
+        var on = Pixels(showLabels: true);
+        var off = Pixels(showLabels: false);
+        Assert.True(on > off + 500, $"labels on: {on}, off: {off}");
+    }
+
+    static int Pixels(bool showLabels)
+    {
+        using var node = new GraticuleNode();
+        var layer = node.Update(out _, degreesSpacing: 30, showLabels: showLabels);
+
+        using var surface = SKSurface.Create(new SKImageInfo(400, 400));
+        surface.Canvas.Clear(SKColors.White);
+        new MapRenderer().Render(
+            surface.Canvas, new Viewport(0, 0, 20037508.34 * 2 / 400, 0, 400, 400),
+            new List<ILayer> { layer! }, new List<global::Mapsui.Widgets.IWidget>(),
+            global::Mapsui.Styles.Color.White);
+        using var image = surface.Snapshot();
+        using var bitmap = SKBitmap.FromImage(image);
+        var drawn = 0;
+        for (var x = 0; x < bitmap.Width; x++)
+        for (var y = 0; y < bitmap.Height; y++)
+            if (bitmap.GetPixel(x, y) != SKColors.White) drawn++;
+        return drawn;
     }
 
     [Fact]

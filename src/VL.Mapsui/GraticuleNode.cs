@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using NetTopologySuite.Geometries;
 using Stride.Core.Mathematics;
@@ -35,9 +35,12 @@ public class GraticuleNode : IDisposable
     const double LatLimit = 85.0511287798066;
 
     readonly VectorStyleNode _style = new();
+    readonly LabelStyleNode _label = new();
+    readonly StyleByGeometryNode _theme = new();
     readonly FeatureLayerNode _layer = new();
 
     double _spacing = double.NaN;
+    bool _showLabels;
     NtsFeature[] _features = Array.Empty<NtsFeature>();
 
     /// <summary>Layers built by this node. Should settle at 1 and stay there.</summary>
@@ -56,6 +59,7 @@ public class GraticuleNode : IDisposable
     public ILayer? Update(
         out int linesBuilt,
         double degreesSpacing = 10,
+        bool showLabels = true,
         Color4? lineColor = null,
         float lineWidth = 1f)
     {
@@ -65,32 +69,64 @@ public class GraticuleNode : IDisposable
             return null;
         }
 
-        if (degreesSpacing != _spacing)
+        if (degreesSpacing != _spacing || showLabels != _showLabels)
         {
-            _features = Build(degreesSpacing);
+            _features = Build(degreesSpacing, showLabels, out var lines);
             _spacing = degreesSpacing;
-            LinesBuilt = _features.Length;
+            _showLabels = showLabels;
+            LinesBuilt = lines;
         }
         linesBuilt = LinesBuilt;
 
         var line = lineColor ?? new Color4(0.5f, 0.5f, 0.5f, 0.55f);
-        return _layer.Update(out _, out _, _features,
-            _style.Update(fillColor: new Color4(0f, 0f, 0f, 0f), lineColor: line, lineWidth: lineWidth),
-            name: "Graticule");
+        var vector = _style.Update(fillColor: new Color4(0f, 0f, 0f, 0f), lineColor: line, lineWidth: lineWidth);
+
+        // Labels ride on point features at the line crossings, dispatched by geometry type -
+        // the same StyleByGeometry the mixed-features lesson produced (a nested StyleCollection
+        // renders NOTHING; the dispatch is the fix, reused rather than re-learnt).
+        var style = showLabels
+            ? _theme.Update(point: _label.Update(attribute: "label", size: 11f), line: vector)
+            : vector;
+
+        return _layer.Update(out _, out _, _features, style, name: "Graticule");
     }
 
-    static NtsFeature[] Build(double spacing)
+    static NtsFeature[] Build(double spacing, bool labels, out int lines)
     {
         var features = new List<NtsFeature>();
+        var lons = new List<double>();
+        var lats = new List<double>();
 
         // Meridians: every multiple of the spacing in [-180, 180). -180 and +180 are the same
         // line on a mercator map, so the upper edge is left out rather than drawn twice.
         for (var lon = -180.0; lon < 180.0 - 1e-9; lon += spacing)
-            features.Add(Line(new Coordinate(lon, -LatLimit), new Coordinate(lon, LatLimit)));
+            lons.Add(lon);
 
         // Parallels: every multiple of the spacing the projection can show, equator included.
         for (var lat = -Math.Floor(LatLimit / spacing) * spacing; lat <= LatLimit + 1e-9; lat += spacing)
+            lats.Add(lat);
+
+        foreach (var lon in lons)
+            features.Add(Line(new Coordinate(lon, -LatLimit), new Coordinate(lon, LatLimit)));
+        foreach (var lat in lats)
             features.Add(Line(new Coordinate(-180, lat), new Coordinate(180, lat)));
+        lines = features.Count;
+
+        // One label per crossing, saying exactly where the crossing is - 'lon, lat' in the
+        // course's plain-numbers voice. Density follows the spacing the patch chose; the toggle
+        // exists precisely because a world view of fine-spacing labels is a crowd.
+        if (labels)
+            foreach (var lon in lons)
+                foreach (var lat in lats)
+                {
+                    var table = new NetTopologySuite.Features.AttributesTable
+                    {
+                        { "label", string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                                                 "{0:0.###}, {1:0.###}", lon, lat) },
+                    };
+                    features.Add(new NtsFeature(
+                        new NetTopologySuite.Geometries.Point(new Coordinate(lon, lat)), table));
+                }
 
         return features.ToArray();
     }
