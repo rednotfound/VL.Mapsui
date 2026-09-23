@@ -1,9 +1,26 @@
-# VL.Mapsui — measurement log
+﻿# VL.Mapsui — measurement log
 
 Running record of what was actually measured, with dates. Claims without a measurement behind
 them do not belong here.
 
 ---
+
+## 2026-09-23 — Initial Center silently clamped to the layers' extent without a tile layer
+
+The 2026-08-23 defect below had a twin, and it hid for a month because the offline maps shipped
+so far carry world-sized layers. `Navigator.CenterOn` is limited to the pan bounds, which default
+to the union of the layers' extents. A tile schema's extent is the whole world, so the clamp
+never bites; a feature-only map is clamped to its own features. The exposing case (vl-overworld
+Tutorial 01's map side): a map whose ONLY layer is a single point near (0,0) — `Home` applied the
+Initial Zoom, then `CenterOn(139.7, 35.68)` was silently pulled back to the point. Zoom applied,
+centre swallowed, no error, every readout healthy.
+
+Fix: `Home` sets `Navigator.OverridePanBounds` to the WebMercator world extent before centring —
+the bounds a tile schema would have supplied, so every map pans identically with or without
+tiles. Regression: `Home_centres_a_feature_only_map_where_the_Initial_pins_say`, failing first —
+it asserts the CENTRE after Home; the 08-23 regression asserted only the resolution, which is the
+gap this twin hid in. Diagnosed from a screenshot's arithmetic: centre (0,0) with the zoom
+correct means CenterOn alone died.
 
 ## 2026-08-23 — Initial Zoom Level silently means nothing without a tile layer
 
