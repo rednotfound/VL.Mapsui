@@ -22,7 +22,7 @@
       service, VL.NetTopologySuite - never has to know that Mapsui will draw it. A spread of
       your own record type can be drawn directly.
 
-      Nine help patches, from the smallest working map to drawing a thousand features.
+      Nineteen help patches, from the smallest working map to drawing a thousand features, each opening a node on F1.
 
       EARLY: the API can still change, and Mapsui's editing and WMS/WFS surfaces are not
       wrapped yet. Requires vvvv gamma 7.4 or newer (.NET 8).

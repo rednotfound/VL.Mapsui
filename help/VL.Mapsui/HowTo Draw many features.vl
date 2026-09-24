@@ -31,10 +31,59 @@
       </p:NodeReference>
       <Patch Id="T1yChjTcVpcQLJ4rxMEL44">
         <Canvas Id="VxYLn5bECvkjhyGerEE3sc" CanvasType="Group">
-          <Pad Id="VaZNqihOnpwz6dORWEdpu0" Bounds="60,30,620,200" ShowValueBox="true" isIOBox="true" Value="Drawing many features - define the type once, and every place is an instance.&#xD;&#xA;&#xD;&#xA;THE PATCH DOES NOT GROW WITH THE DATA, AND THIS ONE PROVES IT. Turn Count up to 2000 and restart: two thousand places appear and not one node, not one link changes. That is the claim, and a patch that wired three places by hand could only assert it.&#xD;&#xA;&#xD;&#xA;A RECORD IS THE TYPE, AN INSTANCE IS A PLACE. Landmark is defined on the right - right-click the canvas and pick Record to make one of your own. It has a Geometry and two words about it. Add a property to the record and every instance has it, including the two thousand.&#xD;&#xA;&#xD;&#xA;THE FOREACH IS WHERE THEY ARE MADE. Two RandomSpreads scatter Count longitudes and Count latitudes; the region takes one of each per iteration and builds one Landmark, and the splicer at the bottom collects them into a Spread. Name and Type cross the border WITHOUT a splicer, so every instance shares them - that is what a link straight through the edge means.&#xD;&#xA;&#xD;&#xA;TOFEATURES IS THE ONLY THING BETWEEN YOUR TYPE AND THE MAP. It reads each value's properties: the one whose type is Geometry is the shape, and every other property becomes an attribute under the name the record gives it. So LabelStyle looks up &quot;Name&quot; and the record is the only place that word is written. Watch Status - it says how many it made and, if a type has no geometry or two and no way to choose, it says that instead of drawing nothing.&#xD;&#xA;&#xD;&#xA;WHAT RUNS ONCE, AND HOW YOU CAN TELL. The generator, the record constructors and the spread all sit in the CREATE operation. They run when the patch starts and never again; the spread lands in a Pad - storage that survives to the next frame - and Update only reads it. CONVERSIONS COUNTS THE PROOF: it reaches 1 and stays at 1 no matter how long you drag and zoom. Move the same nodes into Update and it climbs once per frame.&#xD;&#xA;&#xD;&#xA;How that is expressed in the document: the Create operation names ONE thing, the link that writes the spread into the Pad. Everything that link depends on comes along with it. Everything not named runs every frame - which is what an empty Create means, and what most patches have.&#xD;&#xA;&#xD;&#xA;WHY IT MATTERS AT THIS SIZE. Measured on 1000 features of 500 vertices each: when the same spread arrives every frame, everything downstream costs 0.013 ms per frame. When the features are rebuilt every frame instead, just MAKING them costs 43 ms - two and a half frames, before anything is drawn. Four thousand times, decided by nothing but where the construction sits.&#xD;&#xA;&#xD;&#xA;The price of building once is that it does not react: changing Count or a Name does nothing until you restart with F8 then F5. That is the correct trade for data read from a file. If you want it to rebuild when its inputs change - and only then - that is what a Cache region is for.&#xD;&#xA;&#xD;&#xA;WHAT A POINT LOOKS LIKE IS SymbolStyle's JOB. Shape, Scale and two colours - and it REPLACES VectorStyle rather than joining it, because Mapsui's SymbolStyle derives from VectorStyle. Without one a point is still drawn, but only as a ring: measured, the fallback covers 180 pixels where a filled marker covers 952. Scale 1 is 32 pixels, and a symbol is drawn in PIXELS - zoom in and the markers stay the same size while the ground under them does not.&#xD;&#xA;&#xD;&#xA;THAT IS RIGHT FOR A MARKER AND WRONG FOR A MEASUREMENT, and Mapsui gives you no switch: its UnitType property exists but its Skia renderer never reads it - measured, four renders, all 1156 pixels. So when the size IS the information - a 500 metre catchment, a GPS accuracy, an area affected - do not look for a pin. BUFFER THE POINT INTO A POLYGON with VL.NetTopologySuite and style it with VectorStyle. It then scales with the map because it IS on the map, and unlike a symbol you can pick it, measure it and intersect it.&#xD;&#xA;&#xD;&#xA;THE LABEL STEPS ASIDE FOR THE MARKER, AND NOBODY HAD TO SAY SO. Mapsui centres a label on the feature it names, which is right for a polygon and wrong for a point wearing a symbol - the text and the marker end up in the same pixels. LabelStyle can see the SymbolStyle wired into it, so it reads the scale, works out the radius and lifts the label clear by that much plus 4 pixels. Change Scale and the label moves with it. Wire LabelStyle to a polygon fill instead and nothing moves, because a polygon's label belongs at its centre.&#xD;&#xA;&#xD;&#xA;LABELS AT TWO HUNDRED POINTS ARE STILL NOISE, and that part no setting fixes. They no longer cover their own markers, but they cover EACH OTHER, and Mapsui's CollisionDetection does nothing on this render path - measured, eight overlapping labels draw the same 763 pixels with it on and with it off. This is cartography rather than a defect: no map labels two hundred things at once. The real answer is to draw labels only past a zoom level, which is what MinVisible and MaxVisible are for and is not a node here yet. For now, empty LabelStyle's Attribute pin to turn them off; a style with nothing named has nothing to write.&#xD;&#xA;&#xD;&#xA;The Geometry slot in the record is marked yellow: &quot;This field could mutate at runtime&quot;. It is a warning and nothing more - a Record is immutable and NetTopologySuite's Geometry is an ordinary class, so VL is right to say so, and vvvv's own shipped records do the same (VL.Skia's paint holds an SKShader). Just never modify a Geometry after it is inside a Landmark.&#xD;&#xA;&#xD;&#xA;Geometry comes from VL.NetTopologySuite, as everywhere here: this package draws geometry and does not create it. Coordinate and Point are two of its nodes; a GeoJSON or Shapefile reader would be where a real two thousand came from.&#xD;&#xA;&#xD;&#xA;Enabled starts OFF on the tile layer. Opening a document in vvvv runs it, so a map that fetched on open would give you no chance to decline.&#xD;&#xA;&#xD;&#xA;Watch Layers Built: it should settle at 1 and stay. A number climbing frame after frame means something rebuilds the layer every frame, and every rebuild starts a fresh round of tile requests. Close vvvv if you see it climb.&#xD;&#xA;&#xD;&#xA;Where to go next: HowTo Label your data for attributes built by hand, which is the right shape when the columns are only known at runtime. HowTo Pick what you clicked to ask the map which of these you are pointing at.">
-            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+          <Pad Id="RYrJDbCHz1xvN0b3MHsmDc" Bounds="60,40,255,41" ShowValueBox="true" isIOBox="true" Value="Use ToFeatures!">
+            <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">20</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="Ild2tR4nwZm5qRi2zto5HS" Bounds="60,95,600,82" ShowValueBox="true" isIOBox="true" Value="Define the type once; every place is an instance. Landmark is a Record (right-click the canvas: Record) with a Geometry and two words. A ForEach makes Count of them; ToFeatures turns each into a feature - Geometry is the shape, the rest attributes.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="KY8NjWtra0yKn3qcR2yi4v" Bounds="720,40,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Turn Count up to 2000 and restart with F8, F5: two thousand places appear and not one node or link changes.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="CPGmXC2LjtCeX6Qpg7jSlz" Bounds="720,110,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Conversions must reach 1 and stay. The spread is built once, in Create; rebuilt every frame, 1000 features would cost 43 ms before anything is drawn.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="LB1DWoXpmlmXHsA2WMbnnk" Bounds="720,198,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; SymbolStyle sizes points in PIXELS at every zoom (Scale 1 = 32). When size means something, buffer the point into a polygon and use VectorStyle.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="HF4Jf32Oi3gdXwMhuZ3DQM" Bounds="720,286,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Two hundred labels are noise. Each steps aside from its own marker, not from the others; the answer is not to draw them all - see VisibleRange.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
           </Pad>
           <Pad Id="UnaIkq8cPr0a4UZQVn7ji7" Comment="Enabled" Bounds="79,280,35,35" ShowValueBox="true" isIOBox="true" Value="false">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
@@ -57,6 +106,7 @@
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="OpenStreetMap" />
             </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
             <Pin Id="Usi9xynIVqJWvRhEvGVOYQ" Name="Enabled" Kind="InputPin" />
             <Pin Id="ARy89W2GJw4s60rzwfmBsV" Name="Cache" Kind="InputPin" />
             <Pin Id="VE109xy4WqBycyAwxMeCrD" Name="Result" Kind="OutputPin" />
@@ -284,6 +334,7 @@
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ToFeatures" />
             </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">High</p:HelpFocus>
             <Pin Id="SAorVJSP3Q1oFhAqIQdvLD" Name="Values" Kind="InputPin" />
             <Pin Id="G69LMqZBByDHYApccyPL9W" Name="Result" Kind="OutputPin" />
             <Pin Id="JrM5Yua7jXqgKQWbu3hp06" Name="Status" Kind="OutputPin" />
@@ -432,6 +483,7 @@
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="LabelStyle" />
             </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
             <Pin Id="QNGu1JxjXlXVk8x5Vzah2L" Name="Style" Kind="InputPin" />
             <Pin Id="ULIbppmgrRmENEkrSodKrP" Name="Attribute" Kind="InputPin" />
             <Pin Id="MdXpohRLjhyLuWsCdwFoHx" Name="Color" Kind="InputPin" />
@@ -476,6 +528,7 @@
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="SymbolStyle" />
             </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
             <Pin Id="TyQdZgTtemihQDtdTArRzO" Name="Shape" Kind="InputPin" />
             <Pin Id="Hi8HbKmtdTSgvaR4xUm0gZ" Name="Scale" Kind="InputPin" />
             <Pin Id="RCFOdPirbEB8H7XNNlycYR" Name="Fill Color" Kind="InputPin" />
@@ -488,6 +541,7 @@
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="FeatureLayer" />
             </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
             <Pin Id="AMeaHKeDjwSfsDqswpSIBi" Name="Features" Kind="InputPin" />
             <Pin Id="Sb8LY47ypOqKRxpyRAwgiA" Name="Style" Kind="InputPin" />
             <Pin Id="U7vVs30TfyVg6lNRtRKCvd" Name="Name" Kind="InputPin" />
@@ -500,6 +554,7 @@
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Map" />
             </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
             <Pin Id="H1dkptL5CUJAlSE1SJXIiL" Name="Layers" Kind="InputPin" />
             <Pin Id="Dc7rTes8gEFct080wrJNsg" Name="Initial Center Longitude" Kind="InputPin" />
             <Pin Id="LpWIQOKhRMT4Jt3tKQLG58" Name="Initial Center Latitude" Kind="InputPin" />
@@ -511,6 +566,7 @@
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="ViewportInfo" />
             </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
             <Pin Id="TIjKhLd4rTZDn2dSnszv01" Name="Map" Kind="InputPin" />
             <Pin Id="RkfLJEI1nD6Jqo2WEFBeYS" Name="Center Longitude" Kind="OutputPin" />
             <Pin Id="UUT74iRejEUw8kpEAa6dHx" Name="Center Latitude" Kind="OutputPin" />
@@ -573,6 +629,7 @@
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Drag" />
             </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
             <Pin Id="ORtzkXwQGw7OVYDzpI5bZ9" Name="Map" Kind="InputPin" />
             <Pin Id="Cc6xgbnGsU368CM3MrUcbN" Name="X" Kind="InputPin" />
             <Pin Id="DEhbqpKlwjTgV2nzO22wfj" Name="Y" Kind="InputPin" />
@@ -584,6 +641,7 @@
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="ZoomByWheel" />
             </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
             <Pin Id="O44OyRhtxJ6Z4CIvpXlQh1" Name="Map" Kind="InputPin" />
             <Pin Id="VuvytF8oSOM1ZXfvpw62Rm" Name="X" Kind="InputPin" />
             <Pin Id="C7raymyT76ZJBj3ILHLxZW" Name="Y" Kind="InputPin" />
@@ -626,6 +684,7 @@
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
             </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
             <Pin Id="DQROUBK64s5ONRgS27ZRF9" Name="Map" Kind="InputPin" />
             <Pin Id="MNVbxnjPDHRRznJSzJnEPX" Name="Diagnostics" Kind="InputPin" />
             <Pin Id="U5emzVQ6EofWagaekCXGH2" Name="Result" Kind="OutputPin" />
@@ -672,6 +731,7 @@
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="TileCache" />
             </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
             <Pin Id="ULh17fD8cDxRi4lqa2hYtY" Name="Enabled" Kind="InputPin" />
             <Pin Id="Q2PNoFSapPeFXxtamnrI4n" Name="Folder" Kind="InputPin" />
             <Pin Id="PDfAZ7dDcrkFW1pQwiJ9x4" Name="Result" Kind="OutputPin" />
