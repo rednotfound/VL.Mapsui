@@ -1,0 +1,286 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document xmlns:p="property" xmlns:r="reflection" Id="OneTJyJGMH2S73eqFeyutB" LanguageVersion="2025.7.4" Version="0.128">
+  <NugetDependency Id="AER2AM5L2Na8opbR2ABEBK" Location="VL.CoreLib" Version="2025.7.4" />
+  <NugetDependency Id="Rkxm8XJXVD69URhTff579v" Location="VL.Skia" Version="2025.7.4" />
+  <NugetDependency Id="JXtUPd6zsDSFwSzimHOISH" Location="VL.NetTopologySuite" Version="0.0.0" />
+  <Patch Id="BnrHHo13pM3ANOnp7sp3n0">
+    <Canvas Id="Jb52BCRMJiONYclHpeyc6Z" DefaultCategory="Main" BordersChecked="false" CanvasType="FullCategory" />
+    <!--
+
+    ************************ Application ************************
+
+-->
+    <Node Name="Application" Bounds="100,100" Id="NQzCAbYHTIQHSEOOdSHl95">
+      <p:NodeReference>
+        <Choice Kind="ContainerDefinition" Name="Process" />
+        <CategoryReference Kind="Category" Name="Primitive" />
+      </p:NodeReference>
+      <Patch Id="NRCxfyiizAYF6yD2kYlb6G">
+        <Canvas Id="UhlLqQBQDxSEIRlhM4xmJZ" CanvasType="Group">
+          <Pad Id="R75CMRriLg6vSI45j2QIef" Bounds="60,40,270,41" ShowValueBox="true" isIOBox="true" Value="Use ZoomToLayer!">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">20</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="P2LnrFN4mTG0k5f3ADcnpp" Bounds="60,90,520,64" ShowValueBox="true" isIOBox="true" Value="Put the view where the data is. Two squares 350 km apart; the window opens over the first. Framing is a trigger, not a constant: applied every frame it would pin the view and the map could not be moved.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="VPu0ky4RWMVCaSQtIHDs3l" Comment="Kyoto" Bounds="60,190,340,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((135.7551 34.9834, 135.7611 34.9834, 135.7611 34.9884, 135.7551 34.9884, 135.7551 34.9834))">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Node Bounds="60,230,90,19" Id="VgwUVrKP7gLairzv695YDw">
+            <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Read WKT" />
+            </p:NodeReference>
+            <Pin Id="NgCieiVvlWmSYocZPQQ3U4" Name="WKT" Kind="InputPin" />
+            <Pin Id="PiymMquzvb1ap10Qco2ljN" Name="Factory" Kind="InputPin" />
+            <Pin Id="VzX39cU7YacnKhnOypAXOl" Name="Result" Kind="OutputPin" />
+            <Pin Id="IfdhJUML58dhFp9ENrAaKI" Name="Success" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,280,39,19" Id="BaeeAysXz5J6ID4wpGeTuz">
+            <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Cons" />
+              <CategoryReference Kind="RecordType" Name="Spread" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="BioNz8exuxnTiJG37WQmJJ" Name="Input" Kind="InputPin" />
+            <Pin Id="OKjSY8duzfQitHZ5P7TsTY" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,330,110,19" Id="Ez7CUBRwU2o9WKdfSfVk7z">
+            <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Geometry" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="LwJeFPlRvEvCFOs82ab61k" Name="Geometries" Kind="InputPin" />
+            <Pin Id="P9LCOKQF9sN5TyyZekzxNY" Name="Fill Color" Kind="InputPin" />
+            <Pin Id="QGIeFZGxzTGkVE2MI2Zfoa" Name="Line Color" Kind="InputPin" />
+            <Pin Id="O3IRNQ1hxuUzmvoleg0Bra" Name="Line Width" Kind="InputPin" />
+            <Pin Id="NgrZIN0hk3OKQoiglzubkU" Name="Result" Kind="OutputPin" />
+            <Pin Id="EWLhbNCMwlrSC516oAMGNz" Name="Layers Built" Kind="OutputPin" />
+          </Node>
+          <Pad Id="UjQqGSpokZeMu8ZFJro8Kv" Comment="Tokyo" Bounds="480,190,340,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((139.70 35.65, 139.80 35.65, 139.80 35.72, 139.70 35.72, 139.70 35.65))">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Node Bounds="480,230,90,19" Id="HY9PozrzvVnzw1Ubywbnax">
+            <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Read WKT" />
+            </p:NodeReference>
+            <Pin Id="VYDUhIPUpvjr7JeuKoPGx9" Name="WKT" Kind="InputPin" />
+            <Pin Id="VM7y8edzdCsXYTG63dnqHk" Name="Factory" Kind="InputPin" />
+            <Pin Id="UPMKzpuCMzRboXheGmx3yU" Name="Result" Kind="OutputPin" />
+            <Pin Id="BlPmyuFfuACjhv3WVRZULc" Name="Success" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="480,280,39,19" Id="KbSxlN7c1RKVCmDSCv1sjW">
+            <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Cons" />
+              <CategoryReference Kind="RecordType" Name="Spread" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="PkuEOkhGE7UgBm6l9Cq8Z3" Name="Input" Kind="InputPin" />
+            <Pin Id="Bkez5iStCarGqBy88aYiKR" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="480,330,110,19" Id="GlOPgmZY3CWfyESMUOIskp">
+            <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Geometry" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="BOIMKNyrpgP3CCy8D3ZFsL" Name="Geometries" Kind="InputPin" />
+            <Pin Id="G64TjAs1QbniaaClfJsF0U" Name="Fill Color" Kind="InputPin" />
+            <Pin Id="AWWdm0wQPTF7IV0Q48wJiY" Name="Line Color" Kind="InputPin" />
+            <Pin Id="AnIXgGyN7kNRo7V4NyrfuF" Name="Line Width" Kind="InputPin" />
+            <Pin Id="IXaEM4oVNgPGN2WjqsfnH5" Name="Result" Kind="OutputPin" />
+            <Pin Id="Awikq5JtB0E4gsvEvyyCs2" Name="Layers Built" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,390,39,19" Id="Ukti6MqAzph86CFaDicoed">
+            <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Cons" />
+              <CategoryReference Kind="RecordType" Name="Spread" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="G2EqQQHtyeIRXSfB19OceD" Name="Input" Kind="InputPin" />
+            <Pin Id="UlbwJcm4DG32S9Y0XhLNup" Name="Input 2" Kind="InputPin" />
+            <Pin Id="Gdp0sgBEZJB21q2XKoPaiA" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,440,110,19" Id="NspsaQYaHqRvvQKzS8BFBs">
+            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Map" />
+              <PinReference Kind="InputPin" Name="Initial Zoom Level" />
+              <PinReference Kind="InputPin" Name="Initial Center Latitude" />
+              <PinReference Kind="InputPin" Name="Initial Center Longitude" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="O1gN7SStOJ8fGKnBpQ527V" Name="Layers" Kind="InputPin" />
+            <Pin Id="J2jtEhbQtDSp3fnxqWLINk" Name="Initial Center Longitude" Kind="InputPin" DefaultValue="135.7581">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Float64" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="MpVJKictEL7UoHXBMvNWNt" Name="Initial Center Latitude" Kind="InputPin" DefaultValue="34.9859">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Float64" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="ErHRCSGE3In1qfxpOB4PkP" Name="Initial Zoom Level" Kind="InputPin" DefaultValue="13">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Integer32" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="BHA22PME7NWGh135YRHRAm" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,610,130,19" Id="HKpT8xaEpODRdpdTwKCIV8">
+            <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="JmAO1TMs4nWa7PoLnUosfq" Name="Map" Kind="InputPin" />
+            <Pin Id="R5vsdJIaUDkMYzpGLl0u94" Name="Diagnostics" Kind="InputPin" />
+            <Pin Id="FDEFveN7B39ZmZSU7zUv9h" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,670,185,19" Id="CaRKeIc4tOECClAOlHgGiR">
+            <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Renderer" />
+              <PinReference Kind="InputPin" Name="Bounds" />
+              <PinReference Kind="InputPin" Name="Bound to Document" />
+            </p:NodeReference>
+            <Pin Id="T1fkOVCrbPzc82mXvr5psG" Name="Bounds" Kind="InputPin" DefaultValue="926, 114, 900, 560">
+              <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
+                <Choice Kind="TypeFlag" Name="Rectangle" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="D9u0lq57zVgwHc8m7PWaOj" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Boolean" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="BtMDnuy8qno8ltFcbnCQuJ" Name="Input" Kind="InputPin" />
+          </Node>
+          <Pad Id="V3dgJU9UCG9aGqSzgD2c7O" Comment="Frame Tokyo" Bounds="200,460,35,35" ShowValueBox="true" isIOBox="true" Value="False">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Bang</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="HyVZJjaM5VPMKA8uX6XFUl" Comment="Margin" Bounds="340,470,40,15" ShowValueBox="true" isIOBox="true" Value="0.1">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Float32" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Node Bounds="60,500,110,19" Id="JaVrdIFeIsg6eD328JH3F7">
+            <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="ZoomToLayer" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">High</p:HelpFocus>
+            <Pin Id="MaNUMSfzgWmxivHgvkeh4m" Name="Map" Kind="InputPin" />
+            <Pin Id="CKiM877oWqvmeUm9bwhDnE" Name="Layer" Kind="InputPin" />
+            <Pin Id="UHyg7cIc0MzaGIXk1dtnWa" Name="Trigger" Kind="InputPin" />
+            <Pin Id="Vq4tAANnIEuEwAzlpnry7K" Name="Margin" Kind="InputPin" />
+            <Pin Id="LL9GFAZJaWwpt4Cs2Cjq9Q" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Pad Id="EZpUPrOJMKV5ljh4Y9QKps" Comment="Frame everything" Bounds="200,520,35,35" ShowValueBox="true" isIOBox="true" Value="False">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Bang</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Node Bounds="60,560,110,19" Id="PQTD2G3HrMM6ycPWnSbwvk">
+            <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="ZoomToLayers" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">High</p:HelpFocus>
+            <Pin Id="UMJ1z43tjQ8fqEUML2B0kF" Name="Map" Kind="InputPin" />
+            <Pin Id="ILzDRcrGcVJSWEj49HSkog" Name="Trigger" Kind="InputPin" />
+            <Pin Id="SRYzzgAGsFQfLAiQPZY78c" Name="Margin" Kind="InputPin" />
+            <Pin Id="A7rcmspN5j22tqCsElwdVG" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Pad Id="FtWpoL6JvkcvTtQCyKDBIu" Bounds="860,190,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Any layer with an extent can be framed. A layer with nothing in it has none, and nothing happens.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="IvWGZo0PFiNjGZP2GYuuhD" Bounds="860,460,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Press Frame Tokyo: the view jumps to that layer. Margin is the fraction of the extent left as breathing room.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="BKBLDHxgnH7Ahsr9bTwYMG" Bounds="860,530,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Frame everything: every layer on the map - both squares at once. With a world-covering tile layer on the map that means the world.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="L458JQsmZcSj2qXDxuPPmA" Bounds="860,618,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Navigate nodes take the map and hand it on, so they chain: Map, ZoomToLayer, ZoomToLayers, ToSkiaLayer.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+        </Canvas>
+        <Patch Id="LzH6pmubg9O35smxqVIBeD" Name="Create" />
+        <Patch Id="Ao5iAD8fsO3KYeA7QU9aFC" Name="Update" />
+        <ProcessDefinition Id="RFF3jQoWZ2BkYFaIkEQxRo">
+          <Fragment Id="V94lGoAOH0dY6VMH9VqkXR" Patch="LzH6pmubg9O35smxqVIBeD" Enabled="true" />
+          <Fragment Id="EWeoHuSGU2CCTnng2jmImk" Patch="Ao5iAD8fsO3KYeA7QU9aFC" Enabled="true" />
+        </ProcessDefinition>
+        <Link Id="QHiheKWRNPQvsV0xOCx0SH" Ids="VPu0ky4RWMVCaSQtIHDs3l,NgCieiVvlWmSYocZPQQ3U4" />
+        <Link Id="TtrB2NZukgGqNNbhOLhNbV" Ids="VzX39cU7YacnKhnOypAXOl,BioNz8exuxnTiJG37WQmJJ" />
+        <Link Id="JArZljGtoWBTShPpdZPMEc" Ids="OKjSY8duzfQitHZ5P7TsTY,LwJeFPlRvEvCFOs82ab61k" />
+        <Link Id="TXwUwl7AKLB4STA7yExYjQ" Ids="UjQqGSpokZeMu8ZFJro8Kv,VYDUhIPUpvjr7JeuKoPGx9" />
+        <Link Id="JIBoRGWxpxfCkyQKYgnrLJ" Ids="UPMKzpuCMzRboXheGmx3yU,PkuEOkhGE7UgBm6l9Cq8Z3" />
+        <Link Id="HcSaXoJYNR1NctjKcD4ooN" Ids="Bkez5iStCarGqBy88aYiKR,BOIMKNyrpgP3CCy8D3ZFsL" />
+        <Link Id="ICKA5HzNr03z7f4A29ap6n" Ids="NgrZIN0hk3OKQoiglzubkU,G2EqQQHtyeIRXSfB19OceD" />
+        <Link Id="LeUOwfwj7AxF9pGyJsP8fv" Ids="IXaEM4oVNgPGN2WjqsfnH5,UlbwJcm4DG32S9Y0XhLNup" />
+        <Link Id="QJLO7ugldnHn2LMplSEWMc" Ids="Gdp0sgBEZJB21q2XKoPaiA,O1gN7SStOJ8fGKnBpQ527V" />
+        <Link Id="FTxenF55weON6fQx2jwM9d" Ids="FDEFveN7B39ZmZSU7zUv9h,BtMDnuy8qno8ltFcbnCQuJ" />
+        <Link Id="HeZ4jaSMSGfxUTCabLwTw2" Ids="BHA22PME7NWGh135YRHRAm,MaNUMSfzgWmxivHgvkeh4m" />
+        <Link Id="KGVPlSzZbPiOXGluU1tLof" Ids="IXaEM4oVNgPGN2WjqsfnH5,CKiM877oWqvmeUm9bwhDnE" />
+        <Link Id="Frii3k7M1o95WnN2f3qlg1" Ids="V3dgJU9UCG9aGqSzgD2c7O,UHyg7cIc0MzaGIXk1dtnWa" />
+        <Link Id="FXBt9QpyxdkYhbwQw3SaAz" Ids="HyVZJjaM5VPMKA8uX6XFUl,Vq4tAANnIEuEwAzlpnry7K" />
+        <Link Id="PSwfDsbPSuQYfm5zZNmgE3" Ids="LL9GFAZJaWwpt4Cs2Cjq9Q,UMJ1z43tjQ8fqEUML2B0kF" />
+        <Link Id="E1XTdsPJNYqu3YWb9GGQiN" Ids="EZpUPrOJMKV5ljh4Y9QKps,ILzDRcrGcVJSWEj49HSkog" />
+        <Link Id="IavjXmqkeECcBWBLzQ8QFF" Ids="A7rcmspN5j22tqCsElwdVG,JmAO1TMs4nWa7PoLnUosfq" />
+      </Patch>
+    </Node>
+  </Patch>
+  <NugetDependency Id="V1lBdNHrLhphq83oCLjcsM" Location="VL.Mapsui" Version="0.0.0" />
+</Document>

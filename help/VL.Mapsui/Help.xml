@@ -6,7 +6,13 @@
 	<Topic title="HowTo">
 		<VLDocument link="HowTo Draw a graticule.vl" tags="graticule,grid,meridian,parallel,latitude,longitude,offline,noTiles,coordinateSystem,webMercator,layer,map" />
 		<VLDocument link="HowTo Show a map.vl" tags="map,tiles,openstreetmap,osm,cache,zoom" />
+		<VLDocument link="HowTo Use any tile service.vl" tags="xyz,tiles,url,template,slippy,tileServer,basemap,terrain,satellite,opentopomap,attribution,enabled,policy" />
+		<VLDocument link="HowTo Cache tiles.vl" tags="cache,tileCache,disk,folder,tiles,size,offline,expire,localappdata,path,policy" />
 		<VLDocument link="HowTo Draw a geometry.vl" tags="geometry,wkt,shape,polygon,layer,colour,color,simplest,offline,graticule,nts,netTopologySuite" />
+		<VLDocument link="HowTo Show a layer only at some zooms.vl" tags="visibleRange,zoom,minVisible,maxVisible,scale,range,visible,readable,busy,layer,zoomToLevel" />
+		<VLDocument link="HowTo Frame your data.vl" tags="zoomToLayer,zoomToLayers,frame,extent,fit,bounds,home,showAll,trigger,bang,margin,navigate" />
+		<VLDocument link="HowTo Set the view.vl" tags="centerOn,zoomToLevel,zoomAt,refresh,navigate,view,viewport,center,zoom,level,longitude,latitude" />
+		<VLDocument link="HowTo Convert screen and world.vl" tags="screenToWorld,worldToScreen,project,pixel,screen,world,coordinates,longitude,latitude,mouse,cursor,console,mouseState" />
 		<VLDocument link="HowTo Draw your own shapes.vl" tags="geometry,feature,style,vector,polygon,nts,netTopologySuite,data" />
 		<VLDocument link="HowTo Style mixed geometry.vl" tags="style,geometry,point,line,polygon,mixed,styleByGeometry,theme,themeStyle,symbolStyle,vectorStyle,dispatch,marker,status" />
 		<VLDocument link="HowTo Style by a value.vl" tags="style,value,attribute,choropleth,gradient,gradientTheme,styleByValue,theme,interpolate,graduated,thematic,numeric,min,max,clamp,status,offline" />

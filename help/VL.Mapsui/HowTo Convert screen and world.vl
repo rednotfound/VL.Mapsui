@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document xmlns:p="property" xmlns:r="reflection" Id="KyG1XDjmms4wyxNIH530ki" LanguageVersion="2025.7.4" Version="0.128">
+  <NugetDependency Id="LB1qExTrd5grAbUSCoCPzW" Location="VL.CoreLib" Version="2025.7.4" />
+  <NugetDependency Id="DSYsRN5oLAnziIjfLTDHP0" Location="VL.Skia" Version="2025.7.4" />
+  <Patch Id="NCzbteRkpaB7faWPHF8b9q">
+    <Canvas Id="No2zseOpiazXIn9YdTuLhM" DefaultCategory="Main" BordersChecked="false" CanvasType="FullCategory" />
+    <!--
+
+    ************************ Application ************************
+
+-->
+    <Node Name="Application" Bounds="100,100" Id="F0GSxNv8epcV8OZ7MUtqCo">
+      <p:NodeReference>
+        <Choice Kind="ContainerDefinition" Name="Process" />
+        <CategoryReference Kind="Category" Name="Primitive" />
+      </p:NodeReference>
+      <Patch Id="DDTZ8cKOTUO393w1P1kSf1">
+        <Canvas Id="RzNbe4Yj11Qdu0IpEKIcWk" CanvasType="Group">
+          <Pad Id="ECrdbxtaoZN0hfdm2tfjIO" Bounds="60,40,570,41" ShowValueBox="true" isIOBox="true" Value="Use ScreenToWorld and WorldToScreen!">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">20</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="T1T1UVI94AwXtdM6kpAxKv" Bounds="60,90,520,64" ShowValueBox="true" isIOBox="true" Value="Two directions between the window's pixels and the world's degrees. Pixels count from the top-left of the view, the same ones ToSkiaLayer draws in. Nothing needs to be drawn there: the sea has coordinates too.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Node Bounds="60,190,110,19" Id="UBHUKtEvPpBFBKX4V83SAL">
+            <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Graticule" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="Q78SvbniCd0urJsNra7lOE" Name="Degrees Spacing" Kind="InputPin" />
+            <Pin Id="AR5TC7b9HtfaKbuGTsQKF6" Name="Show Labels" Kind="InputPin" />
+            <Pin Id="JnwzS3Lm3CGBXVWTRUXxZf" Name="Line Color" Kind="InputPin" />
+            <Pin Id="T29PThzak3U4KDr6uDqrwy" Name="Line Width" Kind="InputPin" />
+            <Pin Id="IVezceVixiEVIk5HUgvI5B" Name="Result" Kind="OutputPin" />
+            <Pin Id="VKRqtlLdeUTig14ha2Rg7c" Name="Lines Built" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,240,39,19" Id="JiPzABU6wiNH7Ng0Hab0Dg">
+            <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Cons" />
+              <CategoryReference Kind="RecordType" Name="Spread" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="LoLgDaHmjlFfaC3cUjBbel" Name="Input" Kind="InputPin" />
+            <Pin Id="Gqt1w57NtQkGBJuuqZyuhO" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,290,110,19" Id="K5RmxlODzHKnKGOeI7fGYI">
+            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Map" />
+              <PinReference Kind="InputPin" Name="Initial Zoom Level" />
+              <PinReference Kind="InputPin" Name="Initial Center Latitude" />
+              <PinReference Kind="InputPin" Name="Initial Center Longitude" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="V30UmnMxwg7hXolEafKWxw" Name="Layers" Kind="InputPin" />
+            <Pin Id="Ja7Flaib8JK8lVAt9OvpbY" Name="Initial Center Longitude" Kind="InputPin" DefaultValue="135.7581">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Float64" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="JwPHChOvB9Bglh5rRDWs1D" Name="Initial Center Latitude" Kind="InputPin" DefaultValue="34.9859">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Float64" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="CN0zNXjHoisF22epJNf5Tf" Name="Initial Zoom Level" Kind="InputPin" DefaultValue="15">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Integer32" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="Igpfr3kYOuo1xGJ1X3W8lJ" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,350,130,19" Id="J5UlHbDWfLsRTtj4BHY9TN">
+            <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="RlXjhNUnoUxJRaY3BQSkag" Name="Map" Kind="InputPin" />
+            <Pin Id="Deg0pZ9jlMnhN2F984BDIa" Name="Diagnostics" Kind="InputPin" />
+            <Pin Id="VKh0bLu6LU2WQJREmdNOYo" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="310,350,70,19" Id="KyPHIrEdwaI5KRayf1rBmV">
+            <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Console" />
+            </p:NodeReference>
+            <Pin Id="J7Qy1qxoSX5wdZSjYKYDUO" Name="Output" Kind="OutputPin" />
+            <Pin Id="UMzzBJxwVB5FjI5RALkY0y" Name="Mouse" Kind="OutputPin" />
+            <Pin Id="Bn6RuOawidpUgsQhnW9gs2" Name="Keyboard" Kind="OutputPin" />
+            <Pin Id="LQx3J2X15R069IUAYno4OU" Name="Notifications" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,400,60,19" Id="PxKJBdNQmA1DSdtyuaIUOR">
+            <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Group" />
+              <CategoryReference Kind="Category" Name="Skia" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="TpO4gauyEFpDk3p8ar6RvY" Name="Input" Kind="InputPin" />
+            <Pin Id="POqjy1sG1L3Gg1rSJh7zxs" Name="Input 2" Kind="InputPin" />
+            <Pin Id="VPlAMElsElHOozF9440YXo" Name="Output" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,450,185,19" Id="Ain9nGVQvaMNB1jUBPt2iA">
+            <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Renderer" />
+              <PinReference Kind="InputPin" Name="Bounds" />
+              <PinReference Kind="InputPin" Name="Bound to Document" />
+            </p:NodeReference>
+            <Pin Id="FU9aRnrZpsMsWVzWeb2aWz" Name="Bounds" Kind="InputPin" DefaultValue="926, 114, 900, 560">
+              <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
+                <Choice Kind="TypeFlag" Name="Rectangle" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="VHxKpF0ASmTL8DLmkzhYhc" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Boolean" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="C2j9ZlaPBkOKCw9cmKsBAq" Name="Input" Kind="InputPin" />
+          </Node>
+          <Node Bounds="440,190,80,19" Id="SZ5UPynRawTUVzUVFinUHH">
+            <p:NodeReference LastCategoryFullName="IO.Mouse" LastDependency="CoreLibBasics.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="MouseState" />
+            </p:NodeReference>
+            <Pin Id="R0EZmECaQzB9Kn1QBprGBP" Name="Mouse Device" Kind="InputPin" />
+            <Pin Id="FDzeG97LjUNjskC3LaVfBJ" Name="Position" Kind="OutputPin" />
+            <Pin Id="ECQThUiabZjm2lKHHOLW9A" Name="Left Pressed" Kind="OutputPin" />
+            <Pin Id="KqiUJ7CvB3oxbInz9Fv5ig" Name="Wheel State" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="440,240,46,19" Id="TWbPjHkEKzWvsz0dmtsSDc">
+            <p:NodeReference LastCategoryFullName="2D.Vector2" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Vector (Split)" />
+              <CategoryReference Kind="Vector2Type" Name="Vector2" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="TXL69GIh91ps8Aw8bpJFoL" Name="Input" Kind="StateInputPin" />
+            <Pin Id="CcWSfSYYnFPX9slSKYKKcv" Name="X" Kind="OutputPin" />
+            <Pin Id="Pavd9gSEiuOlepEIP4PdlP" Name="Y" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="440,300,110,19" Id="SupIpvItoHYWmEpMIqudAG">
+            <p:NodeReference LastCategoryFullName="Mapsui.Project" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="ScreenToWorld" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">High</p:HelpFocus>
+            <Pin Id="GZCMzjKxm9vLWSxPLGOvT3" Name="Map" Kind="InputPin" />
+            <Pin Id="NZV6WWvUHfVXHFdDrQUcJS" Name="X" Kind="InputPin" />
+            <Pin Id="AihRG72E3Zf8qlVnarwoaK" Name="Y" Kind="InputPin" />
+            <Pin Id="G5xA1rWhmqa7zdKBjjjdie" Name="Longitude" Kind="OutputPin" />
+            <Pin Id="PzCppta5C5ZMzPIJgSfgsv" Name="Latitude" Kind="OutputPin" />
+          </Node>
+          <Pad Id="DheGJLDTw5chJLdjldXcQO" Comment="Longitude" Bounds="580,305,80,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="NLgD6uUCKIc3pw3yR2Oj9t" Comment="Latitude" Bounds="760,305,80,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="RBRbE86ol7iQZGUx6NKNmm" Comment="Longitude" Bounds="580,350,70,15" ShowValueBox="true" isIOBox="true" Value="135.7581">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Float64" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Pad Id="G2EQZ8O1RmvE0rTcgC3k0V" Comment="Latitude" Bounds="760,350,70,15" ShowValueBox="true" isIOBox="true" Value="34.9859">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="Float64" />
+            </p:TypeAnnotation>
+          </Pad>
+          <Node Bounds="440,380,110,19" Id="LXQGZm0jHjYX4RXWZoJCw3">
+            <p:NodeReference LastCategoryFullName="Mapsui.Project" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="WorldToScreen" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">High</p:HelpFocus>
+            <Pin Id="SetiqkVl18baxkCt3Z08vy" Name="Map" Kind="InputPin" />
+            <Pin Id="FkkON4hr023nm7xAg44zWE" Name="Longitude" Kind="InputPin" />
+            <Pin Id="MOW95MSDWTHy5FyFjWInM7" Name="Latitude" Kind="InputPin" />
+            <Pin Id="IZEi6CBzOq9nVJrtVFnY9f" Name="X" Kind="OutputPin" />
+            <Pin Id="FQVxzHMdRkfCOAu0Wn6Cf0" Name="Y" Kind="OutputPin" />
+          </Node>
+          <Pad Id="Ftcj2dYsshNqDCQO4J44kb" Comment="X" Bounds="580,385,50,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="MlTFLmlfdjqkhECNAQC0Oq" Comment="Y" Bounds="660,385,50,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="B9MEJGmySRliukwdyxL4Pc" Bounds="920,190,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; MouseState reads the map window's mouse through Console, which is grouped with the map layer into the Renderer.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="TxDLPdlvsHwSGSXvDp0MrX" Bounds="920,300,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Pixel in, degrees out, whether or not anything is drawn there. Move over the window and compare with the grid labels. Both read 0 until the map has been drawn once.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="K4Zz698lgBJNXnq8IqbAHf" Bounds="920,388,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Degrees in, pixel out: where a place lands in the window, for putting something of your own on top of the map.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+        </Canvas>
+        <Patch Id="I6tosCd94aiFlrdx7MRyvF" Name="Create" />
+        <Patch Id="Oz3JGHfRJ7twTxLXfKCV8m" Name="Update" />
+        <ProcessDefinition Id="VLVfKaMnhEHe5KPEuxM2ni">
+          <Fragment Id="J3zCdmrmLgu3RTnzZKQKb1" Patch="I6tosCd94aiFlrdx7MRyvF" Enabled="true" />
+          <Fragment Id="NDXV5OQK4Tok4jRxie62Ww" Patch="Oz3JGHfRJ7twTxLXfKCV8m" Enabled="true" />
+        </ProcessDefinition>
+        <Link Id="Tx5TTMCLHQJp0VBefappaV" Ids="IVezceVixiEVIk5HUgvI5B,LoLgDaHmjlFfaC3cUjBbel" />
+        <Link Id="AJhkUnl0w6b1AwkOvXYoHg" Ids="Gqt1w57NtQkGBJuuqZyuhO,V30UmnMxwg7hXolEafKWxw" />
+        <Link Id="BR84o4C1lOWlZaQ3jCYwRx" Ids="Igpfr3kYOuo1xGJ1X3W8lJ,RlXjhNUnoUxJRaY3BQSkag" />
+        <Link Id="MJnNrAyDnQpAA4JMHcGqQ5" Ids="VKh0bLu6LU2WQJREmdNOYo,TpO4gauyEFpDk3p8ar6RvY" />
+        <Link Id="POoxrIG9RtqZ0lVgfLOe23" Ids="J7Qy1qxoSX5wdZSjYKYDUO,POqjy1sG1L3Gg1rSJh7zxs" />
+        <Link Id="N675GWMfoacqF2BgPtvWkA" Ids="VPlAMElsElHOozF9440YXo,C2j9ZlaPBkOKCw9cmKsBAq" />
+        <Link Id="CIZlxFZEzQAqsLPVi0aMIH" Ids="UMzzBJxwVB5FjI5RALkY0y,R0EZmECaQzB9Kn1QBprGBP" />
+        <Link Id="HR04pwz71YhTvGftJ9HZTA" Ids="FDzeG97LjUNjskC3LaVfBJ,TXL69GIh91ps8Aw8bpJFoL" />
+        <Link Id="QKzzIA0rQSJRFXCDuS2yNK" Ids="Igpfr3kYOuo1xGJ1X3W8lJ,GZCMzjKxm9vLWSxPLGOvT3" />
+        <Link Id="B9L5SdX93C4n23KsT1NXGo" Ids="CcWSfSYYnFPX9slSKYKKcv,NZV6WWvUHfVXHFdDrQUcJS" />
+        <Link Id="MV5WQP9YVv1OyttydeHEjw" Ids="Pavd9gSEiuOlepEIP4PdlP,AihRG72E3Zf8qlVnarwoaK" />
+        <Link Id="CPdg5M0ldYpVSDWHhgOGvb" Ids="G5xA1rWhmqa7zdKBjjjdie,DheGJLDTw5chJLdjldXcQO" />
+        <Link Id="R71NZxGD9XxXQo6QDCWNm2" Ids="PzCppta5C5ZMzPIJgSfgsv,NLgD6uUCKIc3pw3yR2Oj9t" />
+        <Link Id="QTD5IXfCYRAPKyMcCfCZQa" Ids="Igpfr3kYOuo1xGJ1X3W8lJ,SetiqkVl18baxkCt3Z08vy" />
+        <Link Id="JJwanGx4AGZdOd78ssK7Re" Ids="RBRbE86ol7iQZGUx6NKNmm,FkkON4hr023nm7xAg44zWE" />
+        <Link Id="GP2vt6rQwQpI5J6CbOps6F" Ids="G2EQZ8O1RmvE0rTcgC3k0V,MOW95MSDWTHy5FyFjWInM7" />
+        <Link Id="THie3OUCKiBLeid370nBsU" Ids="IZEi6CBzOq9nVJrtVFnY9f,Ftcj2dYsshNqDCQO4J44kb" />
+        <Link Id="OdFjOGWTqh3wXFXw4yUeEu" Ids="FQVxzHMdRkfCOAu0Wn6Cf0,MlTFLmlfdjqkhECNAQC0Oq" />
+      </Patch>
+    </Node>
+  </Patch>
+  <NugetDependency Id="GI9BS7fLPtFQCd9k5gnf93" Location="VL.Mapsui" Version="0.0.0" />
+</Document>
