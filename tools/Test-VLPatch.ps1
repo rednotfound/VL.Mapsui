@@ -70,7 +70,11 @@ foreach ($file in $targets) {
         $problems.Add("XML does not parse: " + ($message -replace '\s+', ' ').Trim())
     }
 
-    $allIds = @(([regex]'Id="([^"]+)"').Matches($raw) | ForEach-Object { $_.Groups[1].Value })
+    # (?<![A-Za-z]) so that SlotId="…" is not counted as an Id: a Pad inside a Record definition
+    # references its Slot that way, and the bare pattern reported the four slots of HowTo Draw many
+    # features as duplicate IDs when they were one definition and one reference each. Latent in the
+    # sibling's copy too, which has no records.
+    $allIds = @(([regex]'(?<![A-Za-z])Id="([^"]+)"').Matches($raw) | ForEach-Object { $_.Groups[1].Value })
     $illegal = @($allIds | Where-Object { $_ -notmatch '^[A-V][0-9A-Za-z]{21}$' })
     if ($illegal.Count) { $problems.Add("illegal IDs: $($illegal -join ', ')") }
     $dupes = @($allIds | Group-Object | Where-Object Count -gt 1 | ForEach-Object Name)
@@ -376,7 +380,11 @@ if (-not $Path) {
     $high = @{}; $low = @{}; $used = @{}
     foreach ($vl in Get-ChildItem (Join-Path $RepoRoot 'help') -Filter *.vl -Recurse -File) {
         $raw = [IO.File]::ReadAllText($vl.FullName)
-        $pattern = '<p:NodeReference LastCategoryFullName="([^"]+)" LastDependency="VL\.Mapsui\.vl">(?:(?!</p:NodeReference>).)*?<Choice Kind="(?:OperationCallFlag|ProcessAppFlag)" Name="([^"]+)" />\s*</p:NodeReference>\s*(?:<p:HelpFocus[^>]*>(High|Low)</p:HelpFocus>)?'
+        # (?:\s*<PinReference[^>]*/>)* : a node whose pins carry defaults (Map's Initial pins, the
+        # Renderer's Bounds) lists them as PinReference elements AFTER the Choice and before
+        # </p:NodeReference>. Without this the audit could not see Map or ToSkiaLayer in any patch
+        # and reported both as never flagged High while both were.
+        $pattern = '<p:NodeReference LastCategoryFullName="([^"]+)" LastDependency="VL\.Mapsui\.vl">(?:(?!</p:NodeReference>).)*?<Choice Kind="(?:OperationCallFlag|ProcessAppFlag)" Name="([^"]+)" />(?:\s*<PinReference[^>]*/>)*\s*</p:NodeReference>\s*(?:<p:HelpFocus[^>]*>(High|Low)</p:HelpFocus>)?'
         foreach ($m in [regex]::Matches($raw, $pattern, 'Singleline')) {
             $key = "$($m.Groups[1].Value)|$($m.Groups[2].Value)"
             $used[$key] = $true
