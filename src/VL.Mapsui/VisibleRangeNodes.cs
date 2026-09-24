@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using VL.Core.Import;
 
 using ILayer = global::Mapsui.Layers.ILayer;
@@ -17,7 +17,7 @@ namespace VL.Mapsui;
 /// screen, and both are still being drawn. Every GIS answers this the same way: a layer declares
 /// the scales it belongs to, and outside them it is skipped.
 ///
-/// **Measured 2026-08-16, because the property reads like a dead one.** `get_MinVisible` occurs
+/// **Measured, because the property reads like a dead one.** `get_MinVisible` occurs
 /// **zero times** in `Mapsui.Rendering.Skia.dll` — the same reading as `LabelColumn`, which works,
 /// and as `UnitType`, which does nothing. Rendered: a layer with `MinVisible` 0.5 and `MaxVisible`
 /// 2.0 draws 91204 pixels at resolution 1 and **0** at both 0.25 and 4.0. It is a hard cut, and it

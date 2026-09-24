@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using VL.Core.Import;
@@ -188,7 +188,7 @@ public class FeatureLayerNode : IDisposable
     /// This node is the only place that sees the features and the style at the same time, which
     /// makes it the only place that can notice a combination guaranteeing an empty screen. Mapsui's
     /// renderer dispatches on the style's runtime type: a `SymbolStyle` draws points and refuses
-    /// polygons and lines outright — 0 pixels, measured 2026-08-16, no exception and nothing in any
+    /// polygons and lines outright — 0 pixels, measured, no exception and nothing in any
     /// log. A whole GeoJSON file's worth of shapes can go missing this way while every other
     /// readout in the patch says the data arrived, which is exactly what happened the first time
     /// these three packages were joined.

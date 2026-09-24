@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Mapsui;
 using VL.Core.Import;
@@ -14,7 +14,7 @@ namespace VL.Mapsui;
 /// <remarks>
 /// **The node that was missing.** Without it an example has to hardcode a centre and a zoom that
 /// happen to match its data, and the first one that did got them 350 km apart — the shape was off
-/// screen and it read as a rendering fault (NOTES.md, 2026-08-14). "Show me the data" is a thing a
+/// screen and it read as a rendering fault. "Show me the data" is a thing a
 /// patch should be able to say.
 ///
 /// **Triggered, not continuous, and that is the same safety property as ZoomIn's.** Applied every

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -60,7 +60,7 @@ public sealed class TileDiskCache
     ///
     /// The symptom is that changing <c>URL Template</c> appears to do nothing at all. The layer
     /// really is rebuilt — <c>Layers Built</c> counts up, every guard reports success — and the
-    /// picture does not change, because no request is ever made. Found on 2026-08-17 by writing a
+    /// picture does not change, because no request is ever made. Found by writing a
     /// tutorial whose entire lesson was switching basemaps; 218 unit tests had not, because none of
     /// them used two sources and a cache at once.
     ///
@@ -149,8 +149,7 @@ static class TileCache
     /// empty Path IOBox does *not*: VL stores it as an empty path relative to the document and
     /// hands the node the document's own folder, absolute. That is not a theory — it is what put
     /// 444 tiles next to two repositories, with every guard here reporting success, because from
-    /// this method's point of view somebody had named a perfectly good folder. See NOTES.md,
-    /// 2026-08-14.
+    /// this method's point of view somebody had named a perfectly good folder.
     ///
     /// So there is no "empty means default" rule any more. There cannot be one: on a Path pin,
     /// empty has no representation.

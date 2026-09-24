@@ -1,4 +1,4 @@
-using Stride.Core.Mathematics;
+﻿using Stride.Core.Mathematics;
 using VL.Core.Import;
 
 using IStyle = global::Mapsui.Styles.IStyle;
@@ -42,7 +42,7 @@ public enum SymbolShape
 /// polygon under a `SymbolStyle` draws **0 pixels** where the same polygon under a `VectorStyle`
 /// draws 14884, and where even *no style at all* manages 956. Mapsui's Skia renderer dispatches on
 /// the style's runtime type rather than on what it inherits, and a raw `Mapsui.Styles.SymbolStyle`
-/// behaves the same way, so this is the library's shape and not something we set (2026-08-16).
+/// behaves the same way, so this is the library's shape and not something we set.
 ///
 /// **A map holding more than points therefore needs `StyleByGeometry`**, which hands each feature
 /// the style for its own kind of geometry: this into `Point`, a `VectorStyle` into `Polygon` and
@@ -56,7 +56,7 @@ public enum SymbolShape
 /// which is simply the default. Dispatch, do not stack.
 ///
 /// **Without it a point is still drawn — as a ring.** Mapsui's point renderer falls back to a
-/// default symbol, so nothing is invisible, but measured 2026-08-16 that fallback covers **180
+/// default symbol, so nothing is invisible, but measured that fallback covers **180
 /// pixels** where a filled marker covers **952**: it is a 2-pixel outline around a 32-pixel circle,
 /// and against a busy basemap that is close to nothing. Five times the ink is what this node buys
 /// before anyone changes a colour.
@@ -68,7 +68,7 @@ public enum SymbolShape
 ///
 /// **There is no pin for sizing it on the ground, because Mapsui 4.1.9 cannot do it.**
 /// `Mapsui.Styles.UnitType` offers `Pixel` and `WorldUnit` and `SymbolStyle` has a `UnitType`
-/// property, but the Skia renderer never reads it: measured 2026-08-16, a rectangle at scale 1 draws
+/// property, but the Skia renderer never reads it: measured, a rectangle at scale 1 draws
 /// 1156 pixels under both settings at both zoom levels, and the string `UnitType` appears **zero**
 /// times in `Mapsui.Rendering.Skia.dll`. A pin that does nothing is worse than no pin.
 ///

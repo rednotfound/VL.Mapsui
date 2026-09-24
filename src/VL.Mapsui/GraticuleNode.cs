@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using NetTopologySuite.Geometries;
@@ -22,20 +22,18 @@ namespace VL.Mapsui;
 /// <remarks>
 /// **A map with no tile layer is a blank window, and blank has no direction.** This is the layer
 /// that gives a tile-less map its bearings without any network: the coordinate system itself,
-/// drawn. Requested by vl-overworld's Tutorial 01 (2026-09-23); Mapsui ships no graticule of its
-/// own.
+/// drawn. Mapsui ships no graticule of its own.
 ///
-/// **The lines are generated per VIEW, not per world.** The first version built a fixed-degree
-/// grid for the whole planet up front, and defect nine (NOTES.md 2026-09-24) showed why no GIS
-/// does it that way: labels multiply where lines add, and one fine spacing built 24.5 million
-/// features and froze the process. Now the layer answers Mapsui's own question — "which features
-/// are in THIS view?" — by computing just the lines that cross it: a handful of features at any
-/// zoom, at any spacing, rebuilt only when the view or the spacing changes.
+/// **The lines are generated per VIEW, not per world.** A fixed grid for the whole planet is
+/// millions of features at a fine spacing, because labels multiply where lines only add. Instead
+/// the layer computes just the lines crossing the view it is asked for — a handful of features
+/// at any zoom, at any spacing, rebuilt only when the view or the spacing changes. That is how
+/// every desktop GIS draws its grid.
 ///
-/// Styling stays composed, not reimplemented — <see cref="VectorStyleNode"/> for the lines,
-/// crossing labels through <see cref="StyleByGeometryNode"/> → <see cref="LabelStyleNode"/>
-/// (the defect-three dispatch, reused). In WebMercator a meridian and a parallel are both
-/// straight, so every line is two vertices.
+/// Styling is composed from the same pieces a patch would use — <see cref="VectorStyleNode"/>
+/// for the lines, crossing labels through <see cref="StyleByGeometryNode"/> →
+/// <see cref="LabelStyleNode"/>. In WebMercator a meridian and a parallel are both straight, so
+/// every line is two vertices.
 /// </remarks>
 [ProcessNode(Name = "Graticule", Category = "Mapsui.Layers")]
 public class GraticuleNode : IDisposable

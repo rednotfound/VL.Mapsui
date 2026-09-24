@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Stride.Core.Mathematics;
 using VL.Core.Import;
 
@@ -32,7 +32,7 @@ static class Styles
     /// </summary>
     /// <remarks>
     /// **A nested `StyleCollection` draws nothing, and says nothing about it.** Measured
-    /// 2026-08-16: `{ { VectorStyle, SymbolStyle }, LabelStyle }` over a polygon put down 156
+    ///: `{ { VectorStyle, SymbolStyle }, LabelStyle }` over a polygon put down 156
     /// pixels — the label text and not one pixel of the shape — where the flat
     /// `{ VectorStyle, SymbolStyle }` drew 14884. Mapsui's renderer walks a collection's members
     /// and does not recurse into a member that is itself a collection.

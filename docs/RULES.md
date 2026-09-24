@@ -96,6 +96,15 @@ transitive closure.
 
 Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
 
+- **A `///` doc comment is the node's PUBLISHED description** — vvvv shows the summary and
+  remarks in the tooltip the moment a user hovers. It speaks to the node's user about the node's
+  behaviour: what it does, what it refuses, what was measured. The project's own bookkeeping —
+  dates, defect ordinals, `NOTES.md`/`docs/` pointers, which chapter requested it, where the code
+  used to live — goes in ordinary `//` comments or in NOTES.md, never in `///`. The user found
+  the archaeology in their own tooltips (2026-09-24: Graticule's description cited defect numbers
+  and a tutorial by date); all three packages were swept the same day, and this rule is why it
+  stays swept.
+
 - **Three questions, in order.** Can a patch reach the same result by wiring three existing nodes
   (then it is a help patch, not a node)? Does it hold a resource (then it is a `[ProcessNode]`)?
   Is the thing it decides something the user cares about (if not, put it behind a pin)?

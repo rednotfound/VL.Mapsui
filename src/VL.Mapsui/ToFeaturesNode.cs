@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -144,7 +144,7 @@ public class ToFeaturesNode
     /// <remarks>
     /// **A patched record must be read through VL, not through reflection.** Inside the vvvv editor a
     /// record instance has no CLR members corresponding to its properties at all — measured
-    /// 2026-08-15, a hand-authored `Landmark` record with `Name`, `Type` and `Geometry` reported its
+    ///, a hand-authored `Landmark` record with `Name`, `Type` and `Geometry` reported its
     /// public members as `__State:Object, Context:NodeContext, Identity:UInt32,
     /// __Program__:VLObjectProgram`. The values live inside `__State`, and only
     /// `IVLObject.Type.Properties` can see them.

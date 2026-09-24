@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using VL.Core.Import;
 
@@ -47,7 +47,7 @@ namespace VL.Mapsui;
 ///
 /// Not exposed yet: Mapsui's `ColorBlend` ramps (rainbow and friends) — two styles interpolate two
 /// colours, which is a working choropleth; multi-stop ramps are the obvious next pin. Known
-/// upstream wart, measured 2026-08-23: `GradientTheme` switches `Enabled` (and a `SymbolStyle`'s
+/// upstream wart, measured: `GradientTheme` switches `Enabled` (and a `SymbolStyle`'s
 /// `BitmapId`/`SymbolOffset`) at the midpoint THE WRONG WAY ROUND — nearer Max takes the MIN side.
 /// Styles built by this package's own nodes are always enabled and bitmap-free, so nothing here
 /// trips it; hand-built ones might.

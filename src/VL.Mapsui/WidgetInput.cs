@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Mapsui;
 
 namespace VL.Mapsui;
@@ -10,8 +10,8 @@ namespace VL.Mapsui;
 /// The arithmetic only. **What counts as a click is the patch's business** and arrives through
 /// <c>Click [Mapsui.Widgets]</c>; this is what that node calls once it has been told a press
 /// happened. Everything here is a Map, a point and a bool, so it can be tested without a canvas -
-/// which is also why the first version of this lived in the Skia layer and was wrong: putting it
-/// there meant deciding for every patch that a left press is what clicking a widget means.
+/// and it deliberately does not decide what a click is: deciding that here would decide
+/// for every patch that a left press is what clicking a widget means.
 /// </remarks>
 static class WidgetInput
 {

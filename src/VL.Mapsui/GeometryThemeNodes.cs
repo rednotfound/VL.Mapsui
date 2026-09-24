@@ -1,4 +1,4 @@
-using VL.Core.Import;
+﻿using VL.Core.Import;
 
 using IStyle = global::Mapsui.Styles.IStyle;
 using ThemeStyle = global::Mapsui.Styles.Thematics.ThemeStyle;
@@ -26,7 +26,7 @@ namespace VL.Mapsui;
 /// `VectorStyle` underneath rescues the polygon and ruins the point, because a `VectorStyle` draws
 /// its own 32-pixel circle there too: two concentric markers, and a `Scale` below 1 that cannot
 /// shrink anything. Dispatching means each feature is drawn once, by the style meant for it —
-/// measured 2026-08-16, every geometry type through this node puts down exactly the pixels its
+/// measured, every geometry type through this node puts down exactly the pixels its
 /// style puts down alone.
 ///
 /// **An unwired pin draws nothing for that geometry type, silently.** Mapsui does not object; the
@@ -115,7 +115,7 @@ public sealed class GeometryTheme : ThemeStyle
     /// the one that fills: Polygon, then Line, then Point. That is a guess, but a stated one — the
     /// alternative is drawing nothing for a geometry type the patch clearly meant to style.
     ///
-    /// Returning <c>null</c> is allowed and draws nothing: measured 2026-08-16, Mapsui does not
+    /// Returning <c>null</c> is allowed and draws nothing: measured, Mapsui does not
     /// throw for it.
     /// </remarks>
     static IStyle? Dispatch(MapsuiFeature feature, IStyle? point, IStyle? line, IStyle? polygon) =>

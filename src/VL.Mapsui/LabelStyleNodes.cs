@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Stride.Core.Mathematics;
 using VL.Core.Import;
 
@@ -132,7 +132,7 @@ public class LabelStyleNode
     /// </summary>
     /// <remarks>
     /// **`VerticalAlignment.Bottom` pins the text's bottom edge to the offset point**, which is why
-    /// the arithmetic can ignore the font size entirely — measured 2026-08-16: at `Bottom` a
+    /// the arithmetic can ignore the font size entirely — measured: at `Bottom` a
     /// 10-point label draws to y 199 and a 30-point one also draws to y 199, growing upward instead.
     /// At `Center` both edges move and the clearance would have to include half the text.
     ///

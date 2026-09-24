@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using VL.Core.Import;
 
 using VLPath = VL.Lib.IO.Path;
@@ -12,7 +12,7 @@ namespace VL.Mapsui;
 /// **One node owns the cache, and the layer only consumes it.** It used to be two pins on the
 /// layer node plus a separate node that showed the default, which meant two places to set the same
 /// thing and no guarantee they agreed — they did not, and 444 tiles ended up next to two
-/// repositories because of it (NOTES.md, 2026-08-14).
+/// repositories because of it.
 ///
 /// A process node rather than a static one: it holds a folder and a BruTile FileCache, and a
 /// static method is evaluated every frame, so it would build a fresh cache sixty times a second.
