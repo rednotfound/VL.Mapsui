@@ -53,15 +53,17 @@ feature lives". Internally this package keeps `FeatureHelper` (not a node) for i
 ### Graticule — ours, not Mapsui's (added 2026-09-23)
 
 Mapsui ships no lat/lon grid at all (verified: no `Graticule` in Mapsui 4.1.9's assembly), so
-`Graticule [Mapsui.Layers]` is generated here: meridians ±180° and parallels within WebMercator's
-±85.05° at a `Degrees Spacing`, every line two vertices (both are straight in this projection),
-composed from `FeatureLayerNode` + `VectorStyleNode` like `Geometry` is; `Show Labels` adds a point feature per crossing carrying its own coordinates, dispatched through `StyleByGeometry` to a `LabelStyle` (the mixed-features fix reused). Requested by
-vl-overworld Tutorial 01, whose tile-less map window had no bearings. **Two guards since
-2026-09-24 (defect nine, NOTES.md)**: labels build only while meridians × parallels ≤ 10,000
-crossings — labels multiply where lines add, and 0.05° would have been 24.5 million features —
-and a spacing whose world grid would exceed 100,000 lines returns no layer, the same shape as
-the `<= 0` refusal. 10 tests incl. two pixel; help patch `HowTo Draw a graticule` (offline on
-purpose).
+`Graticule [Mapsui.Layers]` is generated here — and since 2026-09-24 it is **view-driven**, the
+way every desktop GIS grid is (defect nine, NOTES.md: the first, world-sized version built 24.5
+million label features at one fine spacing). `GraticuleLayer : BaseLayer` computes only the
+meridians/parallels crossing the view `GetFeatures` asks for, memoised per (view, spacing,
+labels); every line is two vertices (both straight in WebMercator). `Degrees Spacing 0` (the
+default) is **automatic**: a 1/2/5-ladder value giving ~6 lines across, following the zoom; a
+positive value is honoured until a view would hold over 100 lines, then coarsens up the ladder;
+negative = no layer. `Show Labels` puts each crossing's own coordinates beside it (point features
+through `StyleByGeometry` → `LabelStyle`, the mixed-features fix reused) while the view's
+crossings stay ≤ 400. Requested by vl-overworld Tutorial 01, whose tile-less map window had no
+bearings. 10 tests incl. two pixel; help patch `HowTo Draw a graticule` (offline on purpose).
 
 ## Not wrapped
 

@@ -16,12 +16,20 @@ feature per CROSSING: 7,200 × ~3,400 ≈ **24.5 million features**. vvvv stoppe
 never saw it because they tested 10° and 30°, where crossings number in the hundreds — the guard
 case is the PRODUCT of two counts, and products need a fine-spacing test by construction.
 
-Fix, both halves honest about what they do: labels are built only while meridians × parallels ≤
-10,000 (10° = 612 ✓; finer grids draw lines alone), and a spacing so fine the world grid would
-exceed 100,000 lines returns no layer at all — the same shape as the existing `<= 0` refusal
-("no layer rather than an infinite one"). `LabelsBuilt` is now observable for tests. Three
-regressions: lines-alone at 0.5°, labels back at 10° (exactly 612), null at 0.001°. 252 green.
-The crash itself was the failing-first evidence; the tests lock the guard.
+First aid (same day, superseded within hours): caps on labels and lines. **The real fix, also
+2026-09-24: the graticule became VIEW-DRIVEN**, which is what every desktop GIS does and what the
+user asked for outright ("直接上来创建几千个 feature 那肯定爆炸呀"). `GraticuleLayer : BaseLayer`
+overrides `GetFeatures(box, resolution)` and computes only the lines crossing THAT view — a
+handful of features at any zoom, at any spacing, memoised per (view, spacing, labels). With it:
+`Degrees Spacing 0` (the new default) means **automatic** — a 1/2/5-ladder value giving ~6 lines
+across, following the zoom the way a GIS grid does; a positive spacing is honoured until a view
+would hold over 100 of its lines, then it coarsens up the same ladder (`EffectiveSpacing` is
+observable); labels build only while the view's crossings ≤ 400 — in-view counts, so the
+world-sized product can no longer exist. A negative spacing is no layer; the old `0 = no layer`
+semantic moved to `< 0`. Tests rewritten to ask views (world box, Haneda box): 0.05° over Haneda
+= a handful of lines AND labels; 0.05° over the world = coarsened, bounded; auto = 30° world /
+0.02° city; same view memoised; both pixel tests still pass — proving the real renderer reaches
+`GetFeatures` with the viewport's box. 252 green.
 
 ## 2026-09-23 — Initial Center silently clamped to the layers' extent without a tile layer
 
