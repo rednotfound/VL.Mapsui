@@ -6,6 +6,7 @@
 	<Topic title="HowTo">
 		<VLDocument link="HowTo Draw a graticule.vl" tags="graticule,grid,meridian,parallel,latitude,longitude,offline,noTiles,coordinateSystem,webMercator,layer,map" />
 		<VLDocument link="HowTo Show a map.vl" tags="map,tiles,openstreetmap,osm,cache,zoom" />
+		<VLDocument link="HowTo Draw a geometry.vl" tags="geometry,wkt,shape,polygon,layer,colour,color,simplest,offline,graticule,nts,netTopologySuite" />
 		<VLDocument link="HowTo Draw your own shapes.vl" tags="geometry,feature,style,vector,polygon,nts,netTopologySuite,data" />
 		<VLDocument link="HowTo Style mixed geometry.vl" tags="style,geometry,point,line,polygon,mixed,styleByGeometry,theme,themeStyle,symbolStyle,vectorStyle,dispatch,marker,status" />
 		<VLDocument link="HowTo Style by a value.vl" tags="style,value,attribute,choropleth,gradient,gradientTheme,styleByValue,theme,interpolate,graduated,thematic,numeric,min,max,clamp,status,offline" />
