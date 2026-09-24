@@ -147,6 +147,24 @@ function Pad($d, [string]$Type, [string]$Bounds, [string]$Value, [string]$Commen
     $id
 }
 
+# A Boolean IOBox drawn as a button: -Mode Toggle (stays) or Bang (one frame). The shape every
+# shipped Enabled switch uses: ImmutableTypeFlag plus a buttonmode setting. Returns its Id.
+# (Not named Switch: that is a PowerShell keyword, and a function of that name is a parse error.)
+function Button($d, [string]$Bounds, [string]$Value = 'False', [string]$Comment = '',
+                [ValidateSet('Toggle', 'Bang')][string]$Mode = 'Toggle') {
+    $id = New-Id
+    $d.Elements.Add(@(
+        "          <Pad Id=`"$id`" Comment=`"$(Esc $Comment)`" Bounds=`"$Bounds`" ShowValueBox=`"true`" isIOBox=`"true`" Value=`"$Value`">",
+        '            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">',
+        '              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />',
+        '            </p:TypeAnnotation>',
+        '            <p:ValueBoxSettings>',
+        "              <p:buttonmode p:Assembly=`"VL.UI.Forms`" p:Type=`"VL.HDE.PatchEditor.Editors.ButtonModeEnum`">$Mode</p:buttonmode>",
+        '            </p:ValueBoxSettings>',
+        '          </Pad>') -join "`r`n")
+    $id
+}
+
 # An output IOBox with no value and no type - VL types it from the link. Returns its Id.
 function OutPad($d, [string]$Bounds, [string]$Comment = '') {
     $id = New-Id
@@ -261,20 +279,57 @@ function Link($d, [string]$From, [string]$To) {
 # X,Y in 60 px steps, the shape all the shipped patches here share.
 function MapWindow($d, [int]$X, [int]$Y, [string]$Layers,
                    [double]$Longitude = 139.7, [double]$Latitude = 35.68, [int]$Zoom = 12,
-                   [switch]$Diagnostics) {
+                   [switch]$Diagnostics,
+                   # -Detached leaves Map.Result -> ToSkiaLayer.Map unwired, for a patch that puts
+                   # Navigate nodes between them; -Gap is the vertical room it gets (Map at Y,
+                   # ToSkiaLayer at Y+Gap, Renderer 60 below that).
+                   [switch]$Detached, [int]$Gap = 60,
+                   # -WithConsole adds the mouse idiom vvvv's own help uses (Explanation Mouse and
+                   # Keyboard: "the Mouse node needs to be connected to the Renderer it interacts
+                   # with"): a Console whose Output is grouped with the map layer and whose Mouse
+                   # pin feeds a MouseState in the patch. Returned as .Console and .Group.
+                   [switch]$WithConsole) {
     $map = Node $d 'Map' 'Mapsui' "$X,$Y,110,19" -Kind ProcessAppFlag `
         -In 'Layers','Initial Center Longitude','Initial Center Latitude','Initial Zoom Level' -Out 'Result' `
         -Defaults @{ 'Initial Center Longitude' = "$Longitude|Float64"; 'Initial Center Latitude' = "$Latitude|Float64"; 'Initial Zoom Level' = "$Zoom|Integer32" }
     if ($Layers) { Link $d $Layers $map.Layers }
     $skiaDefaults = @{}
     if ($Diagnostics) { $skiaDefaults['Diagnostics'] = 'True|Boolean' }
-    $skia = Node $d 'ToSkiaLayer' 'Mapsui.Skia' "$X,$($Y + 60),130,19" -Kind ProcessAppFlag -In 'Map','Diagnostics' -Out 'Result' -Defaults $skiaDefaults
-    Link $d $map.Result $skia.Map
-    $renderer = Node $d 'Renderer' 'Graphics.Skia' "$X,$($Y + 120),185,19" -Kind ProcessAppFlag -Dependency 'VL.Skia.vl' `
+    $skia = Node $d 'ToSkiaLayer' 'Mapsui.Skia' "$X,$($Y + $Gap),130,19" -Kind ProcessAppFlag -In 'Map','Diagnostics' -Out 'Result' -Defaults $skiaDefaults
+    if (-not $Detached) { Link $d $map.Result $skia.Map }
+    $rendererY = $Y + $Gap + 60
+    $console = $null; $group = $null
+    if ($WithConsole) {
+        $console = Node $d 'Console' 'Graphics.Skia' "$($X + 250),$($Y + $Gap),70,19" -Kind ProcessAppFlag -Dependency 'VL.Skia.vl' `
+            -Out 'Output','Mouse','Keyboard','Notifications'
+        $group = Node $d 'Group' 'Graphics.Skia' "$X,$($Y + $Gap + 50),60,19" -Kind ProcessAppFlag -Dependency 'VL.Skia.vl' `
+            -In 'Input','Input 2' -Out 'Output' -CategoryRef '<CategoryReference Kind="Category" Name="Skia" NeedsToBeDirectParent="true" />'
+        Link $d $skia.Result $group.Input
+        Link $d $console.Output $group.Input2
+        $rendererY = $Y + $Gap + 100
+    }
+    $renderer = Node $d 'Renderer' 'Graphics.Skia' "$X,$rendererY,185,19" -Kind ProcessAppFlag -Dependency 'VL.Skia.vl' `
         -In 'Bounds','Bound to Document','Input' `
         -Defaults @{ 'Bounds' = '926, 114, 900, 560|Rectangle|System.Drawing|System.Drawing.dll'; 'Bound to Document' = 'True|Boolean' }
-    Link $d $skia.Result $renderer.Input
-    $map | Add-Member -NotePropertyName ToSkiaLayer -NotePropertyValue $skia -PassThru | Add-Member -NotePropertyName Renderer -NotePropertyValue $renderer -PassThru
+    if ($WithConsole) { Link $d $group.Output $renderer.Input } else { Link $d $skia.Result $renderer.Input }
+    $map | Add-Member -NotePropertyName ToSkiaLayer -NotePropertyValue $skia -PassThru |
+           Add-Member -NotePropertyName Renderer -NotePropertyValue $renderer -PassThru |
+           Add-Member -NotePropertyName Console -NotePropertyValue $console -PassThru |
+           Add-Member -NotePropertyName Group -NotePropertyValue $group -PassThru
+}
+
+# The mouse read off the map window: MouseState fed from MapWindow -WithConsole's Console, and
+# its Position split into the X and Y every Navigate/Pick node takes. Returns an object with
+# .X, .Y, .LeftPressed, .WheelState pin ids. Laid out down one column from X,Y.
+function MouseXY($d, [int]$X, [int]$Y, $Window) {
+    if (-not $Window.Console) { throw 'MouseXY needs a MapWindow made with -WithConsole' }
+    $state = Node $d 'MouseState' 'IO.Mouse' "$X,$Y,80,19" -Kind ProcessAppFlag -Dependency 'CoreLibBasics.vl' `
+        -In 'Mouse Device' -Out 'Position','Left Pressed','Wheel State'
+    Link $d $Window.Console.Mouse $state.MouseDevice
+    $split = Node $d 'Vector (Split)' '2D.Vector2' "$X,$($Y + 50),46,19" -Dependency 'VL.CoreLib.vl' `
+        -StateIn 'Input' -Out 'X','Y' -CategoryRef '<CategoryReference Kind="Vector2Type" Name="Vector2" NeedsToBeDirectParent="true" />'
+    Link $d $state.Position $split.Input
+    [pscustomobject]@{ X = $split.X; Y = $split.Y; LeftPressed = $state.LeftPressed; WheelState = $state.WheelState }
 }
 
 # Every map patch declares VL.Skia (it ships inside vvvv; the Renderer needs it) and VL.Mapsui at

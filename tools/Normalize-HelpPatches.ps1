@@ -121,7 +121,10 @@ if ($Check -and $stale.Count -gt 0) {
 # is the tell - vvvv writes True, this file and every hand-written pad write false.
 #
 # Comment="Enabled" is the tile layer's toggle in every patch here and nothing else. A pad that
-# should stay on gets a different comment, which is worth knowing before adding one.
+# should stay on gets a different comment, which is worth knowing before adding one: TileCache's
+# toggle in HowTo Cache tiles is labelled "Cache Enabled" for exactly this reason - the cache
+# defaults ON (it touches nobody's network), and the first build after that patch was written
+# switched it off on the way into dist\ and in the repository.
 # ---------------------------------------------------------------------------------------------
 $EnabledPattern = '(<Pad\b[^>]*\bComment="Enabled"[^>]*\bValue=")([^"]*)(")'
 $switchedOn = @()

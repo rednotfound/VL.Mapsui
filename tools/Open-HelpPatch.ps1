@@ -116,7 +116,14 @@ Write-Host "`nopening $(Split-Path $target -Leaf)"
 $wanted | ForEach-Object { Write-Host "  repo  $($_.Path)" }
 Write-Host ""
 
-Start-Process -FilePath $Vvvv -ArgumentList @("`"$target`"", '--package-repositories', "`"$repositories`"")
+# -PassThru, and the PID written to a file, so that whatever closes vvvv afterwards closes THIS
+# one and not some other. On 2026-09-24 a `Stop-Process vvvv` here killed a sibling session's
+# vvvv that had been opened in the minute between this launch and its close - the two repositories
+# are worked on at the same time on one machine, and "the vvvv that is running" is not always ours.
+$proc = Start-Process -FilePath $Vvvv -ArgumentList @("`"$target`"", '--package-repositories', "`"$repositories`"") -PassThru
+$pidFile = Join-Path ([IO.Path]::GetTempPath()) 'vl-mapsui-vvvv.pid'
+Set-Content $pidFile $proc.Id
+Write-Host "vvvv pid $($proc.Id) (written to $pidFile - stop that pid, never every vvvv)" -ForegroundColor DarkGray
 
 Write-Host "READ IT AND CLOSE IT. Opening a document in vvvv is running it." -ForegroundColor Yellow
 Write-Host "  the overlay's first line goes red on a rebuild across two frames - close immediately if it does`n" -ForegroundColor Yellow
