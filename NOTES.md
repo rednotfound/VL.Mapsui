@@ -5,6 +5,24 @@ them do not belong here.
 
 ---
 
+## 2026-09-24 — Graticule labels multiply where lines only add: 24.5 million features froze vvvv
+
+Defect nine, found by vl-overworld's new Tutorial 2.1 within a minute of its first open — the
+first patch to ask the graticule for an airport-scale spacing. A fixed-degree graticule spans the
+WHOLE world, so at `Degrees Spacing = 0.05` the lines are 7,200 meridians + ~3,400 parallels
+(10,600 features, heavy but survivable) — but `Show Labels`, on by default, builds a point
+feature per CROSSING: 7,200 × ~3,400 ≈ **24.5 million features**. vvvv stopped responding while
+`Build` allocated them; no error, no log, the process alive and dead at once. The unit tests
+never saw it because they tested 10° and 30°, where crossings number in the hundreds — the guard
+case is the PRODUCT of two counts, and products need a fine-spacing test by construction.
+
+Fix, both halves honest about what they do: labels are built only while meridians × parallels ≤
+10,000 (10° = 612 ✓; finer grids draw lines alone), and a spacing so fine the world grid would
+exceed 100,000 lines returns no layer at all — the same shape as the existing `<= 0` refusal
+("no layer rather than an infinite one"). `LabelsBuilt` is now observable for tests. Three
+regressions: lines-alone at 0.5°, labels back at 10° (exactly 612), null at 0.001°. 252 green.
+The crash itself was the failing-first evidence; the tests lock the guard.
+
 ## 2026-09-23 — Initial Center silently clamped to the layers' extent without a tile layer
 
 The 2026-08-23 defect below had a twin, and it hid for a month because the offline maps shipped

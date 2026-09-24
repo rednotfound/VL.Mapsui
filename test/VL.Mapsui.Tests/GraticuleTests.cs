@@ -123,4 +123,36 @@ public class GraticuleTests
         Assert.Equal(0, lines);
         Assert.Null(node.Update(out _, degreesSpacing: -10));
     }
+
+    // Defect nine (NOTES.md 2026-09-24): a fixed-degree graticule spans the whole world, so a
+    // label per crossing MULTIPLIES where lines only ADD - 0.05 degrees is 7,200 meridians x
+    // ~3,400 parallels = 24.5 million label features, and vvvv froze building them. Lines past
+    // the cap draw alone; a grid too fine to be a reference at all is no layer, like spacing 0.
+
+    [Fact]
+    public void A_fine_spacing_draws_lines_alone_not_a_label_crowd()
+    {
+        using var node = new GraticuleNode();
+        var layer = node.Update(out var lines, degreesSpacing: 0.5, showLabels: true);
+        Assert.NotNull(layer);
+        Assert.True(lines > 1000, $"lines: {lines}");
+        Assert.Equal(0, node.LabelsBuilt);
+    }
+
+    [Fact]
+    public void Labels_return_at_a_coarse_spacing()
+    {
+        using var node = new GraticuleNode();
+        node.Update(out _, degreesSpacing: 10, showLabels: true);
+        Assert.Equal(36 * 17, node.LabelsBuilt);
+    }
+
+    [Fact]
+    public void Too_fine_a_spacing_is_no_layer_not_a_freeze()
+    {
+        using var node = new GraticuleNode();
+        Assert.Null(node.Update(out var lines, degreesSpacing: 0.001));
+        Assert.Equal(0, lines);
+        Assert.Equal(0, node.LabelsBuilt);
+    }
 }

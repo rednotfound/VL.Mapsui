@@ -56,8 +56,12 @@ Mapsui ships no lat/lon grid at all (verified: no `Graticule` in Mapsui 4.1.9's 
 `Graticule [Mapsui.Layers]` is generated here: meridians ±180° and parallels within WebMercator's
 ±85.05° at a `Degrees Spacing`, every line two vertices (both are straight in this projection),
 composed from `FeatureLayerNode` + `VectorStyleNode` like `Geometry` is; `Show Labels` adds a point feature per crossing carrying its own coordinates, dispatched through `StyleByGeometry` to a `LabelStyle` (the mixed-features fix reused). Requested by
-vl-overworld Tutorial 01, whose tile-less map window had no bearings. 5 tests; help patch
-`HowTo Draw a graticule` (offline on purpose).
+vl-overworld Tutorial 01, whose tile-less map window had no bearings. **Two guards since
+2026-09-24 (defect nine, NOTES.md)**: labels build only while meridians × parallels ≤ 10,000
+crossings — labels multiply where lines add, and 0.05° would have been 24.5 million features —
+and a spacing whose world grid would exceed 100,000 lines returns no layer, the same shape as
+the `<= 0` refusal. 10 tests incl. two pixel; help patch `HowTo Draw a graticule` (offline on
+purpose).
 
 ## Not wrapped
 

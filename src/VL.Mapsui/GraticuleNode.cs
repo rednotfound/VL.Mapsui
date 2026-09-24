@@ -49,12 +49,25 @@ public class GraticuleNode : IDisposable
     /// <summary>How many meridians and parallels the current spacing produced.</summary>
     internal int LinesBuilt { get; private set; }
 
+    /// <summary>How many crossing labels the current spacing produced. 0 when the guard refused.</summary>
+    internal int LabelsBuilt { get; private set; }
+
+    // A fixed-degree graticule always spans the WHOLE world, so a fine spacing multiplies:
+    // 0.05 degrees is 7,200 meridians x ~3,400 parallels - and a label per CROSSING is 24.5
+    // MILLION point features, which froze vvvv outright on 2026-09-24 (defect nine, NOTES.md).
+    // Lines only add; labels multiply. Hence two guards, both honest about what they do.
+    const int MaxLines = 100_000;
+    const int MaxLabelCrossings = 10_000;
+
     /// <summary>
     /// A graticule layer, ready to hand to a Map — with or without a tile layer beside it.
     /// </summary>
     /// <remarks>
-    /// A spacing of 0 or less gives no layer rather than an infinite one. The default grey is
-    /// deliberately faint: a graticule is a reference, not a subject.
+    /// A spacing of 0 or less gives no layer rather than an infinite one, and so does a spacing
+    /// so fine the world grid would exceed 100,000 lines - a graticule is a reference, not a
+    /// point cloud. Labels appear only while the grid has at most 10,000 crossings (10 degrees
+    /// is 612; at fine spacings the lines draw alone). The default grey is deliberately faint:
+    /// a graticule is a reference, not a subject.
     /// </remarks>
     public ILayer? Update(
         out int linesBuilt,
@@ -63,18 +76,20 @@ public class GraticuleNode : IDisposable
         Color4? lineColor = null,
         float lineWidth = 1f)
     {
-        if (degreesSpacing <= 0)
+        if (degreesSpacing <= 0 || 360.0 / degreesSpacing + 2 * LatLimit / degreesSpacing > MaxLines)
         {
             linesBuilt = 0;
+            LabelsBuilt = 0;
             return null;
         }
 
         if (degreesSpacing != _spacing || showLabels != _showLabels)
         {
-            _features = Build(degreesSpacing, showLabels, out var lines);
+            _features = Build(degreesSpacing, showLabels, out var lines, out var labels);
             _spacing = degreesSpacing;
             _showLabels = showLabels;
             LinesBuilt = lines;
+            LabelsBuilt = labels;
         }
         linesBuilt = LinesBuilt;
 
@@ -91,7 +106,7 @@ public class GraticuleNode : IDisposable
         return _layer.Update(out _, out _, _features, style, name: "Graticule");
     }
 
-    static NtsFeature[] Build(double spacing, bool labels, out int lines)
+    static NtsFeature[] Build(double spacing, bool labels, out int lines, out int labelsBuilt)
     {
         var features = new List<NtsFeature>();
         var lons = new List<double>();
@@ -113,9 +128,10 @@ public class GraticuleNode : IDisposable
         lines = features.Count;
 
         // One label per crossing, saying exactly where the crossing is - 'lon, lat' in the
-        // course's plain-numbers voice. Density follows the spacing the patch chose; the toggle
-        // exists precisely because a world view of fine-spacing labels is a crowd.
-        if (labels)
+        // course's plain-numbers voice. Labels MULTIPLY where lines only add, so past the
+        // crossing cap the lines draw alone (defect nine: 24.5 million labels at 0.05 degrees).
+        labelsBuilt = 0;
+        if (labels && (long)lons.Count * lats.Count <= MaxLabelCrossings)
             foreach (var lon in lons)
                 foreach (var lat in lats)
                 {
@@ -127,6 +143,7 @@ public class GraticuleNode : IDisposable
                     features.Add(new NtsFeature(
                         new NetTopologySuite.Geometries.Point(new Coordinate(lon, lat)), table));
                 }
+        labelsBuilt = features.Count - lines;
 
         return features.ToArray();
     }
