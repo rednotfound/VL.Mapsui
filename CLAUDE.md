@@ -236,6 +236,7 @@ vl-mapsui/
 ├── NuGet.config                  # sources pinned to nuget.org
 └── tools/
     ├── Open-HelpPatch.ps1        # the ONLY way to launch vvvv here - three package repositories
+    ├── Open-HelpPatch-GUI.ps1    # the picker window behind Open-HelpPatch.cmd (repo root): open, close mine, normalize, check
     ├── Test-VLPackage.ps1        # static package validator
     ├── Test-VLPatch.ps1          # per-document validator: IDs, links, label overlap, help flags (36 of 36), Help.xml pairing
     ├── HelpPatchGen.ps1          # scaffold for a new help patch (MapWindow, MouseXY, Button); the .vl is the truth afterwards
@@ -301,6 +302,9 @@ dotnet build src\VL.Mapsui\VL.Mapsui.csproj -c Release
 # followed by 25 ambiguous Point candidates). Two launches were lost to this on 2026-08-16.
 # Cross-package patches are VL.Overworld's; its launcher carries six folders.
 .\tools\Open-HelpPatch.ps1 "Draw many features"     # -List shows them all
+# Or double-click Open-HelpPatch.cmd in the repo root: a picker window with Open / Close my vvvv /
+# Normalize / Check buttons, all going through the same scripts. "Close my vvvv" closes only the
+# pid the launcher wrote, never another session's window.
 
 # Compile every help patch headlessly, then READ THE GENERATED C# before opening any window:
 #   new OpenStreetMapNode() must appear in Create, never in Update
