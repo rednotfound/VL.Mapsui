@@ -5,6 +5,51 @@ them do not belong here.
 
 ---
 
+## 2026-09-24 — the help became the second test suite: 19 patches, 36 of 36 nodes on F1
+
+The whole campaign is in `docs/HELP-PATCH-PLAN.md`; this entry keeps the numbers.
+
+| | before | after |
+|---|---|---|
+| documents | 12 (1 Explanation, 11 HowTo) | 20 (1 Explanation, 18 HowTo, Help.xml with 8 topics) |
+| nodes opening a help patch on F1 | **0 of 36** | **36 of 36** (109 Low flags) |
+| prose per patch | one box, 1,400–6,400 characters | 20pt heading, intro under 260, notes under 150 |
+| patches issuing no request | 4 | 14 |
+| defects the old validator passed | duplicate-looking IDs (4), 2 annotation pads not typed `Comment`, 1 dangling IOBox shipped twice | 0 |
+
+**Measured against 60 community help folders** (in `docs/HELP-PATCH-STYLE.md`): median note 34
+characters; the host is in 46 of VL.Skia's 48 HowTos and the median node count is still 10; a
+mouse appears in 6 of 48; `Camera [Skia]` and `OrbitCamera [Stride]` read the mouse themselves.
+
+**Gate per patch, all by tools:** `Test-VLPatch` → `pack.ps1` → `Compile-HelpPatches` (all 19,
+every process node in `Create`, 172–181 s a run) → opened in vvvv through `Open-HelpPatch.ps1`,
+renderer and editor photographed by `Capture-Renderer.ps1`, closed by pid → `Normalize`. The two
+tile patches also ran as switched-on scratchpad copies: OpenTopoMap tiles with credit, and the
+cache count 3,996 → 4,046 while OSM drew (the machine's cache holds ~4,000 tiles, 77 MB, after a
+month of sessions).
+
+**Four things the tools found that eyes had not:**
+
+- An unwired **generic node does not resolve** — `ToFeatures` on the Explanation canvas was dropped
+  from the C# and drawn grey. Read-the-C# caught it; a compile exit code would not have.
+- `Test-VLPatch` counted `SlotId=` as an Id (four false duplicates in the Record patch) and could not
+  see any node with pin defaults (`PinReference` between `Choice` and `</p:NodeReference>`), so
+  `Map` and `ToSkiaLayer` looked unflagged while flagged. Both fixed here; **both latent in
+  vl-nettopologysuite's copy**, whose session had ended before it could be told.
+- `Normalize-HelpPatches` switches off *every* pad labelled `Enabled`; it switched `TileCache`'s on
+  its first build. That pad is `Cache Enabled` now.
+- `Switch` and `Cat` are PowerShell keywords/aliases; a scaffold function so named is a parse error.
+
+**One incident:** a `Stop-Process vvvv` here killed the sibling session's vvvv, opened in the minute
+between this session's launch and its close. The launcher now writes its pid to
+`%TEMP%\vl-mapsui-vvvv.pid` and that pid is the only one closed; `Open-HelpPatch.cmd`'s
+"Close my vvvv" does the same.
+
+**Not measured by hand** (needs a person at the editor): the bangs, `ZoomAt`'s Steps, dragging,
+picking under the cursor, and F1 itself.
+
+---
+
 ## 2026-09-24 — Graticule labels multiply where lines only add: 24.5 million features froze vvvv
 
 Defect nine, found by vl-overworld's new Tutorial 2.1 within a minute of its first open — the

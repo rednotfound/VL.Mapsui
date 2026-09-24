@@ -189,7 +189,17 @@ Written down before starting, so the finding can be compared with the prediction
   and `PinReference` elements hid `Map` and `ToSkiaLayer` from the flag audit.
 - **Not exercised by hand**: the bangs in `Frame your data` and `Drive the map with the mouse`,
   `ZoomAt`'s Steps, dragging, picking with the cursor over a square, and F1. All need a person at the
-  editor; everything else on the gate was done by the tools.
+  editor; everything else on the gate was done by the tools. `Open-HelpPatch.cmd` (repo root) is
+  the picker for doing it.
+
+## Open items
+
+- **Carry the two `Test-VLPatch` fixes to `vl-nettopologysuite`** (`(?<![A-Za-z])Id="` and the
+  `PinReference` allowance in the flag audit). Its session ended before it could be told; nothing
+  there is wrong today because it has no records and no pin defaults.
+- The `Camera`-style mouse node question, in `docs/RULES.md`'s bundling bullet.
+- `HowTo Draw many features` keeps its 2026-08-16 layout (restyled in place). If it is ever rebuilt,
+  the scaffold needs a Record helper first.
 
 One patch per commit. The step-1 patches also tell us whether `HelpPatchGen` needs anything a map
 patch has and a geometry patch did not (a `Renderer` node, a `Group`, a `Skia` dependency line) —

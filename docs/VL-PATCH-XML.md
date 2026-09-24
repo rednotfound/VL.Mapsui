@@ -196,6 +196,25 @@ literal. A compile proving a pin exists proves nothing about whether anyone can 
 - **`Result` vs `Output`**: a fluent static operation (return type equals the first parameter type)
   gets `Output`; everything else, including a `[ProcessNode]`'s return, gets **`Result`**.
 - Declare all pins you use; unconnected ones may be omitted.
+- **A pin default without an IOBox** is `DefaultValue="…"` on the `<Pin>` plus a `<p:TypeAnnotation>`
+  child naming the type — *and* a `<PinReference Kind="InputPin" Name="…" />` inside the
+  `<p:NodeReference>`, after the `Choice`. Anything that pattern-matches "Choice then
+  `</p:NodeReference>`" misses every such node (that is how `Map` hid from the help-flag audit).
+- **A help flag** — what F1 opens — is one element right after `</p:NodeReference>`:
+  `<p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">High</p:HelpFocus>` (or `Low`).
+  Ctrl+H in the editor writes it. One `High` per node across the library.
+- **A generic node cannot resolve unwired.** `ToFeatures` takes its type from the link; placed on an
+  Explanation canvas with nothing connected, `vvvvc` drops it from the C# and the node greys out.
+  Name such a node in text, or wire it.
+- `LastDependency="X.vl"` and `LastSymbolSource="X.vl"` both occur in shipped patches for the same
+  node (`MouseState`: `LastSymbolSource="CoreLibBasics.vl"`); either resolves. Both are hints.
+- **A Toggle or Bang IOBox** is a `Boolean` Pad with `ImmutableTypeFlag` and a
+  `<p:ValueBoxSettings><p:buttonmode p:Assembly="VL.UI.Forms"
+  p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode></p:ValueBoxSettings>`
+  (`Bang` for one frame). `tools\HelpPatchGen.ps1`'s `Button` writes it.
+- **The mouse idiom** vvvv's own help uses: a `Console [Graphics.Skia]` grouped into the `Renderer`
+  with the map layer, its `Mouse` pin feeding `MouseState [IO.Mouse]`, `Position` through
+  `Vector (Split)`. `MapWindow -WithConsole` + `MouseXY` in the scaffold write it.
 
 Both naming rules were established by `vvvvc` rejecting the wrong one, not by reading anything.
 

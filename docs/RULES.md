@@ -115,7 +115,13 @@ Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
 - **Bundle a choice the user does not want to make; never a concept they have to understand
   anyway.** Heron covers the whole GIS domain in 37 components and reads seven file formats in one
   of them. What must never be bundled, each already paid for here: what the mouse means, where the
-  view looks, where files go, which renderer draws it.
+  view looks, where files go, which renderer draws it. **One recorded tension (2026-09-24):** vvvv's
+  own answer to *driving a view* is a node that reads the host's mouse itself — `Camera [Skia]`,
+  `OrbitCamera [Stride]`, no mouse pin, `Initial …` pins only, a three-node help patch. The incident
+  behind this rule was a node that *rebuilt the map* on movement, not one that interpreted the
+  mouse, so the two claims are not the same. The wiring form costs six nodes here (measured in
+  `HowTo Drive the map with the mouse`; `docs/HELP-PATCH-PLAN.md`). Undecided; decide with that
+  number, not from this bullet.
 - **Help is the teaching surface, not a fatter node.** VL.Skia ships 4 C# static nodes and **98
   help patches**; VL.Stride ships none and 125. In libraries people learn from, help runs 16–24%
   of node count. Five prefixes, not interchangeable: `Explanation` (one per library, the front
