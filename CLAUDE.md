@@ -22,9 +22,21 @@ none of them references another. `D:\2026_Projects\vvvv-gis` holds the retired `
 published `0.2.0-alpha` still declares BruTile 6 and conflicts with this package — see
 `vl-overworld\README.md` for what a user has to delete by hand.
 
-**Current state (2026-08-14): a working package, not yet published.** A map renders in vvvv 7.4,
+**Current state (2026-09-24): a working package, not yet published.** A map renders in vvvv 7.4,
 pans, zooms and takes geometry from any NTS source. `VL.Mapsui.nuspec`, `build.ps1`, `pack.ps1`,
-`tools\Test-VLPackage.ps1` and **186 tests** exist. Nothing is on nuget.org.
+`tools\Test-VLPackage.ps1` and **186 tests** exist. Nothing is on nuget.org. **The help is now the
+second test suite: 19 patches in the community's measured style, every one of the 36 nodes opens
+one on F1** (`tools\Test-VLPatch.ps1` audits the flags), all 19 compile with every process node
+constructed in `Create` (`tools\Compile-HelpPatches.ps1` reads the generated C#), and each was
+opened in vvvv and photographed. The plan, the decisions and what the patches found are in
+[docs/HELP-PATCH-PLAN.md](docs/HELP-PATCH-PLAN.md); the style and the survey of 60 community help
+folders in [docs/HELP-PATCH-STYLE.md](docs/HELP-PATCH-STYLE.md). **Read both before touching
+`help\`**, and `git status` first: the user hand-edits patches in the GUI between sessions.
+
+**Another Claude session works on `vl-nettopologysuite` on this machine at the same time.** Never
+`Stop-Process vvvv`: `tools\Open-HelpPatch.ps1` writes its pid to `%TEMP%\vl-mapsui-vvvv.pid`, and
+that pid is the only one this repository may close. If a vvvv you did not start is running, report
+it and wait; one of theirs was killed here on 2026-09-24.
 
 Node count is the honest measure of how far this is from finished: **Mapsui exposes 306 public
 types and we wrap a few dozen**. See [docs/MAPSUI-SURFACE.md](docs/MAPSUI-SURFACE.md) for what is
@@ -198,6 +210,8 @@ vl-mapsui/
 ├── docs/ARCHITECTURE.md          # the pipeline, the NTS boundary, why a node holds state
 ├── docs/MAPSUI-SURFACE.md        # what Mapsui offers, what we wrap, what we will not
 ├── docs/VL-PATCH-XML.md          # ⭐ hand-authoring a .vl - read before editing one
+├── docs/HELP-PATCH-STYLE.md      # ⭐ the community's help style, measured, + how 60 packs organize help
+├── docs/HELP-PATCH-PLAN.md       # the 2026-09-24 help campaign: decisions, gate, what the patches found
 ├── VL.Mapsui.vl / .nuspec        # the package. .vl is hand-edited but never regenerated
 ├── src/VL.Mapsui/
 │   ├── LayerNodes.cs             # [ProcessNode] OpenStreetMap - tile layer, cache, attribution
@@ -216,15 +230,18 @@ vl-mapsui/
 │   ├── MapsuiLayer.cs            # VL.Skia.ILayer - draws it, plus the diagnostics overlay
 │   ├── PixelSpace.cs             # pixel/VL space bridge
 │   └── TileCache.cs              # the disk cache, its folder and its size
-├── help/VL.Mapsui/               # Explanation Overview + 8 HowTos + Help.xml (ordering and tags)
+├── help/VL.Mapsui/               # Explanation + 18 HowTos + Help.xml (8 domain topics); one High flag per node
 ├── test/VL.Mapsui.Tests/         # 186 xunit tests, no network, no vvvv
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org
 └── tools/
     ├── Open-HelpPatch.ps1        # the ONLY way to launch vvvv here - three package repositories
     ├── Test-VLPackage.ps1        # static package validator
+    ├── Test-VLPatch.ps1          # per-document validator: IDs, links, label overlap, help flags (36 of 36), Help.xml pairing
+    ├── HelpPatchGen.ps1          # scaffold for a new help patch (MapWindow, MouseXY, Button); the .vl is the truth afterwards
+    ├── Capture-Renderer.ps1      # photographs the renderer (-Title '' the editor) - rung 4 without a person relaying
     ├── Normalize-HelpPatches.ps1 # run after any GUI session - vvvv repins deps AND saves Enabled=True
-    ├── Compile-HelpPatches.ps1   # headless vvvvc over every help patch; needs pack.ps1 first
+    ├── Compile-HelpPatches.ps1   # headless vvvvc over every help patch, then READS the C#; needs pack.ps1 first
     ├── New-VLId.ps1              # 22-char VL document IDs
     └── legacy/                   # retired generators; the checked-in .vl is the truth
 ```

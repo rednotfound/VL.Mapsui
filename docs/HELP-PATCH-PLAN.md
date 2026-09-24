@@ -168,9 +168,28 @@ Written down before starting, so the finding can be compared with the prediction
 |---|---|---|
 | 0 | **done 2026-09-24.** `HELP-PATCH-STYLE.md` carried and extended with the organization survey; `HelpPatchGen.ps1` (dependency default `VL.Mapsui.vl`, `MapWindow` for the three host nodes, `Save-Doc -Nts`), `Test-VLPatch.ps1` (36-node F1 audit) and `Compile-HelpPatches.ps1` (reads the C#, 24 process nodes must be built in `Create`; the old exit-code-only script moved to `tools\legacy\`) carried; scaffold smoke-tested (a generated graticule patch passes `Test-VLPatch`); the "before" recorded above | the audit reports 0 of 36 nodes on F1 ✅ |
 | 1 | **done 2026-09-24.** The seven ★ patches, each through the gate: `Test-VLPatch` clean, all 19 documents compiled with every node resolved and every process node in `Create`, each opened in vvvv and photographed (renderer and editor), closed by pid, normalized. The two tile patches were also run as switched-on copies from the scratchpad: OpenTopoMap tiles arrived with their credit in the corner, and `TileCache`'s count rose from 3996 to 4046 while OSM drew. Not exercised by hand: the two bangs in `Frame your data` and `ZoomAt`'s Steps, which need a click in the editor. F1 coverage went from 0 to 12 of 36. Two scaffold findings: `Switch` is a PowerShell keyword (the helper is `Button`), and `Normalize-HelpPatches` switches off any pad labelled `Enabled`, so `TileCache`'s toggle is labelled `Cache Enabled` | each through the per-patch gate ✅ |
-| 2 | rewrite the Explanation as nodes on canvas | GUI |
-| 3 | rewrite the eleven existing patches in the style, applying D1/D2/D4 | each through the gate; `Compile-HelpPatches` with no filter at the end, because deleting boilerplate across patches is exactly the cross-patch break it exists for |
-| 4 | `Help.xml` topics and tags; nuspec line 25 ("Nine help patches") corrected; F1 verified on one node per category | `Test-VLPackage`, `Test-VLPatch`, both green in a separate step before the commit |
+| 2 | **done 2026-09-24.** The Explanation is the 35 nodes on the canvas in three columns by category, one `<` line each, plus "Start here" and "Not here, on purpose". `ToFeatures` is named in text, not placed: it is generic over what you connect, an unwired instance cannot resolve, `vvvvc` drops it and the node greys out - the C#-reading compile caught it, the eye had not | GUI ✅ |
+| 3 | **done 2026-09-24.** Ten patches regenerated, `Draw many features` restyled in place (its Record and ForEach are not the scaffold's to write; essay pad out, heading + intro + four notes in, eleven flags added, dataflow untouched, legacy layout kept). `Stack several layers` teaches only order and `Enabled`. Every one opened in vvvv and photographed; all 19 compile with every process node in `Create` | each through the gate ✅ |
+| 4 | **done 2026-09-24.** `Help.xml` has eight domain topics; nuspec says nineteen. `Test-VLPatch`: **36 of 36 nodes open a help patch on F1**, 109 Low flags. F1 itself was not pressed in this round - the flags are in the files and `dist\` is restaged; pressing F1 on one node per category in a scratch document is the user's rung, and the cheapest remaining check | `Test-VLPackage`, `Test-VLPatch` green ✅ |
+
+## What the patches found (against the predictions above)
+
+- **The mouse chain is six nodes, not fourteen**, once the host is counted as the host: `Console`,
+  `MouseState`, `Vector (Split)`, `FrameDifference`, plus `Drag` and `ZoomByWheel` themselves.
+  `MapWindow -WithConsole` and `MouseXY` in the scaffold write the first three. That is the number
+  to weigh against vvvv's `Camera` node; no decision taken here.
+- **`Geometry` versus `FeatureLayer` reads in one line each** (`Draw a geometry`: "one layer, one
+  colour, no attributes"; `Draw your own shapes`: "one rung up"). The split holds.
+- **Offline by default cost nothing**: 14 of 19 patches issue no request and every GUI round opened
+  in under thirty seconds. The two tile patches were also run switched on, from scratchpad copies.
+- **Two scaffold traps, both fixed in the tools**: a pad labelled `Enabled` is switched off by
+  `Normalize-HelpPatches` whatever it belongs to (so `TileCache`'s is `Cache Enabled`); a
+  PowerShell function may not be called `Switch` or `Cat`.
+- **Two validator blind spots, both fixed**: `SlotId=` counted as an Id (four false duplicates),
+  and `PinReference` elements hid `Map` and `ToSkiaLayer` from the flag audit.
+- **Not exercised by hand**: the bangs in `Frame your data` and `Drive the map with the mouse`,
+  `ZoomAt`'s Steps, dragging, picking with the cursor over a square, and F1. All need a person at the
+  editor; everything else on the gate was done by the tools.
 
 One patch per commit. The step-1 patches also tell us whether `HelpPatchGen` needs anything a map
 patch has and a geometry patch did not (a `Renderer` node, a `Group`, a `Skia` dependency line) —
