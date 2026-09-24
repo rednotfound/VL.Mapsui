@@ -48,6 +48,41 @@ without a map engine — this package only draws and picks them, converting into
 `GeoJsonProvider`. The evidence is in vl-nettopologysuite's `docs/ARCHITECTURE.md`, "Where a
 feature lives". Internally this package keeps `FeatureHelper` (not a node) for its own plumbing.
 
+### The layer philosophy — what the surface above stands on (recorded 2026-09-24)
+
+Written down after the user asked the three questions in order, because the answers ARE the
+package's design and were living only in commit messages.
+
+**Feature is neither library's concept.** It is the field's shared data model — OGC Simple
+Features / ISO 19125: *an abstraction of a real-world phenomenon*, in data a **geometry plus an
+attributes table**. GeoJSON (RFC 7946) carries the same model to everyone; NTS implements it in
+its companion package `NetTopologySuite.Features` (data model, below rendering); Mapsui defines
+its own render-side `IFeature` and converts at the layer boundary. That layering is why our
+`Feature` node lives in VL.NetTopologySuite, not here (the paragraph above).
+
+**A layer is a per-view feature provider, plus the how and the whether.** `ILayer` is three
+things: `GetFeatures(box, resolution)` — *"what do you have in THIS view?"* — a `Style`, and the
+switches (`Enabled`, `MinVisible`/`MaxVisible`, `Opacity`). The word comes from acetate-overlay
+cartography, but the abstraction is the question. Everything on a map is a layer, and they differ
+only in **where the features come from**: `FeatureLayer` holds them in memory; a tile layer
+fetches bitmap squares per view; `Graticule` computes its lines per view. (That is also why the
+graticule's 2026-09-24 rebuild from a world-sized feature set to view-driven was the *correct*
+fix and not a workaround — it returned to the question the abstraction asks.)
+
+**The dividing line between the layer nodes is attributes**, one sentence:
+*geometry answers "where, what shape"; a feature answers "what is this".*
+
+| rung | node | when |
+|---|---|---|
+| shapes only | `Geometry` | you have a geometry (a WKT) and want to see it — one colour, no fake empty attribute table |
+| geometry + attributes | `FeatureLayer` | anything that asks "what is this": `Pick`/hover, `StyleByValue`, `LabelStyle` all read attributes |
+| computed / fetched per view | `Graticule`, tile layers | the features are a function of the view, not a set in memory |
+
+vl-overworld's teaching ladder is deliberately isomorphic to this: chapter 1 is pure geometry,
+2.1 introduces the feature (your shapes gain names), picking and choropleths come later. The
+concept layering and the node layering are the same decision, made once (2026-08-22) and
+consulted since.
+
 ---
 
 ### Graticule — ours, not Mapsui's (added 2026-09-23)
