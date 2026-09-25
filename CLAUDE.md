@@ -302,8 +302,10 @@ dotnet build src\VL.Mapsui\VL.Mapsui.csproj -c Release
 # followed by 25 ambiguous Point candidates). Two launches were lost to this on 2026-08-16.
 # Cross-package patches are VL.Overworld's; its launcher carries six folders.
 .\tools\Open-HelpPatch.ps1 "Draw many features"     # -List shows them all
-# Or double-click Open-HelpPatch.cmd in the repo root: a picker window with Open / Close my vvvv /
-# Normalize / Check buttons, all going through the same scripts. "Close my vvvv" closes only the
+# Or double-click Open-HelpPatch.cmd in the repo root: a picker window listing patches in
+# Help.xml's own order (topic headings, not alphabetical - vvvv's Help Browser reads the same
+# order), with Open / Close my vvvv / Normalize / Check buttons, all going through the same
+# scripts. "Close my vvvv" closes only the
 # pid the launcher wrote, never another session's window.
 
 # Compile every help patch headlessly, then READ THE GENERATED C# before opening any window:

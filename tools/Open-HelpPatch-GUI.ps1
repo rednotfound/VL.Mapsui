@@ -23,6 +23,16 @@
     Carried from vl-nettopologysuite\tools\Open-HelpPatch-GUI.ps1 (itself from vl-overworld) on
     2026-09-24; the Close button is new here, after a Stop-Process on every vvvv killed the sibling
     session's window.
+
+    THE LIST IS IN Help.xml ORDER, NOT ALPHABETICAL - fixed 2026-09-25. The Gray Book states vvvv's
+    own Help Browser "displays items in alphabetical order by default unless Help.xml specifies
+    otherwise", and every shipped pack's Help.xml is hand-curated rather than incidentally
+    alphabetical (VL.Audio lists Reference AudioPlayer before Reference ADSR). The first version of
+    this picker sorted by filename and so showed a different order than vvvv's own browser does -
+    found when the user opened the folder and asked whether other libraries order their files
+    either (they do not; the order lives in Help.xml, universally). Topic headings appear as
+    "-- Title --" and are not launchable; any .vl on disk that Help.xml does not list still appears,
+    under "-- Not in Help.xml --", because the picker must never hide a patch that exists.
 #>
 
 Set-StrictMode -Version Latest
@@ -35,12 +45,66 @@ $RepoRoot  = Split-Path $PSScriptRoot -Parent
 $Launcher  = Join-Path $PSScriptRoot 'Open-HelpPatch.ps1'
 $Normalize = Join-Path $PSScriptRoot 'Normalize-HelpPatches.ps1'
 $Check     = Join-Path $PSScriptRoot 'Test-VLPatch.ps1'
-$HelpDir   = Join-Path $RepoRoot 'help\VL.Mapsui'
-$PidFile   = Join-Path ([IO.Path]::GetTempPath()) 'vl-mapsui-vvvv.pid'
+$HelpDir     = Join-Path $RepoRoot 'help\VL.Mapsui'
+$HelpXmlPath = Join-Path $HelpDir 'Help.xml'
+$PidFile     = Join-Path ([IO.Path]::GetTempPath()) 'vl-mapsui-vvvv.pid'
 
-# The same enumeration Open-HelpPatch.ps1 uses, so the window never shows a patch the launcher
-# would not find. Explanation first, then the HowTos, as the help browser orders them.
-$patches = @(Get-ChildItem $HelpDir -File -Filter *.vl | Sort-Object { if ($_.BaseName -like 'Explanation*') { 0 } else { 1 } }, Name)
+# Builds the picker list in Help.xml's own order - the order vvvv's Help Browser actually shows,
+# per the Gray Book ("alphabetical by default unless Help.xml specifies otherwise"). Each entry is
+# @{ Kind = 'Header' | 'Patch' | 'Missing'; Text; File }. A 'Header' cannot be opened; a 'Missing'
+# entry is something Help.xml names that is not on disk, shown so a broken listing is visible here
+# too rather than only in Test-VLPatch. Falls back to a flat alphabetical list, with a header saying
+# so, if Help.xml is absent or fails to parse - the picker must degrade, never go blank.
+function Get-PatchEntries {
+    $onDisk = @(Get-ChildItem $HelpDir -File -Filter *.vl)
+    $byName = @{}
+    foreach ($f in $onDisk) { $byName[$f.Name] = $f }
+
+    $entries = [System.Collections.Generic.List[object]]::new()
+    $ordered = [System.Collections.Generic.HashSet[string]]::new()
+    $parsed  = $false
+
+    if (Test-Path $HelpXmlPath) {
+        try {
+            [xml]$hx = Get-Content $HelpXmlPath -Raw
+            foreach ($topic in @($hx.SelectNodes('//Topic'))) {
+                $docs = @($topic.SelectNodes('VLDocument'))
+                if ($docs.Count -eq 0) { continue }
+                $entries.Add([pscustomobject]@{ Kind = 'Header'; Text = $topic.title; File = $null })
+                foreach ($doc in $docs) {
+                    $link = $doc.link
+                    if ($byName.ContainsKey($link)) {
+                        $entries.Add([pscustomobject]@{ Kind = 'Patch'; Text = [IO.Path]::GetFileNameWithoutExtension($link); File = $byName[$link] })
+                        [void]$ordered.Add($link)
+                    }
+                    else {
+                        $entries.Add([pscustomobject]@{ Kind = 'Missing'; Text = "$link  (listed in Help.xml, not on disk)"; File = $null })
+                    }
+                }
+            }
+            $parsed = $true
+        }
+        catch {
+            $entries.Clear()
+            $entries.Add([pscustomobject]@{ Kind = 'Header'; Text = "Help.xml did not parse - alphabetical order: $($_.Exception.Message)"; File = $null })
+        }
+    }
+    else {
+        $entries.Add([pscustomobject]@{ Kind = 'Header'; Text = 'no Help.xml found - alphabetical order'; File = $null })
+    }
+
+    # Every .vl on disk appears somewhere, even one Help.xml forgot - Test-VLPatch already fails on
+    # that, but the picker should not silently hide a patch either.
+    $strayLabel = if ($parsed) { 'Not in Help.xml' } else { 'help\VL.Mapsui (alphabetical)' }
+    $stray = @($onDisk | Where-Object { -not $ordered.Contains($_.Name) } | Sort-Object Name)
+    if ($stray.Count -gt 0) {
+        $entries.Add([pscustomobject]@{ Kind = 'Header'; Text = $strayLabel; File = $null })
+        foreach ($f in $stray) { $entries.Add([pscustomobject]@{ Kind = 'Patch'; Text = $f.BaseName; File = $f }) }
+    }
+    , $entries
+}
+
+$entries = Get-PatchEntries
 
 $form                 = [System.Windows.Forms.Form]::new()
 $form.Text            = 'VL.Mapsui - open a help patch'
@@ -55,8 +119,19 @@ $list.Size            = [System.Drawing.Size]::new(676, 330)
 $list.Anchor          = 'Top,Left,Right,Bottom'
 $list.Font            = [System.Drawing.Font]::new('Segoe UI', 11)
 $list.IntegralHeight  = $false
-foreach ($p in $patches) { [void]$list.Items.Add($p.BaseName) }
-if ($list.Items.Count -gt 0) { $list.SelectedIndex = 0 }
+foreach ($e in $entries) {
+    # Plain ASCII decoration on purpose - the file is ASCII throughout, unlike the .vl documents,
+    # and an em dash or warning glyph risks mangling depending on how this gets saved or edited.
+    $line = switch ($e.Kind) {
+        'Header'  { "-- $($e.Text) --" }
+        'Missing' { "    !! $($e.Text)" }
+        default   { "    $($e.Text)" }
+    }
+    [void]$list.Items.Add($line)
+}
+$firstPatch = 0
+for ($i = 0; $i -lt $entries.Count; $i++) { if ($entries[$i].Kind -eq 'Patch') { $firstPatch = $i; break } }
+if ($list.Items.Count -gt 0) { $list.SelectedIndex = $firstPatch }
 
 $hint                 = [System.Windows.Forms.Label]::new()
 $hint.Text            = 'Opening a document in vvvv is RUNNING it. Read, adjust, save, close vvvv - then Normalize and Check. Tile layers start switched off.'
@@ -86,7 +161,11 @@ $log.Font             = [System.Drawing.Font]::new('Consolas', 9)
 $log.Location         = [System.Drawing.Point]::new(12, 422)
 $log.Size             = [System.Drawing.Size]::new(676, 206)
 $log.Anchor           = 'Left,Right,Bottom'
-$log.Text             = "pick a patch and press Open - or double-click it.`r`n"
+$patchCount = @($entries | Where-Object Kind -eq 'Patch').Count
+$topicCount = @($entries | Where-Object Kind -eq 'Header').Count
+$missingCount = @($entries | Where-Object Kind -eq 'Missing').Count
+$log.Text             = "$patchCount patch(es) in $topicCount topic(s), Help.xml order. Pick one and press Open - or double-click it.`r`n"
+if ($missingCount -gt 0) { $log.Text += "$missingCount entr$(if ($missingCount -eq 1) {'y'} else {'ies'}) in Help.xml point at a file that is not on disk - marked with !! above.`r`n" }
 
 function Write-Log([string]$text) {
     $log.AppendText($text)
@@ -113,8 +192,12 @@ function Invoke-Tool([string]$scriptPath, [string[]]$toolArgs, [string]$doing) {
 
 $openPatch = {
     if ($list.SelectedIndex -lt 0) { return }
-    $file = $patches[$list.SelectedIndex].FullName
-    Invoke-Tool $Launcher @('-Path', $file) "opening $($list.SelectedItem)"
+    $entry = $entries[$list.SelectedIndex]
+    if ($entry.Kind -ne 'Patch') {
+        Write-Log "`r`n'$($entry.Text)' is a topic heading, not a patch - pick one listed under it.`r`n"
+        return
+    }
+    Invoke-Tool $Launcher @('-Path', $entry.File.FullName) "opening $($entry.Text)"
 }
 
 # Only the vvvv this launcher started. Another session on this machine may have its own vvvv open;
