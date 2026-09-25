@@ -17,7 +17,7 @@
       <Patch Id="VZFm3ajcu7MfslTsHWPK6s">
         <Canvas Id="LNv9kcd1VQboChKwCH8xNg" CanvasType="Group">
           <Pad Id="RaX41qu1VTkKWvexAGY2wz" Bounds="60,40,420,41" ShowValueBox="true" isIOBox="true" Value="Use OpenStreetMap and Map!">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -26,7 +26,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="Ki4IMtiCn6qrN3JRnVRjn0" Bounds="60,90,520,82" ShowValueBox="true" isIOBox="true" Value="The smallest complete map: a tile layer, a Map to hold it, ToSkiaLayer to draw it. Enabled starts OFF - opening this document runs it, and you have agreed to nothing yet. Read the note beside the switch, then switch it on.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -34,7 +34,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="C34N3DvgyZxzRD4K5lXvfe" Comment="Enabled" Bounds="60,190,35,35" ShowValueBox="true" isIOBox="true" Value="False">
+          <Pad Id="C34N3DvgyZxzRD4K5lXvfe" Comment="Enabled" Bounds="62,190,35,35" ShowValueBox="true" isIOBox="true" Value="false">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
             </p:TypeAnnotation>
@@ -54,9 +54,9 @@
             <Pin Id="KMkqs4rOCF5OHSdf3YS6rN" Name="Layers Built" Kind="OutputPin" />
             <Pin Id="JVwvo5Ebko6Nig1dNkjZDk" Name="Cache Status" Kind="OutputPin" />
           </Node>
-          <Pad Id="K2urXzHUi8TvAVi84yZkkG" Comment="Layers Built" Bounds="200,255,40,15" ShowValueBox="true" isIOBox="true" />
-          <Pad Id="JKSePl9En70NtUtfgLmflc" Comment="Cache Status" Bounds="200,285,340,15" ShowValueBox="true" isIOBox="true" />
-          <Node Bounds="60,310,39,19" Id="CDl17bv6hin8V7ibGvoXq6">
+          <Pad Id="K2urXzHUi8TvAVi84yZkkG" Comment="Layers Built" Bounds="114,290,40,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="JKSePl9En70NtUtfgLmflc" Comment="Cache Status" Bounds="250,291,347,15" ShowValueBox="true" isIOBox="true" />
+          <Node Bounds="60,320,110,19" Id="CDl17bv6hin8V7ibGvoXq6">
             <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Cons" />
@@ -65,7 +65,7 @@
             <Pin Id="SP0cCuJBKr5xIjpyPzNmC8" Name="Input" Kind="InputPin" />
             <Pin Id="NB1JYIwQRdeJVcP5DyDJ9z" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,360,110,19" Id="C67enwFSVuX7SFEea72Hc4">
+          <Node Bounds="60,370,110,19" Id="C67enwFSVuX7SFEea72Hc4">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Map" />
@@ -92,7 +92,7 @@
             </Pin>
             <Pin Id="MMgrgCR2FOZTsj1dFaU9wF" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,420,130,19" Id="JrlTesMElENbfQKTqWCOmd">
+          <Node Bounds="60,440,130,19" Id="JrlTesMElENbfQKTqWCOmd">
             <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
@@ -107,26 +107,45 @@
             </Pin>
             <Pin Id="RcXS635i9NUHllOZOQAXPc" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,480,185,19" Id="UGy2DaiAHoiBn9nh4mJjXA">
+          <Node Bounds="20,550,185,19" Id="UGy2DaiAHoiBn9nh4mJjXA">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
               <PinReference Kind="InputPin" Name="Bound to Document" />
               <PinReference Kind="InputPin" Name="Bounds" />
             </p:NodeReference>
-            <Pin Id="L1HzEgaZffjmDPX2EtcB8x" Name="Bounds" Kind="InputPin" DefaultValue="926, 114, 900, 560">
+            <Pin Id="Ls3SShp0PLNPS0UVs8fFwF" Name="Node Context" Kind="InputPin" IsHidden="true" />
+            <Pin Id="L1HzEgaZffjmDPX2EtcB8x" Name="Bounds" Kind="InputPin" DefaultValue="939, 116, 959, 592">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="M9uottjMleEOhZMEOkj69m" Name="Save Bounds" Kind="InputPin" IsHidden="true" />
             <Pin Id="FX58XlJaRT3007R6vHrZ4R" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="SSrWFZBHvbLOHuB5Z1NJwR" Name="Dialog If Document Changed" Kind="InputPin" IsHidden="true" />
+            <Pin Id="SNEhYUni7hDLutyFThd90R" Name="Always On Top" Kind="InputPin" IsHidden="true" />
+            <Pin Id="UY1krBY0ztaOKhUViJxb9D" Name="Extend Into Title Bar" Kind="InputPin" IsHidden="true" />
             <Pin Id="MHwo8xM8iYPKkI6NGQ8WZS" Name="Input" Kind="InputPin" />
+            <Pin Id="SJSGH1n0ioaMqekPnaiSt6" Name="Title" Kind="InputPin" />
+            <Pin Id="R5B51bcjujVMCGGDe3Oo2r" Name="Title Bar Interaction Width" Kind="InputPin" IsHidden="true" />
+            <Pin Id="Quf2gknfb9eOgRGVD07MUS" Name="Color" Kind="InputPin" />
+            <Pin Id="LHSQsTxFrtwM0o7UkRdgm6" Name="Clear" Kind="InputPin" />
+            <Pin Id="EApXwM3eMfbPsT8cjKEPW6" Name="Space" Kind="InputPin" />
+            <Pin Id="ENnLZVUYilqNYwXhnCNfwS" Name="Show Cursor" Kind="InputPin" />
+            <Pin Id="QSksjOaiodZP6hJaBipuV1" Name="VSync" Kind="InputPin" />
+            <Pin Id="H1x4younSw7NiF8YJPqI8l" Name="Commands" Kind="InputPin" IsHidden="true" />
+            <Pin Id="Fr3NDHky0N7NQGa5JbqvUr" Name="Enable Keyboard Shortcuts" Kind="InputPin" IsHidden="true" />
+            <Pin Id="HOkcuooOALGLp6QGZcjrI6" Name="Enabled" Kind="InputPin" />
+            <Pin Id="VTB5HIBCi7zLnM6VwCBk1j" Name="Form Bounds Notifications" Kind="OutputPin" IsHidden="true" />
+            <Pin Id="PPmTg76DnQpNywGhGEOPWO" Name="Form" Kind="OutputPin" />
+            <Pin Id="MnZaWTALmH0LZl4L1PSOSx" Name="ClientBounds" Kind="OutputPin" />
+            <Pin Id="RoodppRlCsWPIcLvoZdEr1" Name="Render Time" Kind="OutputPin" />
           </Node>
-          <Node Bounds="300,420,110,19" Id="Q4rW1lZ6t5oxOMJdOHESeD">
+          <Node Bounds="279,400,110,19" Id="Q4rW1lZ6t5oxOMJdOHESeD">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="ViewportInfo" />
@@ -139,11 +158,11 @@
             <Pin Id="AOmmC7tlxj4umbbPjX6Pla" Name="Width" Kind="OutputPin" />
             <Pin Id="FsyXzRIS2e1jrA7yzP3dIo" Name="Height" Kind="OutputPin" />
           </Node>
-          <Pad Id="Olb4YkU32wASRMzTvU7dU5" Comment="Center Longitude" Bounds="440,400,80,15" ShowValueBox="true" isIOBox="true" />
-          <Pad Id="B9EAV3VqNLmLOn4s6Rvmwz" Comment="Center Latitude" Bounds="440,425,80,15" ShowValueBox="true" isIOBox="true" />
-          <Pad Id="M6wCHve7t8EWDdgCwwhpxI" Comment="Resolution" Bounds="440,450,80,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="Olb4YkU32wASRMzTvU7dU5" Comment="Center Longitude" Bounds="281,450,48,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="B9EAV3VqNLmLOn4s6Rvmwz" Comment="Center Latitude" Bounds="307,480,48,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="M6wCHve7t8EWDdgCwwhpxI" Comment="Resolution" Bounds="333,510,48,15" ShowValueBox="true" isIOBox="true" />
           <Pad Id="LYkyhjDtV0iRE1wMozep7f" Bounds="680,190,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Switch on to fetch tiles. OpenStreetMap runs on donated servers: this package sends a User-Agent naming itself and keeps only tiles that were drawn.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -152,7 +171,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="H9kZTu0zQDUH3N5ybvbDkR" Bounds="680,278,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Layers Built must reach 1 and stay there. If it climbs frame after frame, close vvvv - that once took a home network down.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -161,7 +180,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="OxpRcchAcjW3ASEWa7XSrt" Bounds="680,348,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Cache unconnected = the default disk cache. HowTo Cache tiles has the node that owns it.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -170,7 +189,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="In3MPr0otcgwHoL1tHGbH5" Bounds="680,418,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Initial Center and Initial Zoom Level are where the window opens. Moving it afterwards is the Navigate nodes' job.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -179,7 +198,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="IjFS6SQZkbUUSoZp6sVqzU" Bounds="680,488,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Diagnostics is ON here: the overlay prints viewport, layers, cache and last press over the map. Its first line goes red on a per-frame rebuild.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -188,7 +207,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="BkBqoTJ9g26KkznMxuXhgk" Bounds="680,576,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; ViewportInfo reads back where the map looks: degrees at the centre, map units per pixel, size.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
