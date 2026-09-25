@@ -125,7 +125,7 @@ if ($patches.Count -eq 0) { throw "No help patch matches -Patch '$Patch'" }
 
 # Every node this package contributes, by the name the patch uses, and the C# a resolved call
 # must contain. A static method compiles to `Class.Method(`; a process node to `new ClassNode(`.
-# 36 entries, the same set as tools\Test-VLPatch.ps1's $ourNodes and docs\MAPSUI-SURFACE.md.
+# 35 entries (ToFeatures removed 2026-09-25), the same set as tools\Test-VLPatch.ps1's $ourNodes and docs\MAPSUI-SURFACE.md.
 #
 # A node the patch names that is NOT in this table is itself a failure, so that adding a node
 # to the package and forgetting it here shows up the first time a patch uses it.
@@ -135,7 +135,6 @@ $OurNodes = @{
     'ViewportInfo'    = 'MapInfoNodes\.ViewportInfo\('
     'LayerInfo'       = 'MapInfoNodes\.LayerInfo\('
     'Pick'            = 'new\s+[\w\.]*PickNode\('
-    'ToFeatures'      = 'new\s+[\w\.]*ToFeaturesNode\('
     'ScreenToWorld'   = 'ProjectNodes\.ScreenToWorld\('
     'WorldToScreen'   = 'ProjectNodes\.WorldToScreen\('
     'DiagnosticsLayer'= 'MapNodes\.DiagnosticsLayer\('
@@ -183,7 +182,7 @@ $OurProcessNodes = @{}
 foreach ($entry in $OurNodes.GetEnumerator()) {
     if ($entry.Value -match '^new\\s\+\[\\w\\\.\]\*(\w+)\\\($') { $OurProcessNodes[$entry.Key] = $Matches[1] }
 }
-if ($OurProcessNodes.Count -ne 24) { throw "expected 24 process nodes in the node table, found $($OurProcessNodes.Count) - the table's shape changed" }
+if ($OurProcessNodes.Count -ne 23) { throw "expected 23 process nodes in the node table, found $($OurProcessNodes.Count) - the table's shape changed" }
 
 # Every node the patch takes from THIS package, by name. Anchored on LastDependency so that a
 # "Split" from VL.NetTopologySuite or a "Drag" from elsewhere is not counted against us.

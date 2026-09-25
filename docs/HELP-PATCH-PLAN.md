@@ -98,7 +98,8 @@ the reader sees something at once.
 
 **D4. Long patches split by node group, the way NTS split by node group.** `Stack several layers`
 teaches order, `Enabled`, `XYZ`, `VisibleRange` and `ZoomToLayer` in one 48 KB document; that is four
-patches. `Draw many features` stays one — `ToFeatures` *is* the topic and the record is its subject.
+patches. `Draw many features` stays one — the record is its subject. (It was built around
+`ToFeatures`, which was removed on 2026-09-25; it now builds each `Feature` in a `ForEach`.)
 
 **D5. Edit in place where the layout was arranged by hand; regenerate where it was not.** `git log
 -- help/` shows every patch here authored by the tooling on 2026-08-13 … 09-24 and none hand-tidied
@@ -119,7 +120,7 @@ Topics are `Help.xml` topics. **bold** = the node's `High` flag lives here. ★ 
 | Your data on the map | ★ HowTo Draw a geometry | **Geometry** — a WKT, one colour, the shortest chain there is | yes |
 | | HowTo Draw your own shapes | **FeatureLayer, VectorStyle** — the same shape gains a name | yes |
 | | HowTo Label your data | **LabelStyle** | yes |
-| | HowTo Draw many features | **ToFeatures, SymbolStyle** | yes |
+| | HowTo Draw many features | **SymbolStyle** (ToFeatures until its removal, 2026-09-25) | yes |
 | Styling | HowTo Style mixed geometry | **StyleByGeometry** | yes |
 | | HowTo Style by a value | **StyleByValue** | yes |
 | Layers | HowTo Stack several layers | order = spread order, `Enabled` as the switch (no High of its own) | yes |

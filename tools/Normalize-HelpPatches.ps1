@@ -174,8 +174,11 @@ foreach ($patch in $patches) {
     $pinIds   = [System.Collections.Generic.HashSet[string]]::new()
     foreach ($m in [regex]::Matches($text, '<Pin Id="([^"]+)"')) { [void]$pinIds.Add($m.Groups[1].Value) }
     $fedPads  = [System.Collections.Generic.HashSet[string]]::new()
-    foreach ($m in [regex]::Matches($text, '<Link Id="[^"]+" Ids="([^",]+),([^"]+)"')) {
-        if ($pinIds.Contains($m.Groups[1].Value)) { [void]$fedPads.Add($m.Groups[2].Value) }
+    # Ids is a path - source, waypoint ControlPoints, sink - so the sink is the LAST id, not the
+    # second (a link bent in the GUI is "src,waypoint,sink"; see Test-VLPatch.ps1).
+    foreach ($m in [regex]::Matches($text, '<Link Id="[^"]+" Ids="([^"]+)"')) {
+        $ids = $m.Groups[1].Value -split ','
+        if ($pinIds.Contains($ids[0])) { [void]$fedPads.Add($ids[$ids.Count - 1]) }
     }
     $count = 0
     $rewritten = [regex]::Replace($text, '(<Pad Id="([^"]+)"[^>]*?) Value="[^"]*"', {

@@ -690,24 +690,6 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="QgV7SkV1FXaCXh5Ybnypmu" Bounds="1020,406,110,19" ShowValueBox="true" isIOBox="true" Value="ToFeatures">
-            <p:TypeAnnotation>
-              <Choice Kind="TypeFlag" Name="String" />
-            </p:TypeAnnotation>
-            <p:ValueBoxSettings>
-              <p:fontsize p:Type="Int32">9</p:fontsize>
-              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
-            </p:ValueBoxSettings>
-          </Pad>
-          <Pad Id="DwXYehhrXIGMc42jyX84IG" Bounds="1150,403,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; Your own records in, features out. Generic: it takes its type from the link, so see HowTo Draw many features.">
-            <p:TypeAnnotation>
-              <Choice Kind="TypeFlag" Name="String" />
-            </p:TypeAnnotation>
-            <p:ValueBoxSettings>
-              <p:fontsize p:Type="Int32">9</p:fontsize>
-              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
-            </p:ValueBoxSettings>
-          </Pad>
           <Pad Id="N0Jd0zDcoPA1C8Q0oNHD1B" Bounds="1020,476,430,26" ShowValueBox="true" isIOBox="true" Value="Mapsui.Project - pixels and degrees">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />

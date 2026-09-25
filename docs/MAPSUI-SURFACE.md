@@ -38,8 +38,20 @@ out to be sitting in a Mapsui dependency we already ship.
 | `SymbolStyle`, `StyleByGeometry` | `Mapsui.Styles` | what a point looks like, and one style per geometry type |
 | `VisibleRange` | `Mapsui.Layers` | the zoom levels a layer is drawn at — the only thing that reduces a busy map |
 | `Pick`, `ScreenToWorld`, `WorldToScreen` | `Mapsui` | asking the map what is under a coordinate, and back |
-| `ToFeatures` | `Mapsui` | a patch's own records in, features out |
 | `ToSkiaLayer` | `Mapsui.Skia` | the bridge into VL.Skia's scene graph, including the press a widget gets |
+
+**`ToFeatures` was removed on 2026-09-25**, before anything was published. It read a patch's own
+record by reflection - one property of type `Geometry` became the shape, every other property an
+attribute - and the user questioned it while reviewing `HowTo Draw many features`: the record is the
+user's, so the node imposed a convention nobody could see until `Status` complained. It also broke
+the bundling rule in `docs/RULES.md` - the `Feature` it hid is a concept a patch meets anyway
+(`Pick` returns one, `Split` takes one apart, labels and themes read its attributes) - and it
+depended on how the editor stores a record, which had already broken it once (NOTES.md,
+2026-08-15). Its one real saving, attributes without an `Add` chain, did not justify that. The
+performance argument it carried belonged to building the data once, which a `Spread<Feature>` built
+in `Create` or a `Cache` region gets equally. The shape now taught: records for the data, a
+`ForEach` that `Split`s each and builds a `Feature [NTS.Feature]`, `FeatureLayer` takes the spread.
+No sibling patch used it.
 
 **`Feature` and `Split` are no longer here.** They moved to VL.NetTopologySuite's `NTS.Feature`
 category on 2026-08-22, because a feature is a data-model object that must be constructible

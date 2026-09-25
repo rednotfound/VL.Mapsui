@@ -5,6 +5,33 @@ them do not belong here.
 
 ---
 
+## 2026-09-25 — ToFeatures removed; the user's replacement builds each Feature in a ForEach
+
+The user questioned `ToFeatures` while reviewing `HowTo Draw many features`: the record is the
+user's, so a node that reads it by convention imposes a rule nobody can see. The reasons it went
+are in `docs/MAPSUI-SURFACE.md` under the Wrapped table. 35 nodes now, 244 tests, 23 process nodes.
+
+**The user's rewrite, read from the generated C#:** `RandomSpread` x2 -> `Coordinate` -> `Point` ->
+the record's `Create` (ID from the loop index through `ToString`, Type a shared constant) -> the
+`Landmarks` slot, **in `Create` - built once**. A second `ForEach` reads the slot, `Split`s each
+record and builds `Feature [NTS.Feature]` with two chained `Add`s (keys `ID`, `Type`), and
+`LabelStyle` reads `ID`. Correct, and exactly the explicit shape the removal argued for. One
+finding: **the second ForEach runs in `Update`** - `FeatureNodes.Feature(` appears only in the
+Update body - so 200 Features and dictionaries are made every frame from records that never change.
+`FeatureLayer`'s element-wise comparison keeps the layer from rebuilding, so nothing flickers, but
+it is the cost the patch exists to teach against. Left to the user: store the features in a slot
+the same way `Landmarks` is.
+
+**A validator bug the review exposed:** a link bent in the GUI is written `Ids="src,waypoint,sink"`
+(docs\VL-PATCH-XML.md says so; 134 shipped help files do it). `Test-VLPatch`'s endpoint check, its
+new Folder check and its dangling-IOBox check, and Normalize's output-value stripping, all read
+exactly two ids - the user's bent Console link was reported as a missing endpoint. All four now
+parse the path (first id source, last sink). Negative-tested: a broken waypoint and a broken sink
+in scratch copies both fail. The first rewrite collided with the script's `[string]$Path`
+parameter - PowerShell names are case-insensitive - and turned the id array back into a string.
+
+---
+
 ## 2026-09-25 — ZoomToLevel did nothing on a map without tiles
 
 The user turned `ZoomToLevel`'s Zoom Level in `HowTo Draw a graticule` and nothing moved. Same root

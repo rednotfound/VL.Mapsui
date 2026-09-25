@@ -203,9 +203,9 @@ literal. A compile proving a pin exists proves nothing about whether anyone can 
 - **A help flag** — what F1 opens — is one element right after `</p:NodeReference>`:
   `<p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">High</p:HelpFocus>` (or `Low`).
   Ctrl+H in the editor writes it. One `High` per node across the library.
-- **A generic node cannot resolve unwired.** `ToFeatures` takes its type from the link; placed on an
-  Explanation canvas with nothing connected, `vvvvc` drops it from the C# and the node greys out.
-  Name such a node in text, or wire it.
+- **A generic node cannot resolve unwired.** `ToFeatures` (removed 2026-09-25) took its type from the
+  link; placed on an Explanation canvas with nothing connected, `vvvvc` dropped it from the C# and
+  the node greyed out. Name such a node in text, or wire it.
 - `LastDependency="X.vl"` and `LastSymbolSource="X.vl"` both occur in shipped patches for the same
   node (`MouseState`: `LastSymbolSource="CoreLibBasics.vl"`); either resolves. Both are hints.
 - **A Toggle or Bang IOBox** is a `Boolean` Pad with `ImmutableTypeFlag` and a

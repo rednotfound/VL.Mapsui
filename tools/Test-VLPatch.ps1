@@ -80,10 +80,18 @@ foreach ($file in $targets) {
     $dupes = @($allIds | Group-Object | Where-Object Count -gt 1 | ForEach-Object Name)
     if ($dupes.Count) { $problems.Add("duplicate IDs: $($dupes -join ', ')") }
 
-    # A value holding a user-profile path ships the author's user name and machine layout inside
-    # the package. vvvv stores the last value an output IOBox showed; on 2026-09-25 a Status box
-    # came back as "C:\Users\<name>\AppData\Local\VL.Mapsui\tiles - 4077 tiles". Normalize strips
-    # output values; this catches anything else - a constant typed in, a pasted path.
+    # A LINK'S Ids IS A PATH: source, any number of waypoint ControlPoints, sink. A link given a bend
+    # in the GUI is written Ids="src,waypoint,sink" (134 shipped help files do it; docs\VL-PATCH-XML.md
+    # says so). Every check below used to read exactly two ids, so the user bending the Console link in
+    # HowTo Draw many features (2026-09-25) produced a false "endpoint is neither a Pin, a Pad nor a
+    # ControlPoint" - "waypoint,sink" read as one id. Parse once; Source is the first id, Sink the last.
+    $links = @([regex]::Matches($raw, '<Link Id="([^"]+)" Ids="([^"]+)"') | ForEach-Object {
+        # $ids, not $path: this script has a [string]$Path parameter, and PowerShell names are
+        # case-insensitive - assigning the split result to $path turned it back into one string.
+        $ids = $_.Groups[2].Value -split ','
+        [pscustomobject]@{ Id = $_.Groups[1].Value; Path = $ids; Source = $ids[0]; Sink = $ids[$ids.Count - 1] }
+    })
+
     # No Path IOBox may feed a pin named Folder (TileCache's). Rule 8 in CLAUDE.md, and it happened
     # twice: 444 tiles next to two repositories on 2026-08-14, and 25 tiles INSIDE help\VL.Mapsui on
     # 2026-09-25 - a Path box wired to Folder was created empty in the GUI, VL read "" as the
@@ -92,25 +100,29 @@ foreach ($file in $targets) {
     # can click and clear. Leave Folder unconnected in a shipped patch.
     $pathPads = [System.Collections.Generic.HashSet[string]]::new()
     foreach ($m in [regex]::Matches($raw, '(?s)<Pad Id="([^"]+)"[^>]*>\s*<p:TypeAnnotation[^>]*>\s*<Choice Kind="\w+" Name="Path" />')) { [void]$pathPads.Add($m.Groups[1].Value) }
-    foreach ($m in [regex]::Matches($raw, '<Link Id="[^"]+" Ids="([^",]+),([^"]+)"')) {
-        if ($pathPads.Contains($m.Groups[1].Value) -and $raw -match "<Pin Id=`"$([regex]::Escape($m.Groups[2].Value))`" Name=`"Folder`"") {
+    foreach ($l in $links) {
+        if ($pathPads.Contains($l.Source) -and $raw -match "<Pin Id=`"$([regex]::Escape($l.Sink))`" Name=`"Folder`"") {
             $problems.Add("a Path IOBox feeds a Folder pin - an empty one means THIS document's folder, and the tile cache writes there (rule 8). Leave Folder unconnected.")
         }
     }
 
+    # A value holding a user-profile path ships the author's user name and machine layout inside
+    # the package. vvvv stores the last value an output IOBox showed; on 2026-09-25 a Status box
+    # came back as "C:\Users\<name>\AppData\Local\VL.Mapsui\tiles - 4077 tiles". Normalize strips
+    # output values; this catches anything else - a constant typed in, a pasted path.
     $userPaths = @([regex]::Matches($raw, 'Value="([^"]*[A-Za-z]:\\Users\\[^"]*)"') | ForEach-Object { $_.Groups[1].Value })
     if ($userPaths.Count) { $problems.Add("a stored value contains a user-profile path (run tools\Normalize-HelpPatches.ps1 for output boxes): $($userPaths[0])") }
 
-    # Pins and Pads are the only things a Link may join.
+    # Pins, Pads and ControlPoints are the only things a Link's path may name.
     $endpoints = @(
         ([regex]'<Pin Id="([^"]+)"').Matches($raw)  | ForEach-Object { $_.Groups[1].Value }
         ([regex]'<Pad Id="([^"]+)"').Matches($raw)  | ForEach-Object { $_.Groups[1].Value }
-        # a ForEach region's border control points are link endpoints too: every link of a region lives in the outer patch
+        # region border control points and link waypoints are both ControlPoint elements
         ([regex]'<ControlPoint Id="([^"]+)"').Matches($raw) | ForEach-Object { $_.Groups[1].Value }
     )
-    $linkMatches = ([regex]'<Link Id="[^"]+" Ids="([^,]+),([^"]+)"').Matches($raw)
-    foreach ($m in $linkMatches) {
-        foreach ($e in @($m.Groups[1].Value, $m.Groups[2].Value)) {
+    $linkMatches = $links   # kept by name: the summary line below counts it
+    foreach ($l in $links) {
+        foreach ($e in $l.Path) {
             if ($endpoints -notcontains $e) { $problems.Add("link endpoint $e is neither a Pin, a Pad nor a ControlPoint") }
         }
     }
@@ -175,7 +187,7 @@ foreach ($file in $targets) {
     #
     # A Pad carrying both is a constant feeding something, and an unwired one still gets flagged -
     # deliberately, since that is a link somebody forgot.
-    $linked = @($linkMatches | ForEach-Object { $_.Groups[1].Value; $_.Groups[2].Value })
+    $linked = @($links | ForEach-Object { $_.Source; $_.Sink })
     foreach ($m in ([regex]'<Pad Id="([^"]+)"([^>]*)>').Matches($raw)) {
         $pad = $m.Groups[1].Value
         if ($linked -contains $pad) { continue }
@@ -383,11 +395,11 @@ if (-not $Path) {
 # the node's Node Info. Measured 2026-09-24: 511 of vvvv 7.4's 689 shipped help patches carry flags.
 if (-not $Path) {
     Write-Host "`nvalidating help flags (F1)" -ForegroundColor Cyan
-    # The 36 public nodes of VL.Mapsui (src\VL.Mapsui, 2026-09-24): every [ProcessNode] and every
+    # The 35 public nodes of VL.Mapsui (src\VL.Mapsui; 36 until ToFeatures was removed 2026-09-25): every [ProcessNode] and every
     # public static method of a [Name]d static class. A node added to the package and not here is
     # invisible to this audit, so keep the two in step - docs\MAPSUI-SURFACE.md lists the same set.
     $ourNodes = @(
-        'Mapsui|Map', 'Mapsui|ViewportInfo', 'Mapsui|LayerInfo', 'Mapsui|Pick', 'Mapsui|ToFeatures',
+        'Mapsui|Map', 'Mapsui|ViewportInfo', 'Mapsui|LayerInfo', 'Mapsui|Pick',
         'Mapsui.Project|ScreenToWorld', 'Mapsui.Project|WorldToScreen', 'Mapsui.Debug|DiagnosticsLayer',
         'Mapsui.Layers|OpenStreetMap', 'Mapsui.Layers|XYZ', 'Mapsui.Layers|FeatureLayer', 'Mapsui.Layers|Geometry',
         'Mapsui.Layers|TileCache', 'Mapsui.Layers|Graticule', 'Mapsui.Layers|VisibleRange',

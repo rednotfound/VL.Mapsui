@@ -16,8 +16,8 @@ namespace VL.Mapsui;
 /// VL.GeoJSON writes them, a patch can make one by hand, and this package only draws and picks
 /// them.
 ///
-/// What stays behind is this internal helper, because <c>GeometryLayer</c> and <c>ToFeatures</c>
-/// build features as plumbing. Internal plumbing is not a node surface, and duplicating six lines
+/// What stays behind is this internal helper, because <c>GeometryLayer</c> builds features as
+/// plumbing (<c>ToFeatures</c> did too, until it was removed on 2026-09-25). Internal plumbing is not a node surface, and duplicating six lines
 /// is cheaper than an assembly reference between two packages that deliberately compose through
 /// NTS types alone.
 /// </remarks>

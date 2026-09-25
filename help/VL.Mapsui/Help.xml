@@ -19,7 +19,7 @@
 		<VLDocument link="HowTo Draw a geometry.vl" tags="geometry,wkt,shape,polygon,layer,colour,color,simplest,offline,graticule,nts,netTopologySuite" />
 		<VLDocument link="HowTo Draw your own shapes.vl" tags="feature,featureLayer,vectorStyle,attributes,dictionary,add,geometry,wkt,polygon,nts,netTopologySuite,status" />
 		<VLDocument link="HowTo Label your data.vl" tags="label,labelStyle,text,attribute,attributes,dictionary,feature,style,halo" />
-		<VLDocument link="HowTo Draw many features.vl" tags="record,class,type,many,thousand,scale,spread,instance,toFeatures,create,performance,symbol,marker,point,symbolStyle,label,forEach,pad" />
+		<VLDocument link="HowTo Draw many features.vl" tags="record,class,type,many,thousand,scale,spread,instance,feature,create,performance,symbol,marker,point,symbolStyle,label,forEach,pad" />
 	</Topic>
 	<Topic title="Styling">
 		<VLDocument link="HowTo Style mixed geometry.vl" tags="style,geometry,point,line,polygon,mixed,styleByGeometry,theme,symbolStyle,vectorStyle,dispatch,marker,status" />
