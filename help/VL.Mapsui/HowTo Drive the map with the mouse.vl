@@ -17,7 +17,7 @@
       <Patch Id="EXdNZ0YTje7sHAYMHg2sZq">
         <Canvas Id="BCnJ5d8m0NRlDxxKDNNT83" CanvasType="Group">
           <Pad Id="MlxsQ7bN1NpvQsNHudEmMw" Bounds="60,40,405,41" ShowValueBox="true" isIOBox="true" Value="Use Drag and ZoomByWheel!">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -26,7 +26,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="DJ8pJkXZNgMFlAk0kMVpul" Bounds="60,90,520,82" ShowValueBox="true" isIOBox="true" Value="Nothing in VL.Mapsui decides what the mouse means. This wiring is one choice - left-drag pans, the wheel zooms, two bangs step a level - and the map nodes would not care if an LFO, OSC or a keyboard drove them instead.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -98,10 +98,13 @@
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Console" />
             </p:NodeReference>
+            <Pin Id="Q9tYraR39zhNbLG3vGBUno" Name="State Output" Kind="OutputPin" IsHidden="true" />
             <Pin Id="OAZM6o4CUzvsAOjXWUCKkv" Name="Output" Kind="OutputPin" />
             <Pin Id="HfxTWpgZ9BjCrx9DBc7bFd" Name="Mouse" Kind="OutputPin" />
             <Pin Id="KaFJORcpaDtlFjZOkPfMsL" Name="Keyboard" Kind="OutputPin" />
+            <Pin Id="KUZac7l39Q4PTXSf5EouMI" Name="Touch Device" Kind="OutputPin" />
             <Pin Id="G48kKiNBDGbePa1ViAURee" Name="Notifications" Kind="OutputPin" />
+            <Pin Id="VegbNXQmk15LGce34HyDKD" Name="Node Context" Kind="InputPin" IsHidden="true" />
           </Node>
           <Node Bounds="60,660,60,19" Id="NArb64YOFSmThgEYcT1w2W">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
@@ -109,38 +112,68 @@
               <Choice Kind="ProcessAppFlag" Name="Group" />
               <CategoryReference Kind="Category" Name="Skia" NeedsToBeDirectParent="true" />
             </p:NodeReference>
+            <Pin Id="QrUGWeo50lHPdXgsyrMtTu" Name="Node Context" Kind="InputPin" IsHidden="true" />
             <Pin Id="I5zK5RdILJGXyvK7la7Nhd" Name="Input" Kind="InputPin" />
             <Pin Id="BXmcRvebB6U0DjFgVv9LO7" Name="Input 2" Kind="InputPin" />
             <Pin Id="P4nOt1FbbJv0fD8hkGN0mE" Name="Output" Kind="OutputPin" />
+            <Pin Id="AlzOkNFDb64MMwQIyjJCAJ" Name="Debug" Kind="InputPin" />
+            <Pin Id="O9kuCfagFcpMWoaDr2QD2Y" Name="Enabled" Kind="InputPin" />
           </Node>
-          <Node Bounds="60,710,185,19" Id="Ru9mGYVQLv2SL296uq8GYO">
+          <Node Bounds="20,710,185,19" Id="Ru9mGYVQLv2SL296uq8GYO">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
               <PinReference Kind="InputPin" Name="Bound to Document" />
               <PinReference Kind="InputPin" Name="Bounds" />
             </p:NodeReference>
+            <Pin Id="FXf04jey7FuNSVotwnciWG" Name="Node Context" Kind="InputPin" IsHidden="true" />
             <Pin Id="UamRT5gRZMoc2qI2l5LV6O" Name="Bounds" Kind="InputPin" DefaultValue="926, 114, 900, 560">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="O130Z0HetaLPlHIWQScYBI" Name="Save Bounds" Kind="InputPin" IsHidden="true" />
             <Pin Id="BlQn8M62FinPfjnaN9ejQd" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="BIUc8YvWWfzPbSvA6dylB9" Name="Dialog If Document Changed" Kind="InputPin" IsHidden="true" />
+            <Pin Id="UYDJXZVxiw6L5Ha0hpJQXf" Name="Always On Top" Kind="InputPin" IsHidden="true" />
+            <Pin Id="FR1VpwL5xHrMx8UQkmoatq" Name="Extend Into Title Bar" Kind="InputPin" IsHidden="true" />
             <Pin Id="M9XyogokEaSq04DxYJqYZV" Name="Input" Kind="InputPin" />
+            <Pin Id="CmogWkwZ3ZhNUweEia2nas" Name="Title" Kind="InputPin" />
+            <Pin Id="KxwgpEZZypDQWgKpUX8Cgu" Name="Title Bar Interaction Width" Kind="InputPin" IsHidden="true" />
+            <Pin Id="ObvGw4fmw41Ls8ij45nTQt" Name="Color" Kind="InputPin" />
+            <Pin Id="Hi8OiIchyiTOdlKMNK4T9d" Name="Clear" Kind="InputPin" />
+            <Pin Id="FvHJBj6kfxTOgpu90fVAEq" Name="Space" Kind="InputPin" />
+            <Pin Id="UDNI40BaJBkQSNlDVPL2p5" Name="Show Cursor" Kind="InputPin" />
+            <Pin Id="IFFZ2GZaR1wP5uXS0ljMKY" Name="VSync" Kind="InputPin" />
+            <Pin Id="GEtA0o2xN60OYeMkJ4CSis" Name="Commands" Kind="InputPin" IsHidden="true" />
+            <Pin Id="MiZhAZDGOwKQZ0eRABSjfI" Name="Enable Keyboard Shortcuts" Kind="InputPin" IsHidden="true" />
+            <Pin Id="RxzYQ1Y34d3ONxuIQxCLN0" Name="Enabled" Kind="InputPin" />
+            <Pin Id="V8I1p9o0P17OTc5fQwnoou" Name="Form Bounds Notifications" Kind="OutputPin" IsHidden="true" />
+            <Pin Id="PERbSgNuV4CLTkZUAy3egm" Name="Form" Kind="OutputPin" />
+            <Pin Id="JDLiamWDlwMNDzy5KYAtiT" Name="ClientBounds" Kind="OutputPin" />
+            <Pin Id="P3cMNirVDyZPORrUvmMErO" Name="Render Time" Kind="OutputPin" />
           </Node>
           <Node Bounds="440,190,80,19" Id="OYY91dx7xOqWd1Y13sLvrt">
             <p:NodeReference LastCategoryFullName="IO.Mouse" LastDependency="CoreLibBasics.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="MouseState" />
             </p:NodeReference>
+            <Pin Id="Gx2ucKDrh2XPSX7XojrUjB" Name="Node Context" Kind="InputPin" IsHidden="true" />
             <Pin Id="FLX9rLCFcmIMNkyORxcJBb" Name="Mouse Device" Kind="InputPin" />
+            <Pin Id="OIe6gOta8lfLa9wdi348Rd" Name="Position In World" Kind="OutputPin" />
+            <Pin Id="N0TpaXFehBBLexjEnOUFya" Name="Position In Projection" Kind="OutputPin" />
             <Pin Id="D2QJq1wkPEeh5mVc9uH0eF" Name="Position" Kind="OutputPin" />
             <Pin Id="KR4yDotqTaZyvC1XBjFov7" Name="Left Pressed" Kind="OutputPin" />
+            <Pin Id="FUi9W5JHfrwOsr0B32XBGx" Name="Middle Pressed" Kind="OutputPin" />
+            <Pin Id="CdgwIwwIGF0PK9g8Tthy98" Name="Right Pressed" Kind="OutputPin" />
+            <Pin Id="U5vaOl4GBhPPwPJPHXhxFW" Name="Normalized Position" Kind="OutputPin" />
             <Pin Id="RM4WRLBp7BpSkpbRUrFr03" Name="Wheel State" Kind="OutputPin" />
+            <Pin Id="Mj2OLCLto5QP2Vbdz6Rmeu" Name="Client Area" Kind="OutputPin" />
+            <Pin Id="DdBodDeMpyhPVMap3sV6kR" Name="Sender" Kind="OutputPin" />
           </Node>
           <Node Bounds="440,240,46,19" Id="UXl9Ahrb37wpKwGRejguXc">
             <p:NodeReference LastCategoryFullName="2D.Vector2" LastDependency="VL.CoreLib.vl">
@@ -169,6 +202,7 @@
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="FrameDifference" />
             </p:NodeReference>
+            <Pin Id="DDo6CgwIMYHNNYANZ2MzEe" Name="Node Context" Kind="InputPin" IsHidden="true" />
             <Pin Id="DNrYCI5riIhKDt3jKpPRpt" Name="Value" Kind="InputPin" />
             <Pin Id="O7YAMEnWaxpVk1oXWteAWG" Name="Result" Kind="OutputPin" />
           </Node>
@@ -222,7 +256,7 @@
             <Pin Id="L67HKdSNuZbjbjOwlbH3FI" Name="Result" Kind="OutputPin" />
           </Node>
           <Pad Id="C03OGKNZORCSrSfQX7cl2u" Bounds="640,190,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; MouseState is fed from Console, which is grouped with the map layer into the Renderer: this mouse belongs to this window.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -231,7 +265,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="GTGpJhFKgUZcPzNhtbjB87" Bounds="640,300,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Wheel State accumulates. FrameDifference turns it into the change per frame, which is what ZoomByWheel wants. Mapsui reads only its sign.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -240,7 +274,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="BnsroGbfGpePuClcSCsdqe" Bounds="640,388,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Drag pans while Dragging is true and remembers the previous frame for you. Left Pressed is the choice made here.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -249,7 +283,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="G4UT3OlL4qvIl0iA6Yqtis" Bounds="640,458,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Zoom around the pixel under the cursor. Notch Size is 1 because that is what VL reports per notch; a MIDI or native source may send 120.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -258,7 +292,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="C1udmhYrTbjVeTUreNjRBj" Bounds="640,546,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; ZoomIn and ZoomOut step one level on a trigger - a bang, a key, whatever should mean it.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -267,7 +301,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="SvYTdVY3bMtZI8GPM85Tw0" Bounds="640,616,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Map goes in at the top of the chain and comes out moved. Drag, ZoomByWheel, ZoomIn, ZoomOut, then ToSkiaLayer.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>

@@ -2,7 +2,7 @@
 <Document xmlns:p="property" xmlns:r="reflection" Id="OneTJyJGMH2S73eqFeyutB" LanguageVersion="2025.7.4" Version="0.128">
   <NugetDependency Id="AER2AM5L2Na8opbR2ABEBK" Location="VL.CoreLib" Version="2025.7.4" />
   <NugetDependency Id="Rkxm8XJXVD69URhTff579v" Location="VL.Skia" Version="2025.7.4" />
-  <NugetDependency Id="JXtUPd6zsDSFwSzimHOISH" Location="VL.NetTopologySuite" Version="0.0.0" />
+  <NugetDependency Id="JXtUPd6zsDSFwSzimHOISH" Location="VL.NetTopologySuite" Version="0.0.1-alpha" />
   <Patch Id="BnrHHo13pM3ANOnp7sp3n0">
     <Canvas Id="Jb52BCRMJiONYclHpeyc6Z" DefaultCategory="Main" BordersChecked="false" CanvasType="FullCategory" />
     <!--
@@ -18,7 +18,7 @@
       <Patch Id="NRCxfyiizAYF6yD2kYlb6G">
         <Canvas Id="UhlLqQBQDxSEIRlhM4xmJZ" CanvasType="Group">
           <Pad Id="R75CMRriLg6vSI45j2QIef" Bounds="60,40,270,41" ShowValueBox="true" isIOBox="true" Value="Use ZoomToLayer!">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -27,7 +27,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="P2LnrFN4mTG0k5f3ADcnpp" Bounds="60,90,520,64" ShowValueBox="true" isIOBox="true" Value="Put the view where the data is. Two squares 350 km apart; the window opens over the first. Framing is a trigger, not a constant: applied every frame it would pin the view and the map could not be moved.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -156,24 +156,43 @@
             <Pin Id="R5vsdJIaUDkMYzpGLl0u94" Name="Diagnostics" Kind="InputPin" />
             <Pin Id="FDEFveN7B39ZmZSU7zUv9h" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,670,185,19" Id="CaRKeIc4tOECClAOlHgGiR">
+          <Node Bounds="20,660,185,19" Id="CaRKeIc4tOECClAOlHgGiR">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
               <PinReference Kind="InputPin" Name="Bounds" />
               <PinReference Kind="InputPin" Name="Bound to Document" />
             </p:NodeReference>
-            <Pin Id="T1fkOVCrbPzc82mXvr5psG" Name="Bounds" Kind="InputPin" DefaultValue="926, 114, 900, 560">
+            <Pin Id="TN2S7ub783pO4L6C7rURje" Name="Node Context" Kind="InputPin" IsHidden="true" />
+            <Pin Id="T1fkOVCrbPzc82mXvr5psG" Name="Bounds" Kind="InputPin" DefaultValue="991, 123, 900, 560">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="UsrlMdwY8RXLjbUosTMvy0" Name="Save Bounds" Kind="InputPin" IsHidden="true" />
             <Pin Id="D9u0lq57zVgwHc8m7PWaOj" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="HsxulvQXqk8Pyzrq3Ki3sH" Name="Dialog If Document Changed" Kind="InputPin" IsHidden="true" />
+            <Pin Id="FCypjydPtZnLnrRU451cd2" Name="Always On Top" Kind="InputPin" IsHidden="true" />
+            <Pin Id="GP6l0AKi47POYiNpRJP7CI" Name="Extend Into Title Bar" Kind="InputPin" IsHidden="true" />
             <Pin Id="BtMDnuy8qno8ltFcbnCQuJ" Name="Input" Kind="InputPin" />
+            <Pin Id="N3FFPCjcouyQHygHNE7Qte" Name="Title" Kind="InputPin" />
+            <Pin Id="Vypmog3ksNoL9u3pVIqdoM" Name="Title Bar Interaction Width" Kind="InputPin" IsHidden="true" />
+            <Pin Id="CnYCsxLcQqlL9jHOGWn5Ts" Name="Color" Kind="InputPin" />
+            <Pin Id="D7yu7891I4zM8AKHncInll" Name="Clear" Kind="InputPin" />
+            <Pin Id="ENMYdlSY1i8MTUAvhfU67s" Name="Space" Kind="InputPin" />
+            <Pin Id="KCtlKYoJom8NClmK6fJ7Ca" Name="Show Cursor" Kind="InputPin" />
+            <Pin Id="O1jQfQLCNn6QasNVG6LeIk" Name="VSync" Kind="InputPin" />
+            <Pin Id="KmmKQ36axrsNx7bc1njeIS" Name="Commands" Kind="InputPin" IsHidden="true" />
+            <Pin Id="T1fmljp1MRyPxY7LA0YAxD" Name="Enable Keyboard Shortcuts" Kind="InputPin" IsHidden="true" />
+            <Pin Id="VyZeXkHJuEqNplP7swrhTq" Name="Enabled" Kind="InputPin" />
+            <Pin Id="AI5hNG9ErxKLlIq6G3nccF" Name="Form Bounds Notifications" Kind="OutputPin" IsHidden="true" />
+            <Pin Id="MPPqFuYhVMVP6q6rLWw8WD" Name="Form" Kind="OutputPin" />
+            <Pin Id="QSPip1D1IxnOJ1tlhHzv5J" Name="ClientBounds" Kind="OutputPin" />
+            <Pin Id="EjEAQNWchUNOgONsLXBEdO" Name="Render Time" Kind="OutputPin" />
           </Node>
           <Pad Id="V3dgJU9UCG9aGqSzgD2c7O" Comment="Frame Tokyo" Bounds="200,460,35,35" ShowValueBox="true" isIOBox="true" Value="False">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
@@ -220,7 +239,7 @@
             <Pin Id="A7rcmspN5j22tqCsElwdVG" Name="Result" Kind="OutputPin" />
           </Node>
           <Pad Id="FtWpoL6JvkcvTtQCyKDBIu" Bounds="860,190,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Any layer with an extent can be framed. A layer with nothing in it has none, and nothing happens.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -229,7 +248,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="IvWGZo0PFiNjGZP2GYuuhD" Bounds="860,460,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Press Frame Tokyo: the view jumps to that layer. Margin is the fraction of the extent left as breathing room.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -238,7 +257,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="BKBLDHxgnH7Ahsr9bTwYMG" Bounds="860,530,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Frame everything: every layer on the map - both squares at once. With a world-covering tile layer on the map that means the world.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -247,7 +266,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="L458JQsmZcSj2qXDxuPPmA" Bounds="860,618,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Navigate nodes take the map and hand it on, so they chain: Map, ZoomToLayer, ZoomToLayers, ToSkiaLayer.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>

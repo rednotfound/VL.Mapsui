@@ -17,7 +17,7 @@
       <Patch Id="URxO0JdY8YzfeQmv3724mg">
         <Canvas Id="B08bA1MMYG1Hg6vGxBtJYR" CanvasType="Group">
           <Pad Id="FDF3CHbuHLSdVHKdDEaVBY" Bounds="60,40,660,41" ShowValueBox="true" isIOBox="true" Value="Use ScaleBar, Attribution and ZoomButtons!">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -26,7 +26,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="R1D1kS6CQ5RzqqwWOtYaHW" Bounds="60,90,560,82" ShowValueBox="true" isIOBox="true" Value="Mapsui's own furniture. Each node takes the map, puts one widget on it once, and hands the map on. Map.Widgets is append-only, so Enabled is how a widget goes away. Click is what makes the buttons work - and tells Drag not to pan when you pressed one.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -104,7 +104,7 @@
             </Pin>
             <Pin Id="VXUbAWYcHVeBy74BBrY3bi" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,700,130,19" Id="Qk86AtDhPKPuvKyv75qjo0">
+          <Node Bounds="60,780,130,19" Id="Qk86AtDhPKPuvKyv75qjo0">
             <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
@@ -114,56 +114,89 @@
             <Pin Id="Tg2iYVgxcYRghBEhHexPLe" Name="Diagnostics" Kind="InputPin" />
             <Pin Id="G2VhJVcvxEcpOlgIKkwnPu" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="310,700,70,19" Id="IWDwBOfWpWoqWAz93uEyHg">
+          <Node Bounds="420,150,85,19" Id="IWDwBOfWpWoqWAz93uEyHg">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Console" />
             </p:NodeReference>
+            <Pin Id="OIUZDKzkS9qLq98GXkTPQK" Name="State Output" Kind="OutputPin" IsHidden="true" />
             <Pin Id="NBq9xqRSSTS2LFHGfqDsUI" Name="Output" Kind="OutputPin" />
             <Pin Id="QhUJh8RjsYFei44w9YkqXr" Name="Mouse" Kind="OutputPin" />
             <Pin Id="QhzYlfYhU5ahQEhfBGifH8" Name="Keyboard" Kind="OutputPin" />
+            <Pin Id="N0RI18pzVVoOifq7btKR0S" Name="Touch Device" Kind="OutputPin" />
             <Pin Id="Txc5puv8H4LKeTKTHZ5prd" Name="Notifications" Kind="OutputPin" />
+            <Pin Id="AeOHe4CeQw4NE5nIBev8Ws" Name="Node Context" Kind="InputPin" IsHidden="true" />
           </Node>
-          <Node Bounds="60,750,60,19" Id="DXERZ83SGv79cq6dbe34p0">
+          <Node Bounds="60,830,65,19" Id="DXERZ83SGv79cq6dbe34p0">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Group" />
               <CategoryReference Kind="Category" Name="Skia" NeedsToBeDirectParent="true" />
             </p:NodeReference>
+            <Pin Id="TlzLi97Cm0cLYMNWi6HXuv" Name="Node Context" Kind="InputPin" IsHidden="true" />
             <Pin Id="VansIs1rxTtoWqMtuyMI2x" Name="Input" Kind="InputPin" />
             <Pin Id="KTZpkWKWnZt9ZaXfw7eOXD" Name="Input 2" Kind="InputPin" />
             <Pin Id="CbOcI1Lw4ivrD3WFtMqcJo" Name="Output" Kind="OutputPin" />
+            <Pin Id="Ouz1jIO84luMjnwuAshcxi" Name="Debug" Kind="InputPin" />
+            <Pin Id="CpNZKyIpJRMOZxbLtUp1Xl" Name="Enabled" Kind="InputPin" />
           </Node>
-          <Node Bounds="60,800,185,19" Id="Js8TKjCkTq5IEGA1K5ECLT">
+          <Node Bounds="20,880,185,19" Id="Js8TKjCkTq5IEGA1K5ECLT">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
               <PinReference Kind="InputPin" Name="Bound to Document" />
               <PinReference Kind="InputPin" Name="Bounds" />
             </p:NodeReference>
+            <Pin Id="E4jadohWjEgMmXYe9WLTLL" Name="Node Context" Kind="InputPin" IsHidden="true" />
             <Pin Id="Ehc8jNCFK3XSkUUvNflhkm" Name="Bounds" Kind="InputPin" DefaultValue="926, 114, 900, 560">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="SWt7IQeeSGgLgQJcck1W9K" Name="Save Bounds" Kind="InputPin" IsHidden="true" />
             <Pin Id="JACVKjT4xPcWpueAUCJmdB" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="CFmC6wajNdJOQNTExr9U7S" Name="Dialog If Document Changed" Kind="InputPin" IsHidden="true" />
+            <Pin Id="CkI27fuxcXJLnuFEDMuER6" Name="Always On Top" Kind="InputPin" IsHidden="true" />
+            <Pin Id="EYhmSdAGrD2NJt8nE86MR6" Name="Extend Into Title Bar" Kind="InputPin" IsHidden="true" />
             <Pin Id="FMmsv5eA4cZS07HFTK11hT" Name="Input" Kind="InputPin" />
+            <Pin Id="TrfKq835J3qNnyxGFd9jQ9" Name="Title" Kind="InputPin" />
+            <Pin Id="UxeAaUJTGViP1YTku527Rt" Name="Title Bar Interaction Width" Kind="InputPin" IsHidden="true" />
+            <Pin Id="AKspUDNft4HOQ0tK0WzyEl" Name="Color" Kind="InputPin" />
+            <Pin Id="RI7BQsd05ZqOg5bNdjONyu" Name="Clear" Kind="InputPin" />
+            <Pin Id="AdEK9ECm2XtNA31TPiSTVF" Name="Space" Kind="InputPin" />
+            <Pin Id="Nqyr9M2kXemQUnTjw0ETh8" Name="Show Cursor" Kind="InputPin" />
+            <Pin Id="UHKum6rYyJjLWiaR5wbdu8" Name="VSync" Kind="InputPin" />
+            <Pin Id="P9fRzSeFVRaPlcPk7Z6Y8G" Name="Commands" Kind="InputPin" IsHidden="true" />
+            <Pin Id="JSuzKNV9H7aOXam8Ae39q1" Name="Enable Keyboard Shortcuts" Kind="InputPin" IsHidden="true" />
+            <Pin Id="DJCMrTE4RAoNn2hf7LjKq2" Name="Enabled" Kind="InputPin" />
+            <Pin Id="DCVTtHvkdVSPUQaSSOB9ue" Name="Form Bounds Notifications" Kind="OutputPin" IsHidden="true" />
+            <Pin Id="Bk7gFNjA34GOGsTOwqSFSJ" Name="Form" Kind="OutputPin" />
+            <Pin Id="M2TNMPJtKR5L9t1Dl9lv9y" Name="ClientBounds" Kind="OutputPin" />
+            <Pin Id="VjBawLviWBsLehGwX35ak8" Name="Render Time" Kind="OutputPin" />
           </Node>
           <Node Bounds="440,190,80,19" Id="FUtorJfdICkrCcAVMnUxpU">
             <p:NodeReference LastCategoryFullName="IO.Mouse" LastDependency="CoreLibBasics.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="MouseState" />
             </p:NodeReference>
+            <Pin Id="DyLgLkkpoakLMvQAcfxvTz" Name="Node Context" Kind="InputPin" IsHidden="true" />
             <Pin Id="PiBgIIQcYjZsb8bQ4S5kM4" Name="Mouse Device" Kind="InputPin" />
+            <Pin Id="TSkGAutfIAPPAXaT9PYgxR" Name="Position In World" Kind="OutputPin" />
+            <Pin Id="O2l3TSMWEyLOptdjXBsp0j" Name="Position In Projection" Kind="OutputPin" />
             <Pin Id="BAk4E90FBNz2IjjWfuGOrI" Name="Position" Kind="OutputPin" />
             <Pin Id="Kp3bSaQg8pvPqOQIIHJR65" Name="Left Pressed" Kind="OutputPin" />
+            <Pin Id="ET0FxjoufigNTCJSMhG9T4" Name="Middle Pressed" Kind="OutputPin" />
+            <Pin Id="FgYbIMJMdTNOhEqY2Ururu" Name="Right Pressed" Kind="OutputPin" />
+            <Pin Id="DJZDZm9QCUYOfAftAg0Z62" Name="Normalized Position" Kind="OutputPin" />
             <Pin Id="Cm8ouNSNjElEqLzhtEgj38" Name="Wheel State" Kind="OutputPin" />
+            <Pin Id="KYwpCYDMw8wNDD3BxHW1Qw" Name="Client Area" Kind="OutputPin" />
+            <Pin Id="UQIOLqTPiSoOfN3miwSyK6" Name="Sender" Kind="OutputPin" />
           </Node>
-          <Node Bounds="440,240,46,19" Id="AZcLLGf9aMEivK3Cj3i7dH">
+          <Node Bounds="480,280,46,19" Id="AZcLLGf9aMEivK3Cj3i7dH">
             <p:NodeReference LastCategoryFullName="2D.Vector2" LastDependency="VL.CoreLib.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Vector (Split)" />
@@ -186,8 +219,8 @@
             <Pin Id="EvSF83F1neuwfPuEPco56s" Name="Result" Kind="OutputPin" />
             <Pin Id="LAqMbgDy3WOFc7VSOPM3pk" Name="Handled" Kind="OutputPin" />
           </Node>
-          <Pad Id="PK1dM2U3zfHSHgSaUZggxn" Comment="Handled" Bounds="200,405,40,15" ShowValueBox="true" isIOBox="true" />
-          <Node Bounds="300,430,40,19" Id="QXgBCE8WuHOQhnYlDdm1z4">
+          <Pad Id="PK1dM2U3zfHSHgSaUZggxn" Comment="Handled" Bounds="167,440,40,15" ShowValueBox="true" isIOBox="true" />
+          <Node Bounds="295,460,40,19" Id="QXgBCE8WuHOQhnYlDdm1z4">
             <p:NodeReference LastCategoryFullName="Primitive.Boolean" LastDependency="CoreLibBasics.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="NOT" />
@@ -195,7 +228,7 @@
             <Pin Id="M9gq6lupDDgYNeWdECLzUl" Name="Input" Kind="StateInputPin" />
             <Pin Id="Uf7PYbwXrUPy4kBMp5J3OJ" Name="Output" Kind="StateOutputPin" />
           </Node>
-          <Node Bounds="300,470,40,19" Id="DPAVeB9xkP93tlqSVoQoI5">
+          <Node Bounds="295,500,40,19" Id="DPAVeB9xkP93tlqSVoQoI5">
             <p:NodeReference LastCategoryFullName="Primitive.Boolean" LastDependency="CoreLibBasics.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="AND" />
@@ -204,7 +237,7 @@
             <Pin Id="BR32aJxsywDgaQoGJKcGgQ" Name="Input 2" Kind="InputPin" />
             <Pin Id="QqR8sz5CKByDgjiWRon1Sl" Name="Output" Kind="StateOutputPin" />
           </Node>
-          <Node Bounds="60,460,110,19" Id="Pc3QUQMEtQOICuipzNoD2b">
+          <Node Bounds="60,540,110,19" Id="Pc3QUQMEtQOICuipzNoD2b">
             <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Drag" />
@@ -216,7 +249,7 @@
             <Pin Id="HFLnHQeyC1H5KPAeANyjDV" Name="Dragging" Kind="InputPin" />
             <Pin Id="A6BaaGRA0MM9bo8oN6bBGC" Name="Result" Kind="OutputPin" />
           </Node>
-          <Pad Id="VUZOujDLey3rKataMLrLvH" Comment="Widgets" Bounds="200,500,35,35" ShowValueBox="true" isIOBox="true" Value="True">
+          <Pad Id="VUZOujDLey3rKataMLrLvH" Comment="Widgets" Bounds="200,571,35,35" ShowValueBox="true" isIOBox="true" Value="True">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
             </p:TypeAnnotation>
@@ -224,7 +257,7 @@
               <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
             </p:ValueBoxSettings>
           </Pad>
-          <Node Bounds="60,520,110,19" Id="SyOORFh9S25Ex5GLWLjFLO">
+          <Node Bounds="60,600,110,19" Id="SyOORFh9S25Ex5GLWLjFLO">
             <p:NodeReference LastCategoryFullName="Mapsui.Widgets" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ScaleBar" />
@@ -236,7 +269,7 @@
             <Pin Id="JR0jrNZFNVVwOc0bGUqlsg" Name="Corner" Kind="InputPin" />
             <Pin Id="Q6Ten1OIwD3ax7YbeEWI6K" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,580,110,19" Id="PFzqxguJkzdyEdEwqtQOFr">
+          <Node Bounds="60,660,110,19" Id="PFzqxguJkzdyEdEwqtQOFr">
             <p:NodeReference LastCategoryFullName="Mapsui.Widgets" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Attribution" />
@@ -248,8 +281,8 @@
             <Pin Id="OJP3Dqq60OeL4LROJPJ1vh" Name="Result" Kind="OutputPin" />
             <Pin Id="NatHgfDeEieUZasHuvO3Qu" Name="Attribution" Kind="OutputPin" />
           </Node>
-          <Pad Id="AtwDsvSrJG3boyrKF7zzgH" Comment="Attribution" Bounds="200,585,340,15" ShowValueBox="true" isIOBox="true" />
-          <Node Bounds="60,640,110,19" Id="LMqbQZVlF2LQWZo0BEzmTt">
+          <Pad Id="AtwDsvSrJG3boyrKF7zzgH" Comment="Attribution" Bounds="167,700,51,15" ShowValueBox="true" isIOBox="true" />
+          <Node Bounds="60,720,110,19" Id="LMqbQZVlF2LQWZo0BEzmTt">
             <p:NodeReference LastCategoryFullName="Mapsui.Widgets" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ZoomButtons" />
@@ -261,7 +294,7 @@
             <Pin Id="M7ZQNzX5lM8acQeKVtCbV5" Name="Result" Kind="OutputPin" />
           </Node>
           <Pad Id="HiD7eSBvsW3FYJ9W54nAC8" Bounds="640,190,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; The mouse belongs to this window: MouseState is fed from Console, which is grouped with the map layer.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -270,7 +303,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="Gf6rSQagAN4OzfLCSmxCFg" Bounds="640,260,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Tiles are off; the graticule gives the window its bearings. Switch OpenStreetMap on and its credit appears in the Attribution widget.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -279,7 +312,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="EWHl2hdcAMHFTjOGHHSi0p" Bounds="640,400,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Click hands a press to the widgets. Handled is true while a button takes it, so Drag is gated with Left Pressed AND NOT Handled: pressing + does not also pan.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -287,8 +320,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="OUQSIIsSaCAyL9smI2DIT7" Bounds="640,520,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; ScaleBar: metric by default; Units and Corner are pins. Switch Widgets off and all three go away - the only way, since Widgets is append-only.">
-            <p:TypeAnnotation>
+          <Pad Id="OUQSIIsSaCAyL9smI2DIT7" Bounds="640,600,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; ScaleBar: metric by default; Units and Corner are pins. Switch Widgets off and all three go away - the only way, since Widgets is append-only.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -296,8 +329,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="MtY0CJY44TxUZWcb3hGAPH" Bounds="640,608,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Attribution shows what the layers carry, and reads it back as text. Nearly every tile service requires it.">
-            <p:TypeAnnotation>
+          <Pad Id="MtY0CJY44TxUZWcb3hGAPH" Bounds="640,688,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Attribution shows what the layers carry, and reads it back as text. Nearly every tile service requires it.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -305,8 +338,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="FSS9VCr9vQh5hJJYzOA2Jr" Bounds="640,678,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; ZoomButtons: + and -. They work because Click is wired; the widgets are drawn last, over everything.">
-            <p:TypeAnnotation>
+          <Pad Id="FSS9VCr9vQh5hJJYzOA2Jr" Bounds="640,758,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; ZoomButtons: + and -. They work because Click is wired; the widgets are drawn last, over everything.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>

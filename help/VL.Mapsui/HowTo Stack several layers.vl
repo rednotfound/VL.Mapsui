@@ -2,7 +2,7 @@
 <Document xmlns:p="property" xmlns:r="reflection" Id="BvdDyvQbtDwmsbeGQGACZQ" LanguageVersion="2025.7.4" Version="0.128">
   <NugetDependency Id="BxkD8Tol8FyXQE3QWwjq6C" Location="VL.CoreLib" Version="2025.7.4" />
   <NugetDependency Id="I0XP8ur8lBiv6AVBhP3Dbd" Location="VL.Skia" Version="2025.7.4" />
-  <NugetDependency Id="Q7O5PriJx1o5hm5F6RI7Az" Location="VL.NetTopologySuite" Version="0.0.0" />
+  <NugetDependency Id="Q7O5PriJx1o5hm5F6RI7Az" Location="VL.NetTopologySuite" Version="0.0.1-alpha" />
   <Patch Id="Kon3lKnlUD4eueDd5QAkGH">
     <Canvas Id="OMIjsG9587igyM284yR2DF" DefaultCategory="Main" BordersChecked="false" CanvasType="FullCategory" />
     <!--
@@ -18,7 +18,7 @@
       <Patch Id="DMeraScVwcmBuMZ7Yn5oW5">
         <Canvas Id="T05BM79ADgevAdSsrka0yi" CanvasType="Group">
           <Pad Id="OuflYdje78YIBKYlryrBcl" Bounds="60,40,210,41" ShowValueBox="true" isIOBox="true" Value="Stack layers">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -27,7 +27,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="I50Bc5yRfMryqOq88MTe8q" Bounds="60,90,560,64" ShowValueBox="true" isIOBox="true" Value="Several layers on one map. Two things decide what you see: ORDER, which is spread order with index 0 at the bottom, and whether a layer is on. To thin a busy map by zoom instead, see HowTo Show a layer only at some zooms.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -177,7 +177,7 @@
             <Pin Id="Lsj4vFuY3cYjlrP7JNDYU4" Name="Layers Built" Kind="OutputPin" />
             <Pin Id="BS61UOlfqpg3LTFrq3FftC" Name="Status" Kind="OutputPin" />
           </Node>
-          <Node Bounds="300,460,110,19" Id="KKpP1Z4jZNQn17ceKAA680">
+          <Node Bounds="60,460,110,19" Id="KKpP1Z4jZNQn17ceKAA680">
             <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Graticule" />
@@ -190,7 +190,7 @@
             <Pin Id="U9pS3G7Yqm4LeiYZJqlv5x" Name="Result" Kind="OutputPin" />
             <Pin Id="VwjNj23YbNSxlrC3DnbvV5" Name="Lines Built" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,510,39,19" Id="RpRHpfmAqXoCIOOJIEcXL5">
+          <Node Bounds="60,510,439,19" Id="RpRHpfmAqXoCIOOJIEcXL5">
             <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Cons" />
@@ -238,27 +238,46 @@
             <Pin Id="MHuocIZWXgnW85G4FMbmmI" Name="Diagnostics" Kind="InputPin" />
             <Pin Id="CnNIX31GmgdoH3LG78gVSz" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,680,185,19" Id="F3UbG9kbfSjbyFSP0uUo3s">
+          <Node Bounds="20,680,185,19" Id="F3UbG9kbfSjbyFSP0uUo3s">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
               <PinReference Kind="InputPin" Name="Bounds" />
               <PinReference Kind="InputPin" Name="Bound to Document" />
             </p:NodeReference>
+            <Pin Id="N8b14KfM0K9N0njmIJbx1k" Name="Node Context" Kind="InputPin" IsHidden="true" />
             <Pin Id="VDzRgtWFMquC62yNB5M4R4" Name="Bounds" Kind="InputPin" DefaultValue="926, 114, 900, 560">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="CtyrkAD20WiOfNtkZ674iq" Name="Save Bounds" Kind="InputPin" IsHidden="true" />
             <Pin Id="GxgPGxEZ5agCHJmSCx1l1x" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="VL9sYrcNWMSOohDlp04rUk" Name="Dialog If Document Changed" Kind="InputPin" IsHidden="true" />
+            <Pin Id="L4PUXySbzwXPS0OgBs92FZ" Name="Always On Top" Kind="InputPin" IsHidden="true" />
+            <Pin Id="CuTomWKKlLAPlOpejAtURL" Name="Extend Into Title Bar" Kind="InputPin" IsHidden="true" />
             <Pin Id="MaXBexiljDIS1nRCdPEgYX" Name="Input" Kind="InputPin" />
+            <Pin Id="TPZ7LzzuROCPXgPzxBv6gg" Name="Title" Kind="InputPin" />
+            <Pin Id="Hm0qXqeDJs4OLeTzMtKNKJ" Name="Title Bar Interaction Width" Kind="InputPin" IsHidden="true" />
+            <Pin Id="SzuEI2WosuXPYV3o7wj8IM" Name="Color" Kind="InputPin" />
+            <Pin Id="D2wJA2Mi9UJQUpy9qxqLrW" Name="Clear" Kind="InputPin" />
+            <Pin Id="UUq61SK3OAsMmkX6WvndsQ" Name="Space" Kind="InputPin" />
+            <Pin Id="CKJV0ulyXzULjktMwMvlI1" Name="Show Cursor" Kind="InputPin" />
+            <Pin Id="RqIkV5ShY4dONtQKTaKNkP" Name="VSync" Kind="InputPin" />
+            <Pin Id="LFWEJP4E3TRPIQOWGGHxID" Name="Commands" Kind="InputPin" IsHidden="true" />
+            <Pin Id="HOrS8W7PdWKLTJvuKq00Bd" Name="Enable Keyboard Shortcuts" Kind="InputPin" IsHidden="true" />
+            <Pin Id="U1crHZVSRRJP7LrwS3L7RX" Name="Enabled" Kind="InputPin" />
+            <Pin Id="K63qnrLPZ2wNszGKPUxGf1" Name="Form Bounds Notifications" Kind="OutputPin" IsHidden="true" />
+            <Pin Id="TiguqHCSorSNwHhmiVVUNU" Name="Form" Kind="OutputPin" />
+            <Pin Id="VrAGK2cwHE4L2c5NcOTgwV" Name="ClientBounds" Kind="OutputPin" />
+            <Pin Id="V3g0CrRPBfJPmL47INLwjm" Name="Render Time" Kind="OutputPin" />
           </Node>
           <Pad Id="BDsr1b4MzRwJpqKXMSJrQ3" Bounds="940,190,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Two squares over Kyoto. The small red one is wired LAST into the Cons, so it draws on top of the big blue one.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -267,7 +286,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="KQTftzLo005z5m17YTjdcU" Bounds="940,330,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; One style per layer. A layer treats a new style object as a change and rebuilds, so the style nodes hand out a stable one.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -276,7 +295,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="CxYRngb7EMfgQ3IJy5KkGS" Bounds="940,400,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Switch a layer off: it draws nothing and costs nothing, and keeps what it holds - a tile layer keeps its tiles. Taking it out of the Cons throws that away.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -285,7 +304,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="FYfq8mXf1nFdfMynYHktG2" Bounds="940,510,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Order is spread order: index 0 is the bottom, the graticule here. Swap the two feature links and the small square vanishes under the big one. There is no z-index.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>

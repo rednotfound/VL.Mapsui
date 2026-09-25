@@ -46,7 +46,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="CPGmXC2LjtCeX6Qpg7jSlz" Bounds="624,828,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; The records are built once, in Create, and kept in the Landmarks pad. Rebuilding data every frame is what costs: 1000 features, 43 ms before anything is drawn.">
+          <Pad Id="CPGmXC2LjtCeX6Qpg7jSlz" Bounds="624,828,320,132" ShowValueBox="true" isIOBox="true" Value="&lt; The records are built once, in Create, and kept in the Landmarks pad. The Features are not: the second ForEach makes 200 new ones every frame. FeatureLayer compares them by value and keeps its layer, so Layers Built stays 1. Cheap for points; 1000 polygons of 500 vertices cost 43 ms a frame - build those in Create too.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -541,10 +541,10 @@
             <ControlPoint Id="JBUf6X5XHdpPVr8DD5NwP8" Bounds="178,830" Alignment="Top" />
             <ControlPoint Id="NunABZFlLkaNsq3wgkj1zw" Bounds="192,1110" Alignment="Bottom" />
           </Node>
-          <Pad Id="QepyuxFgXmPP9U46k4uUWS" SlotId="HWyJRgqNRQNyYeiUzbABL8" Bounds="178,790" />
           <Overlay Id="RJijGI3Nc5DLWjkJrQIjfn" Name="Initialize data and save it into a pad" Bounds="99,247,432,470">
             <p:ColorIndex p:Type="Int32">1</p:ColorIndex>
           </Overlay>
+          <Pad Id="OolsjUyH0qcMnsQ6jOMxjf" Comment="Layers Built" Bounds="364,1460,35,15" ShowValueBox="true" isIOBox="true" />
         </Canvas>
         <Slot Id="HWyJRgqNRQNyYeiUzbABL8" Name="Landmarks" />
         <Patch Id="Qn1Yqox3GN8OqwchBUvODO" Name="Create" ParticipatingElements="HP6tjLsgFQVMTwxcjYZR08" />
@@ -604,7 +604,8 @@
         <Link Id="AxYpPgKXSosOMHDSuYq4TL" Ids="NunABZFlLkaNsq3wgkj1zw,AMeaHKeDjwSfsDqswpSIBi" />
         <Link Id="TPuXsT2o1ZtQSCNZAhf8SV" Ids="BQyXK61W7tWQWootPUbl59,DhQ4RLxy4EVNSMUWbdJCLv" />
         <Link Id="B3ZjDhf5pimNuDUob3ioh5" Ids="NsDWCDOLn57OcPoWrDe5aQ,EOVMzDeayU2NmXEOlQcKp2" />
-        <Link Id="CCCqsrNATrnLbo459BU1qR" Ids="QepyuxFgXmPP9U46k4uUWS,JBUf6X5XHdpPVr8DD5NwP8" />
+        <Link Id="Cz7qu8JjWWkNNacnGibwZo" Ids="UX2Q4zuDSJ3FicIQjybU4g,OolsjUyH0qcMnsQ6jOMxjf" />
+        <Link Id="QrdRpSMTrIDQb3XyYm8CHF" Ids="TKlMWlp4NMGpF95VUsojMR,JBUf6X5XHdpPVr8DD5NwP8" />
       </Patch>
     </Node>
   </Patch>

@@ -2,7 +2,7 @@
 <Document xmlns:p="property" xmlns:r="reflection" Id="KtGkU2YnMzUvrNH3Q2Zy7k" LanguageVersion="2025.7.4" Version="0.128">
   <NugetDependency Id="HEidozxAI4vx8rx8aZtYun" Location="VL.CoreLib" Version="2025.7.4" />
   <NugetDependency Id="NcwdM9VtdwAxpz08sf9IYX" Location="VL.Skia" Version="2025.7.4" />
-  <NugetDependency Id="SOL8lG753Rn7qdwI69KAGp" Location="VL.NetTopologySuite" Version="0.0.0" />
+  <NugetDependency Id="SOL8lG753Rn7qdwI69KAGp" Location="VL.NetTopologySuite" Version="0.0.1-alpha" />
   <Patch Id="SUlOAZJxH6dsRaGtRb01s6">
     <Canvas Id="L1Q2sxC0XHHpGbVEunkZTS" DefaultCategory="Main" BordersChecked="false" CanvasType="FullCategory" />
     <!--
@@ -18,7 +18,7 @@
       <Patch Id="HycOkvVfk1E2Biyud2tk07">
         <Canvas Id="DAuhawh0NgoESnS4R0khJX" CanvasType="Group">
           <Pad Id="DWRaZVdXMeeoYKnJLQCu3m" Bounds="60,40,285,41" ShowValueBox="true" isIOBox="true" Value="Use StyleByValue!">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -26,8 +26,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="Ooy2FKEifAAAKW5VSdAqXg" Bounds="60,90,560,82" ShowValueBox="true" isIOBox="true" Value="What a choropleth is made of: a numeric attribute in [Min, Max] mapped onto the range between two styles. Five squares; four carry a value (0, 33, 66, 100) and one does not - and that one is NOT drawn, rather than quietly styled as 0.">
-            <p:TypeAnnotation>
+          <Pad Id="Ooy2FKEifAAAKW5VSdAqXg" Bounds="60,90,559,63" ShowValueBox="true" isIOBox="true" Value="What a choropleth is made of: a numeric attribute in [Min, Max] mapped onto the range between two styles. Five squares; four carry a value (0, 33, 66, 100) and one does not - and that one is NOT drawn, rather than quietly styled as 0.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -35,17 +35,17 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="J3HLcD6SuTA2IiAxMYIuzu" Comment="Key" Bounds="60,150,60,15" ShowValueBox="true" isIOBox="true" Value="value">
+          <Pad Id="J3HLcD6SuTA2IiAxMYIuzu" Comment="Key" Bounds="146,190,60,15" ShowValueBox="true" isIOBox="true" Value="value">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
           </Pad>
-          <Pad Id="FOHZrakie9FFYfFnHqPPa6" Comment="#1" Bounds="60,190,220,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((139.50 35.64, 139.58 35.64, 139.58 35.72, 139.50 35.72, 139.50 35.64))">
+          <Pad Id="FOHZrakie9FFYfFnHqPPa6" Comment="#1" Bounds="68,240,220,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((139.50 35.64, 139.58 35.64, 139.58 35.72, 139.50 35.72, 139.50 35.64))">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="60,230,90,19" Id="O03LiDfXPeJErUetTNIzOY">
+          <Node Bounds="66,280,90,19" Id="O03LiDfXPeJErUetTNIzOY">
             <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Read WKT" />
@@ -55,7 +55,7 @@
             <Pin Id="UJ2IJml3X4JDhC4b5FoRSK" Name="Result" Kind="OutputPin" />
             <Pin Id="TAoi6q7ilrNvtHBZwJLR0Y" Name="Success" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,340,110,19" Id="AaFvFR4xULgOyUFZg6Sxnj">
+          <Node Bounds="66,390,110,19" Id="AaFvFR4xULgOyUFZg6Sxnj">
             <p:NodeReference LastCategoryFullName="NTS.Feature" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Feature" />
@@ -64,12 +64,12 @@
             <Pin Id="G4qoPR38XqueW9t07hpgUh" Name="Attributes" Kind="InputPin" />
             <Pin Id="FMvaNkLN6WswGnoI8Fjyw3" Name="Result" Kind="OutputPin" />
           </Node>
-          <Pad Id="IqbeHtv7TExzq6IUkE4e1E" Comment="value" Bounds="190,270,50,15" ShowValueBox="true" isIOBox="true" Value="0">
+          <Pad Id="IqbeHtv7TExzq6IUkE4e1E" Comment="value" Bounds="170,320,50,15" ShowValueBox="true" isIOBox="true" Value="0">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float64" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="60,290,53,26" Id="VSB525y3A0X1NH6WEWLcY4">
+          <Node Bounds="120,340,53,26" Id="VSB525y3A0X1NH6WEWLcY4">
             <p:NodeReference LastCategoryFullName="Collections.Dictionary" LastDependency="VL.Collections.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Add" />
@@ -80,12 +80,12 @@
             <Pin Id="FlJjCRIfor6bmibyuMGvDY" Name="Value" Kind="InputPin" />
             <Pin Id="Q3gXXhqEcvQOCuVKYvemFF" Name="Output" Kind="StateOutputPin" />
           </Node>
-          <Pad Id="I72VVu6JQ3aM62JMYAStoO" Comment="#2" Bounds="300,190,220,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((139.60 35.64, 139.68 35.64, 139.68 35.72, 139.60 35.72, 139.60 35.64))">
+          <Pad Id="I72VVu6JQ3aM62JMYAStoO" Comment="#2" Bounds="308,240,220,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((139.60 35.64, 139.68 35.64, 139.68 35.72, 139.60 35.72, 139.60 35.64))">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="300,230,90,19" Id="ROiBDHwKEvN2tFyqcfwMZa">
+          <Node Bounds="306,280,90,19" Id="ROiBDHwKEvN2tFyqcfwMZa">
             <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Read WKT" />
@@ -95,7 +95,7 @@
             <Pin Id="TYdNpKQNCZ2sHd6Lik2p5v" Name="Result" Kind="OutputPin" />
             <Pin Id="MlfQ7fQ5DL8Lg0FKKHkdKR" Name="Success" Kind="OutputPin" />
           </Node>
-          <Node Bounds="300,340,110,19" Id="PGnFUpjTGGEXc7Ec4QvRqI">
+          <Node Bounds="306,390,110,19" Id="PGnFUpjTGGEXc7Ec4QvRqI">
             <p:NodeReference LastCategoryFullName="NTS.Feature" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Feature" />
@@ -104,12 +104,12 @@
             <Pin Id="FMzmnYx3hP1qXUmhEL1lJS" Name="Attributes" Kind="InputPin" />
             <Pin Id="O8uiE2cRuBxyDqF1XVDGby" Name="Result" Kind="OutputPin" />
           </Node>
-          <Pad Id="HQQU8MlCIyYgTHO8VDbCo8" Comment="value" Bounds="430,270,50,15" ShowValueBox="true" isIOBox="true" Value="33">
+          <Pad Id="HQQU8MlCIyYgTHO8VDbCo8" Comment="value" Bounds="398,320,50,15" ShowValueBox="true" isIOBox="true" Value="33">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float64" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="300,290,53,26" Id="CfXapwJmB1UyRjQVqfWgsi">
+          <Node Bounds="348,340,53,26" Id="CfXapwJmB1UyRjQVqfWgsi">
             <p:NodeReference LastCategoryFullName="Collections.Dictionary" LastDependency="VL.Collections.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Add" />
@@ -120,12 +120,12 @@
             <Pin Id="COY5DvhtD3k34tv26ObUwx" Name="Value" Kind="InputPin" />
             <Pin Id="UC5XTzOpMjSbaFWqY61TKB" Name="Output" Kind="StateOutputPin" />
           </Node>
-          <Pad Id="FrkcC5pqKe7ZJ8EYdkInxO" Comment="#3" Bounds="540,190,220,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((139.70 35.64, 139.78 35.64, 139.78 35.72, 139.70 35.72, 139.70 35.64))">
+          <Pad Id="FrkcC5pqKe7ZJ8EYdkInxO" Comment="#3" Bounds="548,240,220,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((139.70 35.64, 139.78 35.64, 139.78 35.72, 139.70 35.72, 139.70 35.64))">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="540,230,90,19" Id="MvLhVf3WbT66G6N4EGPapQ">
+          <Node Bounds="546,280,90,19" Id="MvLhVf3WbT66G6N4EGPapQ">
             <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Read WKT" />
@@ -135,7 +135,7 @@
             <Pin Id="Pba250gTWDSoEJWQ4CEILw" Name="Result" Kind="OutputPin" />
             <Pin Id="JYXUepN2e7ZfM5cc9jv7qd" Name="Success" Kind="OutputPin" />
           </Node>
-          <Node Bounds="540,340,110,19" Id="GTqVyhMlcql8DcmX8kcAZe">
+          <Node Bounds="546,390,110,19" Id="GTqVyhMlcql8DcmX8kcAZe">
             <p:NodeReference LastCategoryFullName="NTS.Feature" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Feature" />
@@ -144,12 +144,12 @@
             <Pin Id="StxOgSNNK70Ipky9FtWEvo" Name="Attributes" Kind="InputPin" />
             <Pin Id="MCHNAzUHoIb0TBj7xpKZpW" Name="Result" Kind="OutputPin" />
           </Node>
-          <Pad Id="SbZi0CuKxfmTyk1pjcghSX" Comment="value" Bounds="670,270,50,15" ShowValueBox="true" isIOBox="true" Value="66">
+          <Pad Id="SbZi0CuKxfmTyk1pjcghSX" Comment="value" Bounds="660,320,50,15" ShowValueBox="true" isIOBox="true" Value="66">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float64" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="540,290,53,26" Id="QQTfw2bW2nIhhSCkbAJPyI">
+          <Node Bounds="610,340,53,26" Id="QQTfw2bW2nIhhSCkbAJPyI">
             <p:NodeReference LastCategoryFullName="Collections.Dictionary" LastDependency="VL.Collections.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Add" />
@@ -160,12 +160,12 @@
             <Pin Id="RYrkEdXPbq8cULXm42rnX1" Name="Value" Kind="InputPin" />
             <Pin Id="UKIF2jmVDleTvrp5RLONuY" Name="Output" Kind="StateOutputPin" />
           </Node>
-          <Pad Id="OxgdOsAGh24keQTZiFeKZb" Comment="#4" Bounds="780,190,220,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((139.80 35.64, 139.88 35.64, 139.88 35.72, 139.80 35.72, 139.80 35.64))">
+          <Pad Id="OxgdOsAGh24keQTZiFeKZb" Comment="#4" Bounds="788,240,220,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((139.80 35.64, 139.88 35.64, 139.88 35.72, 139.80 35.72, 139.80 35.64))">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="780,230,90,19" Id="M5ZR3mIrRGBtnjB2vyHcbu">
+          <Node Bounds="786,280,90,19" Id="M5ZR3mIrRGBtnjB2vyHcbu">
             <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Read WKT" />
@@ -175,7 +175,7 @@
             <Pin Id="ECaL9eqOltaQiybCC5t0PZ" Name="Result" Kind="OutputPin" />
             <Pin Id="INtDX68FSZ0hz5OTX0x2tH" Name="Success" Kind="OutputPin" />
           </Node>
-          <Node Bounds="780,340,110,19" Id="EZbAklq3jyYX9CLcve8uxG">
+          <Node Bounds="786,390,110,19" Id="EZbAklq3jyYX9CLcve8uxG">
             <p:NodeReference LastCategoryFullName="NTS.Feature" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Feature" />
@@ -184,12 +184,12 @@
             <Pin Id="EA84LI9s94rWsjJBk8Y5nr" Name="Attributes" Kind="InputPin" />
             <Pin Id="M8WvIjNTwqkZhBabCvu5PK" Name="Result" Kind="OutputPin" />
           </Node>
-          <Pad Id="Hyl125oXjSFY5rlpAGBcJm" Comment="value" Bounds="910,270,50,15" ShowValueBox="true" isIOBox="true" Value="100">
+          <Pad Id="Hyl125oXjSFY5rlpAGBcJm" Comment="value" Bounds="911,320,50,15" ShowValueBox="true" isIOBox="true" Value="100">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float64" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="780,290,53,26" Id="GFo1I1Ia41562Rdas549Hb">
+          <Node Bounds="861,340,53,26" Id="GFo1I1Ia41562Rdas549Hb">
             <p:NodeReference LastCategoryFullName="Collections.Dictionary" LastDependency="VL.Collections.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Add" />
@@ -200,12 +200,12 @@
             <Pin Id="MEkQUJglJPSS9RWJAovCb9" Name="Value" Kind="InputPin" />
             <Pin Id="UwavWHGJRmqgx1DX1Pvv2K" Name="Output" Kind="StateOutputPin" />
           </Node>
-          <Pad Id="PQi2XXfSE5hOaundLWgEZV" Comment="#5" Bounds="1020,190,220,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((139.90 35.64, 139.98 35.64, 139.98 35.72, 139.90 35.72, 139.90 35.64))">
+          <Pad Id="PQi2XXfSE5hOaundLWgEZV" Comment="#5" Bounds="1028,240,220,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((139.90 35.64, 139.98 35.64, 139.98 35.72, 139.90 35.72, 139.90 35.64))">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="1020,230,90,19" Id="DlZx1i7KSywNoyKNbJ0R8G">
+          <Node Bounds="1026,280,90,19" Id="DlZx1i7KSywNoyKNbJ0R8G">
             <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Read WKT" />
@@ -215,7 +215,7 @@
             <Pin Id="J3p05xGp0vbcb3QfpITMan" Name="Result" Kind="OutputPin" />
             <Pin Id="VbirKlevFP0lkgA7qXLQ68" Name="Success" Kind="OutputPin" />
           </Node>
-          <Node Bounds="1020,340,110,19" Id="SHjwKRO91MHnHFmQb2YCAD">
+          <Node Bounds="1026,390,110,19" Id="SHjwKRO91MHnHFmQb2YCAD">
             <p:NodeReference LastCategoryFullName="NTS.Feature" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Feature" />
@@ -224,7 +224,7 @@
             <Pin Id="MbrXGJYbSIjogaKsqaaNAs" Name="Attributes" Kind="InputPin" />
             <Pin Id="DSat6eOFdW3OgUfPGyUij1" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,400,39,19" Id="LY7a8jYEs7Uk15gpJjDLAw">
+          <Node Bounds="66,470,584,19" Id="LY7a8jYEs7Uk15gpJjDLAw">
             <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Cons" />
@@ -237,12 +237,12 @@
             <Pin Id="L0pebjuihbzAd5JELCsZtx" Name="Input 5" Kind="InputPin" />
             <Pin Id="NVlqODDQVpo4cWOq1AiMG0" Name="Result" Kind="OutputPin" />
           </Node>
-          <Pad Id="VPLIJmIeVru0NXJE2xj2er" Comment="Min Fill" Bounds="440,420,120,15" ShowValueBox="true" isIOBox="true" Value="1, 0.96, 0.8, 0.9">
+          <Pad Id="VPLIJmIeVru0NXJE2xj2er" Comment="Min Fill" Bounds="295,530,120,15" ShowValueBox="true" isIOBox="true" Value="1, 0.96, 0.8, 0.9">
             <p:TypeAnnotation LastCategoryFullName="Color" LastDependency="CoreLibBasics.vl">
               <Choice Kind="TypeFlag" Name="RGBA" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="300,450,110,19" Id="QSGUTJyyi16jq8EqyZTVCn">
+          <Node Bounds="293,550,110,19" Id="QSGUTJyyi16jq8EqyZTVCn">
             <p:NodeReference LastCategoryFullName="Mapsui.Styles" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="VectorStyle" />
@@ -253,12 +253,12 @@
             <Pin Id="TlmqRpjmPFa8WyorLb2UPv" Name="Line Width" Kind="InputPin" />
             <Pin Id="BHdeb0Frkg66utiIrD6JLR" Name="Result" Kind="OutputPin" />
           </Node>
-          <Pad Id="QHR2DKXCdmxidzNQTzbrTs" Comment="Max Fill" Bounds="440,480,120,15" ShowValueBox="true" isIOBox="true" Value="0.6, 0, 0.05, 0.9">
+          <Pad Id="QHR2DKXCdmxidzNQTzbrTs" Comment="Max Fill" Bounds="353,590,120,15" ShowValueBox="true" isIOBox="true" Value="0.6, 0, 0.05, 0.9">
             <p:TypeAnnotation LastCategoryFullName="Color" LastDependency="CoreLibBasics.vl">
               <Choice Kind="TypeFlag" Name="RGBA" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="300,510,110,19" Id="Ruen8wMVb103WdjFOfVpCX">
+          <Node Bounds="351,620,110,19" Id="Ruen8wMVb103WdjFOfVpCX">
             <p:NodeReference LastCategoryFullName="Mapsui.Styles" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="VectorStyle" />
@@ -269,22 +269,22 @@
             <Pin Id="D1QMrnbdYylnviFayjto1t" Name="Line Width" Kind="InputPin" />
             <Pin Id="OedoqmvlBuGz8IFMoAJLps" Name="Result" Kind="OutputPin" />
           </Node>
-          <Pad Id="FLebOwowDQ57uTyDvlDiJA" Comment="Attribute" Bounds="440,540,60,15" ShowValueBox="true" isIOBox="true" Value="value">
+          <Pad Id="FLebOwowDQ57uTyDvlDiJA" Comment="Attribute" Bounds="216,621,60,15" ShowValueBox="true" isIOBox="true" Value="value">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
           </Pad>
-          <Pad Id="PGhdXXLwTYdlXCaS40gE9U" Comment="Min" Bounds="580,540,40,15" ShowValueBox="true" isIOBox="true" Value="0">
+          <Pad Id="PGhdXXLwTYdlXCaS40gE9U" Comment="Min" Bounds="242,651,40,15" ShowValueBox="true" isIOBox="true" Value="0">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float64" />
             </p:TypeAnnotation>
           </Pad>
-          <Pad Id="D1g7wHOyVZdpW8OJPYn9pg" Comment="Max" Bounds="660,540,40,15" ShowValueBox="true" isIOBox="true" Value="100">
+          <Pad Id="D1g7wHOyVZdpW8OJPYn9pg" Comment="Max" Bounds="268,670,40,15" ShowValueBox="true" isIOBox="true" Value="100">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float64" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="300,570,110,19" Id="KxF03vafQTgkvu1YvLYPcG">
+          <Node Bounds="214,690,110,19" Id="KxF03vafQTgkvu1YvLYPcG">
             <p:NodeReference LastCategoryFullName="Mapsui.Styles" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="StyleByValue" />
@@ -297,7 +297,7 @@
             <Pin Id="VeX1JEiZMwZEs5epFaRIYC" Name="Max Style" Kind="InputPin" />
             <Pin Id="IE7VqWqQTxWRSvQVgTfWKy" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,630,110,19" Id="UtqIpeydxKCueiTT9AVqou">
+          <Node Bounds="66,730,110,19" Id="UtqIpeydxKCueiTT9AVqou">
             <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="FeatureLayer" />
@@ -311,8 +311,8 @@
             <Pin Id="JutGNrTwOKlscMHoLSV5Z4" Name="Layers Built" Kind="OutputPin" />
             <Pin Id="F2ZwVK18MQUb2esNedLNuY" Name="Status" Kind="OutputPin" />
           </Node>
-          <Pad Id="LqcWhStnobxhHPPQyqdLlz" Comment="Status" Bounds="200,635,340,15" ShowValueBox="true" isIOBox="true" />
-          <Node Bounds="300,680,110,19" Id="Bz0Ik12YC90UstfMgjda7t">
+          <Pad Id="LqcWhStnobxhHPPQyqdLlz" Comment="Status" Bounds="173,770,236,39" ShowValueBox="true" isIOBox="true" />
+          <Node Bounds="100,830,110,19" Id="Bz0Ik12YC90UstfMgjda7t">
             <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Graticule" />
@@ -325,7 +325,7 @@
             <Pin Id="KRrDLEL4IS7vHOlWF9367G" Name="Result" Kind="OutputPin" />
             <Pin Id="KJmlO0rWQeHDeWZGzR3ybl" Name="Lines Built" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,680,39,19" Id="Db56uy7YzJDLrhoVcm6jrs">
+          <Node Bounds="66,860,39,19" Id="Db56uy7YzJDLrhoVcm6jrs">
             <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Cons" />
@@ -335,7 +335,7 @@
             <Pin Id="GqMHLUi8m87ZcWiKAHTTMI" Name="Input 2" Kind="InputPin" />
             <Pin Id="NQo0D6631guhAJAI8Zk2Qy" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,730,110,19" Id="GzNf2UCkRtrhP9BSWM4Vzs">
+          <Node Bounds="66,910,110,19" Id="GzNf2UCkRtrhP9BSWM4Vzs">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Map" />
@@ -362,7 +362,7 @@
             </Pin>
             <Pin Id="SjnNBit43DneVnUCAGGUuc" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,790,130,19" Id="BPZI6C7L9VIDedFJ6xPYoi">
+          <Node Bounds="66,970,130,19" Id="BPZI6C7L9VIDedFJ6xPYoi">
             <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
@@ -372,27 +372,46 @@
             <Pin Id="L76QaDFQgV3miJHNGNBDNU" Name="Diagnostics" Kind="InputPin" />
             <Pin Id="VDP79kk3xf9LcbJqns2bam" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,850,185,19" Id="LljdbZV7EQsyoLIeLeYdT2">
+          <Node Bounds="26,1030,185,19" Id="LljdbZV7EQsyoLIeLeYdT2">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
               <PinReference Kind="InputPin" Name="Bound to Document" />
               <PinReference Kind="InputPin" Name="Bounds" />
             </p:NodeReference>
+            <Pin Id="DQ39fJTjXG4Pt2yXjw38tS" Name="Node Context" Kind="InputPin" IsHidden="true" />
             <Pin Id="RuNuearbjYtsdWVMGlDFec" Name="Bounds" Kind="InputPin" DefaultValue="926, 114, 900, 560">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="B3CR4iNlE3FM6EkoNW2lGQ" Name="Save Bounds" Kind="InputPin" IsHidden="true" />
             <Pin Id="Vr8lz45vGxjdRAw0XMiT9J" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="D1Qf8F3NiLxNJDfHkkj2hs" Name="Dialog If Document Changed" Kind="InputPin" IsHidden="true" />
+            <Pin Id="QmMc1U1SspnOABbNv7p94p" Name="Always On Top" Kind="InputPin" IsHidden="true" />
+            <Pin Id="GUxFkJ7SgBKNZ7Ni1sPm37" Name="Extend Into Title Bar" Kind="InputPin" IsHidden="true" />
             <Pin Id="M4yxgTHEcIV0u34TtkbC49" Name="Input" Kind="InputPin" />
+            <Pin Id="SAS21rUe1Z0O3qlOvizmdB" Name="Title" Kind="InputPin" />
+            <Pin Id="UmraYAypqsYNy1vzGTHOVr" Name="Title Bar Interaction Width" Kind="InputPin" IsHidden="true" />
+            <Pin Id="OqyjvpPzGPPNedy4T53h44" Name="Color" Kind="InputPin" />
+            <Pin Id="E2N4K7ZExxWMdmarwQ9GvO" Name="Clear" Kind="InputPin" />
+            <Pin Id="T6YZyCiXjfLLCJ55auW1Fd" Name="Space" Kind="InputPin" />
+            <Pin Id="UaGRe3K1YcOQdMIEr13vHt" Name="Show Cursor" Kind="InputPin" />
+            <Pin Id="E9j7AJMd3uKNY2cpofWEjY" Name="VSync" Kind="InputPin" />
+            <Pin Id="JBhRyrli83tPKHBxlJ5YbP" Name="Commands" Kind="InputPin" IsHidden="true" />
+            <Pin Id="KXSdltaOoeON23FL08M56X" Name="Enable Keyboard Shortcuts" Kind="InputPin" IsHidden="true" />
+            <Pin Id="C3vCrgvitYnLbKHJQt7Gdz" Name="Enabled" Kind="InputPin" />
+            <Pin Id="EUkKLHoBHocL1iMrjTTTqH" Name="Form Bounds Notifications" Kind="OutputPin" IsHidden="true" />
+            <Pin Id="Ql7Utxk3zLkL4PUJgdO599" Name="Form" Kind="OutputPin" />
+            <Pin Id="MCRQeM1gjWaLxDbcBGbosH" Name="ClientBounds" Kind="OutputPin" />
+            <Pin Id="BzCCIA6fl1xOvRMuiG43We" Name="Render Time" Kind="OutputPin" />
           </Node>
-          <Pad Id="MBfPySLddqofNhWpPAjWq0" Bounds="780,420,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Two VectorStyles are the ends of the ramp; everything between is interpolated - fill, outline and width. Between two SymbolStyles the scale interpolates instead.">
-            <p:TypeAnnotation>
+          <Pad Id="MBfPySLddqofNhWpPAjWq0" Bounds="786,470,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Two VectorStyles are the ends of the ramp; everything between is interpolated - fill, outline and width. Between two SymbolStyles the scale interpolates instead.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -400,8 +419,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="K0RZooaiqeMTAfCZaK5mvn" Bounds="780,540,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Attribute names the numeric column; Min and Max are the ends. Try Max 33: the 66 and 100 squares clamp to full dark rather than extrapolate.">
-            <p:TypeAnnotation>
+          <Pad Id="K0RZooaiqeMTAfCZaK5mvn" Bounds="786,590,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Attribute names the numeric column; Min and Max are the ends. Try Max 33: the 66 and 100 squares clamp to full dark rather than extrapolate.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -409,8 +428,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="AR1hevrN7yLJ7iSlrO6gZF" Bounds="780,635,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; The fifth square has no value: it is not drawn, and Status counts it. Raw Mapsui would read the missing attribute as 0 and dress it in the Min style.">
-            <p:TypeAnnotation>
+          <Pad Id="AR1hevrN7yLJ7iSlrO6gZF" Bounds="786,685,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; The fifth square has no value: it is not drawn, and Status counts it. Raw Mapsui would read the missing attribute as 0 and dress it in the Min style.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -418,8 +437,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="CNJHIjHe7IMl69duCRa9S1" Bounds="780,723,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Retype Attribute to something wrong: every square vanishes and Status says whose pin to check.">
-            <p:TypeAnnotation>
+          <Pad Id="CNJHIjHe7IMl69duCRa9S1" Bounds="786,773,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Retype Attribute to something wrong: every square vanishes and Status says whose pin to check.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>

@@ -83,7 +83,7 @@
             </Pin>
             <Pin Id="MgtBdl8Oh6tbzWR9B0VSgm" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,630,130,19" Id="JHd9FDgI2PXPa770jkHHqX">
+          <Node Bounds="60,550,130,19" Id="JHd9FDgI2PXPa770jkHHqX">
             <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
@@ -93,7 +93,7 @@
             <Pin Id="RpqKsAmqUdEOXRIUsxPRpk" Name="Diagnostics" Kind="InputPin" />
             <Pin Id="Q5UxXHMHaflMtHmy9QMh5s" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,690,185,19" Id="O3xUBzwfpoEuGCSfTcsO7E">
+          <Node Bounds="20,610,185,19" Id="O3xUBzwfpoEuGCSfTcsO7E">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
@@ -131,17 +131,17 @@
             <Pin Id="KcGXHNgdnMEPHx7qNH3NzC" Name="ClientBounds" Kind="OutputPin" />
             <Pin Id="G4rA5cD7nS4MVLLzm888WS" Name="Render Time" Kind="OutputPin" />
           </Node>
-          <Pad Id="Fd46exOgIyPQZd7VSQm2F3" Comment="Longitude" Bounds="200,310,60,15" ShowValueBox="true" isIOBox="true" Value="140.85">
+          <Pad Id="Fd46exOgIyPQZd7VSQm2F3" Comment="Longitude" Bounds="114,361,60,15" ShowValueBox="true" isIOBox="true" Value="140.85">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float64" />
             </p:TypeAnnotation>
           </Pad>
-          <Pad Id="MvdwIVs95LfjsIZd2a2fj1" Comment="Latitude" Bounds="330,310,60,15" ShowValueBox="true" isIOBox="true" Value="36.25">
+          <Pad Id="MvdwIVs95LfjsIZd2a2fj1" Comment="Latitude" Bounds="244,361,60,15" ShowValueBox="true" isIOBox="true" Value="36.25">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float64" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="60,340,110,19" Id="OBRbzguAlUB1mHOoEn6EGQ">
+          <Node Bounds="60,400,110,19" Id="OBRbzguAlUB1mHOoEn6EGQ">
             <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="CenterOn" />
@@ -152,12 +152,15 @@
             <Pin Id="CSUi3JLMM9eULPsIVK1FzK" Name="Latitude" Kind="InputPin" />
             <Pin Id="Rqgm8P7ubQjhsjGle1Q6p1" Name="Output" Kind="OutputPin" />
           </Node>
-          <Pad Id="AqPZOGjbq3s0B5yqgREvJP" Comment="Zoom Level" Bounds="200,360,40,15" ShowValueBox="true" isIOBox="true" Value="5">
+          <Pad Id="AqPZOGjbq3s0B5yqgREvJP" Comment="Zoom Level" Bounds="200,450,40,15" ShowValueBox="true" isIOBox="true" Value="9">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Integer32" />
             </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:stepsize p:Type="Int32">1</p:stepsize>
+            </p:ValueBoxSettings>
           </Pad>
-          <Node Bounds="60,390,110,19" Id="Q2ehlRsKXVegnHQMmcwnLE">
+          <Node Bounds="60,480,110,19" Id="Q2ehlRsKXVegnHQMmcwnLE">
             <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="ZoomToLevel" />
@@ -167,7 +170,7 @@
             <Pin Id="NCwv3ckO45HlQTPxs2yIzE" Name="Zoom Level" Kind="InputPin" />
             <Pin Id="EpdwdawDuPMyD36aIAel0y" Name="Output" Kind="OutputPin" />
           </Node>
-          <Pad Id="Q3d7HBRj6EoTknOpnFBFWQ" Bounds="560,303,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Longitude first, then latitude - x before y, as everywhere here. Edit either and the view moves; the graticule labels say where you are.">
+          <Pad Id="Q3d7HBRj6EoTknOpnFBFWQ" Bounds="456,369,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Longitude first, then latitude - x before y, as everywhere here. Edit either and the view moves; the graticule labels say where you are.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -176,7 +179,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="SQi3OB2rGwvIzGET5VRIS5" Bounds="560,374,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; 0 is the whole world, 19 is a building. Try 2, 10, 15.">
+          <Pad Id="SQi3OB2rGwvIzGET5VRIS5" Bounds="456,447,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; 0 is the whole world, 19 is a building. Try 2, 10, 15.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -185,7 +188,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="DKO7k32mO0bGqz8liMVqIN" Bounds="560,702,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Map, then the Navigate nodes, then ToSkiaLayer: the map goes in at the top and comes out moved.">
+          <Pad Id="DKO7k32mO0bGqz8liMVqIN" Bounds="456,300,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Map, then the Navigate nodes, then ToSkiaLayer: the map goes in at the top and comes out moved.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>

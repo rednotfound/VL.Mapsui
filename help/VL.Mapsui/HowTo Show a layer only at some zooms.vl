@@ -2,7 +2,7 @@
 <Document xmlns:p="property" xmlns:r="reflection" Id="HJDzfn0aHLYpGNxR2l8gDY" LanguageVersion="2025.7.4" Version="0.128">
   <NugetDependency Id="GiryhXwP8KbKP3MvV8pMiu" Location="VL.CoreLib" Version="2025.7.4" />
   <NugetDependency Id="KxGk10RsN6k7enxOO2Z8d3" Location="VL.Skia" Version="2025.7.4" />
-  <NugetDependency Id="UtK2ofcItXbCxU1CXGJho1" Location="VL.NetTopologySuite" Version="0.0.0" />
+  <NugetDependency Id="UtK2ofcItXbCxU1CXGJho1" Location="VL.NetTopologySuite" Version="0.0.1-alpha" />
   <Patch Id="DOWTzXepZde8d9EZ6O4Kpy">
     <Canvas Id="So21hEtcjV1JyJvNC4Z8EI" DefaultCategory="Main" BordersChecked="false" CanvasType="FullCategory" />
     <!--
@@ -18,7 +18,7 @@
       <Patch Id="TXEmTPReP90fDUJVkoPLbm">
         <Canvas Id="UGPUoZ2j390D4CsJ6Z9FfQ" CanvasType="Group">
           <Pad Id="UlJY3PTIqzMnLMcCS0gcJS" Bounds="60,40,285,41" ShowValueBox="true" isIOBox="true" Value="Use VisibleRange!">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -27,7 +27,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="GpKFclr7MhPfCHCtmYBDZd" Bounds="60,90,520,64" ShowValueBox="true" isIOBox="true" Value="Draw order decides what covers what; it does not reduce anything. A layer declares the zoom levels it belongs to and outside them it is skipped - the one thing that keeps a busy map readable.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -35,7 +35,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="TlR4k3j1scjx1d37rSqu13" Comment="WKT" Bounds="60,190,440,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((135.7551 34.9834, 135.7611 34.9834, 135.7611 34.9884, 135.7551 34.9884, 135.7551 34.9834))">
+          <Pad Id="TlR4k3j1scjx1d37rSqu13" Comment="WKT" Bounds="62,190,440,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((135.7551 34.9834, 135.7611 34.9834, 135.7611 34.9884, 135.7551 34.9884, 135.7551 34.9834))">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -77,7 +77,7 @@
               <Choice Kind="TypeFlag" Name="Integer32" />
             </p:TypeAnnotation>
           </Pad>
-          <Pad Id="Ci5HdZtWNPQIFQQAddcSzb" Comment="To Zoom" Bounds="300,350,40,15" ShowValueBox="true" isIOBox="true" Value="30">
+          <Pad Id="Ci5HdZtWNPQIFQQAddcSzb" Comment="To Zoom" Bounds="328,350,40,15" ShowValueBox="true" isIOBox="true" Value="30">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Integer32" />
             </p:TypeAnnotation>
@@ -94,8 +94,8 @@
             <Pin Id="MyvPWrTzjZ9YovxsGcylML" Name="Output" Kind="OutputPin" />
             <Pin Id="V4PLQpm4rL4VwJ8EcFpbrk" Name="Status" Kind="OutputPin" />
           </Node>
-          <Pad Id="N13aIAF0JBf4K6sGfaMM4u" Comment="Status" Bounds="200,385,340,15" ShowValueBox="true" isIOBox="true" />
-          <Node Bounds="300,430,110,19" Id="KnFHCQ8kXwwSF3EwYBccOM">
+          <Pad Id="N13aIAF0JBf4K6sGfaMM4u" Comment="Status" Bounds="167,410,95,15" ShowValueBox="true" isIOBox="true" />
+          <Node Bounds="94,430,110,19" Id="KnFHCQ8kXwwSF3EwYBccOM">
             <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Graticule" />
@@ -108,7 +108,7 @@
             <Pin Id="GWWGYdBTcN9oP8LJWvGmJC" Name="Result" Kind="OutputPin" />
             <Pin Id="JI5sXgWrdES7pjVOTJUkpH" Name="Lines Built" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,430,39,19" Id="STpaP4bt8V2osasZhMuBFx">
+          <Node Bounds="60,470,39,19" Id="STpaP4bt8V2osasZhMuBFx">
             <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Cons" />
@@ -118,7 +118,7 @@
             <Pin Id="Ue5OqOCyGDz2McPSAzGRrj" Name="Input 2" Kind="InputPin" />
             <Pin Id="CJQyTcYkCNaOdmoSEO1oaH" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,480,110,19" Id="It6RlPNoTE7JuH9r1S6W2a">
+          <Node Bounds="60,520,110,19" Id="It6RlPNoTE7JuH9r1S6W2a">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Map" />
@@ -145,7 +145,7 @@
             </Pin>
             <Pin Id="R3Hlqj2jTrf6EOdVPqRKSv" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,590,130,19" Id="MC9klUXLtgElxhfy5YKUhz">
+          <Node Bounds="60,630,130,19" Id="MC9klUXLtgElxhfy5YKUhz">
             <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
@@ -155,31 +155,50 @@
             <Pin Id="No46qdgzOknxGWAwmvWxPU" Name="Diagnostics" Kind="InputPin" />
             <Pin Id="HmD4l1jF218rEwZgIbrG4g" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,650,185,19" Id="ViIO6SmebYxjmjwx4c8TiQ">
+          <Node Bounds="20,700,185,19" Id="ViIO6SmebYxjmjwx4c8TiQ">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
               <PinReference Kind="InputPin" Name="Bounds" />
               <PinReference Kind="InputPin" Name="Bound to Document" />
             </p:NodeReference>
+            <Pin Id="RBvw4lb5WGxLw2O42BPDEq" Name="Node Context" Kind="InputPin" IsHidden="true" />
             <Pin Id="A77WuGpU5VWplMhNvCKzMH" Name="Bounds" Kind="InputPin" DefaultValue="926, 114, 900, 560">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="V4N0SEM1KQuOlN7p4HMzDY" Name="Save Bounds" Kind="InputPin" IsHidden="true" />
             <Pin Id="PYhLjh2UVTclH6svvouECi" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="AEfHGhwpr58NcBbCCZm0YM" Name="Dialog If Document Changed" Kind="InputPin" IsHidden="true" />
+            <Pin Id="OvWy2c8TT06PGAtV8J0CUl" Name="Always On Top" Kind="InputPin" IsHidden="true" />
+            <Pin Id="Pb8TxxCwtNvMAHpwCrwxX6" Name="Extend Into Title Bar" Kind="InputPin" IsHidden="true" />
             <Pin Id="GRyDNmIcdbef780OZZZLBn" Name="Input" Kind="InputPin" />
+            <Pin Id="UAncUHQjSlFLBdlzk5TiZN" Name="Title" Kind="InputPin" />
+            <Pin Id="SwJaG6YofiJOmNfPRHyCQU" Name="Title Bar Interaction Width" Kind="InputPin" IsHidden="true" />
+            <Pin Id="JScNvZpkKOxPIhdMpnLn14" Name="Color" Kind="InputPin" />
+            <Pin Id="GJIgOO2T2UUMDWJlxsHkfL" Name="Clear" Kind="InputPin" />
+            <Pin Id="UKN0WzdycKROoeQhmrpBzF" Name="Space" Kind="InputPin" />
+            <Pin Id="HE9Zare7KezMAiq1V6oywr" Name="Show Cursor" Kind="InputPin" />
+            <Pin Id="SadFBKOONRJOAuFHedETVT" Name="VSync" Kind="InputPin" />
+            <Pin Id="AZktxBYX9k4PEXsXoqm3Al" Name="Commands" Kind="InputPin" IsHidden="true" />
+            <Pin Id="Lwvrhy0N8c0M0C4h4taZjG" Name="Enable Keyboard Shortcuts" Kind="InputPin" IsHidden="true" />
+            <Pin Id="BxUJruzY6i4MLVvmyxThsl" Name="Enabled" Kind="InputPin" />
+            <Pin Id="PEokBcGjvzxPM6S5l58Biw" Name="Form Bounds Notifications" Kind="OutputPin" IsHidden="true" />
+            <Pin Id="HxEGz4lq6GoQbSYJdQXU21" Name="Form" Kind="OutputPin" />
+            <Pin Id="DKxu0d5IAnhOBWnXlIrTBu" Name="ClientBounds" Kind="OutputPin" />
+            <Pin Id="CcCJ1jUBD8VLusPneMfAFI" Name="Render Time" Kind="OutputPin" />
           </Node>
-          <Pad Id="AuwNkQOAdAYVwG2DHU3GbN" Comment="Zoom Level" Bounds="300,500,40,15" ShowValueBox="true" isIOBox="true" Value="15">
+          <Pad Id="AuwNkQOAdAYVwG2DHU3GbN" Comment="Zoom Level" Bounds="307,540,40,15" ShowValueBox="true" isIOBox="true" Value="15">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Integer32" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="200,540,110,19" Id="IpklfylUalYRSM2ng6N807">
+          <Node Bounds="200,580,110,19" Id="IpklfylUalYRSM2ng6N807">
             <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="ZoomToLevel" />
@@ -189,8 +208,8 @@
             <Pin Id="ABUziGCrUtpGBmKuWCYzL9" Name="Zoom Level" Kind="InputPin" />
             <Pin Id="AvG2EKWJsyZfASztUOAEdY" Name="Output" Kind="OutputPin" />
           </Node>
-          <Pad Id="PNdlFEBoMx5zUwS6mTQv3u" Bounds="640,350,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; From 13 to 30: drawn at 13 and closer, skipped further out. Both named levels are inside the range.">
-            <p:TypeAnnotation>
+          <Pad Id="PNdlFEBoMx5zUwS6mTQv3u" Bounds="444,351,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; From 13 to 30: drawn at 13 and closer, skipped further out. Both named levels are inside the range.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -198,8 +217,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="DF80ONaSdgpaiDptQVZKoh" Bounds="640,420,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; The same layer object comes back with two properties set, so the map does not rebuild. Status says so if a layer cannot be ranged.">
-            <p:TypeAnnotation>
+          <Pad Id="DF80ONaSdgpaiDptQVZKoh" Bounds="444,421,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; The same layer object comes back with two properties set, so the map does not rebuild. Status says so if a layer cannot be ranged.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -207,8 +226,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="JnM4Nf0IJfoWxj3n73kShS" Bounds="640,508,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Set Zoom Level to 12: the square is gone, the grid stays. Back to 13 and it returns. A hard cut, no fading.">
-            <p:TypeAnnotation>
+          <Pad Id="JnM4Nf0IJfoWxj3n73kShS" Bounds="444,552,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Set Zoom Level to 12: the square is gone, the grid stays. Back to 13 and it returns. A hard cut, no fading.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -216,8 +235,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="Ku92BiIo4dFiH5RRp2vxU9" Bounds="640,578,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; ZoomToLevel is wired every frame here, so the pad IS the zoom. With a mouse driving the map you would not do that.">
-            <p:TypeAnnotation>
+          <Pad Id="Ku92BiIo4dFiH5RRp2vxU9" Bounds="444,622,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; ZoomToLevel is wired every frame here, so the pad IS the zoom. With a mouse driving the map you would not do that.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>

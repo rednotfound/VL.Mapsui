@@ -2,7 +2,7 @@
 <Document xmlns:p="property" xmlns:r="reflection" Id="BWBKfAiOlzgS2IGtZQcgQw" LanguageVersion="2025.7.4" Version="0.128">
   <NugetDependency Id="NdA71TDbFKCnrZ8ZufiyuH" Location="VL.CoreLib" Version="2025.7.4" />
   <NugetDependency Id="J07LIlZAbBLwvCYiYJg0is" Location="VL.Skia" Version="2025.7.4" />
-  <NugetDependency Id="Luy6mtxzN0tRT9YfpSbhBi" Location="VL.NetTopologySuite" Version="0.0.0" />
+  <NugetDependency Id="Luy6mtxzN0tRT9YfpSbhBi" Location="VL.NetTopologySuite" Version="0.0.1-alpha" />
   <Patch Id="QlNsWQnFsTwr0B2I2VYBdo">
     <Canvas Id="FhmazDD4h8hBkcy6Li3fgQ" DefaultCategory="Main" BordersChecked="false" CanvasType="FullCategory" />
     <!--
@@ -18,7 +18,7 @@
       <Patch Id="GaEz2c5UYnSDVZ4Wc09Tsq">
         <Canvas Id="O3e07y1xJi7Gq637egClvY" CanvasType="Group">
           <Pad Id="BNKSNsD68RV2FaUE43t0fI" Bounds="60,40,225,41" ShowValueBox="true" isIOBox="true" Value="Use Geometry!">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -27,7 +27,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="JE82mbNhfawRsTL2HxTtnP" Bounds="60,90,520,82" ShowValueBox="true" isIOBox="true" Value="The shortest way from a shape to a map: one WKT, one layer, one colour. It has no attributes - the moment you want to label it, colour it by a value or pick it, you want a Feature instead (HowTo Draw your own shapes).">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -35,7 +35,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="Av2nqP4XokzwAn3E6mTCPZ" Comment="WKT" Bounds="60,190,440,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((135.7551 34.9834, 135.7611 34.9834, 135.7611 34.9884, 135.7551 34.9884, 135.7551 34.9834))">
+          <Pad Id="Av2nqP4XokzwAn3E6mTCPZ" Comment="WKT" Bounds="62,200,214,15" ShowValueBox="true" isIOBox="true" Value="POLYGON ((135.7551 34.9834, 135.7611 34.9834, 135.7611 34.9884, 135.7551 34.9884, 135.7551 34.9834))">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -59,17 +59,17 @@
             <Pin Id="GRopI1pWQ6x2Xl1sWOSuSR" Name="Input" Kind="InputPin" />
             <Pin Id="JHsar59s3slzvcdZo25MtN" Name="Result" Kind="OutputPin" />
           </Node>
-          <Pad Id="Cix264TMmD2MKemTp2af3X" Comment="Fill Color" Bounds="200,290,120,15" ShowValueBox="true" isIOBox="true" Value="0.2, 0.5, 0.9, 0.4">
+          <Pad Id="Cix264TMmD2MKemTp2af3X" Comment="Fill Color" Bounds="97,331,34,15" ShowValueBox="true" isIOBox="true" Value="0.2, 0.5, 0.9, 0.4">
             <p:TypeAnnotation LastCategoryFullName="Color" LastDependency="CoreLibBasics.vl">
               <Choice Kind="TypeFlag" Name="RGBA" />
             </p:TypeAnnotation>
           </Pad>
-          <Pad Id="OE6xBSjl6c1CiwB1motI0X" Comment="Line Width" Bounds="400,290,40,15" ShowValueBox="true" isIOBox="true" Value="3">
+          <Pad Id="OE6xBSjl6c1CiwB1motI0X" Comment="Line Width" Bounds="167,360,40,15" ShowValueBox="true" isIOBox="true" Value="3">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float32" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="60,330,110,19" Id="FJexBxwMwP1rmY6mDFD2tu">
+          <Node Bounds="60,380,110,19" Id="FJexBxwMwP1rmY6mDFD2tu">
             <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Geometry" />
@@ -82,8 +82,8 @@
             <Pin Id="HeM6YISJaZXkY1DCQqxNPs" Name="Result" Kind="OutputPin" />
             <Pin Id="O7uTxAHivlGWzra3vrsmKS" Name="Layers Built" Kind="OutputPin" />
           </Node>
-          <Pad Id="O2AwHLxS9H4BVoRmCRqRWT" Comment="Layers Built" Bounds="200,335,40,15" ShowValueBox="true" isIOBox="true" />
-          <Node Bounds="300,380,110,19" Id="Suw5t1xVAi0HFGzM0IwdHI">
+          <Pad Id="O2AwHLxS9H4BVoRmCRqRWT" Comment="Layers Built" Bounds="167,440,40,15" ShowValueBox="true" isIOBox="true" />
+          <Node Bounds="94,480,110,19" Id="Suw5t1xVAi0HFGzM0IwdHI">
             <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Graticule" />
@@ -96,7 +96,7 @@
             <Pin Id="NzF7PE7q3nVdoWMTkYxYFH" Name="Result" Kind="OutputPin" />
             <Pin Id="KY4NmAwCav9dFcj7vsCaWi" Name="Lines Built" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,430,39,19" Id="MyL5Ze2RmjSjlcYzmPsYiv">
+          <Node Bounds="60,520,39,19" Id="MyL5Ze2RmjSjlcYzmPsYiv">
             <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Cons" />
@@ -106,7 +106,7 @@
             <Pin Id="HLmDUIkydHGcZXbMUa1HLU" Name="Input 2" Kind="InputPin" />
             <Pin Id="Mcval7rMmC0KvrLF7c5rPF" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,480,110,19" Id="EeDy06SdhdyLNX4LW2a4aS">
+          <Node Bounds="60,570,110,19" Id="EeDy06SdhdyLNX4LW2a4aS">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Map" />
@@ -133,7 +133,7 @@
             </Pin>
             <Pin Id="Iib6M6He2mVUe4XGEA82Lg" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,540,130,19" Id="B9bhHjNqY9aC218SJ8LP8l">
+          <Node Bounds="60,630,130,19" Id="B9bhHjNqY9aC218SJ8LP8l">
             <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
@@ -143,27 +143,46 @@
             <Pin Id="AGO7EjuVR6u8KxE8EKwMhs" Name="Diagnostics" Kind="InputPin" />
             <Pin Id="JR9IhBdF7GdBKmsmab0pKX" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,600,185,19" Id="UhWcqSqMNu1IKMrgKHjWcp">
+          <Node Bounds="20,680,185,19" Id="UhWcqSqMNu1IKMrgKHjWcp">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
               <PinReference Kind="InputPin" Name="Bound to Document" />
               <PinReference Kind="InputPin" Name="Bounds" />
             </p:NodeReference>
+            <Pin Id="Lem7rB5snebNSb6BuJE1Ls" Name="Node Context" Kind="InputPin" IsHidden="true" />
             <Pin Id="TJacAq104y1B0NEUr0IqRH" Name="Bounds" Kind="InputPin" DefaultValue="926, 114, 900, 560">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="ECpWjD4ijxJMEVNc2osgEc" Name="Save Bounds" Kind="InputPin" IsHidden="true" />
             <Pin Id="QUtGiIK4bAdqEs51shOfNt" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="NJksQ82kaI3O2VrfH0oWUT" Name="Dialog If Document Changed" Kind="InputPin" IsHidden="true" />
+            <Pin Id="QGtP62e0PGVLvSJstU6S2x" Name="Always On Top" Kind="InputPin" IsHidden="true" />
+            <Pin Id="NopzDKi3r6tLg95BfLDxG8" Name="Extend Into Title Bar" Kind="InputPin" IsHidden="true" />
             <Pin Id="QZsaCGmgujQ0nzhKE3TcoM" Name="Input" Kind="InputPin" />
+            <Pin Id="JnPSNtjtqA1NrSu3xrmUYw" Name="Title" Kind="InputPin" />
+            <Pin Id="OatVo660Dc5Mf8Z1t3A7EX" Name="Title Bar Interaction Width" Kind="InputPin" IsHidden="true" />
+            <Pin Id="CUUUofKxaK0MSqyKPIz3bT" Name="Color" Kind="InputPin" />
+            <Pin Id="Du4YHVYEbzHLbembTVUKBG" Name="Clear" Kind="InputPin" />
+            <Pin Id="QRmom6plNzTOKAvvf35Cw1" Name="Space" Kind="InputPin" />
+            <Pin Id="G0AMJw3fm9rOtAIDwxK7z5" Name="Show Cursor" Kind="InputPin" />
+            <Pin Id="EKgiSQJM50iMw8GRX9X69p" Name="VSync" Kind="InputPin" />
+            <Pin Id="NEaBn7tTNtRPqQeRmzd8At" Name="Commands" Kind="InputPin" IsHidden="true" />
+            <Pin Id="TRN7Do3D1HrQMKSJoZCXT8" Name="Enable Keyboard Shortcuts" Kind="InputPin" IsHidden="true" />
+            <Pin Id="UZ6KDVCfLLlL1yvzVV4gxw" Name="Enabled" Kind="InputPin" />
+            <Pin Id="ObUZOYgjNRIPe4QAtWFbfy" Name="Form Bounds Notifications" Kind="OutputPin" IsHidden="true" />
+            <Pin Id="OnqZBXSpLvGOn6FYZq9XJC" Name="Form" Kind="OutputPin" />
+            <Pin Id="RgfqD8oriy2O2i9v8PiX87" Name="ClientBounds" Kind="OutputPin" />
+            <Pin Id="Va3KFjK36GcNoRCNrSisMd" Name="Render Time" Kind="OutputPin" />
           </Node>
-          <Pad Id="HQYo7zALehLCwzyz03SRnb" Bounds="560,190,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; Any WKT. Edit it and the shape follows; the map does not move.">
-            <p:TypeAnnotation>
+          <Pad Id="HQYo7zALehLCwzyz03SRnb" Bounds="332,190,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; Any WKT. Edit it and the shape follows; the map does not move.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -171,8 +190,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="OJ1dIYlNgL5cN96AerkJPe" Bounds="560,242,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; From VL.NetTopologySuite. VL.Mapsui draws geometry; it never makes it.">
-            <p:TypeAnnotation>
+          <Pad Id="OJ1dIYlNgL5cN96AerkJPe" Bounds="332,234,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; From VL.NetTopologySuite. VL.Mapsui draws geometry; it never makes it.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -180,8 +199,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="Lr8Lz2GcLYYViuJKh0RB8P" Bounds="560,330,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; One layer, one colour, no attributes. Unconnected colours get sensible defaults.">
-            <p:TypeAnnotation>
+          <Pad Id="Lr8Lz2GcLYYViuJKh0RB8P" Bounds="332,385,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; One layer, one colour, no attributes. Unconnected colours get sensible defaults.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -189,8 +208,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="IPSYPWrzXxo2iMbcHXXLtm" Bounds="560,382,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; No tiles on purpose: the graticule is the offline basemap. Put OpenStreetMap in the Cons instead when you want the world under it.">
-            <p:TypeAnnotation>
+          <Pad Id="IPSYPWrzXxo2iMbcHXXLtm" Bounds="332,493,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; No tiles on purpose: the graticule is the offline basemap. Put OpenStreetMap in the Cons instead when you want the world under it.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -198,8 +217,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="QsQa96RgFVDLQnNxlQRHW7" Bounds="560,480,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; Initial Center and Zoom Level are pin defaults, so the window opens over the shape.">
-            <p:TypeAnnotation>
+          <Pad Id="QsQa96RgFVDLQnNxlQRHW7" Bounds="332,577,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; Initial Center and Zoom Level are pin defaults, so the window opens over the shape.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -207,8 +226,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="UZ4fiSk96wnZ56rs3bMgh8" Bounds="560,540,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; Layers Built stays at 1. If it climbs frame after frame, close vvvv.">
-            <p:TypeAnnotation>
+          <Pad Id="UZ4fiSk96wnZ56rs3bMgh8" Bounds="332,434,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; Layers Built stays at 1. If it climbs frame after frame, close vvvv.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
