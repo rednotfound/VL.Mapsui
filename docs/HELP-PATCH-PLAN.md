@@ -126,7 +126,7 @@ Topics are `Help.xml` topics. **bold** = the node's `High` flag lives here. ★ 
 | Layers | HowTo Stack several layers | order = spread order, `Enabled` as the switch (no High of its own) | yes |
 | | ★ HowTo Show a layer only at some zooms | **VisibleRange** | yes |
 | | ★ HowTo Frame your data | **ZoomToLayer, ZoomToLayers** | yes |
-| Where the map looks | ★ HowTo Set the view | **CenterOn, ZoomToLevel, ZoomAt, Refresh** | yes |
+| Where the map looks | ★ HowTo Set the view | **CenterOn, ZoomToLevel** (ZoomAt, Refresh until their removal, 2026-09-25) | yes |
 | | HowTo Drive the map with the mouse | **Drag, ZoomByWheel, ZoomIn, ZoomOut, DragBetween** | yes |
 | Asking the map | HowTo Pick what you clicked | **Pick** (+ `Split` from NTS, Low) | yes |
 | | ★ HowTo Convert screen and world | **ScreenToWorld, WorldToScreen** — cursor → lon/lat, lon/lat → a Skia circle on the map | yes |

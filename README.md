@@ -31,7 +31,7 @@ Mapsui.Layers    OpenStreetMap   Enabled, Cache To Disk, Cache Folder
                                                            -> a tile layer + Layers Built, Cache Status
 Mapsui.Layers    CacheFolder     Folder                    -> where tiles go + Tiles, Size MB
 Mapsui           Map             Layers, initial view      -> a map
-Mapsui.Navigate  CenterOn  ZoomToLevel  Drag  ZoomAt  ZoomByWheel  ZoomIn  ZoomOut  Refresh
+Mapsui.Navigate  CenterOn  ZoomToLevel  Drag  ZoomByWheel  ZoomIn  ZoomOut
 Mapsui           ViewportInfo  LayerInfo                    (readers)
 Mapsui.Skia      ToSkiaLayer     Map                       -> a VL.Skia layer
 ```

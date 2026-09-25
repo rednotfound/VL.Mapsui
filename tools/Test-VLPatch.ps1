@@ -395,7 +395,7 @@ if (-not $Path) {
 # the node's Node Info. Measured 2026-09-24: 511 of vvvv 7.4's 689 shipped help patches carry flags.
 if (-not $Path) {
     Write-Host "`nvalidating help flags (F1)" -ForegroundColor Cyan
-    # The 35 public nodes of VL.Mapsui (src\VL.Mapsui; 36 until ToFeatures was removed 2026-09-25): every [ProcessNode] and every
+    # The 33 public nodes of VL.Mapsui (src\VL.Mapsui; 36 until ToFeatures, ZoomAt and Refresh were removed 2026-09-25): every [ProcessNode] and every
     # public static method of a [Name]d static class. A node added to the package and not here is
     # invisible to this audit, so keep the two in step - docs\MAPSUI-SURFACE.md lists the same set.
     $ourNodes = @(
@@ -405,8 +405,8 @@ if (-not $Path) {
         'Mapsui.Layers|TileCache', 'Mapsui.Layers|Graticule', 'Mapsui.Layers|VisibleRange',
         'Mapsui.Styles|VectorStyle', 'Mapsui.Styles|SymbolStyle', 'Mapsui.Styles|LabelStyle',
         'Mapsui.Styles|StyleByGeometry', 'Mapsui.Styles|StyleByValue',
-        'Mapsui.Navigate|CenterOn', 'Mapsui.Navigate|ZoomToLevel', 'Mapsui.Navigate|ZoomAt', 'Mapsui.Navigate|ZoomByWheel',
-        'Mapsui.Navigate|DragBetween', 'Mapsui.Navigate|Refresh', 'Mapsui.Navigate|ZoomToLayer', 'Mapsui.Navigate|ZoomToLayers',
+        'Mapsui.Navigate|CenterOn', 'Mapsui.Navigate|ZoomToLevel', 'Mapsui.Navigate|ZoomByWheel',
+        'Mapsui.Navigate|DragBetween', 'Mapsui.Navigate|ZoomToLayer', 'Mapsui.Navigate|ZoomToLayers',
         'Mapsui.Navigate|Drag', 'Mapsui.Navigate|ZoomIn', 'Mapsui.Navigate|ZoomOut',
         'Mapsui.Widgets|ScaleBar', 'Mapsui.Widgets|Attribution', 'Mapsui.Widgets|ZoomButtons', 'Mapsui.Widgets|Click',
         'Mapsui.Skia|ToSkiaLayer')

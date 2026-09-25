@@ -5,6 +5,24 @@ them do not belong here.
 
 ---
 
+## 2026-09-25 — ZoomAt and Refresh removed: an IOBox could not make either one do anything
+
+The user, in HowTo Set the view: "I edited the parameters and got no feedback at all." Both were
+true, for different reasons.
+
+- **ZoomAt needs a one-frame pulse.** Mapsui's `MouseWheelZoom` starts an animation and reads only
+  the sign. Measured: Steps held at 1 for 120 frames moved level 5 (4892 m/px) to **4882**, because
+  every call restarts the animation from where it is; a single frame of 1 lands exactly on level 6
+  (**2446**). An IOBox holds its value, so a person typing 1 sees nothing. The two nodes that need
+  it already make the pulse — ZoomByWheel from FrameDifference, ZoomIn/ZoomOut from a trigger's
+  rising edge — so it stays as their `internal` helper.
+- **Refresh had no visible effect in any patch this package can build.** Every node that moves the
+  map already calls it, and Map refreshes when its layers change. Also `internal` now.
+
+HowTo Set the view is edited in place (the user's layout otherwise untouched): ZoomAt, Refresh,
+their four pads and two notes gone, ZoomToLevel wired straight to ToSkiaLayer. 33 nodes, 244 tests,
+19 patches compile with 23 process nodes in Create; opened in vvvv, zoom 5 over Japan.
+
 ## 2026-09-25 — ToFeatures removed; the user's replacement builds each Feature in a ForEach
 
 The user questioned `ToFeatures` while reviewing `HowTo Draw many features`: the record is the

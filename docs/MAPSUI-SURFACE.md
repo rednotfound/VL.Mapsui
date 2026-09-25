@@ -31,7 +31,7 @@ out to be sitting in a Mapsui dependency we already ship.
 | `TileCache` | `Mapsui.Layers` | the disk cache itself: where tiles go and how much is there |
 | `Map` | `Mapsui` | the `Map` and its layer collection |
 | `ViewportInfo`, `LayerInfo` | `Mapsui` | readers — centre, resolution, size; layer count and busy |
-| `CenterOn`, `ZoomToLevel`, `ZoomAt`, `ZoomByWheel`, `DragBetween`, `Refresh` | `Mapsui.Navigate` | the navigator |
+| `CenterOn`, `ZoomToLevel`, `ZoomByWheel`, `DragBetween` | `Mapsui.Navigate` | the navigator |
 | `ZoomToLayer`, `ZoomToLayers` | `Mapsui.Navigate` | put the view where the data is, on a trigger. Framing every frame would pin the view and the map could not be moved |
 | `Drag`, `ZoomIn`, `ZoomOut` | `Mapsui.Navigate` | stateful gestures — they remember the previous frame |
 | `ScaleBar`, `Attribution`, `ZoomButtons` | `Mapsui.Widgets` | Mapsui's own furniture, added to a map once each |
@@ -52,6 +52,8 @@ performance argument it carried belonged to building the data once, which a `Spr
 in `Create` or a `Cache` region gets equally. The shape now taught: records for the data, a
 `ForEach` that `Split`s each and builds a `Feature [NTS.Feature]`, `FeatureLayer` takes the spread.
 No sibling patch used it.
+
+**ZoomAt and Refresh were removed the same day**, after the user found both inert in `HowTo Set the view`. `ZoomAt` only works with a one-frame pulse - measured: Steps held at 1 for 120 frames moved level 5 from 4892 to 4882 m/px, because each call restarts Mapsui's wheel animation, while one frame of 1 lands exactly on level 6 - so an IOBox showed nothing, and the nodes that need it (`ZoomByWheel`, `ZoomIn`, `ZoomOut`) already make the pulse. `Refresh` is called by every node that moves the map and by `Map` when its layers change, so no patch of this package's nodes ever needs it. Both stay as internal methods.
 
 **`Feature` and `Split` are no longer here.** They moved to VL.NetTopologySuite's `NTS.Feature`
 category on 2026-08-22, because a feature is a data-model object that must be constructible

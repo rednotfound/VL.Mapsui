@@ -125,7 +125,7 @@ if ($patches.Count -eq 0) { throw "No help patch matches -Patch '$Patch'" }
 
 # Every node this package contributes, by the name the patch uses, and the C# a resolved call
 # must contain. A static method compiles to `Class.Method(`; a process node to `new ClassNode(`.
-# 35 entries (ToFeatures removed 2026-09-25), the same set as tools\Test-VLPatch.ps1's $ourNodes and docs\MAPSUI-SURFACE.md.
+# 33 entries (ToFeatures, ZoomAt, Refresh removed 2026-09-25), the same set as tools\Test-VLPatch.ps1's $ourNodes and docs\MAPSUI-SURFACE.md.
 #
 # A node the patch names that is NOT in this table is itself a failure, so that adding a node
 # to the package and forgetting it here shows up the first time a patch uses it.
@@ -155,10 +155,8 @@ $OurNodes = @{
     # Mapsui.Navigate
     'CenterOn'        = 'NavigateNodes\.CenterOn\('
     'ZoomToLevel'     = 'NavigateNodes\.ZoomToLevel\('
-    'ZoomAt'          = 'NavigateNodes\.ZoomAt\('
     'ZoomByWheel'     = 'NavigateNodes\.ZoomByWheel\('
     'DragBetween'     = 'NavigateNodes\.DragBetween\('
-    'Refresh'         = 'NavigateNodes\.Refresh\('
     'ZoomToLayer'     = 'new\s+[\w\.]*ZoomToLayerNode\('
     'ZoomToLayers'    = 'new\s+[\w\.]*ZoomToLayersNode\('
     'Drag'            = 'new\s+[\w\.]*DragNode\('

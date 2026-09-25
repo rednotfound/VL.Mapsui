@@ -31,7 +31,7 @@
 		<VLDocument link="HowTo Frame your data.vl" tags="zoomToLayer,zoomToLayers,frame,extent,fit,bounds,home,showAll,trigger,bang,margin,navigate" />
 	</Topic>
 	<Topic title="Where the map looks">
-		<VLDocument link="HowTo Set the view.vl" tags="centerOn,zoomToLevel,zoomAt,refresh,navigate,view,viewport,center,zoom,level,longitude,latitude" />
+		<VLDocument link="HowTo Set the view.vl" tags="centerOn,zoomToLevel,navigate,view,viewport,center,zoom,level,longitude,latitude" />
 		<VLDocument link="HowTo Drive the map with the mouse.vl" tags="mouse,drag,pan,wheel,zoom,zoomByWheel,zoomIn,zoomOut,frameDifference,mouseState,console,interaction" />
 	</Topic>
 	<Topic title="Asking the map">

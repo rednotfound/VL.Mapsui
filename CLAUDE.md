@@ -25,7 +25,7 @@ published `0.2.0-alpha` still declares BruTile 6 and conflicts with this package
 **Current state (2026-09-24): a working package, not yet published.** A map renders in vvvv 7.4,
 pans, zooms and takes geometry from any NTS source. `VL.Mapsui.nuspec`, `build.ps1`, `pack.ps1`,
 `tools\Test-VLPackage.ps1` and **186 tests** exist. Nothing is on nuget.org. **The help is now the
-second test suite: 19 patches in the community's measured style, every one of the 35 nodes opens
+second test suite: 19 patches in the community's measured style, every one of the 33 nodes opens
 one on F1** (`tools\Test-VLPatch.ps1` audits the flags), all 19 compile with every process node
 constructed in `Create` (`tools\Compile-HelpPatches.ps1` reads the generated C#), and each was
 opened in vvvv and photographed. The plan, the decisions and what the patches found are in
@@ -230,7 +230,7 @@ vl-mapsui/
 │   ├── GeometryThemeNodes.cs     # [ProcessNode] StyleByGeometry - one style per geometry type
 │   ├── GeometryLayerNodes.cs     # [ProcessNode] Geometry - the shortcut, composed from those three
 │   ├── MapNode.cs                # [ProcessNode] Map + ViewportInfo / LayerInfo readers
-│   ├── NavigateNodes.cs          # CenterOn, ZoomToLevel, ZoomByWheel, Refresh …
+│   ├── NavigateNodes.cs          # CenterOn, ZoomToLevel, ZoomByWheel, DragBetween (ZoomAt, Refresh internal)
 │   ├── DragNode.cs, ZoomNodes.cs # [ProcessNode] - they remember the previous frame
 │   ├── WidgetNodes.cs            # [ProcessNode] ScaleBar, Attribution, ZoomButtons
 │   ├── WidgetInput.cs            # the hit test behind Click - arithmetic only, testable alone
@@ -246,7 +246,7 @@ vl-mapsui/
     ├── Open-HelpPatch.ps1        # the ONLY way to launch vvvv here - three package repositories
     ├── Open-HelpPatch-GUI.ps1    # the picker window behind Open-HelpPatch.cmd (repo root): open, close mine, normalize, check
     ├── Test-VLPackage.ps1        # static package validator
-    ├── Test-VLPatch.ps1          # per-document validator: IDs, links, label overlap, help flags (35 of 35), Help.xml pairing
+    ├── Test-VLPatch.ps1          # per-document validator: IDs, links, label overlap, help flags (33 of 33), Help.xml pairing
     ├── HelpPatchGen.ps1          # scaffold for a new help patch (MapWindow, MouseXY, Button); the .vl is the truth afterwards
     ├── Capture-Renderer.ps1      # photographs the renderer (-Title '' the editor) - rung 4 without a person relaying
     ├── Normalize-HelpPatches.ps1 # run after any GUI session - vvvv repins deps AND saves Enabled=True

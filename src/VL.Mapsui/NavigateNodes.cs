@@ -78,8 +78,15 @@ public static class NavigateNodes
     /// Mapsui also animates the change over MouseWheelAnimation.Duration, so the viewport's
     /// resolution does not move on the frame this is called. Something has to call
     /// Map.UpdateAnimations each frame, which the Map node does.
+    ///
+    /// **Internal since 2026-09-25 - no longer a node.** It only works with a ONE-FRAME pulse:
+    /// measured, Steps held at 1 for 120 frames moved level 5 (4892 m/px) to 4882, because each
+    /// call restarts the animation; a single frame of 1 lands exactly on level 6 (2446). A patch
+    /// author typing 1 into an IOBox therefore saw nothing (the user, in HowTo Set the view), and
+    /// the two nodes that need it already make the pulse: ZoomByWheel from a FrameDifference, and
+    /// ZoomIn/ZoomOut from a trigger's rising edge. ZoomByWheel calls this.
     /// </remarks>
-    public static Map ZoomAt(Map map, float x, float y, int steps = 0)
+    internal static Map ZoomAt(Map map, float x, float y, int steps = 0)
     {
         if (steps == 0) return map;
 
@@ -139,8 +146,13 @@ public static class NavigateNodes
     /// <remarks>
     /// Continuous is for mid-gesture, where Mapsui holds back on fetching; discrete is for
     /// when the view has settled and everything visible should be requested.
+    ///
+    /// **Internal since 2026-09-25 - no longer a node.** Every node here that moves the map
+    /// already calls it, and Map calls Mapsui's refresh when its layers change, so no patch built
+    /// from this package's nodes ever needs to wire it - in HowTo Set the view it could not show
+    /// any effect at all, and the user asked what it was for.
     /// </remarks>
-    public static Map Refresh(Map map, bool continuous = false)
+    internal static Map Refresh(Map map, bool continuous = false)
     {
         map.Refresh(continuous ? ChangeType.Continuous : ChangeType.Discrete);
         return map;
