@@ -5,6 +5,41 @@ them do not belong here.
 
 ---
 
+## 2026-09-25 — release preparation for 0.0.1-alpha: what was checked, and what was stale
+
+The user decided to prepare the first release, an early preview. Measured before writing anything:
+
+| check | result |
+|---|---|
+| `dotnet test` | 244 passed |
+| `Compile-HelpPatches.ps1` | 19 of 19, 23 process nodes all in `Create` |
+| `Test-VLPatch.ps1` | 20 documents valid, 33 of 33 nodes on F1, 105 Low flags |
+| `Test-VLPackage.ps1` | pass, no stray tiles, every help patch pinned `0.0.0` |
+| `Test-Install.ps1` | all six dependencies arrive (34 packages), 19 of 19 compile **from the installed package** |
+| vvvv GUI | all 19 opened, editor photographed maximized, renderer photographed; no clipped or overlapping note |
+
+`Test-Install` resolved VL.NetTopologySuite from the sibling's **local** feed. On nuget.org it does
+not exist yet, so the same install would fail there — the publish order (NTS first) is a hard
+requirement, not a courtesy.
+
+What had gone stale, all fixed in the same commit:
+
+- **README** still said "a spike, not a release", 63 tests, a `CacheFolder` node, and that the
+  package could not be loaded beside VL.GIS (fixed 2026-08-14). Rewritten for the release.
+- **nuspec** promised "a spread of your own record type can be drawn directly" — that was
+  `ToFeatures`, removed this morning — and "drawing a thousand features". Release notes written.
+- **`pack.ps1`** claimed a publish workflow overrides the version from the git tag. There is no
+  workflow; there is no `.github\` in any of the four repositories.
+- **CLAUDE.md** said 186 tests, listed `FeatureNodes.cs` (Feature is VL.NetTopologySuite's) and a
+  `Build-SpikePatch.ps1` that no longer exists, and kept "no public node may mention a Mapsui type"
+  as a live rule — true for the spike, false since the `.vl` declared Mapsui.
+- **`D:\2026_Projects\vvvv-gis` is gone locally.** RULES.md linked into it by relative path; the
+  links now point at GitHub.
+
+All five GitHub repositories (the four and vvvv-gis) answer the anonymous API as `public`. One
+thing deliberately left for the user: how the package is pushed — a GitHub Actions workflow with
+the key in a secret, or by hand.
+
 ## 2026-09-25 — ZoomAt and Refresh removed: an IOBox could not make either one do anything
 
 The user, in HowTo Set the view: "I edited the parameters and got no feedback at all." Both were

@@ -1,109 +1,132 @@
 # VL.Mapsui
 
-[Mapsui](https://mapsui.com) as nodes for [vvvv gamma](https://vvvv.org): a tile layer, a map to
-put layers on, navigation operations, and a node that draws the map into VL.Skia.
+[Mapsui](https://mapsui.com) — a real map engine — as nodes for [vvvv gamma](https://vvvv.org):
+tile layers, your own geometry and features on top, styles, labels, picking, widgets, and a node
+that draws the map into VL.Skia.
 
-Companion to [VL.GIS](https://github.com/rednotfound/vvvv-gis), which is a *toolbox* — geometry,
-projection, formats, tile indexing — where this is a *map engine*. VL.GIS computes and lets the
-patch draw; VL.Mapsui hands over a map that draws itself.
+## ⚠️ Status: 0.0.1-alpha, an early preview
 
-## ⚠️ Status: a spike, not a release
-
-Nothing is published. The package builds, installs into a local repository and draws an
-OpenStreetMap map inside vvvv, and that is the whole of what has been shown.
+This is the first published version, and it is a **prerelease**. It works — a map renders in vvvv
+7.4, pans, zooms, draws geometry from any NetTopologySuite source and tells you which feature is
+under the mouse — but the node surface can still change between versions, and Mapsui is far larger
+than what is wrapped (a few dozen of its 306 public types; see
+[docs/MAPSUI-SURFACE.md](docs/MAPSUI-SURFACE.md)).
 
 | | |
 |---|---|
-| ✅ Verified | A map renders in vvvv 7.4, panning and zooming work through the navigation nodes |
-| ✅ Verified | 63 tests covering node lifetime, navigation arithmetic, the disk cache and the pixel-space bridge. No test touches the network, checked by watching the test process's own connections |
-| ⚠️ Thin | One tile source, no vector layers, no styling, no widgets |
-| ❌ Missing | CI, a published package, custom tile sources |
+| ✅ | 33 nodes: tile layers (OpenStreetMap, any XYZ service), a disk cache, geometry and feature layers, a lat/lon graticule, five styles, navigation, picking, pixel↔degree conversion, widgets |
+| ✅ | 19 help patches, every node opens one on F1; each compiles headlessly and was opened in vvvv before release |
+| ✅ | 244 tests, no network, shaped like frame loops because the expensive bugs here were about lifetime |
+| ⚠️ | Mapsui 4.1.9, not 5.x: Mapsui 5 needs SkiaSharp 3 and vvvv ships 2.88 |
+| ❌ | Not wrapped yet: editing geometry on the map, WMS/WFS, image and rasterizing layers, TMS, layer opacity. The map is WebMercator; reprojection is not exposed |
 
-**It cannot be loaded next to VL.GIS.** `Mapsui.Tiling` pins BruTile to 5.x and VL.GIS uses 6;
-`BruTile.Attribution` changed layout between them, so mixing throws `TypeLoadException`. This
-resolves itself when vvvv moves to SkiaSharp 3 and Mapsui 5 becomes usable, since 5.x uses
-BruTile 6 and matches VL.GIS exactly.
+## Install
+
+vvvv gamma **7.4 or newer**. In vvvv: Quad menu → Manage Nugets → Commandline, then
+
+```
+nuget install VL.Mapsui -pre
+```
+
+`-pre` is needed because this is a prerelease. It brings
+[VL.NetTopologySuite](https://github.com/rednotfound/VL.NetTopologySuite) along, which is what
+*makes* the geometry this package draws. Then open the Help Browser, or press F1 on any node.
+
+**If you ever installed VL.GIS 0.2.0-alpha**, delete `%LOCALAPPDATA%\vvvv\gamma\nugets\BruTile.6.0.0`
+by hand. VL.GIS declared BruTile 6, Mapsui needs 5, the folder is shared by everything vvvv loads,
+and uninstalling VL.GIS does not remove it. The symptom is a `TypeLoadException` naming
+`BruTile.Attribution`.
 
 ## Not one map node
 
 ```
-Mapsui.Layers    OpenStreetMap   Enabled, Cache To Disk, Cache Folder
-                                                           -> a tile layer + Layers Built, Cache Status
-Mapsui.Layers    CacheFolder     Folder                    -> where tiles go + Tiles, Size MB
-Mapsui           Map             Layers, initial view      -> a map
-Mapsui.Navigate  CenterOn  ZoomToLevel  Drag  ZoomByWheel  ZoomIn  ZoomOut
-Mapsui           ViewportInfo  LayerInfo                    (readers)
-Mapsui.Skia      ToSkiaLayer     Map                       -> a VL.Skia layer
+Mapsui              Map  ViewportInfo  LayerInfo  Pick
+Mapsui.Layers       OpenStreetMap  XYZ  TileCache  Geometry  FeatureLayer  Graticule  VisibleRange
+Mapsui.Styles       VectorStyle  SymbolStyle  LabelStyle  StyleByGeometry  StyleByValue
+Mapsui.Navigate     CenterOn  ZoomToLevel  ZoomByWheel  DragBetween  Drag  ZoomIn  ZoomOut
+                    ZoomToLayer  ZoomToLayers
+Mapsui.Project      ScreenToWorld  WorldToScreen
+Mapsui.Widgets      ScaleBar  Attribution  ZoomButtons  Click
+Mapsui.Skia         ToSkiaLayer
+Mapsui.Debug        DiagnosticsLayer
 ```
 
 A single all-in-one map node would have been less to wire, and it is deliberately not what this
-is. **Nothing here decides for you what the mouse does.** Read it with VL.Skia's `MouseState`
-and wire it to `Navigate`, or drive the map from an LFO, an OSC message, a keyboard or a
-timeline instead. Composing that is the reason to reach for a patching environment, and an
-earlier version of this package took the choice away by handling drag and wheel internally.
+is. **Nothing here decides for you what the mouse does.** Read it with VL.Skia's `MouseState` and
+wire it to `Navigate`, or drive the map from an LFO, an OSC message, a keyboard or a timeline
+instead. Composing that is the reason to reach for a patching environment.
 
-`help\VL.Mapsui\Explanation Overview of available nodes.vl` is the front door; `HowTo Show a map`,
-`HowTo Drive the map with the mouse` and `HowTo Add widgets to the map` are the wired-up examples,
-one topic each. Beginners start from a help patch, not from a fatter node.
+`Explanation Overview of available nodes` is the front door; `HowTo Show a map` is the smallest
+complete map, and each HowTo after it is one topic. Beginners start from a help patch, not from a
+fatter node.
 
-Widgets are Mapsui's own furniture — a scale bar, the attribution the tile policy requires, buttons
-that zoom. Each node takes the map, puts one widget on it and hands the map on. `Map.Widgets` is
-append only, so `Enabled` is how a widget goes away rather than removal.
-
-**A click is wired like everything else here.** `Click` takes a position and a pressed gate, the
-same shape as `Drag`, so nothing decides for you that the left button is what presses a widget. Its
-`Handled` output is what keeps the two apart: gate dragging with `Left Pressed AND NOT Handled` and
-a press on a zoom button stops being a pan as well.
+**Geometry crosses the boundary as NetTopologySuite.** `Feature` is a geometry plus attributes,
+VL.NetTopologySuite's own type, and a `FeatureLayer` draws a spread of them — so whatever produced
+them (a file, a service, your own `ForEach` over a record) never has to know that Mapsui will draw
+them. `HowTo Draw many features` builds two hundred from a record of your own.
 
 ## Manners
 
 `Enabled` starts **off** on anything that fetches. Opening a document in vvvv runs it, so a map
 that fetched on open would give whoever opened it no chance to decline.
 
-Tiles that were drawn are cached under `%LOCALAPPDATA%\VL.Mapsui\tiles` — a session is a few
-megabytes; delete the folder to reset. That is what
-[OpenStreetMap's tile policy](https://operations.osmfoundation.org/policies/tiles/) asks for.
-What it forbids is the opposite: fetching tiles nobody is looking at. Requests carry a
-User-Agent naming this package.
+Tiles that were drawn are cached under `%LOCALAPPDATA%\VL.Mapsui\tiles` for 7 days — a session is a
+few megabytes; delete the folder to reset. That is what
+[OpenStreetMap's tile policy](https://operations.osmfoundation.org/policies/tiles/) asks for. What
+it forbids is the opposite: fetching tiles nobody is looking at. Requests carry a User-Agent naming
+this package. Other services have their own policies; `HowTo Use any tile service` says so beside
+the switch.
 
-`TileCache` is the node that decides where they go — beside your project so it travels with it,
-onto a fast disk, or shared between patches — and it is the only thing that decides. Hand its
-output to a layer's `Cache` pin, or leave that pin unconnected for the default above. It reads the
-disk and never the network, so it also answers how much is cached with the layer switched off.
+`TileCache` is the one node that decides where tiles go. Hand its output to a layer's `Cache` pin,
+or leave that pin unconnected for the default above. **Leave its `Folder` pin unconnected for the
+default; never connect an empty Path IOBox** — VL resolves an empty Path against the document and
+hands the node your patch's own folder.
 
-**Leave its `Folder` pin unconnected for the default; do not connect an empty Path IOBox.** There is
-no such thing as an empty one: VL resolves an empty Path against the document and hands the node
-your patch's own folder. That wrote 444 tiles into two repositories on 2026-08-14 while every pin
-still read correctly. A folder that cannot be used is reported and the cache left off, rather than
-quietly writing somewhere you did not ask for.
+`Layers Built` should reach 1 and stay. A number that climbs frame after frame means a layer is
+rebuilt every frame, and every rebuild starts a fresh round of tile requests — which once exhausted
+a machine's ephemeral ports and took a home network down. Close vvvv if you see it climb; the
+diagnostics overlay's first line turns red for exactly that.
 
-`Layers Built` is an output pin, and it should reach 1 and stay. A number that climbs frame after
-frame means the layer is being rebuilt every frame and every rebuild starts a fresh round of tile
-requests — which once exhausted a machine's ephemeral ports and took a home network down. Close
-vvvv if you see it climb.
+## The family
+
+VL.Mapsui draws maps and nothing else. Its siblings compose with it through NetTopologySuite, a
+library they share rather than a dependency on each other:
+
+| package | what it does |
+|---|---|
+| [VL.NetTopologySuite](https://github.com/rednotfound/VL.NetTopologySuite) | geometry: points, lines, polygons, operations |
+| [VL.GeoJSON](https://github.com/rednotfound/VL.GeoJSON) | reads and writes the format data arrives in |
+| [VL.Overworld](https://github.com/rednotfound/VL.Overworld) | the course: no nodes, every patch that needs more than one package |
+
+[VL.GIS](https://github.com/rednotfound/vvvv-gis) was the first attempt at all of this in one
+package and is retired.
 
 ## Building
 
 ```powershell
-dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj   # 30 tests, ~1s, no network
+dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj   # 244 tests, ~2 s, no network
 .\build.ps1                                                # build + stage dist\
-.\tools\Test-VLPackage.ps1                                 # static checks, no vvvv needed
 .\pack.ps1                                                 # + a .nupkg in dist\feed
-
-vvvv.exe "help\VL.Mapsui\HowTo Show a map.vl" --package-repositories dist
+.\tools\Test-VLPackage.ps1                                 # static package checks
+.\tools\Test-VLPatch.ps1                                   # every help patch, and F1 for every node
+.\tools\Compile-HelpPatches.ps1                            # vvvvc over every help patch, reads the C#
+.\tools\Open-HelpPatch.ps1 "Show a map"                    # the only way to launch vvvv here
 ```
 
-vvvv must be closed while building: a running one holds the staged assemblies open, and would
-not pick up the change anyway.
+vvvv must be closed while building: a running one holds the staged assemblies open. Launch through
+`Open-HelpPatch.ps1` (or double-click `Open-HelpPatch.cmd`), never by hand — it needs three package
+repository folders, and a missing one fails with an error naming something else.
 
 ## Reading
 
 - [NOTES.md](NOTES.md) — what was measured, with dates
+- [docs/RULES.md](docs/RULES.md) — what earns a node, and when a node runs
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — the pipeline and the NetTopologySuite boundary
+- [docs/MAPSUI-SURFACE.md](docs/MAPSUI-SURFACE.md) — what Mapsui offers, what is wrapped, what will not be
+- [docs/HELP-PATCH-STYLE.md](docs/HELP-PATCH-STYLE.md) — the help style, measured across 60 community packs
 - [CLAUDE.md](CLAUDE.md) — the rules that matter in this repository
-- [VL.GIS's docs](https://github.com/rednotfound/vvvv-gis/tree/main/docs) — `VL-RUNTIME.md` on
-  how a VL node is evaluated and why that matters for anything holding a resource, and
-  `VL-PACKAGING.md` on everything that silently breaks when packaging for vvvv
 
 ## Licence
 
-MIT. Mapsui is MIT. OpenStreetMap data is © OpenStreetMap contributors, ODbL.
+MIT. Mapsui is MIT, NetTopologySuite BSD-3-Clause. OpenStreetMap data is © OpenStreetMap
+contributors, ODbL.

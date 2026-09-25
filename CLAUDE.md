@@ -18,17 +18,19 @@ nothing else.
 | `D:\2026_Projects\vl-overworld` | **the course.** No nodes; it declares the other three and holds every patch that needs more than one of them |
 
 They compose through **NetTopologySuite**, a library they share rather than an agreement they made:
-none of them references another. `D:\2026_Projects\vvvv-gis` holds the retired `VL.GIS`, whose
-published `0.2.0-alpha` still declares BruTile 6 and conflicts with this package — see
-`vl-overworld\README.md` for what a user has to delete by hand.
+none of them references another. The retired `VL.GIS` lives only on GitHub now
+(`rednotfound/vvvv-gis`; the local clone is gone as of 2026-09-25). Its published `0.2.0-alpha`
+still declares BruTile 6 and conflicts with this package — the README's Install section says what
+a user has to delete by hand.
 
-**Current state (2026-09-24): a working package, not yet published.** A map renders in vvvv 7.4,
-pans, zooms and takes geometry from any NTS source. `VL.Mapsui.nuspec`, `build.ps1`, `pack.ps1`,
-`tools\Test-VLPackage.ps1` and **186 tests** exist. Nothing is on nuget.org. **The help is now the
-second test suite: 19 patches in the community's measured style, every one of the 33 nodes opens
-one on F1** (`tools\Test-VLPatch.ps1` audits the flags), all 19 compile with every process node
-constructed in `Create` (`tools\Compile-HelpPatches.ps1` reads the generated C#), and each was
-opened in vvvv and photographed. The plan, the decisions and what the patches found are in
+**Current state (2026-09-25): preparing the first release, `0.0.1-alpha` — a prerelease, an early
+preview, not a stable version.** A map renders in vvvv 7.4, pans, zooms and takes geometry from
+any NTS source. **33 nodes, 244 tests.** Nothing is on nuget.org yet; see "Releasing" below for the
+order and what the user does themselves. **The help is the second test suite: 19 patches in the
+community's measured style, every one of the 33 nodes opens one on F1** (`tools\Test-VLPatch.ps1`
+audits the flags), all 19 compile with every process node constructed in `Create`
+(`tools\Compile-HelpPatches.ps1` reads the generated C#), and every one was hand-arranged by the
+user in the GUI, then opened in vvvv and photographed (last full pass 2026-09-25). The plan, the decisions and what the patches found are in
 [docs/HELP-PATCH-PLAN.md](docs/HELP-PATCH-PLAN.md); the style and the survey of 60 community help
 folders in [docs/HELP-PATCH-STYLE.md](docs/HELP-PATCH-STYLE.md). **Read both before touching
 `help\`**, and `git status` first: the user hand-edits patches in the GUI between sessions.
@@ -204,10 +206,10 @@ map renders, which also clears the risk that Mapsui 4.1.9 (compiled against NTS 
 to VL.GIS's 2.6.
 
 The two packages compose through **NetTopologySuite**, not through each other: VL.GIS computes
-geometry and `Mapsui.Layers.Geometry` draws it. Neither references the other.
-`vvvv-gis\examples\Example Map with data on it.vl` is the patch that proves it — it lives there,
-outside either package's `help\`, because a patch needing two packages cannot ship inside one whose
-dependencies do not guarantee the other.
+geometry and `Mapsui.Layers.Geometry` draws it. Neither references the other. The patch that proved
+it lived in `vvvv-gis\examples\`, outside either package's `help\`, because a patch needing two
+packages cannot ship inside one whose dependencies do not guarantee the other — the same rule that
+now sends every cross-package patch to VL.Overworld.
 
 ## Repository layout
 
@@ -221,25 +223,32 @@ vl-mapsui/
 ├── docs/HELP-PATCH-STYLE.md      # ⭐ the community's help style, measured, + how 60 packs organize help
 ├── docs/HELP-PATCH-PLAN.md       # the 2026-09-24 help campaign: decisions, gate, what the patches found
 ├── VL.Mapsui.vl / .nuspec        # the package. .vl is hand-edited but never regenerated
-├── src/VL.Mapsui/
-│   ├── LayerNodes.cs             # [ProcessNode] OpenStreetMap - tile layer, cache, attribution
-│   ├── FeatureNodes.cs           # Feature and Split - NTS geometry + attributes, the neutral type
-│   ├── PickNodes.cs              # [ProcessNode] Pick + ScreenToWorld - the only nodes handing data BACK
-│   ├── FeatureLayerNodes.cs      # [ProcessNode] FeatureLayer - THE NTS to Mapsui adapter
-│   ├── StyleNodes.cs             # [ProcessNode] VectorStyle + Styles.Combine (FLATTENS - nested draws nothing)
+├── src/VL.Mapsui/                # 33 nodes. Feature itself is VL.NetTopologySuite's, not ours
+│   ├── LayerNodes.cs             # [ProcessNode] OpenStreetMap - tile layer, cache, attribution, UserAgent
+│   ├── XyzLayerNodes.cs          # [ProcessNode] XYZ - any slippy-map URL template
+│   ├── CacheNodes.cs, TileCache.cs # [ProcessNode] TileCache + the TileDiskCache value it hands out
+│   ├── GeometryLayerNodes.cs     # [ProcessNode] Geometry - the shortcut: one geometry, one colour
+│   ├── FeatureLayerNodes.cs      # [ProcessNode] FeatureLayer - THE NTS to Mapsui adapter, compares by value
+│   ├── GraticuleNode.cs          # [ProcessNode] Graticule - ours, not Mapsui's
+│   ├── VisibleRangeNodes.cs      # VisibleRange - the zooms a layer is drawn at
+│   ├── StyleNodes.cs             # [ProcessNode] VectorStyle + internal Styles.Combine (FLATTENS - nested draws nothing)
+│   ├── SymbolStyleNodes.cs, LabelStyleNodes.cs # [ProcessNode] SymbolStyle, LabelStyle
 │   ├── GeometryThemeNodes.cs     # [ProcessNode] StyleByGeometry - one style per geometry type
-│   ├── GeometryLayerNodes.cs     # [ProcessNode] Geometry - the shortcut, composed from those three
+│   ├── ValueThemeNodes.cs        # [ProcessNode] StyleByValue - the choropleth
 │   ├── MapNode.cs                # [ProcessNode] Map + ViewportInfo / LayerInfo readers
+│   ├── MapNodes.cs               # DiagnosticsLayer
+│   ├── PickNodes.cs              # [ProcessNode] Pick + ScreenToWorld / WorldToScreen - data handed BACK
 │   ├── NavigateNodes.cs          # CenterOn, ZoomToLevel, ZoomByWheel, DragBetween (ZoomAt, Refresh internal)
-│   ├── DragNode.cs, ZoomNodes.cs # [ProcessNode] - they remember the previous frame
-│   ├── WidgetNodes.cs            # [ProcessNode] ScaleBar, Attribution, ZoomButtons
+│   ├── DragNode.cs, ZoomNodes.cs # [ProcessNode] Drag, ZoomIn, ZoomOut - they remember the previous frame
+│   ├── FrameNodes.cs             # [ProcessNode] ZoomToLayer, ZoomToLayers - on a trigger
+│   ├── ZoomLadder.cs             # slippy zoom level -> resolution, for maps with no tile layer
+│   ├── WidgetNodes.cs            # [ProcessNode] ScaleBar, Attribution, ZoomButtons, Click
 │   ├── WidgetInput.cs            # the hit test behind Click - arithmetic only, testable alone
-│   ├── SkiaNodes.cs              # ToSkiaLayer
+│   ├── SkiaNodes.cs              # [ProcessNode] ToSkiaLayer
 │   ├── MapsuiLayer.cs            # VL.Skia.ILayer - draws it, plus the diagnostics overlay
-│   ├── PixelSpace.cs             # pixel/VL space bridge
-│   └── TileCache.cs              # the disk cache, its folder and its size
+│   └── PixelSpace.cs             # pixel/VL space bridge
 ├── help/VL.Mapsui/               # Explanation + 18 HowTos + Help.xml (8 domain topics); one High flag per node
-├── test/VL.Mapsui.Tests/         # 186 xunit tests, no network, no vvvv
+├── test/VL.Mapsui.Tests/         # 244 xunit tests, no network, no vvvv
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org
 └── tools/
@@ -257,7 +266,7 @@ vl-mapsui/
 
 ## Tests
 
-`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 186 tests, well under a second. No
+`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 244 tests, about two seconds. No
 network and no vvvv: the tile source is faked, and the geometry tests use a MemoryLayer.
 
 They exist because the expensive bug here was a **lifetime** bug, not an arithmetic one, so
@@ -290,19 +299,21 @@ before reaching an assertion.
 `[assembly: ImportAsIs(Namespace = "VL")]`. Namespace `VL.Mapsui` therefore gives `Mapsui`.
 `[ProcessNode(Name, Category)]` and `[Name("...")]` override it.
 
-**No public node may mention a Mapsui type in its signature yet.** VL builds a node only for
-methods whose types it has imported, and it learns a foreign library's types from a
-`<NugetDependency>` in the `.vl`. This spike is loaded through a `ProjectDependency` and declares
-none, so a node returning `Mapsui.Map` is silently never created — greyed out in the patch,
-absent from the compiled program, every link to it dropped, nothing in the log. Exposing `Map` is
-the better API and returns with the nuspec.
+**A node may mention a Mapsui type only because `VL.Mapsui.vl` declares Mapsui.** VL builds a
+node only for methods whose types it has imported, and it learns a foreign library's types from a
+`<NugetDependency>` in the `.vl`. The early spike was loaded through a `ProjectDependency` and
+declared none, so a node returning `Mapsui.Map` was silently never created — greyed out in the
+patch, absent from the compiled program, every link to it dropped, nothing in the log. The package
+`.vl` now declares Mapsui, Mapsui.Tiling, Mapsui.Rendering.Skia and both NTS packages, and `Map`
+flows between nodes as `Mapsui.Map`. **A new foreign type in a signature needs its package added
+there and in the nuspec**, or the node vanishes the same way.
 
 ## Commands
 
 ```powershell
 # vvvv must be closed first - it holds the built assembly open
-dotnet build src\VL.Mapsui\VL.Mapsui.csproj -c Release
-.\tools\Build-SpikePatch.ps1
+.\build.ps1                                 # build + stage dist\ (dist\VL.Mapsui\help is a junction)
+.\pack.ps1                                  # + dist\feed\*.nupkg, evicting the stale cached copy
 
 # NEVER type the vvvv launch by hand. THREE package repositories are needed - dist\, deps\ and
 # ..\vl-nettopologysuite\dist\ - and omitting one produces an error naming something else
@@ -330,6 +341,37 @@ dotnet build src\VL.Mapsui\VL.Mapsui.csproj -c Release
 # Launch with Enabled off, confirm zero connections, then turn it on and watch
 Get-NetTCPConnection | Where-Object { $_.OwningProcess -eq (Get-Process vvvv).Id }
 ```
+
+## Releasing — `0.0.1-alpha`, the first one (prepared 2026-09-25)
+
+- **The version is `0.0.1-alpha`, a prerelease.** Any `-suffix` makes nuget.org treat it as one:
+  hidden from a default search, installed with `nuget install VL.Mapsui -pre`. The three siblings
+  use the same suffix; keep the family in step rather than inventing `-pre` or `-preview` here.
+- **The version is written in three places, and nothing overrides them:** the nuspec's
+  `<version>`, `LayerNodes.UserAgent` (what OSM's servers see), and the nuspec's dependency on
+  `VL.NetTopologySuite`. There is no publish workflow — no `.github\` at all — so the nuspec is the
+  source of truth.
+- **Order: VL.NetTopologySuite (and VL.GeoJSON) → VL.Mapsui → VL.Overworld.** This package declares
+  `VL.NetTopologySuite 0.0.1-alpha`; published first, every install of it fails to resolve. That
+  repository belongs to the sibling session.
+- **The user performs the irreversible step.** Claude prepares, validates, commits and pushes
+  `main`, then hands over the exact command and stops. A published version can never be replaced
+  or deleted, only unlisted — VL.GIS's six unlisted versions are still installable by exact
+  version.
+- **Undecided: how it gets pushed.** A tag-triggered GitHub Actions workflow with the key in a
+  `NUGET_KEY` secret (the user's choice on vvvv-gis, so the key never passes through a local
+  shell), or `dist\feed\VL.Mapsui.0.0.1-alpha.nupkg` pushed by hand with the `!` prefix.
+- **The gate, run as its own step before the irreversible one:** `dotnet test`, `.\pack.ps1`,
+  `tools\Test-VLPackage.ps1`, `tools\Test-VLPatch.ps1`, `tools\Compile-HelpPatches.ps1`, and
+  **`tools\Test-Install.ps1`** — it installs from the feed the way a user does and compiles every
+  help patch from inside the installed package, the only check that proves the nuspec's
+  dependencies really arrive.
+- **The GitHub repository must be public**, since the nuspec's `projectUrl` and every README link
+  point at it. Checked 2026-09-25: all four family repositories and vvvv-gis are public.
+- **Right after publishing, bump the working version to `0.0.2-alpha`.** The dev loop repacks the
+  same version all day, and NuGet uses any cached copy whose version matches without looking at
+  the feed — once a real `0.0.1-alpha` exists in someone's cache, a local one with that number is
+  indistinguishable from it.
 
 ## Working style
 

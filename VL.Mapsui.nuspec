@@ -19,17 +19,21 @@
       and can put its own layers on it. That is what a patching environment is for.
 
       Geometry crosses the boundary as NetTopologySuite, so whatever produced it - a file, a
-      service, VL.NetTopologySuite - never has to know that Mapsui will draw it. A spread of
-      your own record type can be drawn directly.
+      service, VL.NetTopologySuite, a ForEach over a record of your own - never has to know that
+      Mapsui will draw it.
 
-      Nineteen help patches, from the smallest working map to drawing a thousand features, each opening a node on F1.
+      33 nodes and 19 help patches, from the smallest working map to styling by a value; every
+      node opens one on F1.
 
-      EARLY: the API can still change, and Mapsui's editing and WMS/WFS surfaces are not
-      wrapped yet. Requires vvvv gamma 7.4 or newer (.NET 8).
+      EARLY PREVIEW: the node surface can still change between versions, and Mapsui's editing
+      and WMS/WFS surfaces are not wrapped yet. Requires vvvv gamma 7.4 or newer (.NET 8).
+      Install with: nuget install VL.Mapsui -pre
     </description>
     <summary>Mapsui map engine as composable nodes for vvvv gamma.</summary>
     <releaseNotes>
-      0.0.1-alpha - First package. Not published.
+      0.0.1-alpha - First public preview. Tile layers (OpenStreetMap, any XYZ service) with a
+      shared disk cache, geometry and feature layers, a graticule, five styles, navigation,
+      picking, pixel/degree conversion and widgets. Wraps Mapsui 4.1.9.
     </releaseNotes>
     <copyright>Copyright 2026 VL.Mapsui Contributors</copyright>
     <!-- The "VL" tag is what makes the pack discoverable at https://vvvv.org/packs -->

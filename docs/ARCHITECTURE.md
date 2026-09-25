@@ -108,10 +108,10 @@ declared in the nuspec so `HowTo Draw your own shapes` opens working rather than
 fetch a missing document dependency by itself. That direction is allowed and the reverse never is:
 nothing that computes geometry may learn about a renderer.
 
-VL.GIS and VL.Mapsui compose **through NTS**, neither referencing the other.
-`vvvv-gis\examples\Example Map with data on it.vl` is the patch that proves it, and it lives
-outside both packages deliberately: a patch needing two packages cannot ship inside one whose
-dependencies do not guarantee the other.
+The siblings compose **through NTS**, none referencing another — VL.GIS did the same while it
+lived. A patch needing two packages cannot ship inside one whose dependencies do not guarantee the
+other, so every such patch lives in VL.Overworld, the course, which declares the whole family and
+compiles them all as a standing integration test.
 
 **Coordinates crossing in are WGS84 longitude and latitude, x first** — what GeoJSON carries and
 what VL.GIS produces. Mapsui draws in spherical mercator, so the adapter projects on the way in, on

@@ -13,8 +13,9 @@
 
     Uses the NuGet.exe that ships with vvvv, so nothing extra needs installing.
 
-    Note: `nuget pack` reads <version> from the nuspec. The publish workflow overrides it
-    with -Version from the git tag, so the tag is the source of truth at release time.
+    Note: `nuget pack` reads <version> from the nuspec, and nothing overrides it: there is no
+    publish workflow in this repository (checked 2026-09-25, before 0.0.1-alpha). The nuspec is
+    the source of truth, so bump it - and LayerNodes.UserAgent - before packing a release.
 
 .EXAMPLE
     .\pack.ps1

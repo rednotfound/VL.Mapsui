@@ -303,14 +303,14 @@ Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
 
 Full forensics, kept where they were written:
 
-- [`../../vvvv-gis/docs/VL-PACKAGING.md`](../../vvvv-gis/docs/VL-PACKAGING.md) — how a node comes
+- [`vvvv-gis/docs/VL-PACKAGING.md`](https://github.com/rednotfound/vvvv-gis/blob/main/docs/VL-PACKAGING.md) — how a node comes
   to exist, and every way that fails quietly
-- [`../../vvvv-gis/docs/VL-RUNTIME.md`](../../vvvv-gis/docs/VL-RUNTIME.md) — what happens once it
+- [`vvvv-gis/docs/VL-RUNTIME.md`](https://github.com/rednotfound/vvvv-gis/blob/main/docs/VL-RUNTIME.md) — what happens once it
   runs; both incidents dissected
-- [`../../vvvv-gis/docs/NODE-DESIGN.md`](../../vvvv-gis/docs/NODE-DESIGN.md) — the survey behind
+- [`vvvv-gis/docs/NODE-DESIGN.md`](https://github.com/rednotfound/vvvv-gis/blob/main/docs/NODE-DESIGN.md) — the survey behind
   the node-design section above
-- [`../../vvvv-gis/docs/DESIGN.md`](../../vvvv-gis/docs/DESIGN.md) — why VL.GIS is shaped the way
+- [`vvvv-gis/docs/DESIGN.md`](https://github.com/rednotfound/vvvv-gis/blob/main/docs/DESIGN.md) — why VL.GIS is shaped the way
   it is, and the division of labour between the two packages
 
-Those links assume both repositories sit side by side under `D:\2026_Projects\`. If they do not,
-this file is still complete on its own.
+VL.GIS is retired and its local clone is gone (2026-09-25), so these point at GitHub. This file is
+complete on its own without them.
