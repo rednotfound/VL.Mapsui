@@ -208,9 +208,13 @@ $closeMine = {
     $ourPid = [int](Get-Content $PidFile)
     $p = Get-Process -Id $ourPid -ErrorAction SilentlyContinue
     if (-not $p -or $p.ProcessName -ne 'vvvv') { Write-Log "pid $ourPid is not a running vvvv - already closed.`r`n"; return }
+    # NEVER force it. vvvv answers a close request with a "save changes?" dialog when a tab is
+    # dirty, and killing it after a timeout would throw away exactly the edits the person made -
+    # the first version of this button did that after 8 seconds (caught 2026-09-25 before it cost
+    # anything). Ask, wait a little, and if it is still up, say where the question is.
     [void]$p.CloseMainWindow()
-    if (-not $p.WaitForExit(8000)) { Stop-Process -Id $ourPid -Force; Write-Log "did not close on request; stopped pid $ourPid.`r`n" }
-    else { Write-Log "closed pid $ourPid.`r`n" }
+    if ($p.WaitForExit(5000)) { Write-Log "closed pid $ourPid.`r`n" }
+    else { Write-Log "vvvv is still open - it is probably asking whether to save. Answer it in vvvv; nothing was forced.`r`n" }
     $others = @(Get-Process vvvv -ErrorAction SilentlyContinue)
     if ($others) { Write-Log "NOTE: $($others.Count) other vvvv still running (pid $($others.Id -join ', ')) - not ours, left alone.`r`n" }
 }

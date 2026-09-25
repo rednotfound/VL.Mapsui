@@ -67,7 +67,7 @@
             <Pin Id="UrUc8bB9SmJiUdSBjaitGx" Name="Cache Status" Kind="OutputPin" />
           </Node>
           <Pad Id="QG057kIqLRyR1Prg12B2cQ" Comment="Layers Built" Bounds="114,490,40,15" ShowValueBox="true" isIOBox="true" />
-          <Pad Id="JVJnWy5DdIM2rV3bYDSJkH" Comment="Cache Status" Bounds="167,440,340,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="JVJnWy5DdIM2rV3bYDSJkH" Comment="Cache Status" Bounds="167,450,340,15" ShowValueBox="true" isIOBox="true" />
           <Node Bounds="165,550,110,19" Id="U6PJW7W2timTyUTUeH1bQS">
             <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
@@ -184,7 +184,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="Kez3yYOL1JG2oGUZ2VW0wF" Bounds="640,339,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Enabled starts OFF. Every service has a usage policy - read it before you switch on. OpenTopoMap is CC-BY-SA and asks for this credit.">
+          <Pad Id="Kez3yYOL1JG2oGUZ2VW0wF" Bounds="640,325,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Enabled starts OFF. Every service has a usage policy - read it before you switch on. OpenTopoMap is CC-BY-SA and asks for this credit.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -193,7 +193,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="TS4ikwMuyONyu3dFOgKa3i" Bounds="640,490,320,42" ShowValueBox="true" isIOBox="true" Value="&lt; Layers Built counts rebuilds: a new URL or a flip of Enabled is one each. It must never climb on its own.">
+          <Pad Id="TS4ikwMuyONyu3dFOgKa3i" Bounds="640,491,320,42" ShowValueBox="true" isIOBox="true" Value="&lt; Layers Built counts rebuilds: a new URL or a flip of Enabled is one each. It must never climb on its own.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -202,7 +202,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="J3oQgSvooXzSSL6MJqkGDR" Bounds="640,436,325,42" ShowValueBox="true" isIOBox="true" Value="&lt; Cache unconnected = the default disk cache. HowTo Cache tiles has the node that owns it.">
+          <Pad Id="J3oQgSvooXzSSL6MJqkGDR" Bounds="640,405,325,42" ShowValueBox="true" isIOBox="true" Value="&lt; Cache unconnected = the default disk cache. HowTo Cache tiles has the node that owns it.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>

@@ -17,7 +17,7 @@
       <Patch Id="MmFC3tThTQJHkIJ2vWQ9cX">
         <Canvas Id="I8uQpWxfEsrrzjFaiBE2eE" CanvasType="Group">
           <Pad Id="RwNGOe3UWkHbq4CDUZnYQt" Bounds="60,40,240,41" ShowValueBox="true" isIOBox="true" Value="Use Graticule!">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -26,7 +26,7 @@
             </p:ValueBoxSettings>
           </Pad>
           <Pad Id="DNhBWfDa6jcPRsMJ6rWztl" Bounds="60,90,520,82" ShowValueBox="true" isIOBox="true" Value="A map with no tiles is a blank window, and blank has no direction. The graticule is the coordinate system itself, drawn: meridians and parallels at a spacing that follows the zoom. No network anywhere in this patch.">
-            <p:TypeAnnotation>
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -34,12 +34,12 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="SVTM2W8Rmju4375Rq9y3e9" Comment="Degrees Spacing" Bounds="200,190,50,15" ShowValueBox="true" isIOBox="true" Value="0">
+          <Pad Id="SVTM2W8Rmju4375Rq9y3e9" Comment="Degrees Spacing" Bounds="58,181,50,15" ShowValueBox="true" isIOBox="true" Value="0">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float64" />
             </p:TypeAnnotation>
           </Pad>
-          <Pad Id="T0PoUsgVJIcauZ11n2ayzN" Comment="Show Labels" Bounds="370,180,35,35" ShowValueBox="true" isIOBox="true" Value="True">
+          <Pad Id="T0PoUsgVJIcauZ11n2ayzN" Comment="Show Labels" Bounds="93,270,35,35" ShowValueBox="true" isIOBox="true" Value="True">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
             </p:TypeAnnotation>
@@ -47,12 +47,12 @@
               <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="MI4x8IctAp67UY4Vro3JME" Comment="Line Width" Bounds="500,190,40,15" ShowValueBox="true" isIOBox="true" Value="1">
+          <Pad Id="MI4x8IctAp67UY4Vro3JME" Comment="Line Width" Bounds="163,389,40,15" ShowValueBox="true" isIOBox="true" Value="1">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Float32" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="60,230,110,19" Id="Jyo3vQWleGwClf7Iwb4cqg">
+          <Node Bounds="56,439,110,19" Id="Jyo3vQWleGwClf7Iwb4cqg">
             <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Graticule" />
@@ -65,8 +65,8 @@
             <Pin Id="PNkeRNjzzs322RsAckdwpN" Name="Result" Kind="OutputPin" />
             <Pin Id="SGNmWLwKkCt9J6mqRyYbu5" Name="Lines Built" Kind="OutputPin" />
           </Node>
-          <Pad Id="Por8hF9j6BARMJT5GQyJW5" Comment="Lines Built" Bounds="200,235,40,15" ShowValueBox="true" isIOBox="true" />
-          <Node Bounds="60,280,39,19" Id="DOsJTY63VtRmCrBQww4aQz">
+          <Pad Id="Por8hF9j6BARMJT5GQyJW5" Comment="Lines Built" Bounds="163,489,40,15" ShowValueBox="true" isIOBox="true" />
+          <Node Bounds="56,580,39,19" Id="DOsJTY63VtRmCrBQww4aQz">
             <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Cons" />
@@ -75,7 +75,7 @@
             <Pin Id="MAHDE0bWQSkmsKbWtNIXI3" Name="Input" Kind="InputPin" />
             <Pin Id="DOUnKke4X3eaM0aVGzciIQ" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,330,110,19" Id="MeAlhS6TM2MLau6B65DJJb">
+          <Node Bounds="56,620,110,19" Id="MeAlhS6TM2MLau6B65DJJb">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Map" />
@@ -95,14 +95,10 @@
                 <Choice Kind="TypeFlag" Name="Float64" />
               </p:TypeAnnotation>
             </Pin>
-            <Pin Id="Uj7KfoZ3TFGCHHGDk03xM8" Name="Initial Zoom Level" Kind="InputPin" DefaultValue="2">
-              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
-                <Choice Kind="TypeFlag" Name="Integer32" />
-              </p:TypeAnnotation>
-            </Pin>
+            <Pin Id="Uj7KfoZ3TFGCHHGDk03xM8" Name="Initial Zoom Level" Kind="InputPin" />
             <Pin Id="TfnwK7zIIeijshcwdXQKX4" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,440,130,19" Id="C62UMus9XWBbIfP6eXCOQ6">
+          <Node Bounds="56,770,130,19" Id="C62UMus9XWBbIfP6eXCOQ6">
             <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
@@ -112,31 +108,50 @@
             <Pin Id="FA14mZhnVq3uAIfDe4i4eY" Name="Diagnostics" Kind="InputPin" />
             <Pin Id="EhgwpMUmoFHex32Stf0uNN" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,500,185,19" Id="BjVXatvCPYkG1sg8BuVsAU">
+          <Node Bounds="16,830,185,19" Id="BjVXatvCPYkG1sg8BuVsAU">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
               <PinReference Kind="InputPin" Name="Bound to Document" />
               <PinReference Kind="InputPin" Name="Bounds" />
             </p:NodeReference>
-            <Pin Id="HGp8NyrxrmOTW720pszLuW" Name="Bounds" Kind="InputPin" DefaultValue="926, 114, 900, 560">
+            <Pin Id="NZPc4zh35B0PPd71o5k2Wa" Name="Node Context" Kind="InputPin" IsHidden="true" />
+            <Pin Id="HGp8NyrxrmOTW720pszLuW" Name="Bounds" Kind="InputPin" DefaultValue="963, 25, 737, 560">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="Nz429w3coHfOA3QecLACer" Name="Save Bounds" Kind="InputPin" IsHidden="true" />
             <Pin Id="G4kec9hYuDuQ7WNFIIShsU" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
+            <Pin Id="Lu1j1Cx7jhHL5UG9HlXnjC" Name="Dialog If Document Changed" Kind="InputPin" IsHidden="true" />
+            <Pin Id="DW9hUYwAY7YQFm6ZEjT4Wk" Name="Always On Top" Kind="InputPin" IsHidden="true" />
+            <Pin Id="PAcnpgHbMDFNreO2RgXXD1" Name="Extend Into Title Bar" Kind="InputPin" IsHidden="true" />
             <Pin Id="A8LULFZEZcheH6rnBWws7e" Name="Input" Kind="InputPin" />
+            <Pin Id="SrcfSCGG63dP9QkcUg5o7s" Name="Title" Kind="InputPin" />
+            <Pin Id="JoUdrFgH9H9LedZchbcqDW" Name="Title Bar Interaction Width" Kind="InputPin" IsHidden="true" />
+            <Pin Id="AgdKRoS06XKL8gRE8OID76" Name="Color" Kind="InputPin" />
+            <Pin Id="K5exNBGGwLNOwzv3vlocCF" Name="Clear" Kind="InputPin" />
+            <Pin Id="JhoV9YCjWhjM9uvjTippk0" Name="Space" Kind="InputPin" />
+            <Pin Id="UUdUNbTtIKUMBXIv2aLZZt" Name="Show Cursor" Kind="InputPin" />
+            <Pin Id="Ll0As2GP8yNLYZJxISUzeA" Name="VSync" Kind="InputPin" />
+            <Pin Id="K1ZV0PZYqAxOVV7GazNhq9" Name="Commands" Kind="InputPin" IsHidden="true" />
+            <Pin Id="LfdD8BnUpeqPX1lC6gZZyi" Name="Enable Keyboard Shortcuts" Kind="InputPin" IsHidden="true" />
+            <Pin Id="MKruI6FDDqSODuNtlnRzv2" Name="Enabled" Kind="InputPin" />
+            <Pin Id="FIvbzv1dB7uQbGMLvnUvF2" Name="Form Bounds Notifications" Kind="OutputPin" IsHidden="true" />
+            <Pin Id="LKZMjXEkO2BO9wxx4ZqqaA" Name="Form" Kind="OutputPin" />
+            <Pin Id="Cui8R3V7n5FMhTUmyePbwn" Name="ClientBounds" Kind="OutputPin" />
+            <Pin Id="NbgeayGXRtwNtIXMifSdYO" Name="Render Time" Kind="OutputPin" />
           </Node>
-          <Pad Id="MY2VCfnTNGI5AgqIu6IW7p" Comment="Zoom Level" Bounds="300,350,40,15" ShowValueBox="true" isIOBox="true" Value="2">
+          <Pad Id="MY2VCfnTNGI5AgqIu6IW7p" Comment="Zoom Level" Bounds="163,690,40,15" ShowValueBox="true" isIOBox="true" Value="12">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="Integer32" />
             </p:TypeAnnotation>
           </Pad>
-          <Node Bounds="200,390,110,19" Id="DN9rcmH13ELlygDGV1exYg">
+          <Node Bounds="56,710,110,19" Id="DN9rcmH13ELlygDGV1exYg">
             <p:NodeReference LastCategoryFullName="Mapsui.Navigate" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="ZoomToLevel" />
@@ -146,8 +161,8 @@
             <Pin Id="AXsPrzDeTtYMmS8p3Vxarh" Name="Zoom Level" Kind="InputPin" />
             <Pin Id="EHyfvRGWe8krg4ABqP53SG" Name="Output" Kind="OutputPin" />
           </Node>
-          <Pad Id="LJyYA4aL0f8cOoLDu6iBKL" Bounds="640,190,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Degrees Spacing 0 = automatic: a 1/2/5 value giving about six lines across, following the zoom. 10 is the school atlas, 1 is a mesh, negative is no grid.">
-            <p:TypeAnnotation>
+          <Pad Id="LJyYA4aL0f8cOoLDu6iBKL" Bounds="401,171,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Degrees Spacing 0 = automatic: a 1/2/5 value giving about six lines across, following the zoom. 10 is the school atlas, 1 is a mesh, negative is no grid.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -155,8 +170,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="ErSiGS0L9MNqFT83u3XaLt" Bounds="640,278,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Lines Built counts what the spacing produced. Every line is two vertices: in WebMercator meridians and parallels are straight.">
-            <p:TypeAnnotation>
+          <Pad Id="ErSiGS0L9MNqFT83u3XaLt" Bounds="405,479,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Lines Built counts what the spacing produced. Every line is two vertices: in WebMercator meridians and parallels are straight.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -164,8 +179,8 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="J7dLJzcRYV28bBeDX4gyWS" Bounds="640,348,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; Show Labels writes each crossing's own coordinates beside it.">
-            <p:TypeAnnotation>
+          <Pad Id="J7dLJzcRYV28bBeDX4gyWS" Bounds="401,266,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; Show Labels writes each crossing's own coordinates beside it.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
@@ -173,14 +188,19 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="UsrTFefIW0gkeiXQwu12J4" Bounds="640,400,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Change Zoom Level and watch the automatic spacing follow. The parallels stop at 85.05 degrees - WebMercator's own limit, not ours.">
-            <p:TypeAnnotation>
+          <Pad Id="UsrTFefIW0gkeiXQwu12J4" Bounds="405,691,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Change Zoom Level and watch the automatic spacing follow. The parallels stop at 85.05 degrees - WebMercator's own limit, not ours.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>
               <p:fontsize p:Type="Int32">9</p:fontsize>
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="GEvnhM4gelhOhvFqFhshHP" Comment="Line Color" Bounds="128,350,136,15" ShowValueBox="true" isIOBox="true" Value="1, 0, 0, 1">
+            <p:TypeAnnotation LastCategoryFullName="Color" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="RGBA" />
+            </p:TypeAnnotation>
           </Pad>
         </Canvas>
         <Patch Id="DZezSDuTo4E6WOE8CJcSeL" Name="Create" />
@@ -199,6 +219,7 @@
         <Link Id="Jgf1EdjQpLDOhgfRxnXrRj" Ids="TfnwK7zIIeijshcwdXQKX4,JIa2AMKx0vFj1vv82TPSgW" />
         <Link Id="N7iAq4Xm1Q55qrbBwzPQXV" Ids="MY2VCfnTNGI5AgqIu6IW7p,AXsPrzDeTtYMmS8p3Vxarh" />
         <Link Id="CuOtIbxXDjqueJuJrknQPd" Ids="EHyfvRGWe8krg4ABqP53SG,SgmcuHyMsX7xWDwMq1elhM" />
+        <Link Id="Rn9Y4U7J2OpLEIOK7ngUS8" Ids="GEvnhM4gelhOhvFqFhshHP,FnkB6po8NBWHYqoj1p69CO" />
       </Patch>
     </Node>
   </Patch>
