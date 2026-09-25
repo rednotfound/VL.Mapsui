@@ -109,7 +109,10 @@ writing any node; the four questions at the top of it would have prevented both.
    "the default", so never wire an empty Path IOBox in a shipped patch and never write "leave it
    empty" on a pin. The same ambiguity repeats one level up wherever `null` would have to mean three
    things at once — unconnected, switched off, and failed — so a thing that can be off needs a value
-   saying so (`TileDiskCache.IsOn`), not an absence. Details in `NOTES.md`, 2026-08-14.
+   saying so (`TileDiskCache.IsOn`), not an absence. Details in `NOTES.md`, 2026-08-14. **It
+   recurred on 2026-09-25**: a Path box wired to `TileCache.Folder` in the GUI wrote 25 tiles into
+   `help\VL.Mapsui` itself, though it was null by the time it was saved. `Test-VLPatch` now fails
+   any Path IOBox feeding a `Folder` pin.
 
 ## Node design rules inherited from VL.GIS
 
@@ -310,7 +313,8 @@ dotnet build src\VL.Mapsui\VL.Mapsui.csproj -c Release
 # Or double-click Open-HelpPatch.cmd in the repo root: a picker window listing patches in
 # Help.xml's own order (topic headings, not alphabetical - vvvv's Help Browser reads the same
 # order), with Open / Close my vvvv / Normalize / Check buttons, all going through the same
-# scripts. "Close my vvvv" closes only the
+# scripts. Open while our vvvv runs adds a TAB to it (vvvv is single-instance without -m); a vvvv
+# this launcher did not start is refused. Normalize only after vvvv is closed. "Close my vvvv" closes only the
 # pid the launcher wrote, never another session's window.
 
 # Compile every help patch headlessly, then READ THE GENERATED C# before opening any window:

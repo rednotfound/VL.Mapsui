@@ -80,6 +80,27 @@ foreach ($file in $targets) {
     $dupes = @($allIds | Group-Object | Where-Object Count -gt 1 | ForEach-Object Name)
     if ($dupes.Count) { $problems.Add("duplicate IDs: $($dupes -join ', ')") }
 
+    # A value holding a user-profile path ships the author's user name and machine layout inside
+    # the package. vvvv stores the last value an output IOBox showed; on 2026-09-25 a Status box
+    # came back as "C:\Users\<name>\AppData\Local\VL.Mapsui\tiles - 4077 tiles". Normalize strips
+    # output values; this catches anything else - a constant typed in, a pasted path.
+    # No Path IOBox may feed a pin named Folder (TileCache's). Rule 8 in CLAUDE.md, and it happened
+    # twice: 444 tiles next to two repositories on 2026-08-14, and 25 tiles INSIDE help\VL.Mapsui on
+    # 2026-09-25 - a Path box wired to Folder was created empty in the GUI, VL read "" as the
+    # document's own folder, OSM was switched on, and the cache wrote there. The box was null by the
+    # time the patch was saved, so the file looked safe; the danger is the box itself, which anyone
+    # can click and clear. Leave Folder unconnected in a shipped patch.
+    $pathPads = [System.Collections.Generic.HashSet[string]]::new()
+    foreach ($m in [regex]::Matches($raw, '(?s)<Pad Id="([^"]+)"[^>]*>\s*<p:TypeAnnotation[^>]*>\s*<Choice Kind="\w+" Name="Path" />')) { [void]$pathPads.Add($m.Groups[1].Value) }
+    foreach ($m in [regex]::Matches($raw, '<Link Id="[^"]+" Ids="([^",]+),([^"]+)"')) {
+        if ($pathPads.Contains($m.Groups[1].Value) -and $raw -match "<Pin Id=`"$([regex]::Escape($m.Groups[2].Value))`" Name=`"Folder`"") {
+            $problems.Add("a Path IOBox feeds a Folder pin - an empty one means THIS document's folder, and the tile cache writes there (rule 8). Leave Folder unconnected.")
+        }
+    }
+
+    $userPaths = @([regex]::Matches($raw, 'Value="([^"]*[A-Za-z]:\\Users\\[^"]*)"') | ForEach-Object { $_.Groups[1].Value })
+    if ($userPaths.Count) { $problems.Add("a stored value contains a user-profile path (run tools\Normalize-HelpPatches.ps1 for output boxes): $($userPaths[0])") }
+
     # Pins and Pads are the only things a Link may join.
     $endpoints = @(
         ([regex]'<Pin Id="([^"]+)"').Matches($raw)  | ForEach-Object { $_.Groups[1].Value }

@@ -215,7 +215,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="OejScpElXYiL3YgUfDaP2x" Bounds="-212,189,252,19" ShowValueBox="true" isIOBox="true" Value=" Switch on to see the source map ----&gt;">
+          <Pad Id="OejScpElXYiL3YgUfDaP2x" Bounds="153,188,255,22" ShowValueBox="true" isIOBox="true" Value="&lt;----  Switch on to see the source map">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>

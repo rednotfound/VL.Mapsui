@@ -155,4 +155,45 @@ if ($Check -and $switchedOn.Count -gt 0) {
     exit 1
 }
 
+# ---------------------------------------------------------------------------------------------
+# Output IOBoxes carry no stored value.
+#
+# vvvv saves the last value an OUTPUT IOBox displayed, and some outputs describe the machine: on
+# 2026-09-25 HowTo Cache tiles came back from a GUI session with its Status box holding
+# "C:\Users\<name>\AppData\Local\VL.Mapsui\tiles - 4077 tiles, 79.1 MB" - the author's user name
+# and tile count, about to ship inside the package. The value is meaningless anyway: the link
+# overwrites it on the first frame.
+#
+# An output IOBox is a Pad that a Link feeds FROM A NODE PIN (Ids="<pin>,<pad>"). Input constants
+# are link sources, not targets, and annotation boxes have no links, so neither is touched.
+# ---------------------------------------------------------------------------------------------
+$stripped = @()
+foreach ($patch in $patches) {
+    $relative = $patch.FullName.Substring($RepoRoot.Length + 1)
+    $text     = [IO.File]::ReadAllText($patch.FullName)
+    $pinIds   = [System.Collections.Generic.HashSet[string]]::new()
+    foreach ($m in [regex]::Matches($text, '<Pin Id="([^"]+)"')) { [void]$pinIds.Add($m.Groups[1].Value) }
+    $fedPads  = [System.Collections.Generic.HashSet[string]]::new()
+    foreach ($m in [regex]::Matches($text, '<Link Id="[^"]+" Ids="([^",]+),([^"]+)"')) {
+        if ($pinIds.Contains($m.Groups[1].Value)) { [void]$fedPads.Add($m.Groups[2].Value) }
+    }
+    $count = 0
+    $rewritten = [regex]::Replace($text, '(<Pad Id="([^"]+)"[^>]*?) Value="[^"]*"', {
+        param($m)
+        if ($fedPads.Contains($m.Groups[2].Value)) { $script:count++; $m.Groups[1].Value } else { $m.Value }
+    })
+    if ($count -eq 0) { continue }
+    $stripped += $relative
+    if ($Check) { Write-Host "  would strip $count output value(s)  $relative" }
+    else {
+        [IO.File]::WriteAllText($patch.FullName, $rewritten, (New-Object System.Text.UTF8Encoding($true)))
+        Write-Host "   help\$($patch.Directory.Name)\$($patch.Name): stripped $count stored output value(s)"
+    }
+}
+
+if ($Check -and $stripped.Count -gt 0) {
+    Write-Host "FAIL - $($stripped.Count) help patch(es) store values in output IOBoxes. Run tools\Normalize-HelpPatches.ps1" -ForegroundColor Red
+    exit 1
+}
+
 exit 0

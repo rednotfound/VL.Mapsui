@@ -58,7 +58,7 @@
           <Pad Id="BGJYeCEyjbPsit1g1lq19U" Comment="Tiles" Bounds="227,350,40,15" ShowValueBox="true" isIOBox="true" />
           <Pad Id="SzEgtlszu8qUzmsmAlNMUf" Comment="Size MB" Bounds="262,320,50,15" ShowValueBox="true" isIOBox="true" />
           <Pad Id="DoyV9GimM0WEQGzIygjNMf" Comment="Status" Bounds="192,400,340,15" ShowValueBox="true" isIOBox="true" />
-          <Pad Id="TvspEyqGgWCBymk2xZeCxe" Comment="Enabled" Bounds="52,400,35,35" ShowValueBox="true" isIOBox="true" Value="false">
+          <Pad Id="TvspEyqGgWCBymk2xZeCxe" Comment="Enabled" Bounds="52,459,35,35" ShowValueBox="true" isIOBox="true" Value="false">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
             </p:TypeAnnotation>
@@ -66,7 +66,7 @@
               <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
             </p:ValueBoxSettings>
           </Pad>
-          <Node Bounds="50,450,110,19" Id="OCC3uaYSAwecTTR0dGhEB4">
+          <Node Bounds="50,539,110,19" Id="OCC3uaYSAwecTTR0dGhEB4">
             <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="OpenStreetMap" />
@@ -78,8 +78,8 @@
             <Pin Id="FJisHEaotcYjX4FG2K55Ee" Name="Layers Built" Kind="OutputPin" />
             <Pin Id="IGoUU2l1YzqisLma3id0vi" Name="Cache Status" Kind="OutputPin" />
           </Node>
-          <Pad Id="DVhJsdFPkfctZZgVPnNJcP" Comment="Cache Status" Bounds="157,490,340,15" ShowValueBox="true" isIOBox="true" />
-          <Node Bounds="84,510,110,19" Id="HZGsgvGUtCwuZk24XyrJ3R">
+          <Pad Id="DVhJsdFPkfctZZgVPnNJcP" Comment="Cache Status" Bounds="157,579,340,15" ShowValueBox="true" isIOBox="true" />
+          <Node Bounds="84,620,110,19" Id="HZGsgvGUtCwuZk24XyrJ3R">
             <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Graticule" />
@@ -92,7 +92,7 @@
             <Pin Id="KFvGCK9onTyqipb1X2chps" Name="Result" Kind="OutputPin" />
             <Pin Id="R7eBWvWsttZVIRMEhstMKK" Name="Lines Built" Kind="OutputPin" />
           </Node>
-          <Node Bounds="50,550,39,19" Id="I5lnwnvkTo6zgDe4FtQZa0">
+          <Node Bounds="50,660,39,19" Id="I5lnwnvkTo6zgDe4FtQZa0">
             <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="Cons" />
@@ -102,7 +102,7 @@
             <Pin Id="N0row59DaAgG5HOzqiGO5s" Name="Input 2" Kind="InputPin" />
             <Pin Id="RtfUpYDqJWZ2qa0hk3CRBJ" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="50,600,110,19" Id="A2RmE7obycTfeCsHSsD371">
+          <Node Bounds="50,720,110,19" Id="A2RmE7obycTfeCsHSsD371">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Map" />
@@ -129,7 +129,7 @@
             </Pin>
             <Pin Id="OP3RuXo5PCvGg8zjefkTkl" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="50,660,130,19" Id="HJntZUeudCbruss8CRptof">
+          <Node Bounds="50,780,130,19" Id="HJntZUeudCbruss8CRptof">
             <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
@@ -139,7 +139,7 @@
             <Pin Id="JtNBO9oNFKFrpMqx4RKvPX" Name="Diagnostics" Kind="InputPin" />
             <Pin Id="FW8vAVxbrrb1B4fEvmjG2S" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="10,720,185,19" Id="KaCw0CgyZdohf3Jxa775oE">
+          <Node Bounds="10,840,185,19" Id="KaCw0CgyZdohf3Jxa775oE">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
@@ -147,7 +147,7 @@
               <PinReference Kind="InputPin" Name="Bounds" />
             </p:NodeReference>
             <Pin Id="NfnBqtVk1YMLSPxmHtzXI8" Name="Node Context" Kind="InputPin" IsHidden="true" />
-            <Pin Id="AYEgxOg1C7xKArlbaEyQH9" Name="Bounds" Kind="InputPin" DefaultValue="536, 454, 900, 560">
+            <Pin Id="AYEgxOg1C7xKArlbaEyQH9" Name="Bounds" Kind="InputPin" DefaultValue="897, 457, 900, 560">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
@@ -177,7 +177,7 @@
             <Pin Id="N3oBebp8ry2LoLT64MuoFJ" Name="ClientBounds" Kind="OutputPin" />
             <Pin Id="I52536MZO2KP5nfSB6dqWF" Name="Render Time" Kind="OutputPin" />
           </Node>
-          <Pad Id="DSoq5GDNdbNHHO1ieJvHV3" Bounds="879,198,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Enabled defaults ON: a cache touches nobody's network, and keeping drawn tiles is what OSM's policy asks for. Off means every restart refetches the same view.">
+          <Pad Id="DSoq5GDNdbNHHO1ieJvHV3" Bounds="879,174,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Enabled defaults ON: a cache touches nobody's network, and keeping drawn tiles is what OSM's policy asks for. Off means every restart refetches the same view.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -186,7 +186,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="LmQKdC76lZdS5x8b8Re199" Bounds="879,286,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Folder unconnected = %LOCALAPPDATA%\VL.Mapsui\tiles. To move it, connect a Path IOBox with an ABSOLUTE path, never an empty one: VL reads &quot;&quot; as this document's folder.">
+          <Pad Id="LmQKdC76lZdS5x8b8Re199" Bounds="879,267,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Folder unconnected = %LOCALAPPDATA%\VL.Mapsui\tiles. To move it, connect a Path IOBox with an ABSOLUTE path, never an empty one: VL reads &quot;&quot; as this document's folder.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -195,7 +195,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="LL1DzB1k9ap96PoWjjsxO5" Bounds="879,374,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Reads the disk, never the network: Tiles and Size MB are true with the layer switched off. Delete the folder to start over.">
+          <Pad Id="LL1DzB1k9ap96PoWjjsxO5" Bounds="879,363,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Reads the disk, never the network: Tiles and Size MB are true with the layer switched off. Delete the folder to start over.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -213,7 +213,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="IBSciNasmGhH9NMr59RkLy" Bounds="879,514,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Cache Status is where THIS layer writes. An unusable or relative folder is reported here, not replaced by the default.">
+          <Pad Id="IBSciNasmGhH9NMr59RkLy" Bounds="879,560,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Cache Status is where THIS layer writes. An unusable or relative folder is reported here, not replaced by the default.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -222,7 +222,16 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="KL8B9XN92Hs0lL1S42IGID" Bounds="879,584,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; The graticule keeps the window from being blank while the tiles are off.">
+          <Pad Id="KL8B9XN92Hs0lL1S42IGID" Bounds="879,629,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; The graticule keeps the window from being blank while the tiles are off.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="JBWPhTaRxUzMMXNaLeSdHo" Bounds="134,469,255,22" ShowValueBox="true" isIOBox="true" Value="&lt;----  Switch on to see the source map">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>

@@ -5,6 +5,39 @@ them do not belong here.
 
 ---
 
+## 2026-09-25 — rule 8 happened again: 25 tiles inside help\, and a user path in a Status box
+
+Reviewing three hand-arranged patches, `Test-VLPackage` found **25 tiles (785 KB, zoom 9–12) in
+`help\VL.Mapsui\tile.openstreetmap.org-142435f5\`**, all written at 11:26:37 - inside the user's
+session on `HowTo Cache tiles`, in which OpenStreetMap had been switched on (Normalize turned its
+`Enabled` back off) and a **Path IOBox had been wired to `TileCache`'s `Folder`**. The box was
+`<p:Value r:IsNull="true" />` when saved, and `vvvvc` compiled it to `default(Path)` - null, the
+default folder; the Status box read the default folder when the patch was reopened at 11:33. So the
+saved file looked safe. The tiles show it was not safe while being edited: a freshly created Path
+box is `""`, VL reads that as the document's own folder, and the cache wrote there. The danger is
+the box, not its saved value - anyone can click it and clear it, including a user of the installed
+package, whose help folder is under `%LOCALAPPDATA%\vvvv\gamma\nugets\`.
+
+Not in git (`.gitignore`'s tile pattern), never committed. Deleted after checking the folder held
+only the 25 png. The Path box and its link were removed; the note beside `TileCache` already says
+"Folder unconnected = default". **`Test-VLPatch` now fails any Path IOBox that feeds a pin named
+`Folder`** - negative-tested on the patch before the removal.
+
+Same review, second finding: vvvv saved the last value of the **`Status` output box**,
+`C:\Users\<name>\AppData\Local\VL.Mapsui\tiles - 4077 tiles, 79.1 MB` - the author's user name, about
+to ship. **`Normalize-HelpPatches` now strips stored values from every output IOBox** (a Pad fed by a
+node pin), and **`Test-VLPatch` fails any value holding a `X:\Users\` path**. Both negative-tested.
+
+**Opening several patches at once works now.** vvvv gamma is single-instance unless started with
+`-m`: a second `vvvv.exe <file>` hands the file to the running instance and exits within a second.
+Measured: three patches, one vvvv process throughout, each a new tab and each in
+`RecentDocuments.txt`. `Open-HelpPatch.ps1` does that when the running vvvv is the one it started
+(pid file) and the only one; a foreign vvvv is still refused. One caution seen the same morning:
+editing a patch's file on disk while vvvv has it open makes the next close hang on a dialog -
+Normalize and edits go after vvvv is closed.
+
+---
+
 ## 2026-09-25 — a hand-arranged layout "reverted": two copies of every help patch
 
 The user arranged `HowTo Show a map` by hand, reopened it, and found the old layout. Nothing had

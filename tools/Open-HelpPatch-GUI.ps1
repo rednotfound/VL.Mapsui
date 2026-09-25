@@ -134,7 +134,7 @@ for ($i = 0; $i -lt $entries.Count; $i++) { if ($entries[$i].Kind -eq 'Patch') {
 if ($list.Items.Count -gt 0) { $list.SelectedIndex = $firstPatch }
 
 $hint                 = [System.Windows.Forms.Label]::new()
-$hint.Text            = 'Opening a document in vvvv is RUNNING it. Read, adjust, save, close vvvv - then Normalize and Check. Tile layers start switched off.'
+$hint.Text            = 'Open as many as you like - each becomes a tab in the same vvvv. When done: save, close vvvv, then Normalize and Check.'
 $hint.Location        = [System.Drawing.Point]::new(12, 350)
 $hint.Size            = [System.Drawing.Size]::new(676, 20)
 $hint.Anchor          = 'Left,Right,Bottom'

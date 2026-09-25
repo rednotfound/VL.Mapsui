@@ -106,9 +106,37 @@ if ($missing) {
 
 $repositories = ($wanted | ForEach-Object { $_.Path }) -join ';'
 
-if (Get-Process vvvv -ErrorAction SilentlyContinue) {
-    Write-Host "`nvvvv is ALREADY RUNNING. Close it first - two instances share one tile cache" -ForegroundColor Red
-    Write-Host "and one set of ephemeral ports.`n" -ForegroundColor Red
+$pidFile = Join-Path ([IO.Path]::GetTempPath()) 'vl-mapsui-vvvv.pid'
+
+# ALREADY RUNNING: open the patch as a new tab in OUR vvvv, instead of refusing (2026-09-25).
+# vvvv gamma is single-instance unless started with -m: a second `vvvv.exe <file>` hands the file to
+# the running instance and exits within a second. Measured that day - three patches opened this
+# way, one vvvv process throughout, each a new tab, each in RecentDocuments.txt. The running
+# instance already has the package repositories, so none are passed.
+# Only when the running vvvv is the one this launcher started (its pid is in the pid file) and it
+# is the only one: a sibling session on this machine runs its own vvvv, and a file must never be
+# pushed into their window - nor could we say which of two instances would receive it.
+$running = @(Get-Process vvvv -ErrorAction SilentlyContinue)
+if ($running) {
+    $ours = $null
+    if (Test-Path $pidFile) { $ours = [int](Get-Content $pidFile -ErrorAction SilentlyContinue) }
+    if ($running.Count -eq 1 -and $running[0].Id -eq $ours) {
+        Write-Host "`nopening $(Split-Path $target -Leaf) as a new tab in the running vvvv (pid $ours)"
+        Start-Process -FilePath $Vvvv -ArgumentList @("`"$target`"") | Out-Null
+        # If forwarding ever stops working, a second vvvv would stay up - say so rather than
+        # leaving two instances fighting over one tile cache.
+        Start-Sleep -Seconds 3
+        $now = @(Get-Process vvvv -ErrorAction SilentlyContinue | Where-Object { $_.Id -ne $ours })
+        if ($now) {
+            Write-Host "a SECOND vvvv started (pid $($now.Id -join ', ')) instead of a new tab - close it; forwarding did not work" -ForegroundColor Red
+            exit 1
+        }
+        Write-Host "READ IT AND CLOSE IT. Every open tab is running.`n" -ForegroundColor Yellow
+        exit 0
+    }
+    Write-Host "`na vvvv is running that this launcher did not start (pid $($running.Id -join ', '))." -ForegroundColor Red
+    Write-Host "It may belong to another session on this machine - not opening anything into it." -ForegroundColor Red
+    Write-Host "Close it (if it is yours) and try again.`n" -ForegroundColor Red
     exit 1
 }
 
@@ -121,7 +149,6 @@ Write-Host ""
 # vvvv that had been opened in the minute between this launch and its close - the two repositories
 # are worked on at the same time on one machine, and "the vvvv that is running" is not always ours.
 $proc = Start-Process -FilePath $Vvvv -ArgumentList @("`"$target`"", '--package-repositories', "`"$repositories`"") -PassThru
-$pidFile = Join-Path ([IO.Path]::GetTempPath()) 'vl-mapsui-vvvv.pid'
 Set-Content $pidFile $proc.Id
 Write-Host "vvvv pid $($proc.Id) (written to $pidFile - stop that pid, never every vvvv)" -ForegroundColor DarkGray
 
