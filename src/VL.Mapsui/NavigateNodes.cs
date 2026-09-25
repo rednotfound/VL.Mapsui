@@ -38,7 +38,9 @@ public static class NavigateNodes
     /// </summary>
     public static Map ZoomToLevel(Map map, int zoomLevel = 12)
     {
-        map.Navigator.ZoomToLevel(Math.Clamp(zoomLevel, 0, 22));
+        // Not map.Navigator.ZoomToLevel: on a map with no tile layer that is a silent no-op
+        // (2026-09-25, HowTo Draw a graticule). See ZoomLadder.
+        ZoomLadder.ZoomToLevel(map.Navigator, Math.Clamp(zoomLevel, 0, 22));
         Refresh(map, continuous: false);
         return map;
     }

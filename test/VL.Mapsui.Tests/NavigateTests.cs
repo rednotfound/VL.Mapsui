@@ -45,6 +45,68 @@ public class NavigateTests
         Assert.Equal(156543.03392804097 / Math.Pow(2, 11), map.Navigator.Viewport.Resolution, precision: 6);
     }
 
+    // ---- zoom nodes on a map WITHOUT a tile layer ------------------------------------------
+    //
+    // Found by the user testing HowTo Draw a graticule (2026-09-25): turning ZoomToLevel's Zoom
+    // Level changed nothing. The 2026-08-23 fix above gave only Home a fallback; ZoomToLevel,
+    // ZoomIn, ZoomOut and the wheel all look levels up in the navigator's resolutions list, which
+    // only a tile schema fills, so on a tile-less map every one of them was a silent no-op. The
+    // SizedMap helper below never saw it: it installs a resolution ladder itself - the suite
+    // worked around the defect instead of testing it. These build the map exactly as a patch does.
+
+    static Map TileLessMap(MapNode node)
+    {
+        var map = node.Update();                 // no layers, no OverrideResolutions from the test
+        map.Navigator.SetSize(800f, 600f);
+        map.Navigator.MouseWheelAnimation.Duration = 0;
+        map.Home!(map.Navigator);
+        return map;
+    }
+
+    [Theory]
+    [InlineData(2)]
+    [InlineData(5)]
+    [InlineData(15)]
+    public void ZoomToLevel_moves_a_map_that_has_no_tile_layer(int level)
+    {
+        using var node = new MapNode();
+        var map = TileLessMap(node);
+
+        NavigateNodes.ZoomToLevel(map, level);
+
+        Assert.Equal(156543.03392804097 / Math.Pow(2, level), map.Navigator.Viewport.Resolution, precision: 6);
+    }
+
+    [Fact]
+    public void ZoomIn_and_ZoomOut_move_a_map_that_has_no_tile_layer()
+    {
+        using var node = new MapNode();
+        var map = TileLessMap(node);
+        var start = map.Navigator.Viewport.Resolution;
+
+        new ZoomInNode().Update(map, trigger: true);
+        map.UpdateAnimations();
+        var zoomedIn = map.Navigator.Viewport.Resolution;
+        Assert.True(zoomedIn < start, $"ZoomIn should shrink metres per pixel: {start} -> {zoomedIn}");
+
+        new ZoomOutNode().Update(map, trigger: true);
+        map.UpdateAnimations();
+        Assert.True(map.Navigator.Viewport.Resolution > zoomedIn, "ZoomOut should grow metres per pixel");
+    }
+
+    [Fact]
+    public void The_wheel_moves_a_map_that_has_no_tile_layer()
+    {
+        using var node = new MapNode();
+        var map = TileLessMap(node);
+        var start = map.Navigator.Viewport.Resolution;
+
+        NavigateNodes.ZoomAt(map, 400f, 300f, steps: 1);
+        map.UpdateAnimations();
+
+        Assert.True(map.Navigator.Viewport.Resolution < start, "one wheel step in should shrink metres per pixel");
+    }
+
     [Fact]
     public void Home_centres_a_feature_only_map_where_the_Initial_pins_say()
     {

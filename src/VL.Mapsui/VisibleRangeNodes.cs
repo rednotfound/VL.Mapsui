@@ -3,7 +3,6 @@ using VL.Core.Import;
 
 using ILayer = global::Mapsui.Layers.ILayer;
 using BaseLayer = global::Mapsui.Layers.BaseLayer;
-using GlobalSphericalMercator = BruTile.Predefined.GlobalSphericalMercator;
 
 namespace VL.Mapsui;
 
@@ -103,7 +102,5 @@ public static class VisibleRangeNodes
     /// which tile a zoom level means. The schema's own dictionary stops at 19; halving from level 0
     /// does not, and a data layer has no reason to stop where a tile source does.
     /// </remarks>
-    static double Resolution(int zoomLevel) => TopResolution / Math.Pow(2, Math.Max(0, zoomLevel));
-
-    static readonly double TopResolution = new GlobalSphericalMercator().Resolutions[0].UnitsPerPixel;
+    static double Resolution(int zoomLevel) => ZoomLadder.Resolution(zoomLevel);
 }

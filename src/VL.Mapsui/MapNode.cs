@@ -71,10 +71,9 @@ public class MapNode : IDisposable
                 // Found by the first offline help patch, 2026-08-23: a full-screen solid colour
                 // with every readout healthy. The fallback is the number the list would have
                 // held: the standard WebMercator resolution for that level, 256-pixel tiles.
-                if (navigator.Resolutions.Count > initialZoomLevel && initialZoomLevel >= 0)
-                    navigator.ZoomToLevel(initialZoomLevel);
-                else
-                    navigator.ZoomTo(156543.03392804097 / Math.Pow(2, initialZoomLevel));
+                // The same fallback ZoomToLevel uses, from one place (ZoomLadder): the two drifted
+                // apart once, and ZoomToLevel stayed broken on tile-less maps for a month.
+                ZoomLadder.ZoomToLevel(navigator, initialZoomLevel);
             };
         }
 

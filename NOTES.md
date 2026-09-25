@@ -5,6 +5,31 @@ them do not belong here.
 
 ---
 
+## 2026-09-25 — ZoomToLevel did nothing on a map without tiles
+
+The user turned `ZoomToLevel`'s Zoom Level in `HowTo Draw a graticule` and nothing moved. Same root
+as defect six (2026-08-23): Mapsui's `Navigator.ZoomToLevel` looks the level up in a resolutions
+list only a tile schema fills, and on a tile-less map it logs a warning and does not zoom. That fix
+went into `Map`'s Home only; the `ZoomToLevel` node kept calling Mapsui directly. It was silent in
+every tile-less patch - `Draw a graticule`, `Set the view`, `Show a layer only at some zooms`, whose
+whole lesson ("set 12 and the square is gone") could not be seen.
+
+**Why the tests never caught it:** `NavigateTests.SizedMap` installs `OverrideResolutions` itself,
+with a comment saying an empty map makes every zoom a no-op. The suite worked around the defect.
+New tests build the map as a patch does: `ZoomToLevel` at 2, 5 and 15 failed on the old code, pass
+now, and fail again when the fix is reverted on the finished code. The same tests showed ZoomIn,
+ZoomOut and the wheel were never broken - with an empty list Mapsui halves or doubles instead.
+
+Fixed through one helper, `ZoomLadder`, which `Map`'s Home, `ZoomToLevel` and `VisibleRange` now
+share: the navigator's own list when it has the level, else BruTile's `GlobalSphericalMercator`
+level-0 resolution halved per level. 257 tests.
+
+**The grid "crowded to the left" was the view, not the grid.** At zoom 2 the world is 1024 px wide
+and the window 900; centred on Tokyo (139.7°E), the antimeridian sits about 115 px right of centre,
+and Mapsui does not repeat the world - the right third of the window is outside it.
+
+---
+
 ## 2026-09-25 — rule 8 happened again: 25 tiles inside help\, and a user path in a Status box
 
 Reviewing three hand-arranged patches, `Test-VLPackage` found **25 tiles (785 KB, zoom 9–12) in
