@@ -69,12 +69,50 @@ the patch running - there is no idle state.
 "@
 }
 
+# EDITS MADE IN dist\ ARE NOT LOST SILENTLY. Until 2026-09-25 dist\<Package>\help was a COPY of
+# help\<Package>, and vvvv - launched with --package-repositories dist - opens that copy whenever a
+# help patch is reached from inside it: F1 on a node, the Help Browser. So a layout arranged by hand
+# after pressing F1 was saved into dist\, and the next build wiped it; it happened to HowTo Show a
+# map that morning (vvvv's RecentDocuments.txt showed the dist path). help is a junction now (see
+# below), which makes the two one file. This check covers a dist\ staged by the old copying build:
+# refuse, and name the files, if any staged help file is newer than its repo counterpart and differs.
+foreach ($pkg in $Packages) {
+    $stagedHelp = Join-Path $pkg.PkgDir 'help'
+    $repoHelp   = Join-Path $RepoRoot "help\$($pkg.Name)"
+    if (-not (Test-Path $stagedHelp)) { continue }
+    if ((Get-Item $stagedHelp -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) { continue }
+    $unsaved = @(Get-ChildItem $stagedHelp -File -Recurse | Where-Object {
+        $src = Join-Path $repoHelp $_.FullName.Substring($stagedHelp.Length).TrimStart('\')
+        if (-not (Test-Path $src)) { return $true }
+        ($_.LastWriteTime -gt (Get-Item $src).LastWriteTime) -and
+            ((Get-FileHash $_.FullName).Hash -ne (Get-FileHash $src).Hash)
+    })
+    if ($unsaved.Count -gt 0) {
+        throw @"
+These help files were edited in dist\ (opened through F1 or the Help Browser) and are newer than
+the repository's copy. Building would delete them:
+
+$(($unsaved | ForEach-Object { '  ' + $_.FullName }) -join "`n")
+
+Copy the ones you want to keep into help\$($pkg.Name)\, then run .\build.ps1 again.
+"@
+    }
+}
+
 Write-Host "== 1/5 build ==" -ForegroundColor Cyan
 dotnet build (Join-Path $RepoRoot 'src\VL.Mapsui\VL.Mapsui.csproj') -c $Configuration -v minimal
 if ($LASTEXITCODE -ne 0) { throw "dotnet build failed ($LASTEXITCODE)" }
 
 Write-Host "`n== 2/5 stage dist\ ==" -ForegroundColor Cyan
-if (Test-Path $Dist) { Remove-Item $Dist -Recurse -Force }
+# dist\<Package>\help is a junction INTO the repository. Remove every junction first, on its own
+# and non-recursively, so the recursive delete below can never reach through one into help\ -
+# measured safe without this in PowerShell 7.6 and 5.1 (2026-09-25, scratchpad), kept anyway: the
+# cost is two lines and the failure would be the repository's help patches.
+if (Test-Path $Dist) {
+    Get-ChildItem $Dist -Recurse -Force -Attributes ReparsePoint -ErrorAction SilentlyContinue |
+        ForEach-Object { [IO.Directory]::Delete($_.FullName, $false) }
+    Remove-Item $Dist -Recurse -Force
+}
 
 # A version number is immutable as far as every cache is concerned, and this repository rebuilds
 # 0.0.1-alpha over and over. Two caches then keep serving yesterday's assembly while dist\ holds
@@ -139,9 +177,21 @@ foreach ($pkg in $Packages) {
     [xml]$nuspec = Get-Content $pkg.Nuspec -Raw
     $shipsHelp = @($nuspec.package.files.file | Where-Object { $_.src -like 'help\*' }).Count -gt 0
     $helpSrc = Join-Path $RepoRoot "help\$($pkg.Name)"
+    # A JUNCTION, not a copy (2026-09-25): vvvv opens dist\...\help\ for F1 and the Help Browser,
+    # and a copy there made every edit reached that way land in a file the next build deleted. With
+    # a junction there is one file whichever way it is opened, and git sees the edit. The package
+    # itself is unaffected: pack.ps1 packs help\ straight out of the repository via the nuspec.
     if ($shipsHelp -and (Test-Path $helpSrc) -and (Get-ChildItem $helpSrc -File -Recurse -ErrorAction SilentlyContinue)) {
-        Copy-Item $helpSrc -Destination (Join-Path $pkg.PkgDir 'help') -Recurse
-        Write-Host "      help\ (from help\$($pkg.Name))"
+        $helpDst = Join-Path $pkg.PkgDir 'help'
+        try {
+            New-Item -ItemType Junction -Path $helpDst -Target $helpSrc -ErrorAction Stop | Out-Null
+            Write-Host "      help\ -> junction to help\$($pkg.Name)  (edits from F1 land in the repository)"
+        }
+        catch {
+            Copy-Item $helpSrc -Destination $helpDst -Recurse
+            Write-Host "      help\ COPIED from help\$($pkg.Name) - junction failed: $($_.Exception.Message)" -ForegroundColor Yellow
+            Write-Host "      edits made after F1 will land in dist\ and the next build refuses until they are copied back" -ForegroundColor Yellow
+        }
     }
 }
 

@@ -194,6 +194,10 @@ Written down before starting, so the finding can be compared with the prediction
 
 ## Open items
 
+- **Carry the dist-help junction to `vl-nettopologysuite` and `vl-geojson`** — both `build.ps1`
+  still copy `help\` into `dist\` (line 151), so an edit made after F1 lands in a file their next
+  build deletes. The fix and its measurements are in this repository's `build.ps1` and NOTES.md,
+  2026-09-25.
 - **Carry the two `Test-VLPatch` fixes to `vl-nettopologysuite`** (`(?<![A-Za-z])Id="` and the
   `PinReference` allowance in the flag audit). Its session ended before it could be told; nothing
   there is wrong today because it has no records and no pin defaults.

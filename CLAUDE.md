@@ -33,6 +33,11 @@ opened in vvvv and photographed. The plan, the decisions and what the patches fo
 folders in [docs/HELP-PATCH-STYLE.md](docs/HELP-PATCH-STYLE.md). **Read both before touching
 `help\`**, and `git status` first: the user hand-edits patches in the GUI between sessions.
 
+**`dist\VL.Mapsui\help` is a junction to `help\VL.Mapsui`, not a copy** (2026-09-25). vvvv opens
+the dist path for F1 and the Help Browser; while it was a copy, a layout arranged after F1 was saved
+where the next build deleted it. If `build.ps1` ever refuses with "edited in dist\", copy the named
+files back into `help\` before anything else. NOTES.md, 2026-09-25.
+
 **Another Claude session works on `vl-nettopologysuite` on this machine at the same time.** Never
 `Stop-Process vvvv`: `tools\Open-HelpPatch.ps1` writes its pid to `%TEMP%\vl-mapsui-vvvv.pid`, and
 that pid is the only one this repository may close. If a vvvv you did not start is running, report

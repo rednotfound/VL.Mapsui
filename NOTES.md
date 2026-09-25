@@ -5,6 +5,42 @@ them do not belong here.
 
 ---
 
+## 2026-09-25 — a hand-arranged layout "reverted": two copies of every help patch
+
+The user arranged `HowTo Show a map` by hand, reopened it, and found the old layout. Nothing had
+reverted. vvvv's own `%LOCALAPPDATA%\vvvv\gamma\RecentDocuments.txt` settled it in one read:
+
+```
+11:13:23  ...\vl-mapsui\help\VL.Mapsui\HowTo Use any tile service.vl     <- opened from the picker
+11:13:20  ...\vl-mapsui\dist\VL.Mapsui\help\HowTo Show a map.vl          <- reached from inside vvvv
+10:45:08  ...\vl-mapsui\help\VL.Mapsui\HowTo Show a map.vl               <- the first arrangement
+```
+
+**`build.ps1` copied `help\VL.Mapsui` into `dist\VL.Mapsui\help`, and vvvv - launched with
+`--package-repositories dist` - opens that copy whenever a help patch is reached from inside it**:
+F1 on a node (OpenStreetMap's High flag is in Show a map), the Help Browser. The picker opens the
+repository copy. So the first arrangement lived only in the repository, the dist copy still held
+the generated layout, the user saw that through F1 and re-arranged it there - into a file the next
+build would have deleted. Rescued into the repository (both versions backed up; the first is also
+in git at `a80b000`).
+
+**Fixed at the root: `dist\<Package>\help` is a directory junction to `help\<Package>` now.** One
+file, whichever way it is opened, and git sees the edit. The package is unaffected (`pack.ps1`
+packs `help\` from the repository through the nuspec; the built nupkg still lists all 20 files).
+Before relying on it the delete path was measured in the scratchpad, because `build.ps1` wipes
+`dist\` recursively: `Remove-Item -Recurse -Force` on a folder holding a junction left the target
+intact in **both PowerShell 7.6 and 5.1**. `build.ps1` removes junctions non-recursively first anyway.
+
+**And a guard for the old state:** if `dist\...\help` is still a real copy and any file in it is
+newer than its repository counterpart and differs, `build.ps1` refuses and names the files instead
+of deleting them. Negative-tested by touching the stale dist copy of `HowTo Cache tiles`: refused,
+before anything was removed.
+
+**`vl-nettopologysuite` and `vl-geojson` have the same copy** (`build.ps1` line 151). Not changed
+here; carried as an open item.
+
+---
+
 ## 2026-09-24 — the help became the second test suite: 19 patches, 36 of 36 nodes on F1
 
 The whole campaign is in `docs/HELP-PATCH-PLAN.md`; this entry keeps the numbers.
