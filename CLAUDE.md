@@ -23,10 +23,11 @@ none of them references another. The retired `VL.GIS` lives only on GitHub now
 still declares BruTile 6 and conflicts with this package — the README's Install section says what
 a user has to delete by hand.
 
-**Current state (2026-09-25): preparing the first release, `0.0.1-alpha` — a prerelease, an early
+**Current state (2026-09-26): ready for the first release, `0.0.1-alpha` — a prerelease, an early
 preview, not a stable version.** A map renders in vvvv 7.4, pans, zooms and takes geometry from
-any NTS source. **33 nodes, 244 tests.** Nothing is on nuget.org yet; see "Releasing" below for the
-order and what the user does themselves. **The help is the second test suite: 19 patches in the
+any NTS source. **33 nodes, 244 tests.** VL.NetTopologySuite, which this package depends on, is on
+nuget.org since 2026-09-26; VL.Mapsui is not yet — the upload is the maintainer's. See "Releasing"
+below and [docs/RELEASE.md](docs/RELEASE.md). **The help is the second test suite: 19 patches in the
 community's measured style, every one of the 33 nodes opens one on F1** (`tools\Test-VLPatch.ps1`
 audits the flags), all 19 compile with every process node constructed in `Create`
 (`tools\Compile-HelpPatches.ps1` reads the generated C#), and every one was hand-arranged by the
@@ -222,6 +223,8 @@ vl-mapsui/
 ├── docs/VL-PATCH-XML.md          # ⭐ hand-authoring a .vl - read before editing one
 ├── docs/HELP-PATCH-STYLE.md      # ⭐ the community's help style, measured, + how 60 packs organize help
 ├── docs/HELP-PATCH-PLAN.md       # the 2026-09-24 help campaign: decisions, gate, what the patches found
+├── docs/RELEASE.md               # the release checklist: what each step proves, where it stands
+├── LICENSE, .gitattributes       # MIT; .vl and Help.xml bytes pinned (-text)
 ├── VL.Mapsui.vl / .nuspec        # the package. .vl is hand-edited but never regenerated
 ├── src/VL.Mapsui/                # 33 nodes. Feature itself is VL.NetTopologySuite's, not ours
 │   ├── LayerNodes.cs             # [ProcessNode] OpenStreetMap - tile layer, cache, attribution, UserAgent
@@ -261,6 +264,7 @@ vl-mapsui/
     ├── Normalize-HelpPatches.ps1 # run after any GUI session - vvvv repins deps AND saves Enabled=True
     ├── Compile-HelpPatches.ps1   # headless vvvvc over every help patch, then READS the C#; needs pack.ps1 first
     ├── New-VLId.ps1              # 22-char VL document IDs
+    ├── Test-Install.ps1          # installs the packed nupkg like a user and compiles its help; -FromNuGetOrg before a release
     └── legacy/                   # retired generators; the checked-in .vl is the truth
 ```
 
@@ -342,36 +346,32 @@ there and in the nuspec**, or the node vanishes the same way.
 Get-NetTCPConnection | Where-Object { $_.OwningProcess -eq (Get-Process vvvv).Id }
 ```
 
-## Releasing — `0.0.1-alpha`, the first one (prepared 2026-09-25)
+## Releasing — `0.0.1-alpha`, the first one
 
-- **The version is `0.0.1-alpha`, a prerelease.** Any `-suffix` makes nuget.org treat it as one:
-  hidden from a default search, installed with `nuget install VL.Mapsui -pre`. The three siblings
-  use the same suffix; keep the family in step rather than inventing `-pre` or `-preview` here.
+**[docs/RELEASE.md](docs/RELEASE.md) is the checklist**: what each step proves, where it stands,
+and what is the maintainer's. The rules that outlive this release:
+
+- **Every release is a prerelease for now**, `0.0.1-alpha` first, the family's suffix, in step with
+  VL.NetTopologySuite. A user installs with `nuget install VL.Mapsui -pre`.
+- **VL.NetTopologySuite went first and is on nuget.org since 2026-09-26** (`0.0.1-alpha`, browser
+  upload). This package's dependency on it resolves there now; before that date, publishing this
+  one would have produced a package nobody could install.
 - **The version is written in three places, and nothing overrides them:** the nuspec's
   `<version>`, `LayerNodes.UserAgent` (what OSM's servers see), and the nuspec's dependency on
-  `VL.NetTopologySuite`. There is no publish workflow — no `.github\` at all — so the nuspec is the
-  source of truth.
-- **Order: VL.NetTopologySuite (and VL.GeoJSON) → VL.Mapsui → VL.Overworld.** This package declares
-  `VL.NetTopologySuite 0.0.1-alpha`; published first, every install of it fails to resolve. That
-  repository belongs to the sibling session.
-- **The user performs the irreversible step.** Claude prepares, validates, commits and pushes
-  `main`, then hands over the exact command and stops. A published version can never be replaced
-  or deleted, only unlisted — VL.GIS's six unlisted versions are still installable by exact
-  version.
-- **Undecided: how it gets pushed.** A tag-triggered GitHub Actions workflow with the key in a
-  `NUGET_KEY` secret (the user's choice on vvvv-gis, so the key never passes through a local
-  shell), or `dist\feed\VL.Mapsui.0.0.1-alpha.nupkg` pushed by hand with the `!` prefix.
-- **The gate, run as its own step before the irreversible one:** `dotnet test`, `.\pack.ps1`,
-  `tools\Test-VLPackage.ps1`, `tools\Test-VLPatch.ps1`, `tools\Compile-HelpPatches.ps1`, and
-  **`tools\Test-Install.ps1`** — it installs from the feed the way a user does and compiles every
-  help patch from inside the installed package, the only check that proves the nuspec's
-  dependencies really arrive.
-- **The GitHub repository must be public**, since the nuspec's `projectUrl` and every README link
-  point at it. Checked 2026-09-25: all four family repositories and vvvv-gis are public.
-- **Right after publishing, bump the working version to `0.0.2-alpha`.** The dev loop repacks the
-  same version all day, and NuGet uses any cached copy whose version matches without looking at
-  the feed — once a real `0.0.1-alpha` exists in someone's cache, a local one with that number is
-  indistinguishable from it.
+  `VL.NetTopologySuite`. No `.github\` exists in any family repository.
+- **The maintainer performs the irreversible step.** Claude prepares, validates, commits and pushes
+  `main`, then hands over and stops. A published version can never be replaced or deleted.
+- **Way A — upload in the browser — for the first release**, as VL.NetTopologySuite did: no key is
+  created, and the Verify page shows every field plus a README preview before the one click. API
+  keys are now 30-day at most and every pre-2026-08-17 key dies on 2026-11-01; Trusted Publishing
+  from GitHub Actions is the shape for the next release. Sources in VL.NetTopologySuite's RELEASE.md.
+- **`tools\Test-Install.ps1 -FromNuGetOrg` before the upload, never the bare form.** The bare form
+  passed on 2026-09-26 with VL.NetTopologySuite taken from `%USERPROFILE%\.nuget\packages` — a local
+  build of the same version, byte-identical DLL, distinguishable only by nuget.org's
+  `.signature.p7s`, which the switch now requires.
+- **Right after publishing, the working version becomes `0.0.2-alpha`** (nuspec + UserAgent, and a
+  nuspec comment saying so, as VL.NetTopologySuite's has). NuGet uses any cached copy whose version
+  matches without looking at the feed — the trap above, in the other direction.
 
 ## Working style
 

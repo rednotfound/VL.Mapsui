@@ -6,7 +6,8 @@ that draws the map into VL.Skia.
 
 ## ⚠️ Status: 0.0.1-alpha, an early preview
 
-This is the first published version, and it is a **prerelease**. It works — a map renders in vvvv
+`0.0.1-alpha` is the first release, and it is a **prerelease**; how it gets to nuget.org, and what
+each check before that proves, is in [docs/RELEASE.md](docs/RELEASE.md). It works — a map renders in vvvv
 7.4, pans, zooms, draws geometry from any NetTopologySuite source and tells you which feature is
 under the mouse — but the node surface can still change between versions, and Mapsui is far larger
 than what is wrapped (a few dozen of its 306 public types; see
@@ -110,6 +111,7 @@ dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj   # 244 tests, ~2 s, no 
 .\tools\Test-VLPackage.ps1                                 # static package checks
 .\tools\Test-VLPatch.ps1                                   # every help patch, and F1 for every node
 .\tools\Compile-HelpPatches.ps1                            # vvvvc over every help patch, reads the C#
+.\tools\Test-Install.ps1 -FromNuGetOrg                     # install like a user, compile the help from it
 .\tools\Open-HelpPatch.ps1 "Show a map"                    # the only way to launch vvvv here
 ```
 
@@ -124,6 +126,7 @@ repository folders, and a missing one fails with an error naming something else.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — the pipeline and the NetTopologySuite boundary
 - [docs/MAPSUI-SURFACE.md](docs/MAPSUI-SURFACE.md) — what Mapsui offers, what is wrapped, what will not be
 - [docs/HELP-PATCH-STYLE.md](docs/HELP-PATCH-STYLE.md) — the help style, measured across 60 community packs
+- [docs/RELEASE.md](docs/RELEASE.md) — the release checklist, what each step proves
 - [CLAUDE.md](CLAUDE.md) — the rules that matter in this repository
 
 ## Licence

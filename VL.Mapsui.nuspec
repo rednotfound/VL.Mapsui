@@ -9,7 +9,13 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <projectUrl>https://github.com/rednotfound/VL.Mapsui</projectUrl>
+    <!-- nuget.org shows this on the package page. The path is the path INSIDE the package (README.md
+         is packed to docs\ below), and nuget pack refuses to pack if it is not in <files>. Settled
+         the same way in VL.NetTopologySuite, 2026-09-25. -->
+    <readme>docs\README.md</readme>
     <description>
+      EARLY - not ready for real work yet.
+
       A real map engine as nodes for vvvv gamma. Tile layers from OpenStreetMap or any XYZ
       service, your own geometry drawn on top, labels taken from your data, and a Pick node
       that tells you which feature you are pointing at.
@@ -25,15 +31,19 @@
       33 nodes and 19 help patches, from the smallest working map to styling by a value; every
       node opens one on F1.
 
-      EARLY PREVIEW: the node surface can still change between versions, and Mapsui's editing
-      and WMS/WFS surfaces are not wrapped yet. Requires vvvv gamma 7.4 or newer (.NET 8).
+      The node surface can still change between prereleases, and Mapsui's editing and WMS/WFS
+      surfaces are not wrapped yet. Requires vvvv gamma 7.4 or newer (.NET 8).
       Install with: nuget install VL.Mapsui -pre
     </description>
     <summary>Mapsui map engine as composable nodes for vvvv gamma.</summary>
     <releaseNotes>
-      0.0.1-alpha - First public preview. Tile layers (OpenStreetMap, any XYZ service) with a
-      shared disk cache, geometry and feature layers, a graticule, five styles, navigation,
-      picking, pixel/degree conversion and widgets. Wraps Mapsui 4.1.9.
+      0.0.1-alpha - The first release, a prerelease. 33 nodes in eight categories - Mapsui,
+      Mapsui.Layers, Mapsui.Styles, Mapsui.Navigate, Mapsui.Project, Mapsui.Widgets, Mapsui.Skia,
+      Mapsui.Debug - 244 tests, 19 help patches, and F1 on every node opens one. Tile layers
+      (OpenStreetMap, any XYZ service) with a shared disk cache, geometry and feature layers, a
+      graticule, five styles, navigation, picking, pixel/degree conversion and widgets. Wraps
+      Mapsui 4.1.9; verified in vvvv gamma 7.4. Fetching is off until you switch it on. Not ready
+      for real work: the node surface may still change between prereleases.
     </releaseNotes>
     <copyright>Copyright 2026 VL.Mapsui Contributors</copyright>
     <!-- The "VL" tag is what makes the pack discoverable at https://vvvv.org/packs -->
@@ -87,7 +97,13 @@
     -->
     <file src="help\VL.Mapsui\Help.xml" target="help\" />
 
-    <file src="README.md"  target="docs\" />
-    <file src="NOTES.md"   target="docs\" />
+    <!--
+      README.md is also the nuget.org page (<readme> above). NOTES.md is deliberately NOT shipped:
+      it is a 2000-line working log of this repository, full of machine paths, and a user reading
+      the package wants the design, not the forensics.
+    -->
+    <file src="README.md" target="docs\" />
+    <file src="docs\ARCHITECTURE.md" target="docs\" />
+    <file src="docs\MAPSUI-SURFACE.md" target="docs\" />
   </files>
 </package>

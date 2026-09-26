@@ -5,6 +5,43 @@ them do not belong here.
 
 ---
 
+## 2026-09-26 — VL.NetTopologySuite is on nuget.org; what its release taught, and a false green here
+
+VL.NetTopologySuite `0.0.1-alpha` was uploaded in the browser by the maintainer on 2026-09-26
+(flat container lists it; `VL.Mapsui` still 404). Its repository was read for what this one lacked:
+
+| NTS had | here | done |
+|---|---|---|
+| `<readme>docs\README.md</readme>` — the nuget.org page and the upload's Preview | missing | added |
+| description opening `EARLY - not ready for real work yet.` | EARLY at the end | moved to the first line |
+| release notes dated, with counts | one line | rewritten in that shape |
+| `LICENSE` at the root | missing (nuspec said MIT) | added |
+| `.gitattributes` pinning `.vl` bytes | missing | added, as `-text`: our 20 `.vl` are CRLF in the index, and NTS's `text eol=crlf` would have renormalized every one |
+| `docs\RELEASE.md` — the checklist, the three ways to publish | a CLAUDE.md section | `docs\RELEASE.md` written; CLAUDE.md keeps the rules |
+| ships ARCHITECTURE + ROADMAP | shipped NOTES.md — this file, with a machine path in it | ships ARCHITECTURE + MAPSUI-SURFACE |
+
+New facts taken from its RELEASE.md, which quotes the sources: nuget.org API keys are 30 days at
+most since 2026-08-17, every older key stops working on 2026-11-01, and browser upload needs no key
+— so way A for the first release, Trusted Publishing for the next.
+
+**A false green, caught the same hour.** `Test-Install.ps1` passed with "VL.NetTopologySuite came
+along", and the installed folder was `VL.NetTopologySuite.0.0.1-alpha` — the right version, and the
+sibling feed holds only `0.0.2-alpha`, so it looked like proof that nuget.org served it. It was not:
+
+| | nuget.org's nupkg | what was installed |
+|---|---|---|
+| size | 138,710 B | 125,625 B |
+| `lib\net8.0\VL.NetTopologySuite.dll` sha256 | `ca0c903b…` | `ca0c903b…` |
+| `.signature.p7s` | present | **absent** |
+| origin | — | `%USERPROFILE%\.nuget\packages\vl.nettopologysuite\0.0.1-alpha\.nupkg.metadata`: `"source": "D:\\2026_Projects\\vl-nettopologysuite\\dist\\feed"`, dated 2026-09-25 23:52 — before the upload |
+
+nuget.exe read the global packages folder before any source. The mechanism by which the check could
+have gone red — a dependency nuget.org does not serve — was never exercised, because the cache
+answered first. `Test-Install.ps1 -FromNuGetOrg` now drops the sibling feed, passes `-NoHttpCache
+-DirectDownload`, demands an empty output folder, and fails any `VL.*` dependency without nuget.org's
+repository signature. Run that way: VL.NetTopologySuite arrived **signed**, 34 packages, 19 of 19
+help patches compile from the install. The unsigned local copy above is the negative case.
+
 ## 2026-09-25 — release preparation for 0.0.1-alpha: what was checked, and what was stale
 
 The user decided to prepare the first release, an early preview. Measured before writing anything:

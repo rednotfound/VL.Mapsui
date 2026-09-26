@@ -36,12 +36,22 @@
 .PARAMETER Version
     Which version to install. Defaults to the version in the nuspec.
 
+.PARAMETER FromNuGetOrg
+    Resolve every dependency from nuget.org itself: no sibling feed, and neither the global
+    packages folder nor the HTTP cache is read. Without it, a dependency already cached from a
+    LOCAL build of the same version passes silently - measured 2026-09-26, when
+    VL.NetTopologySuite 0.0.1-alpha "came along" from %USERPROFILE%\.nuget\packages, whose
+    .nupkg.metadata named the sibling's dist\feed, a day after the real one reached nuget.org.
+    With it, each VL.* dependency must carry .signature.p7s, the repository signature nuget.org
+    adds to every package it serves and a local pack never has.
+
 .EXAMPLE
     .\pack.ps1 ; .\tools\Test-Install.ps1
 #>
 param(
     [string]$OutputDirectory,
-    [string]$Version
+    [string]$Version,
+    [switch]$FromNuGetOrg
 )
 
 Set-StrictMode -Version Latest
@@ -85,11 +95,18 @@ New-Item -ItemType Directory $OutputDirectory -Force | Out-Null
 
 Write-Host "installing $packageId $Version -> $OutputDirectory`n"
 
+if ($FromNuGetOrg -and (Test-Path $OutputDirectory) -and (Get-ChildItem $OutputDirectory)) {
+    Write-Host "-FromNuGetOrg needs an empty OutputDirectory: packages already there are reused" -ForegroundColor Red
+    exit 1
+}
+$useSibling = (Test-Path $SiblingFeed) -and -not $FromNuGetOrg
+
 $sources = @($feed)
-if (Test-Path $SiblingFeed) { $sources += $SiblingFeed }
+if ($useSibling) { $sources += $SiblingFeed }
 $sources += 'https://api.nuget.org/v3/index.json'
 
-$log = & $NuGet install $packageId -Version $Version -PreRelease `
+$cacheFlags = if ($FromNuGetOrg) { @('-NoHttpCache', '-DirectDownload') } else { @() }
+$log = & $NuGet install $packageId -Version $Version -PreRelease @cacheFlags `
     -Source ($sources -join ';') -OutputDirectory $OutputDirectory -NonInteractive 2>&1
 
 if ($LASTEXITCODE -ne 0) {
@@ -113,6 +130,26 @@ foreach ($dependency in $expected) {
 }
 Write-Host ("        ({0} packages in total)`n" -f $landed.Count)
 
+# ---- 1b. with -FromNuGetOrg: prove where our own dependencies came from ----------------------
+if ($FromNuGetOrg) {
+    foreach ($dependency in @($expected | Where-Object { $_ -like 'VL.*' })) {
+        $folder = Get-ChildItem $OutputDirectory -Directory | Where-Object { $_.Name -like "$dependency.*" } | Select-Object -First 1
+        if (-not $folder) { continue }
+        $nupkg = Get-ChildItem $folder.FullName -Filter *.nupkg | Select-Object -First 1
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        $zip = [IO.Compression.ZipFile]::OpenRead($nupkg.FullName)
+        $signed = [bool]($zip.Entries | Where-Object { $_.FullName -eq '.signature.p7s' })
+        $zip.Dispose()
+        if ($signed) {
+            Write-Host ("  ok    {0} carries nuget.org's repository signature - it came from nuget.org" -f $folder.Name) -ForegroundColor DarkGray
+        } else {
+            $missing += $dependency
+            Write-Host ("  FAIL  {0} has no .signature.p7s - it came from a local build, not nuget.org" -f $folder.Name) -ForegroundColor Red
+        }
+    }
+    Write-Host ""
+}
+
 # ---- 2. compile the help patches that shipped inside the package -----------------------------
 $installed = Get-ChildItem $OutputDirectory -Directory | Where-Object { $_.Name -like "$packageId.*" } | Select-Object -First 1
 $helpPatches = @(Get-ChildItem (Join-Path $installed.FullName 'help') -Filter *.vl -ErrorAction SilentlyContinue)
@@ -131,7 +168,7 @@ New-Item -ItemType Directory $compileRoot -Force | Out-Null
 <configuration>
   <packageSources>
     <add key="feed" value="$feed" />
-$(if (Test-Path $SiblingFeed) { "    <add key=`"sibling`" value=`"$SiblingFeed`" />" })
+$(if ($useSibling) { "    <add key=`"sibling`" value=`"$SiblingFeed`" />" })
   </packageSources>
 </configuration>
 "@ | Set-Content (Join-Path $compileRoot 'NuGet.config') -Encoding utf8

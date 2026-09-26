@@ -1,0 +1,16 @@
+# Sane defaults for everything else.
+* text=auto
+
+# A .vl is a vvvv gamma document, and a corrupted one fails SILENTLY - vvvv simply does not load
+# it, with no error anywhere. So its bytes are pinned rather than left to whatever core.autocrlf a
+# contributor happens to have.
+#
+# "-text", not VL.NetTopologySuite's "text eol=crlf": every .vl here was already committed with
+# CRLF in the index (git ls-files --eol, 2026-09-26), and "text" would renormalize all twenty of
+# them to LF in one noisy commit. "-text" stores the bytes exactly as committed - BOM, CRLF and
+# all - and git diff still shows them as text.
+*.vl -text
+
+# Same reasoning, same silent failure: Help.xml orders the help patches and carries their search
+# tags, and vvvv ignores a malformed one without complaint.
+Help.xml -text
