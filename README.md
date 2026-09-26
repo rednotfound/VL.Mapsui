@@ -26,19 +26,43 @@ than what is wrapped (a few dozen of its 306 public types; see
 | ⚠️ | Mapsui 4.1.9, not 5.x: Mapsui 5 needs SkiaSharp 3 and vvvv ships 2.88 |
 | ❌ | Not wrapped yet: editing geometry on the map, WMS/WFS, image and rasterizing layers, TMS, layer opacity. The map is WebMercator; reprojection is not exposed |
 
-## Install
+## Install and your first map
 
-vvvv gamma **7.4 or newer**. In vvvv: Quad menu → Manage Nugets → Commandline, then
+VL.Mapsui is listed at [vvvv.org/packs](https://vvvv.org/packs) and on
+[nuget.org](https://www.nuget.org/packages/VL.Mapsui). Verified in vvvv gamma **7.4**.
+
+**1. Install.** In vvvv gamma 7.x: Quad menu → **Manage Nugets → Commandline**, then
 
 ```
 nuget install VL.Mapsui -pre
 ```
 
-`-pre` is needed because this is a prerelease. It brings
+`-pre` is needed because every version so far is a prerelease. It brings
 [VL.NetTopologySuite](https://github.com/rednotfound/VL.NetTopologySuite) along, which is what
-*makes* the geometry this package draws. Its help patches appear in the Help Browser straight
-away; to use its nodes in your own document, add VL.Mapsui there through the **Dependencies**
-menu — installing does not reference it by itself. Then press F1 on any node.
+*makes* the geometry this package draws. vvvv gamma 8.0 previews also have **Packman** (Ctrl+F3:
+Browse → the pack → Add, which installs and references it in one step); that path has not been
+tried with this package, and its announcement does not say whether prereleases are listed — if
+VL.Mapsui does not show up there, use the command line above.
+
+**2. See it work.** Press **F1** with nothing selected to open the Help Browser, go to **Learn**
+and find VL.Mapsui. Start with `Explanation Overview of available nodes`, then open
+`HowTo Show a map` and switch **Enabled** on: OpenStreetMap tiles appear, with their credit bottom
+right. Every node opens its own help patch with **F1**.
+
+**3. Use it in your own patch.** Installing does not reference a package by itself. In your
+document: **Document menu → Dependencies → NuGets**, right-click **VL.Mapsui** to reference it
+(add **VL.NetTopologySuite** the same way if you want to make geometry, as most HowTos do). Then
+double-click the canvas and type a node name — they are in the `Mapsui` categories below. The
+smallest map is five nodes:
+
+```
+OpenStreetMap  (Enabled on)
+      ↓
+    Cons  →  Map  →  ToSkiaLayer  →  Renderer
+```
+
+No mouse is wired in that chain, so the map sits still; `HowTo Drive the map with the mouse` adds
+dragging and the wheel, and `HowTo Draw your own shapes` puts your own geometry on top.
 
 **If you ever installed VL.GIS 0.2.0-alpha**, delete `%LOCALAPPDATA%\vvvv\gamma\nugets\BruTile.6.0.0`
 by hand. VL.GIS declared BruTile 6, Mapsui needs 5, the folder is shared by everything vvvv loads,
