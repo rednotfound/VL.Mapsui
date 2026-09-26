@@ -1,5 +1,6 @@
-# Sane defaults for everything else.
-* text=auto
+# No "* text=auto" here, unlike VL.NetTopologySuite: this repository has files committed with
+# CRLF (the csproj, a script, twenty .vl) and one with mixed endings, and text=auto would turn
+# the next edit of each into a whole-file diff. Only the files that fail silently are pinned.
 
 # A .vl is a vvvv gamma document, and a corrupted one fails SILENTLY - vvvv simply does not load
 # it, with no error anywhere. So its bytes are pinned rather than left to whatever core.autocrlf a
