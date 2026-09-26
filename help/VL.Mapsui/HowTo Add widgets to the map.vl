@@ -104,7 +104,7 @@
             </Pin>
             <Pin Id="VXUbAWYcHVeBy74BBrY3bi" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,780,130,19" Id="Qk86AtDhPKPuvKyv75qjo0">
+          <Node Bounds="60,730,130,19" Id="Qk86AtDhPKPuvKyv75qjo0">
             <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
@@ -127,7 +127,7 @@
             <Pin Id="Txc5puv8H4LKeTKTHZ5prd" Name="Notifications" Kind="OutputPin" />
             <Pin Id="AeOHe4CeQw4NE5nIBev8Ws" Name="Node Context" Kind="InputPin" IsHidden="true" />
           </Node>
-          <Node Bounds="60,830,65,19" Id="DXERZ83SGv79cq6dbe34p0">
+          <Node Bounds="60,780,65,19" Id="DXERZ83SGv79cq6dbe34p0">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Group" />
@@ -140,7 +140,7 @@
             <Pin Id="Ouz1jIO84luMjnwuAshcxi" Name="Debug" Kind="InputPin" />
             <Pin Id="CpNZKyIpJRMOZxbLtUp1Xl" Name="Enabled" Kind="InputPin" />
           </Node>
-          <Node Bounds="20,880,185,19" Id="Js8TKjCkTq5IEGA1K5ECLT">
+          <Node Bounds="20,830,185,19" Id="Js8TKjCkTq5IEGA1K5ECLT">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
@@ -269,7 +269,7 @@
             <Pin Id="JR0jrNZFNVVwOc0bGUqlsg" Name="Corner" Kind="InputPin" />
             <Pin Id="Q6Ten1OIwD3ax7YbeEWI6K" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,720,110,19" Id="LMqbQZVlF2LQWZo0BEzmTt">
+          <Node Bounds="60,670,110,19" Id="LMqbQZVlF2LQWZo0BEzmTt">
             <p:NodeReference LastCategoryFullName="Mapsui.Widgets" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ZoomButtons" />
