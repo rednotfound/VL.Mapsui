@@ -4,15 +4,15 @@
 tile layers, your own geometry and features on top, styles, labels, picking, widgets, and a node
 that draws the map into VL.Skia.
 
-## ⚠️ Status: 0.0.1-alpha, an early preview
+## ⚠️ Status: 0.0.1-alpha on nuget.org since 2026-09-26, an early preview
 
 > **EARLY — not ready for real work yet.** Node names, pins and behaviour may change between
 > prereleases without a migration path, so do not build a project you have to deliver on it yet.
 > The MIT licence lets you use it for anything, commercial work included; it comes as is, with no
 > warranty and no support promise.
 
-`0.0.1-alpha` is the first release, and it is a **prerelease**; how it gets to nuget.org, and what
-each check before that proves, is in [docs/RELEASE.md](docs/RELEASE.md). It works — a map renders in vvvv
+`0.0.1-alpha` is the first release, and it is a **prerelease**; how it got to nuget.org, and what
+each check before and after that proves, is in [docs/RELEASE.md](docs/RELEASE.md). It works — a map renders in vvvv
 7.4, pans, zooms, draws geometry from any NetTopologySuite source and tells you which feature is
 under the mouse — but the node surface can still change between versions, and Mapsui is far larger
 than what is wrapped (a few dozen of its 306 public types; see

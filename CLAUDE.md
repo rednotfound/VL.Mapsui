@@ -23,10 +23,10 @@ none of them references another. The retired `VL.GIS` lives only on GitHub now
 still declares BruTile 6 and conflicts with this package — the README's Install section says what
 a user has to delete by hand.
 
-**Current state (2026-09-26): ready for the first release, `0.0.1-alpha` — a prerelease, an early
-preview, not a stable version.** A map renders in vvvv 7.4, pans, zooms and takes geometry from
-any NTS source. **32 nodes, 244 tests.** VL.NetTopologySuite, which this package depends on, is on
-nuget.org since 2026-09-26; VL.Mapsui is not yet — the upload is the maintainer's. See "Releasing"
+**Current state (2026-09-26): `0.0.1-alpha` is on nuget.org — a prerelease, an early preview, not a
+stable version. The working version is `0.0.2-alpha`.** A map renders in vvvv 7.4, pans, zooms and takes geometry from
+any NTS source. **32 nodes, 244 tests.** VL.NetTopologySuite, which this package depends on, went up the
+same day, first. See "Releasing"
 below and [docs/RELEASE.md](docs/RELEASE.md). **The help is the second test suite: 19 patches in the
 community's measured style, every one of the 32 nodes opens one on F1** (`tools\Test-VLPatch.ps1`
 audits the flags), all 19 compile with every process node constructed in `Create`
@@ -353,9 +353,11 @@ and what is the maintainer's. The rules that outlive this release:
 
 - **Every release is a prerelease for now**, `0.0.1-alpha` first, the family's suffix, in step with
   VL.NetTopologySuite. A user installs with `nuget install VL.Mapsui -pre`.
-- **VL.NetTopologySuite went first and is on nuget.org since 2026-09-26** (`0.0.1-alpha`, browser
-  upload). This package's dependency on it resolves there now; before that date, publishing this
-  one would have produced a package nobody could install.
+- **Both are on nuget.org since 2026-09-26, `0.0.1-alpha`, browser uploads:** VL.NetTopologySuite
+  first, then VL.Mapsui, whose dependency on it would not have resolved the other way round. The
+  published VL.Mapsui was diffed file by file against `dist\feed` (identical but for nuget.org's
+  `.signature.p7s`) and installed back with `tools\Test-Install.ps1 -Published -Version
+  0.0.1-alpha`: both packages signed, 19 of 19 help patches compile from that install.
 - **The version is written in three places, and nothing overrides them:** the nuspec's
   `<version>`, `LayerNodes.UserAgent` (what OSM's servers see), and the nuspec's dependency on
   `VL.NetTopologySuite`. No `.github\` exists in any family repository.

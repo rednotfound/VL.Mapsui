@@ -5,6 +5,30 @@ them do not belong here.
 
 ---
 
+## 2026-09-26 — VL.Mapsui 0.0.1-alpha is on nuget.org
+
+Uploaded in the browser by the maintainer (way A), the day VL.NetTopologySuite went up.
+https://www.nuget.org/packages/VL.Mapsui/0.0.1-alpha
+
+| check | result |
+|---|---|
+| flat container | lists `0.0.1-alpha`, nothing else |
+| published nupkg vs `dist\feed\VL.Mapsui.0.0.1-alpha.nupkg` (packed from `3a1ac54`) | every file identical; nuget.org's adds only `.signature.p7s` (211,648 B vs 198,564 B) — so the maintainer uploaded the last pack, EARLY notice included |
+| `Test-Install.ps1 -Published -Version 0.0.1-alpha` (new switch: no local feed at all, no cache) | VL.Mapsui **and** VL.NetTopologySuite arrived signed from nuget.org, 34 packages, 19 of 19 help patches compile from the install |
+
+**A bug in the new switch, caught by the next run.** `$sources = if (...) { @() } else { @($feed) }`
+unrolls a one-element array into a string, so the following `+=` concatenated three sources into one
+nonexistent path. The `-Published` run passed only because it had a single source; the default run
+right after failed with "不支持给定路径的格式". Declared `[string[]]`; both modes re-run green.
+
+**Working version bumped to `0.0.2-alpha`** the same hour: nuspec (with a comment saying why, as
+VL.NetTopologySuite's has), `LayerNodes.UserAgent`, and the dependency on VL.NetTopologySuite, which
+follows its working version `0.0.2-alpha`. Consequence: until that is published, a working-copy
+install resolves VL.NetTopologySuite from the sibling's `dist\feed`, and `-FromNuGetOrg` fails by
+design — the next release again goes NTS first.
+
+Left to the maintainer: the tag `v0.0.1-alpha` on `3a1ac54`, and a GitHub release on it.
+
 ## 2026-09-26 — Mapsui draws the credit by itself; the Attribution node is removed
 
 **The user, in vvvv:** "I enabled OSM in the patch and saw the attribution bottom right, but it also

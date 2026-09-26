@@ -27,14 +27,14 @@ package nobody could install.
 | **`tools\Test-Install.ps1 -FromNuGetOrg`** | `nuget install` brings all six dependencies **from nuget.org itself**, and every help patch **inside the installed package** compiles with that install as the only repository | ✅ 2026-09-26: VL.NetTopologySuite 0.0.1-alpha arrived carrying nuget.org's `.signature.p7s`; 19 of 19 compile. **Without the switch the same run also passed — on a local build** (see below) |
 | the vvvv GUI | every help patch opens, draws, and reads without clipped notes | ✅ 2026-09-25, all 19 photographed maximized |
 | the maintainer's own review in vvvv | the patches read right to someone who uses them | ✅ 2026-09-25, all 19 hand-arranged |
-| publish to nuget.org | a stranger's vvvv can install it | ⬜ **the maintainer** — way A below |
-| install back from nuget.org alone | nuget.org behaves like the local feed | ⬜ after publishing |
-| tag `v0.0.1-alpha` on GitHub | the source matching the package is findable | ⬜ |
+| publish to nuget.org | a stranger's vvvv can install it | ✅ **2026-09-26, `0.0.1-alpha`**, browser upload by the maintainer (way A) |
+| install back from nuget.org alone | nuget.org behaves like the local feed | ✅ 2026-09-26: the published nupkg diffed against `dist\feed` — identical but for `.signature.p7s`; `Test-Install.ps1 -Published -Version 0.0.1-alpha` installed VL.Mapsui **and** VL.NetTopologySuite from nuget.org, both signed, 34 packages, 19 of 19 help patches compile from the install |
+| tag `v0.0.1-alpha` on GitHub | the source matching the package is findable | ⬜ the maintainer: on `3a1ac54`, the commit the uploaded nupkg was packed from |
 | GitHub release on the tag | release notes readable without the nuspec | ⬜ the maintainer, in the browser |
-| working version bumped to `0.0.2-alpha` | a local repack can never pass for the published package | ⬜ the same day |
+| working version bumped to `0.0.2-alpha` | a local repack can never pass for the published package | ✅ 2026-09-26: nuspec, `LayerNodes.UserAgent`, and the VL.NetTopologySuite dependency (its working version) |
 
-`VL.Mapsui` does not exist on nuget.org yet (flat container 404, checked 2026-09-26), so the first
-upload creates it under the uploading account.
+`VL.Mapsui` did not exist on nuget.org before the upload (flat container 404, checked 2026-09-26);
+the upload created it under the maintainer's account.
 
 **A green install test can come from your own disk.** The first run on 2026-09-26, without
 `-FromNuGetOrg`, reported VL.NetTopologySuite 0.0.1-alpha "came along" — and it had, from
@@ -118,7 +118,9 @@ dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj
 #    page: six dependencies incl. VL.NetTopologySuite 0.0.1-alpha, the README preview. Submit.
 
 # 3. After the confirmation email, install back from nuget.org alone into a fresh folder and
-#    compile the shipped help patches from it; then in vvvv: nuget install VL.Mapsui -pre,
+#    compile the shipped help patches from it:
+.\tools\Test-Install.ps1 -Published -Version 0.0.1-alpha
+#    then, then in vvvv: nuget install VL.Mapsui -pre,
 #    Help Browser -> VL.Mapsui -> HowTo Show a map, switch Enabled on.
 
 # 4. Tag the commit the package was packed from, and push it.

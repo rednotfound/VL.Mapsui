@@ -36,6 +36,12 @@
 .PARAMETER Version
     Which version to install. Defaults to the version in the nuspec.
 
+.PARAMETER Published
+    The install-back check after a release: THIS package too comes from nuget.org, with no local
+    feed at all. Implies -FromNuGetOrg, and the package itself must carry nuget.org's signature.
+    Use with -Version for the published version, e.g. after the working version was bumped:
+        .\tools\Test-Install.ps1 -Published -Version 0.0.1-alpha
+
 .PARAMETER FromNuGetOrg
     Resolve every dependency from nuget.org itself: no sibling feed, and neither the global
     packages folder nor the HTTP cache is read. Without it, a dependency already cached from a
@@ -51,8 +57,10 @@
 param(
     [string]$OutputDirectory,
     [string]$Version,
-    [switch]$FromNuGetOrg
+    [switch]$FromNuGetOrg,
+    [switch]$Published
 )
+if ($Published) { $FromNuGetOrg = $true }
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -68,7 +76,7 @@ foreach ($tool in @($NuGet, $Vvvvc)) {
 }
 
 $feed = Join-Path $RepoRoot 'dist\feed'
-if (-not (Get-ChildItem $feed -Filter *.nupkg -ErrorAction SilentlyContinue)) {
+if (-not $Published -and -not (Get-ChildItem $feed -Filter *.nupkg -ErrorAction SilentlyContinue)) {
     Write-Host "no nupkg in dist\feed - run .\pack.ps1 first" -ForegroundColor Red
     exit 1
 }
@@ -101,7 +109,8 @@ if ($FromNuGetOrg -and (Test-Path $OutputDirectory) -and (Get-ChildItem $OutputD
 }
 $useSibling = (Test-Path $SiblingFeed) -and -not $FromNuGetOrg
 
-$sources = @($feed)
+# [string[]], or a one-element result unrolls to a string and += concatenates the paths
+[string[]]$sources = if ($Published) { @() } else { @($feed) }
 if ($useSibling) { $sources += $SiblingFeed }
 $sources += 'https://api.nuget.org/v3/index.json'
 
@@ -132,7 +141,9 @@ Write-Host ("        ({0} packages in total)`n" -f $landed.Count)
 
 # ---- 1b. with -FromNuGetOrg: prove where our own dependencies came from ----------------------
 if ($FromNuGetOrg) {
-    foreach ($dependency in @($expected | Where-Object { $_ -like 'VL.*' })) {
+    $ours = @($expected | Where-Object { $_ -like 'VL.*' })
+    if ($Published) { $ours = @($packageId) + $ours }
+    foreach ($dependency in $ours) {
         $folder = Get-ChildItem $OutputDirectory -Directory | Where-Object { $_.Name -like "$dependency.*" } | Select-Object -First 1
         if (-not $folder) { continue }
         $nupkg = Get-ChildItem $folder.FullName -Filter *.nupkg | Select-Object -First 1
@@ -167,7 +178,7 @@ New-Item -ItemType Directory $compileRoot -Force | Out-Null
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <packageSources>
-    <add key="feed" value="$feed" />
+$(if (-not $Published) { "    <add key=`"feed`" value=`"$feed`" />" })
 $(if ($useSibling) { "    <add key=`"sibling`" value=`"$SiblingFeed`" />" })
   </packageSources>
 </configuration>

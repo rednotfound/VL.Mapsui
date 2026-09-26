@@ -2,7 +2,10 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>VL.Mapsui</id>
-    <version>0.0.1-alpha</version>
+    <!-- The WORKING version: always one ahead of what is on nuget.org (0.0.1-alpha, 2026-09-26), so a
+         local repack can never be mistaken for the published package in a NuGet cache. Managed in
+         step with VL.NetTopologySuite, whose working version is the dependency below. -->
+    <version>0.0.2-alpha</version>
     <title>VL.Mapsui — Mapsui map engine nodes for vvvv gamma</title>
     <authors>VL.Mapsui Contributors</authors>
     <owners>VL.Mapsui Contributors</owners>
@@ -37,7 +40,9 @@
     </description>
     <summary>Mapsui map engine as composable nodes for vvvv gamma.</summary>
     <releaseNotes>
-      0.0.1-alpha - The first release, a prerelease. 32 nodes in eight categories - Mapsui,
+      0.0.2-alpha - In development, not published.
+
+      0.0.1-alpha (2026-09-26) - The first release, a prerelease. 32 nodes in eight categories - Mapsui,
       Mapsui.Layers, Mapsui.Styles, Mapsui.Navigate, Mapsui.Project, Mapsui.Widgets, Mapsui.Skia,
       Mapsui.Debug - 244 tests, 19 help patches, and F1 on every node opens one. Tile layers
       (OpenStreetMap, any XYZ service) with a shared disk cache, geometry and feature layers, a
@@ -74,7 +79,7 @@
           VL dependency at all and its help uses VL.Stride) because everything there ships inside
           vvvv and is therefore always present. Nothing guarantees that for us.
         -->
-        <dependency id="VL.NetTopologySuite"   version="0.0.1-alpha" />
+        <dependency id="VL.NetTopologySuite"   version="0.0.2-alpha" />
         <dependency id="Mapsui.Rendering.Skia" version="4.1.9" />
       </group>
     </dependencies>
