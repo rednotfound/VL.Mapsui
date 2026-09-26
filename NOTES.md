@@ -5,6 +5,14 @@ them do not belong here.
 
 ---
 
+## 2026-09-26 — the README's install path, walked by the maintainer in vvvv 7.4
+
+The one check no script here can make: the maintainer followed the README's "Install and your first
+map" in vvvv gamma 7.4 against the published package — `nuget install VL.Mapsui -pre` in the
+command line, the Help Browser, a patch of their own referencing it through Dependencies — and
+reported "可以用": it works. Not tried: Packman in the vvvv 8.0 previews (not installed here), so the
+README still says so.
+
 ## 2026-09-26 — VL.Mapsui 0.0.1-alpha is on nuget.org
 
 Uploaded in the browser by the maintainer (way A), the day VL.NetTopologySuite went up.
