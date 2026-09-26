@@ -6,6 +6,11 @@ that draws the map into VL.Skia.
 
 ## ⚠️ Status: 0.0.1-alpha, an early preview
 
+> **EARLY — not ready for real work yet.** Node names, pins and behaviour may change between
+> prereleases without a migration path, so do not build a project you have to deliver on it yet.
+> The MIT licence lets you use it for anything, commercial work included; it comes as is, with no
+> warranty and no support promise.
+
 `0.0.1-alpha` is the first release, and it is a **prerelease**; how it gets to nuget.org, and what
 each check before that proves, is in [docs/RELEASE.md](docs/RELEASE.md). It works — a map renders in vvvv
 7.4, pans, zooms, draws geometry from any NetTopologySuite source and tells you which feature is
