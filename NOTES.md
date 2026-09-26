@@ -5,6 +5,44 @@ them do not belong here.
 
 ---
 
+## 2026-09-26 — Mapsui draws the credit by itself; the Attribution node is removed
+
+**The user, in vvvv:** "I enabled OSM in the patch and saw the attribution bottom right, but it also
+shows without the Attribution node, and changing the Attribution node's pins changes nothing on the
+map." Both true. My fix an hour earlier — adding `Attribution` to three patches — rested on a
+premise I had reasoned and never measured: that `Map.Widgets` starts empty and only that node fills
+it.
+
+Measured, in order:
+
+| check | result |
+|---|---|
+| `new Mapsui.Map()`, then an OSM tile layer added (PowerShell, Mapsui 4.1.9 net6.0) | `Widgets.Count` 0 and 0; layer attribution `© OpenStreetMap contributors`, url `…/copyright` |
+| `Mapsui.Rendering.Skia.dll` metadata | references `get_Attribution` — the renderer reads layers' credits |
+| offscreen render, 400×300, **no widgets**, layer with a credit | TL 0, TR 0, BL 0, **BR 631** px |
+| same, layer without a credit | 0 everywhere |
+| + our `Hyperlink`, `Enabled = false` | BR 631 — unchanged: switching the node off hides nothing |
+| + our `Hyperlink` at top left | TL 631, BR 631 — a second copy, the renderer's stays |
+
+So **`MapRenderer` prints every layer's `Attribution` bottom right on its own.** The node drew the
+same text in the same corner, invisible on top of the real one — which is also what was "confirmed
+on screen" on 2026-08-14: that credit was the renderer's. `AttributionRenderingFacts` keeps the
+measurement as two tests.
+
+Done, on the user's decision: the three patches restored byte-for-byte to before the insertion
+(`git checkout a61225e~1`); the node removed (33 → 32; `WidgetNodes.cs`, two widget tests replaced
+by the rendering facts, 244 tests); `HowTo Add widgets to the map` edited in place — node, readout
+and four links out, `ScaleBar → ZoomButtons` reconnected, heading and three notes rewritten, nothing
+moved; the Explanation regenerated (its last change was the generator's); the validator tables
+(32 of 32, 22 process nodes). The credit a user sees comes from the layer: OSM's is built in, and
+`XYZ`'s `Attribution` pin reaches `layer.Attribution` (`XyzLayerTests`), which the renderer prints.
+
+**What went wrong in method, not just in fact.** The rule in this repository — name the mechanism by
+which a green result could have gone red — was skipped: the compile proved the node resolved and
+the chain was wired, and the one check that could have failed (switch the node off, look at the
+map) was deferred as "verified 2026-08-14". It was the same look, and it would have shown the credit
+still there.
+
 ## 2026-09-26 — facts checked against their sources before the release
 
 The user asked for every claim in the README, the licences and the attributions to be checked.
@@ -19,13 +57,13 @@ Checked against the primary source each time, not against our own earlier text:
 | VL.GIS 0.2.0-alpha declares BruTile 6 | its nuspec on nuget.org | ✅ `BruTile 6.0.0` |
 | install via Quad menu → Manage Nugets → Commandline, `-pre` | the Gray Book, *Managing NuGets* | ✅ — and it adds that installing does **not** reference the package; the Dependencies menu does. **Added to the README** |
 | OSM: cache 7 days, User-Agent, no bulk download | operations.osmfoundation.org/policies/tiles | ✅, but `TileCache.cs` quoted an **older wording**; replaced with today's |
-| OSM: attribution | same | "Show OpenStreetMap licence attribution clearly on the map" — **three help patches drew tiles with no credit**; `Attribution` added to each (below) |
+| OSM: attribution | same | "Show OpenStreetMap licence attribution clearly on the map" — ~~three help patches drew tiles with no credit~~ **wrong: Mapsui draws it by itself; see the entry above** |
 | OpenTopoMap credit and licence | opentopomap.org/about | CC-BY-SA; our English credit line matches their German one |
 | API keys 30 days, old keys end 2026-11-01 | .NET Blog, 2026-08-03 | ✅ — cited directly in RELEASE.md now, not via VL.NetTopologySuite |
 | "a session is a few megabytes" | our own measurement | replaced by the measured figure: 16 tiles, 736 KB |
 | ARCHITECTURE: "VL.GIS" as the geometry source | — | retired; now VL.NetTopologySuite / VL.GeoJSON |
 
-**The three patches.** `HowTo Show a map`, `HowTo Cache tiles` and `HowTo Use any tile service`
+**The three patches — withdrawn the same day, see the entry above: the credit was never missing.** `HowTo Show a map`, `HowTo Cache tiles` and `HowTo Use any tile service`
 each wired `Map → ToSkiaLayer` directly, so switching Enabled on drew OSM or OpenTopoMap tiles with
 no credit anywhere — `Map.Widgets` starts empty and only the `Attribution` node fills it. Inserted
 in place, `Map → Attribution → ToSkiaLayer`, defaults unwired (Enabled on, bottom right — the corner

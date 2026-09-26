@@ -34,7 +34,7 @@ out to be sitting in a Mapsui dependency we already ship.
 | `CenterOn`, `ZoomToLevel`, `ZoomByWheel`, `DragBetween` | `Mapsui.Navigate` | the navigator |
 | `ZoomToLayer`, `ZoomToLayers` | `Mapsui.Navigate` | put the view where the data is, on a trigger. Framing every frame would pin the view and the map could not be moved |
 | `Drag`, `ZoomIn`, `ZoomOut` | `Mapsui.Navigate` | stateful gestures — they remember the previous frame |
-| `ScaleBar`, `Attribution`, `ZoomButtons` | `Mapsui.Widgets` | Mapsui's own furniture, added to a map once each |
+| `ScaleBar`, `ZoomButtons` | `Mapsui.Widgets` | Mapsui's own furniture, added to a map once each |
 | `SymbolStyle`, `StyleByGeometry` | `Mapsui.Styles` | what a point looks like, and one style per geometry type |
 | `VisibleRange` | `Mapsui.Layers` | the zoom levels a layer is drawn at — the only thing that reduces a busy map |
 | `Pick`, `ScreenToWorld`, `WorldToScreen` | `Mapsui` | asking the map what is under a coordinate, and back |
@@ -118,11 +118,20 @@ bearings. 10 tests incl. two pixel; help patch `HowTo Draw a graticule` (offline
 
 Ordered by what a map patch actually needs.
 
-### Widgets — 3 of 10
+### Widgets — 2 of 10
 
-Wrapped: `ScaleBar` (metric / imperial / nautical), `Attribution` (a `Hyperlink` fed from the
-layers), `ZoomButtons` (`ZoomInOutWidget`). All three confirmed on screen 2026-08-14, buttons
-included.
+Wrapped: `ScaleBar` (metric / imperial / nautical) and `ZoomButtons` (`ZoomInOutWidget`), both
+confirmed on screen 2026-08-14, buttons included.
+
+**`Attribution` was removed on 2026-09-26, before anything was published.** It put a `Hyperlink`
+fed from the layers bottom right, and the credit seen there on 2026-08-14 was taken as its work.
+It was not: **Mapsui 4.1.9's `MapRenderer` prints every layer's `Attribution` bottom right by
+itself, with no widget on the map.** Measured offscreen (`AttributionRenderingFacts`): a layer with
+a credit and an empty widget list puts 631 pixels in the bottom-right quadrant and none elsewhere;
+the same layer without a credit puts none. The node's widget drew the same text in the same place,
+so switching it off changed nothing and moving it only added a second copy — the user found both in
+the GUI. The credit therefore comes from the layer, which is why `XYZ`'s `Attribution` pin matters
+and a node cannot hide it.
 
 **Corrected here, because this document said otherwise and it was wrong:** not every widget has a
 renderer registered. Measured by constructing a `MapRenderer` and reading `WidgetRenders` — a thing

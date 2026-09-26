@@ -48,20 +48,18 @@ public class WidgetTests
     [Fact]
     public void A_hundred_frames_add_one_of_each_widget()
     {
-        // Three nodes on one map: three widgets, not three hundred.
+        // Two nodes on one map: two widgets, not two hundred.
         var map = NewMap();
         var bar = new ScaleBarWidgetNode();
-        var credit = new AttributionWidgetNode();
         var zoom = new ZoomButtonsWidgetNode();
 
         for (int frame = 0; frame < 100; frame++)
         {
             bar.Update(map);
-            credit.Update(map, out _);
             zoom.Update(map);
         }
 
-        Assert.Equal(3, map.Widgets.Count);
+        Assert.Equal(2, map.Widgets.Count);
     }
 
     [Fact]
@@ -131,50 +129,6 @@ public class WidgetTests
 
         Assert.Null(node.Update(null));
         Assert.Equal(0, node.WidgetsAdded);
-    }
-
-    // ── Attribution, which is compliance rather than decoration ───────────────
-
-    [Fact]
-    public void The_attribution_comes_from_the_layers_rather_than_a_pin()
-    {
-        // OpenStreetMap's policy requires the attribution to be displayed. Reading it from the
-        // layers is what keeps it true when the layers change - and what stops it being typed in
-        // wrongly.
-        var map = NewMap();
-        var layer = new global::Mapsui.Layers.MemoryLayer { Name = "credited" };
-        layer.Attribution.Text = "© OpenStreetMap contributors";
-        layer.Attribution.Url = "https://www.openstreetmap.org/copyright";
-        map.Layers.Add(layer);
-
-        var node = new AttributionWidgetNode();
-        node.Update(map, out var shown);
-
-        Assert.Contains("OpenStreetMap", shown);
-        var widget = (global::Mapsui.Widgets.Hyperlink)map.Widgets.Single();
-        Assert.Contains("OpenStreetMap", widget.Text);
-        Assert.Equal("https://www.openstreetmap.org/copyright", widget.Url);
-    }
-
-    [Fact]
-    public void An_attribution_that_arrives_late_still_gets_shown()
-    {
-        // The widget is built on the first frame and layers are added on some later one, so
-        // reading the text once at construction would leave it permanently empty.
-        var map = NewMap();
-        var node = new AttributionWidgetNode();
-
-        node.Update(map, out var before);
-        Assert.Equal(string.Empty, before);
-
-        var layer = new global::Mapsui.Layers.MemoryLayer { Name = "late" };
-        layer.Attribution.Text = "© Someone";
-        map.Layers.Add(layer);
-
-        node.Update(map, out var after);
-
-        Assert.Contains("Someone", after);
-        Assert.Equal(1, node.WidgetsAdded);
     }
 
     // ── Clicks, which only the host can deliver ───────────────────────────────

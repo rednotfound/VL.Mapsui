@@ -9,7 +9,6 @@ using IWidget = global::Mapsui.Widgets.IWidget;
 using HAlign = global::Mapsui.Widgets.HorizontalAlignment;
 using VAlign = global::Mapsui.Widgets.VerticalAlignment;
 using ScaleBarWidget = global::Mapsui.Widgets.ScaleBar.ScaleBarWidget;
-using Hyperlink = global::Mapsui.Widgets.Hyperlink;
 using ZoomInOutWidget = global::Mapsui.Widgets.Zoom.ZoomInOutWidget;
 
 namespace VL.Mapsui;
@@ -155,68 +154,10 @@ public class ScaleBarWidgetNode
     }
 }
 
-/// <summary>
-/// The attribution the tile provider requires, taken from the layers on the map.
-/// </summary>
-/// <remarks>
-/// **This is compliance, not decoration.** OpenStreetMap's tile usage policy requires the
-/// attribution to be displayed; every tile layer here has carried the text since the beginning and
-/// nothing ever drew it.
-///
-/// The text is read from the map's own layers rather than typed into a pin, so it stays true when
-/// the layers change and cannot be filled in wrongly. Mapsui's Hyperlink widget carries a Url as
-/// well, which is why this is a Hyperlink rather than a label.
-/// </remarks>
-[ProcessNode(Name = "Attribution", Category = "Mapsui.Widgets")]
-public class AttributionWidgetNode
-{
-    readonly WidgetSlot<Hyperlink> _slot = new();
-    string _text = string.Empty;
-
-    /// <summary>Widgets this node has added. It should reach 1 and stay there.</summary>
-    internal int WidgetsAdded => _slot.Added;
-
-    /// <summary>What is currently being shown, so a patch can check it is not empty.</summary>
-    internal string Text => _text;
-
-    /// <summary>The same map, so this sits in the chain between Map and ToSkiaLayer.</summary>
-    /// <remarks>
-    /// Map comes first and the readout after it, because a node whose return type equals its
-    /// *first* parameter type is the fluent shape VL recognises - it gets an `Output` pin and sits
-    /// in a chain. Putting the out parameter first would quietly make this something else.
-    /// </remarks>
-    public Map? Update(
-        Map? map,
-        out string attribution,
-        bool enabled = true,
-        WidgetCorner corner = WidgetCorner.BottomRight)
-    {
-        if (map is null)
-        {
-            attribution = string.Empty;
-            return null;
-        }
-
-        var widget = _slot.Ensure(map, _ => new Hyperlink());
-
-        // Read every frame: layers come and go, and an attribution that stops matching the tiles
-        // on screen is worse than none, because it is a claim about where they came from.
-        var credits = map.Layers
-            .Select(l => l.Attribution)
-            .Where(a => a is not null && !string.IsNullOrWhiteSpace(a.Text))
-            .ToArray();
-
-        _text = string.Join("  |  ", credits.Select(a => a!.Text).Distinct());
-
-        widget.Enabled = enabled;
-        widget.Text = _text;
-        widget.Url = credits.FirstOrDefault(a => !string.IsNullOrWhiteSpace(a!.Url))?.Url ?? string.Empty;
-        WidgetSlot<Hyperlink>.Place(widget, corner);
-
-        attribution = _text;
-        return map;
-    }
-}
+// There was an Attribution node here until 2026-09-26. Mapsui 4.1.9's MapRenderer draws every
+// layer's Attribution bottom right by itself, with no widget on the map (AttributionRenderingFacts),
+// so the node could only add a second copy: switching it off or moving it changed nothing the
+// user could see. The credit a tile layer carries is what reaches the screen - see XyzLayerNodes.
 
 /// <summary>
 /// Plus and minus buttons that zoom the map. Wire a <c>Click</c> node for them to respond.

@@ -16,7 +16,7 @@
       </p:NodeReference>
       <Patch Id="URxO0JdY8YzfeQmv3724mg">
         <Canvas Id="B08bA1MMYG1Hg6vGxBtJYR" CanvasType="Group">
-          <Pad Id="FDF3CHbuHLSdVHKdDEaVBY" Bounds="60,40,660,41" ShowValueBox="true" isIOBox="true" Value="Use ScaleBar, Attribution and ZoomButtons!">
+          <Pad Id="FDF3CHbuHLSdVHKdDEaVBY" Bounds="60,40,660,41" ShowValueBox="true" isIOBox="true" Value="Use ScaleBar and ZoomButtons!">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -269,19 +269,6 @@
             <Pin Id="JR0jrNZFNVVwOc0bGUqlsg" Name="Corner" Kind="InputPin" />
             <Pin Id="Q6Ten1OIwD3ax7YbeEWI6K" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,660,110,19" Id="PFzqxguJkzdyEdEwqtQOFr">
-            <p:NodeReference LastCategoryFullName="Mapsui.Widgets" LastDependency="VL.Mapsui.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="ProcessAppFlag" Name="Attribution" />
-            </p:NodeReference>
-            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">High</p:HelpFocus>
-            <Pin Id="HXEhLHd9ntGD5zTt5U6CVa" Name="Map" Kind="InputPin" />
-            <Pin Id="C8bwGBQoDJGfWUgRDAqFoO" Name="Enabled" Kind="InputPin" />
-            <Pin Id="QFFUxGtSlHSqNyEZOaVzfv" Name="Corner" Kind="InputPin" />
-            <Pin Id="OJP3Dqq60OeL4LROJPJ1vh" Name="Result" Kind="OutputPin" />
-            <Pin Id="NatHgfDeEieUZasHuvO3Qu" Name="Attribution" Kind="OutputPin" />
-          </Node>
-          <Pad Id="AtwDsvSrJG3boyrKF7zzgH" Comment="Attribution" Bounds="167,700,51,15" ShowValueBox="true" isIOBox="true" />
           <Node Bounds="60,720,110,19" Id="LMqbQZVlF2LQWZo0BEzmTt">
             <p:NodeReference LastCategoryFullName="Mapsui.Widgets" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
@@ -302,7 +289,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="Gf6rSQagAN4OzfLCSmxCFg" Bounds="640,260,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Tiles are off; the graticule gives the window its bearings. Switch OpenStreetMap on and its credit appears in the Attribution widget.">
+          <Pad Id="Gf6rSQagAN4OzfLCSmxCFg" Bounds="640,260,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Tiles are off; the graticule gives the window its bearings. Switch OpenStreetMap on and its credit appears bottom right.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -320,7 +307,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="OUQSIIsSaCAyL9smI2DIT7" Bounds="640,600,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; ScaleBar: metric by default; Units and Corner are pins. Switch Widgets off and all three go away - the only way, since Widgets is append-only.">
+          <Pad Id="OUQSIIsSaCAyL9smI2DIT7" Bounds="640,600,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; ScaleBar: metric by default; Units and Corner are pins. Switch Widgets off and both go away - the only way, since Widgets is append-only.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -329,7 +316,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="MtY0CJY44TxUZWcb3hGAPH" Bounds="640,688,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Attribution shows what the layers carry, and reads it back as text. Nearly every tile service requires it.">
+          <Pad Id="MtY0CJY44TxUZWcb3hGAPH" Bounds="640,688,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; The credit bottom right is not a widget: Mapsui prints every layer's attribution by itself, so nothing here can hide it - as tile policies require.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -377,10 +364,7 @@
         <Link Id="TEweqptZZ2EBy8fonRECof" Ids="QqR8sz5CKByDgjiWRon1Sl,HFLnHQeyC1H5KPAeANyjDV" />
         <Link Id="GLtAo4ZpFhs1uRgxvWBCWB" Ids="A6BaaGRA0MM9bo8oN6bBGC,BwwNlJCNLQTJlI1axurZRR" />
         <Link Id="S8yZPmP6oifFTPsaGtShNr" Ids="VUZOujDLey3rKataMLrLvH,Ma1wn1EnbfbCSqpwBMtgKK" />
-        <Link Id="Ldc7cOdyuFIaY9yUvwIJhJ" Ids="Q6Ten1OIwD3ax7YbeEWI6K,HXEhLHd9ntGD5zTt5U6CVa" />
-        <Link Id="M1Too39Mpr3LymV9UQnT0k" Ids="VUZOujDLey3rKataMLrLvH,C8bwGBQoDJGfWUgRDAqFoO" />
-        <Link Id="BmwWzltCOybQwft02a4gee" Ids="NatHgfDeEieUZasHuvO3Qu,AtwDsvSrJG3boyrKF7zzgH" />
-        <Link Id="KRAbCpbEIaLfhOiK4LoWTY" Ids="OJP3Dqq60OeL4LROJPJ1vh,JjI4ruGosfNMDOOrnexSoG" />
+        <Link Id="Ldc7cOdyuFIaY9yUvwIJhJ" Ids="Q6Ten1OIwD3ax7YbeEWI6K,JjI4ruGosfNMDOOrnexSoG" />
         <Link Id="HoTL9wmSajK4zmTcTfA3Iy" Ids="VUZOujDLey3rKataMLrLvH,JAtl80bu28JD7cVDbf08Bz" />
         <Link Id="H6CZSoopmFXROpZMnWCYPz" Ids="M7ZQNzX5lM8acQeKVtCbV5,P64lciD1teKsWMY3T23cRn" />
       </Patch>

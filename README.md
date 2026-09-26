@@ -15,7 +15,7 @@ than what is wrapped (a few dozen of its 306 public types; see
 
 | | |
 |---|---|
-| ✅ | 33 nodes: tile layers (OpenStreetMap, any XYZ service), a disk cache, geometry and feature layers, a lat/lon graticule, five styles, navigation, picking, pixel↔degree conversion, widgets |
+| ✅ | 32 nodes: tile layers (OpenStreetMap, any XYZ service), a disk cache, geometry and feature layers, a lat/lon graticule, five styles, navigation, picking, pixel↔degree conversion, widgets |
 | ✅ | 19 help patches, every node opens one on F1; each compiles headlessly and was opened in vvvv before release |
 | ✅ | 244 tests, no network, shaped like frame loops because the expensive bugs here were about lifetime |
 | ⚠️ | Mapsui 4.1.9, not 5.x: Mapsui 5 needs SkiaSharp 3 and vvvv ships 2.88 |
@@ -49,7 +49,7 @@ Mapsui.Styles       VectorStyle  SymbolStyle  LabelStyle  StyleByGeometry  Style
 Mapsui.Navigate     CenterOn  ZoomToLevel  ZoomByWheel  DragBetween  Drag  ZoomIn  ZoomOut
                     ZoomToLayer  ZoomToLayers
 Mapsui.Project      ScreenToWorld  WorldToScreen
-Mapsui.Widgets      ScaleBar  Attribution  ZoomButtons  Click
+Mapsui.Widgets      ScaleBar  ZoomButtons  Click
 Mapsui.Skia         ToSkiaLayer
 Mapsui.Debug        DiagnosticsLayer
 ```
@@ -80,10 +80,12 @@ cache cannot read the server's caching headers. What it forbids is the opposite:
 nobody is looking at, and offline use. Requests carry a User-Agent naming this package, as the
 policy requires.
 
-**Show the credit on the map.** The policy asks for "© OpenStreetMap contributors" clearly on the
-map, not hidden behind a toggle; the `Attribution` node draws whatever the layers carry
-(`HowTo Add widgets to the map`). Other services set their own terms — OpenTopoMap, used in
-`HowTo Use any tile service`, is CC-BY-SA and asks for its own credit line.
+**The credit is on the map by itself.** The policy asks for "© OpenStreetMap contributors"
+clearly on the map, not hidden behind a toggle, and Mapsui's renderer prints every layer's
+attribution bottom right without being asked — there is no node to add and none that can hide it.
+A tile layer carries its credit: `OpenStreetMap` has OSM's built in, and `XYZ` prints whatever its
+`Attribution` pin says, so fill that pin in. Other services set their own terms — OpenTopoMap, used
+in `HowTo Use any tile service`, is CC-BY-SA and asks for its own credit line.
 
 `TileCache` is the one node that decides where tiles go. Hand its output to a layer's `Cache` pin,
 or leave that pin unconnected for the default above. **Leave its `Folder` pin unconnected for the

@@ -6,9 +6,9 @@ not write it. This plan says what exists, what VL.NetTopologySuite settled the s
 transfers here, what is different about a map, and the order of work. It is a plan, so every row
 below is either "done" with a date or a to-do; nothing in it is a measurement.
 
-> **Status 2026-09-25: complete, and shipping with `0.0.1-alpha`.** 19 patches for 33 nodes (36
+> **Status 2026-09-25: complete, and shipping with `0.0.1-alpha`.** 19 patches for 32 nodes (36
 > until ToFeatures, ZoomAt and Refresh were removed after the patches showed nobody could use
-> them), every one hand-arranged by the user in the GUI, then compiled, validated, opened in vvvv
+> them, and Attribution on 2026-09-26 after the user saw the credit drawn without it), every one hand-arranged by the user in the GUI, then compiled, validated, opened in vvvv
 > and photographed maximized. The section below is the starting point this plan was written
 > against, kept as it was.
 

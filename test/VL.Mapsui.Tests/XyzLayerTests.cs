@@ -108,11 +108,11 @@ public class XyzLayerTests : IDisposable
     }
 
     [Fact]
-    public void The_attribution_reaches_the_layer_where_the_widget_reads_it()
+    public void The_attribution_reaches_the_layer_where_the_renderer_reads_it()
     {
-        // Nearly every tile service requires attribution, and the Attribution widget draws whatever
-        // the layers carry. A layer with none contributes nothing to it, silently - so this asserts
-        // the text arrives where the widget will look, not merely that the pin exists.
+        // Nearly every tile service requires attribution, and Mapsui's renderer prints whatever the
+        // layers carry, bottom right (AttributionRenderingFacts). A layer with none prints nothing,
+        // silently - so this asserts the text arrives on the layer, not merely that the pin exists.
         using var node = new XyzTileLayerNode();
 
         var layer = node.Update(out _, out _, Template, "© Example contributors", enabled: true, cache: NoDisk);

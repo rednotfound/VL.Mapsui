@@ -25,10 +25,10 @@ a user has to delete by hand.
 
 **Current state (2026-09-26): ready for the first release, `0.0.1-alpha` — a prerelease, an early
 preview, not a stable version.** A map renders in vvvv 7.4, pans, zooms and takes geometry from
-any NTS source. **33 nodes, 244 tests.** VL.NetTopologySuite, which this package depends on, is on
+any NTS source. **32 nodes, 244 tests.** VL.NetTopologySuite, which this package depends on, is on
 nuget.org since 2026-09-26; VL.Mapsui is not yet — the upload is the maintainer's. See "Releasing"
 below and [docs/RELEASE.md](docs/RELEASE.md). **The help is the second test suite: 19 patches in the
-community's measured style, every one of the 33 nodes opens one on F1** (`tools\Test-VLPatch.ps1`
+community's measured style, every one of the 32 nodes opens one on F1** (`tools\Test-VLPatch.ps1`
 audits the flags), all 19 compile with every process node constructed in `Create`
 (`tools\Compile-HelpPatches.ps1` reads the generated C#), and every one was hand-arranged by the
 user in the GUI, then opened in vvvv and photographed (last full pass 2026-09-25). The plan, the decisions and what the patches found are in
@@ -226,7 +226,7 @@ vl-mapsui/
 ├── docs/RELEASE.md               # the release checklist: what each step proves, where it stands
 ├── LICENSE, .gitattributes       # MIT; .vl and Help.xml bytes pinned (-text)
 ├── VL.Mapsui.vl / .nuspec        # the package. .vl is hand-edited but never regenerated
-├── src/VL.Mapsui/                # 33 nodes. Feature itself is VL.NetTopologySuite's, not ours
+├── src/VL.Mapsui/                # 32 nodes. Feature itself is VL.NetTopologySuite's, not ours
 │   ├── LayerNodes.cs             # [ProcessNode] OpenStreetMap - tile layer, cache, attribution, UserAgent
 │   ├── XyzLayerNodes.cs          # [ProcessNode] XYZ - any slippy-map URL template
 │   ├── CacheNodes.cs, TileCache.cs # [ProcessNode] TileCache + the TileDiskCache value it hands out
@@ -245,7 +245,7 @@ vl-mapsui/
 │   ├── DragNode.cs, ZoomNodes.cs # [ProcessNode] Drag, ZoomIn, ZoomOut - they remember the previous frame
 │   ├── FrameNodes.cs             # [ProcessNode] ZoomToLayer, ZoomToLayers - on a trigger
 │   ├── ZoomLadder.cs             # slippy zoom level -> resolution, for maps with no tile layer
-│   ├── WidgetNodes.cs            # [ProcessNode] ScaleBar, Attribution, ZoomButtons, Click
+│   ├── WidgetNodes.cs            # [ProcessNode] ScaleBar, ZoomButtons, Click (no Attribution: Mapsui draws the credit itself)
 │   ├── WidgetInput.cs            # the hit test behind Click - arithmetic only, testable alone
 │   ├── SkiaNodes.cs              # [ProcessNode] ToSkiaLayer
 │   ├── MapsuiLayer.cs            # VL.Skia.ILayer - draws it, plus the diagnostics overlay
@@ -258,7 +258,7 @@ vl-mapsui/
     ├── Open-HelpPatch.ps1        # the ONLY way to launch vvvv here - three package repositories
     ├── Open-HelpPatch-GUI.ps1    # the picker window behind Open-HelpPatch.cmd (repo root): open, close mine, normalize, check
     ├── Test-VLPackage.ps1        # static package validator
-    ├── Test-VLPatch.ps1          # per-document validator: IDs, links, label overlap, help flags (33 of 33), Help.xml pairing
+    ├── Test-VLPatch.ps1          # per-document validator: IDs, links, label overlap, help flags (32 of 32), Help.xml pairing
     ├── HelpPatchGen.ps1          # scaffold for a new help patch (MapWindow, MouseXY, Button); the .vl is the truth afterwards
     ├── Capture-Renderer.ps1      # photographs the renderer (-Title '' the editor) - rung 4 without a person relaying
     ├── Normalize-HelpPatches.ps1 # run after any GUI session - vvvv repins deps AND saves Enabled=True

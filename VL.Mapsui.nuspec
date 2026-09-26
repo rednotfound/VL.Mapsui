@@ -28,7 +28,7 @@
       service, VL.NetTopologySuite, a ForEach over a record of your own - never has to know that
       Mapsui will draw it.
 
-      33 nodes and 19 help patches, from the smallest working map to styling by a value; every
+      32 nodes and 19 help patches, from the smallest working map to styling by a value; every
       node opens one on F1.
 
       The node surface can still change between prereleases, and Mapsui's editing and WMS/WFS
@@ -37,7 +37,7 @@
     </description>
     <summary>Mapsui map engine as composable nodes for vvvv gamma.</summary>
     <releaseNotes>
-      0.0.1-alpha - The first release, a prerelease. 33 nodes in eight categories - Mapsui,
+      0.0.1-alpha - The first release, a prerelease. 32 nodes in eight categories - Mapsui,
       Mapsui.Layers, Mapsui.Styles, Mapsui.Navigate, Mapsui.Project, Mapsui.Widgets, Mapsui.Skia,
       Mapsui.Debug - 244 tests, 19 help patches, and F1 on every node opens one. Tile layers
       (OpenStreetMap, any XYZ service) with a shared disk cache, geometry and feature layers, a

@@ -22,7 +22,7 @@ package nobody could install.
 |---|---|---|
 | `dotnet test` | the arithmetic, and that nothing rebuilds per frame | ✅ 244 tests |
 | `tools\Test-VLPackage.ps1` | the package can contribute nodes at all, no stray tiles, every help patch pinned `0.0.0` | ✅ |
-| `tools\Test-VLPatch.ps1` | every `.vl` well formed, `Help.xml` complete, every node F1-flagged | ✅ 20 documents, 33 of 33 |
+| `tools\Test-VLPatch.ps1` | every `.vl` well formed, `Help.xml` complete, every node F1-flagged | ✅ 20 documents, 32 of 32 |
 | `pack.ps1` + `tools\Compile-HelpPatches.ps1` | every node in every help patch resolves against the **packed** nupkg, and every process node is built in `Create` — read from the generated C# | ✅ 19 patches |
 | **`tools\Test-Install.ps1 -FromNuGetOrg`** | `nuget install` brings all six dependencies **from nuget.org itself**, and every help patch **inside the installed package** compiles with that install as the only repository | ✅ 2026-09-26: VL.NetTopologySuite 0.0.1-alpha arrived carrying nuget.org's `.signature.p7s`; 19 of 19 compile. **Without the switch the same run also passed — on a local build** (see below) |
 | the vvvv GUI | every help patch opens, draws, and reads without clipped notes | ✅ 2026-09-25, all 19 photographed maximized |
@@ -69,10 +69,11 @@ without `.signature.p7s`.
 - **The package ships README, ARCHITECTURE and MAPSUI-SURFACE, not NOTES.md.** NOTES is the
   repository's working log — two thousand lines of forensics and one machine path.
 - **`LICENSE`** at the root (MIT, VL.Mapsui Contributors) matches the nuspec's licence expression.
-- **Every help patch that shows tiles puts the credit on the map** (`Attribution`, bottom right) —
-  OSM's policy: "Show OpenStreetMap licence attribution clearly on the map", and OpenTopoMap is
-  CC-BY-SA. Until 2026-09-26 only `HowTo Add widgets to the map` did; `Show a map`, `Cache tiles`
-  and `Use any tile service` would have drawn uncredited tiles the moment Enabled went on.
+- **The credit is on the map in every patch that shows tiles, and no node is needed for it.**
+  OSM's policy: "Show OpenStreetMap licence attribution clearly on the map"; OpenTopoMap is
+  CC-BY-SA. Mapsui's renderer prints each layer's attribution bottom right by itself — measured
+  2026-09-26 (`AttributionRenderingFacts`) after the user saw it with no widget. The `Attribution`
+  node, which only drew a second copy, was removed the same day (33 → 32 nodes).
 - The repository is public, as are the other three and vvvv-gis (checked 2026-09-25).
 
 ## How to publish — way A for this release

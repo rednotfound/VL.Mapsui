@@ -24,9 +24,11 @@ namespace VL.Mapsui;
 /// unchanged:
 /// <code>https://tile.opentopomap.org/{z}/{x}/{y}.png</code>
 ///
-/// **Attribution is a pin rather than an afterthought.** Nearly every tile service requires it, the
-/// `Attribution` widget draws whatever the layers carry, and a layer with none silently contributes
-/// nothing to it. Filling it in is the difference between complying and appearing to.
+/// **Attribution is a pin rather than an afterthought.** Nearly every tile service requires it, and
+/// this pin is the only place the credit comes from: Mapsui's renderer prints every layer's
+/// attribution bottom right by itself (measured 2026-09-26, AttributionRenderingFacts), and a layer
+/// with none prints nothing, silently. Filling it in is the difference between complying and
+/// appearing to.
 ///
 /// A process node for the same reason the OpenStreetMap one is: a tile layer owns HTTP connections
 /// and a disk cache, and a static method is evaluated every frame.
