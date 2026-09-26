@@ -81,9 +81,9 @@ by hand, and it makes the order legible instead of accidental.
 **Geometry crosses package lines as NetTopologySuite, never as ours and never as Mapsui's.**
 
 ```
-whatever computes geometry            VL.Mapsui                Mapsui
-(VL.GIS, a GeoJSON reader, ...)  ──►  adapter          ──►     GeometryFeature
-      NTS Geometry / Feature          (FeatureLayer)           MemoryLayer
+whatever computes geometry              VL.Mapsui                Mapsui
+(VL.NetTopologySuite, VL.GeoJSON)  ──►  adapter          ──►     GeometryFeature
+      NTS Geometry / Feature            (FeatureLayer)           MemoryLayer
 ```
 
 - There is no `VLPoint`, no `VLPolygon`, no `MapsuiPolygonWrapper`. NTS is the shared vocabulary.
@@ -100,7 +100,7 @@ Dependency direction, which is the same statement read downwards:
 VL.Mapsui ──► VL.NetTopologySuite ──► NetTopologySuite     ✅ rendering above processing
 VL.Mapsui ──► Mapsui              ──► NetTopologySuite     ✅
 VL.NetTopologySuite ──► Mapsui                             ✗ must never happen
-VL.GIS              ──► Mapsui                             ✗ does not exist
+VL.GeoJSON          ──► Mapsui                             ✗ must never happen either
 ```
 
 **VL.NetTopologySuite is the package that makes geometry**; this one draws it. The dependency is
@@ -114,7 +114,7 @@ other, so every such patch lives in VL.Overworld, the course, which declares the
 compiles them all as a standing integration test.
 
 **Coordinates crossing in are WGS84 longitude and latitude, x first** — what GeoJSON carries and
-what VL.GIS produces. Mapsui draws in spherical mercator, so the adapter projects on the way in, on
+what VL.NetTopologySuite and VL.GeoJSON produce. Mapsui draws in spherical mercator, so the adapter projects on the way in, on
 a copy. Which projection an engine happens to draw in is not a decision anyone wants to take.
 
 **A CRS is an identifier** (`"EPSG:3857"`), which is what Mapsui itself uses. No universal CRS

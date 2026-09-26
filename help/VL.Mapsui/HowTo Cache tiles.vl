@@ -129,7 +129,28 @@
             </Pin>
             <Pin Id="OP3RuXo5PCvGg8zjefkTkl" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="50,780,130,19" Id="HJntZUeudCbruss8CRptof">
+          <Node Bounds="50,780,110,19" Id="RDWn1BzmRiIOxtYcmbvFgu">
+            <p:NodeReference LastCategoryFullName="Mapsui.Widgets" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Attribution" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="CLqdnNiSjODxuNZjlSFJpp" Name="Map" Kind="InputPin" />
+            <Pin Id="RGiEWFR6J8izWfMxqkGHyR" Name="Enabled" Kind="InputPin" />
+            <Pin Id="UzD49M6xACPPgITT3RFx1g" Name="Corner" Kind="InputPin" />
+            <Pin Id="NqTIafnPqUeO4EcXnIhMkI" Name="Result" Kind="OutputPin" />
+            <Pin Id="UdwoYHWSMTmfy6jacsBU0K" Name="Attribution" Kind="OutputPin" />
+          </Node>
+          <Pad Id="INsOglAsa0Gw7CwdWPFtZp" Bounds="879,770,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Attribution puts the credit on the map, bottom right. OSM's tile policy requires it there, visible.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Node Bounds="50,840,130,19" Id="HJntZUeudCbruss8CRptof">
             <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
@@ -139,7 +160,7 @@
             <Pin Id="JtNBO9oNFKFrpMqx4RKvPX" Name="Diagnostics" Kind="InputPin" />
             <Pin Id="FW8vAVxbrrb1B4fEvmjG2S" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="10,840,185,19" Id="KaCw0CgyZdohf3Jxa775oE">
+          <Node Bounds="10,900,185,19" Id="KaCw0CgyZdohf3Jxa775oE">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
@@ -256,7 +277,8 @@
         <Link Id="Vf9XXpn3Qcfw6CAp84GetG" Ids="MST1FXGa016nQBycfoP8kg,MqiRWSoUebQOOy4tIvB9vU" />
         <Link Id="B6SY0twU3ZA4HTqDG3X2KC" Ids="KFvGCK9onTyqipb1X2chps,N0row59DaAgG5HOzqiGO5s" />
         <Link Id="Kj0spFAxa7ny90shZGD9Ur" Ids="RtfUpYDqJWZ2qa0hk3CRBJ,Rzc6LtLxxjxzUl1XEM2AN6" />
-        <Link Id="V1zRiRtKFl1OiktjAa04JN" Ids="OP3RuXo5PCvGg8zjefkTkl,EXNDsIMs379XOuSDqp5far" />
+        <Link Id="V1zRiRtKFl1OiktjAa04JN" Ids="OP3RuXo5PCvGg8zjefkTkl,CLqdnNiSjODxuNZjlSFJpp" />
+        <Link Id="KxTFRhzHcaIxsrmX5Nv1eS" Ids="NqTIafnPqUeO4EcXnIhMkI,EXNDsIMs379XOuSDqp5far" />
         <Link Id="HR68Zrgg8PJY2kNZ3e4Rbr" Ids="FW8vAVxbrrb1B4fEvmjG2S,M5raMh0O5hN7B5cEdcZyVj" />
         <Link Id="UbLnYBV9FBpNoqICqdEmWB" Ids="TvspEyqGgWCBymk2xZeCxe,U66ycgZQ8JXMKE5Geuv3FW" />
       </Patch>

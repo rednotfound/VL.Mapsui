@@ -92,6 +92,27 @@
             </Pin>
             <Pin Id="MMgrgCR2FOZTsj1dFaU9wF" Name="Result" Kind="OutputPin" />
           </Node>
+          <Node Bounds="60,760,110,19" Id="DdB7eP5BS8FwIcoZkW12Pq">
+            <p:NodeReference LastCategoryFullName="Mapsui.Widgets" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Attribution" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="KHb0YVbW7ugkjjb6Ud22dY" Name="Map" Kind="InputPin" />
+            <Pin Id="HjiIDx1fnPOBCPdM5ey7Fu" Name="Enabled" Kind="InputPin" />
+            <Pin Id="S24NWz0ypzdMC5vwKRkQwj" Name="Corner" Kind="InputPin" />
+            <Pin Id="NZCpDvtSMrCbFKxahMTBIo" Name="Result" Kind="OutputPin" />
+            <Pin Id="DocOZM7aq6kFCLIlDKUHrs" Name="Attribution" Kind="OutputPin" />
+          </Node>
+          <Pad Id="N3ZGJnVR8vJf6FNmRsIQZS" Bounds="507,690,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Attribution puts the credit the layer carries on the map, bottom right. OSM's tile policy requires it there, visible.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
           <Node Bounds="60,830,130,19" Id="JrlTesMElENbfQKTqWCOmd">
             <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
@@ -244,7 +265,8 @@
         <Link Id="FYPg0sBlY2oWCeRNN75bbQ" Ids="JVwvo5Ebko6Nig1dNkjZDk,JKSePl9En70NtUtfgLmflc" />
         <Link Id="SOq1m7zpJ6zBt8E4dYtwnM" Ids="E5EVBoCRU2JVnGpi5t6flN,SP0cCuJBKr5xIjpyPzNmC8" />
         <Link Id="GyICnBs2BfSiGWvYW2Kyeg" Ids="NB1JYIwQRdeJVcP5DyDJ9z,QjnqZa5LNapc8xKt2ally7" />
-        <Link Id="PnePxUEr4lGJjynDhMdFQr" Ids="MMgrgCR2FOZTsj1dFaU9wF,FCkSKlorrDRzK1RYWr0Vv4" />
+        <Link Id="PnePxUEr4lGJjynDhMdFQr" Ids="MMgrgCR2FOZTsj1dFaU9wF,KHb0YVbW7ugkjjb6Ud22dY" />
+        <Link Id="Edkuvt2dBxgBsjEComsnzN" Ids="NZCpDvtSMrCbFKxahMTBIo,FCkSKlorrDRzK1RYWr0Vv4" />
         <Link Id="L8qZ5KL6fh9MPb8ibDvkgH" Ids="RcXS635i9NUHllOZOQAXPc,MHwo8xM8iYPKkI6NGQ8WZS" />
         <Link Id="GIv2SsV8T2snT6yGCn0CGL" Ids="MMgrgCR2FOZTsj1dFaU9wF,M32leTd4aLlLymefF08xzt" />
         <Link Id="GgFAwuSUSFLCg3L9UAMutg" Ids="QhP287nStqArMzSuU2mrIg,Olb4YkU32wASRMzTvU7dU5" />

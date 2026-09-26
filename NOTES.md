@@ -5,6 +5,37 @@ them do not belong here.
 
 ---
 
+## 2026-09-26 — facts checked against their sources before the release
+
+The user asked for every claim in the README, the licences and the attributions to be checked.
+Checked against the primary source each time, not against our own earlier text:
+
+| claim | source | result |
+|---|---|---|
+| Mapsui, Mapsui.Tiling, Mapsui.Rendering.Skia are MIT | their nuspecs (4.1.9) | ✅ |
+| NetTopologySuite, NetTopologySuite.Features are BSD-3-Clause | their nuspecs (2.6.0, 2.1.0) | ✅ |
+| BruTile (via Mapsui.Tiling `[5.0.6, 6.0.0)`) | its `license.txt` | Apache-2.0 — **was missing from the README**, added |
+| Mapsui 5 needs SkiaSharp 3; vvvv ships 2.88 | Mapsui.Rendering.Skia 5.1.0 nuspec: SkiaSharp 3.119.2; vvvv 7.4's `SkiaSharp.dll`: file 2.88.8, assembly 2.88.0.0 | ✅ |
+| VL.GIS 0.2.0-alpha declares BruTile 6 | its nuspec on nuget.org | ✅ `BruTile 6.0.0` |
+| install via Quad menu → Manage Nugets → Commandline, `-pre` | the Gray Book, *Managing NuGets* | ✅ — and it adds that installing does **not** reference the package; the Dependencies menu does. **Added to the README** |
+| OSM: cache 7 days, User-Agent, no bulk download | operations.osmfoundation.org/policies/tiles | ✅, but `TileCache.cs` quoted an **older wording**; replaced with today's |
+| OSM: attribution | same | "Show OpenStreetMap licence attribution clearly on the map" — **three help patches drew tiles with no credit**; `Attribution` added to each (below) |
+| OpenTopoMap credit and licence | opentopomap.org/about | CC-BY-SA; our English credit line matches their German one |
+| API keys 30 days, old keys end 2026-11-01 | .NET Blog, 2026-08-03 | ✅ — cited directly in RELEASE.md now, not via VL.NetTopologySuite |
+| "a session is a few megabytes" | our own measurement | replaced by the measured figure: 16 tiles, 736 KB |
+| ARCHITECTURE: "VL.GIS" as the geometry source | — | retired; now VL.NetTopologySuite / VL.GeoJSON |
+
+**The three patches.** `HowTo Show a map`, `HowTo Cache tiles` and `HowTo Use any tile service`
+each wired `Map → ToSkiaLayer` directly, so switching Enabled on drew OSM or OpenTopoMap tiles with
+no credit anywhere — `Map.Widgets` starts empty and only the `Attribution` node fills it. Inserted
+in place, `Map → Attribution → ToSkiaLayer`, defaults unwired (Enabled on, bottom right — the corner
+OSM's policy names). Where the user's layout had no room, ToSkiaLayer and Renderer moved down 60;
+nothing else moved. Verified: IDs legal and unique, XML parses, `Test-VLPatch` (108 Low flags, was
+105), `vvvvc` with the call chain read from the C# (`Attribution.Update(map: <Map result>)` feeding
+`ToSkiaLayer.Update(map: …)`, all three built in Create), `Test-Install -FromNuGetOrg` 19 of 19,
+editor photographed in vvvv. Not verified here: the credit text on screen with tiles switched on —
+that was seen for the same node in `HowTo Add widgets to the map` (2026-08-14 widget entry).
+
 ## 2026-09-26 — VL.NetTopologySuite is on nuget.org; what its release taught, and a false green here
 
 VL.NetTopologySuite `0.0.1-alpha` was uploaded in the browser by the maintainer on 2026-09-26

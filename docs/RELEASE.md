@@ -69,13 +69,19 @@ without `.signature.p7s`.
 - **The package ships README, ARCHITECTURE and MAPSUI-SURFACE, not NOTES.md.** NOTES is the
   repository's working log — two thousand lines of forensics and one machine path.
 - **`LICENSE`** at the root (MIT, VL.Mapsui Contributors) matches the nuspec's licence expression.
+- **Every help patch that shows tiles puts the credit on the map** (`Attribution`, bottom right) —
+  OSM's policy: "Show OpenStreetMap licence attribution clearly on the map", and OpenTopoMap is
+  CC-BY-SA. Until 2026-09-26 only `HowTo Add widgets to the map` did; `Show a map`, `Cache tiles`
+  and `Use any tile service` would have drawn uncredited tiles the moment Enabled went on.
 - The repository is public, as are the other three and vvvv-gis (checked 2026-09-25).
 
 ## How to publish — way A for this release
 
 nuget.org's account page labels API keys "Not Recommended" since a policy change announced
 2026-08-03: new keys live at most **30 days**, and **every key created before 2026-08-17 stops
-working on 2026-11-01**. VL.NetTopologySuite's RELEASE.md quotes the sources.
+working on 2026-11-01** — [.NET Blog, *Strengthening NuGet Supply Chain Security: Reducing API
+Key Lifetime*](https://devblogs.microsoft.com/dotnet/strengthening-nuget-supply-chain-security-reducing-api-key-lifetime/),
+checked 2026-09-26. The same post points CI at Trusted Publishing (OIDC, launched September 2025).
 
 - **A. Upload in the browser — no key at all.** nuget.org → *Upload* →
   `dist\feed\VL.Mapsui.0.0.1-alpha.nupkg` → the **Verify** page shows every nuspec field, the six

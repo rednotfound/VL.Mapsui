@@ -79,8 +79,9 @@ public sealed class TileDiskCache
 /// </summary>
 /// <remarks>
 /// **This stores only tiles that were actually drawn**, which is what OpenStreetMap's tile usage
-/// policy asks for: "Cache tiles locally according to HTTP caching headers (or at least 7 days if
-/// your cache cannot read them)." What the policy forbids is the opposite thing — "any
+/// policy asks for: "Honour server caching headers (Cache-Control, Expires, Etag). If your cache
+/// cannot read them, cache each tile for at least 7 days." (wording as of 2026-09-26; this cache
+/// cannot read them, so it keeps every tile exactly 7 days.) What the policy forbids is the opposite thing — "any
 /// pre-emptive fetching of tiles other than those a user is actively viewing", such as
 /// pre-seeding areas or zoom levels. Nothing here fetches anything; it only keeps what the map
 /// already asked for, so restarting vvvv stops meaning downloading the same view again.

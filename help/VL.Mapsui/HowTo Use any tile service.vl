@@ -118,7 +118,28 @@
             </Pin>
             <Pin Id="DAJgb3719GFNgYMXaqxchH" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="60,710,130,19" Id="VEPlHg5Fvpew5P6GLC9Pgd">
+          <Node Bounds="60,710,110,19" Id="H6QpOxYVqCR39GOMwOCSEt">
+            <p:NodeReference LastCategoryFullName="Mapsui.Widgets" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Attribution" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="Ehs93VwRvP5Z8dtTLQEbID" Name="Map" Kind="InputPin" />
+            <Pin Id="OBZOzRjPikp7hlqNLby9Ub" Name="Enabled" Kind="InputPin" />
+            <Pin Id="QyACXxbCzqWFzQpaBkxYF9" Name="Corner" Kind="InputPin" />
+            <Pin Id="SLeqw5PpXcgSWtehTmMAH5" Name="Result" Kind="OutputPin" />
+            <Pin Id="NWB9s8MD1eb8Tx0BF1NuIx" Name="Attribution" Kind="OutputPin" />
+          </Node>
+          <Pad Id="JTyv1l9VyB0YMJGwNfyp6Y" Bounds="640,700,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Attribution draws the credit from the pin above onto the map, bottom right. OpenTopoMap (CC-BY-SA) asks for it.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Node Bounds="60,770,130,19" Id="VEPlHg5Fvpew5P6GLC9Pgd">
             <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
@@ -128,7 +149,7 @@
             <Pin Id="SCQaIo0856PbhT3mFdFacX" Name="Diagnostics" Kind="InputPin" />
             <Pin Id="K8MKAuirpj17u4SVGp8lz9" Name="Result" Kind="OutputPin" />
           </Node>
-          <Node Bounds="20,770,185,19" Id="S0cx3F1CPIeKSK1xKW3BRu">
+          <Node Bounds="20,830,185,19" Id="S0cx3F1CPIeKSK1xKW3BRu">
             <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Renderer" />
@@ -244,7 +265,8 @@
         <Link Id="Mhypo1hgN2Ve4yEEDzxNxm" Ids="UUmUZlPsSjoiIUmJGMVWBS,Ea765KjbsIS2ZUvY2QPKDf" />
         <Link Id="M9GGT8yqX1JxvvOdswUgYk" Ids="Jvba9kmqhpNZVMYwPRUUVt,OHJPG0ynL6aTHZuxQe6Kt7" />
         <Link Id="T6sQmu70AHDDkZgJirD8cH" Ids="BPl7XwNQMNkL2makFOmIXu,QHgyZMU3oyepQayB0wXOH4" />
-        <Link Id="IXR2AjohCVTlSLOWMvDANC" Ids="DAJgb3719GFNgYMXaqxchH,SWpgrRytBRS0H7iLPdvRk5" />
+        <Link Id="IXR2AjohCVTlSLOWMvDANC" Ids="DAJgb3719GFNgYMXaqxchH,Ehs93VwRvP5Z8dtTLQEbID" />
+        <Link Id="PFGFNJgBDikR9WCb215Ru2" Ids="SLeqw5PpXcgSWtehTmMAH5,SWpgrRytBRS0H7iLPdvRk5" />
         <Link Id="Q3Tt3952qkoCoEocM7wPwB" Ids="K8MKAuirpj17u4SVGp8lz9,MrcOdXAV9WrpSUIS3i295m" />
       </Patch>
     </Node>

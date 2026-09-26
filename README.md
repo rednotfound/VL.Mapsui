@@ -31,7 +31,9 @@ nuget install VL.Mapsui -pre
 
 `-pre` is needed because this is a prerelease. It brings
 [VL.NetTopologySuite](https://github.com/rednotfound/VL.NetTopologySuite) along, which is what
-*makes* the geometry this package draws. Then open the Help Browser, or press F1 on any node.
+*makes* the geometry this package draws. Its help patches appear in the Help Browser straight
+away; to use its nodes in your own document, add VL.Mapsui there through the **Dependencies**
+menu — installing does not reference it by itself. Then press F1 on any node.
 
 **If you ever installed VL.GIS 0.2.0-alpha**, delete `%LOCALAPPDATA%\vvvv\gamma\nugets\BruTile.6.0.0`
 by hand. VL.GIS declared BruTile 6, Mapsui needs 5, the folder is shared by everything vvvv loads,
@@ -71,12 +73,17 @@ them. `HowTo Draw many features` builds two hundred from a record of your own.
 `Enabled` starts **off** on anything that fetches. Opening a document in vvvv runs it, so a map
 that fetched on open would give whoever opened it no chance to decline.
 
-Tiles that were drawn are cached under `%LOCALAPPDATA%\VL.Mapsui\tiles` for 7 days — a session is a
-few megabytes; delete the folder to reset. That is what
-[OpenStreetMap's tile policy](https://operations.osmfoundation.org/policies/tiles/) asks for. What
-it forbids is the opposite: fetching tiles nobody is looking at. Requests carry a User-Agent naming
-this package. Other services have their own policies; `HowTo Use any tile service` says so beside
-the switch.
+Tiles that were drawn are cached under `%LOCALAPPDATA%\VL.Mapsui\tiles` for 7 days — a session
+over one city at zoom 12 measured 16 tiles, 736 KB; delete the folder to reset. That is what
+[OpenStreetMap's tile policy](https://operations.osmfoundation.org/policies/tiles/) asks for when a
+cache cannot read the server's caching headers. What it forbids is the opposite: fetching tiles
+nobody is looking at, and offline use. Requests carry a User-Agent naming this package, as the
+policy requires.
+
+**Show the credit on the map.** The policy asks for "© OpenStreetMap contributors" clearly on the
+map, not hidden behind a toggle; the `Attribution` node draws whatever the layers carry
+(`HowTo Add widgets to the map`). Other services set their own terms — OpenTopoMap, used in
+`HowTo Use any tile service`, is CC-BY-SA and asks for its own credit line.
 
 `TileCache` is the one node that decides where tiles go. Hand its output to a layer's `Cache` pin,
 or leave that pin unconnected for the default above. **Leave its `Folder` pin unconnected for the
@@ -131,5 +138,11 @@ repository folders, and a missing one fails with an error naming something else.
 
 ## Licence
 
-MIT. Mapsui is MIT, NetTopologySuite BSD-3-Clause. OpenStreetMap data is © OpenStreetMap
-contributors, ODbL.
+VL.Mapsui is MIT — see [LICENSE](LICENSE). The package contains only its own assembly, help
+patches and docs; everything else arrives as a NuGet dependency under its own licence:
+[Mapsui](https://github.com/Mapsui/Mapsui) (MIT), [BruTile](https://github.com/BruTile/BruTile)
+(Apache-2.0), [NetTopologySuite](https://github.com/NetTopologySuite/NetTopologySuite) and
+NetTopologySuite.Features (BSD-3-Clause), SkiaSharp (MIT, supplied by vvvv).
+
+Map data from OpenStreetMap is © OpenStreetMap contributors, available under the
+[ODbL](https://www.openstreetmap.org/copyright). OpenTopoMap tiles are CC-BY-SA.
