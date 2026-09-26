@@ -316,7 +316,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="MtY0CJY44TxUZWcb3hGAPH" Bounds="640,688,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; The credit bottom right is not a widget: Mapsui prints every layer's attribution by itself, so nothing here can hide it - as tile policies require.">
+          <Pad Id="MtY0CJY44TxUZWcb3hGAPH" Bounds="640,738,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; The credit bottom right is not a widget: Mapsui prints every layer's attribution by itself, so nothing here can hide it - as tile policies require.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -325,7 +325,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="FSS9VCr9vQh5hJJYzOA2Jr" Bounds="640,758,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; ZoomButtons: + and -. They work because Click is wired; the widgets are drawn last, over everything.">
+          <Pad Id="FSS9VCr9vQh5hJJYzOA2Jr" Bounds="640,677,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; ZoomButtons: + and -. They work because Click is wired; the widgets are drawn last, over everything.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
