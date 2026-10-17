@@ -175,7 +175,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="TzdkxJVUFVY1pkvhh1OZGg" Bounds="640,251,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Attribution is what the Attribution widget shows for this layer. Nearly every service requires it; an empty pin credits nobody.">
+          <Pad Id="TzdkxJVUFVY1pkvhh1OZGg" Bounds="640,251,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Attribution is the credit Mapsui prints bottom right for this layer. Nearly every service requires it; an empty pin credits nobody.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
