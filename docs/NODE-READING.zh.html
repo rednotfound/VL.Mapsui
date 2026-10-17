@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VL.Mapsui 节点逐行精读</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;800&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: the same field-notebook as the reading guide; each lesson is a survey sheet - code on the left, the surveyor's notes on the right */
+:root {
+  --paper: #f5f7f6; --sheet: #ffffff; --ink: #17242b; --muted: #5b6b70; --rule: #d5dedc;
+  --water: #0e6e78; --water-soft: #dcefee; --road: #b45309; --road-soft: #fbecd9;
+  --park: #3f7d3a; --park-soft: #e3f1df;
+  --code-bg: #12201f; --code-fg: #d8e6e3; --code-dim: #7f9894; --code-key: #6fd3d9; --code-str: #f2b46b; --code-num: #b9e08a;
+  --display: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --mono: "JetBrains Mono", Consolas, "Cascadia Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f171a; --sheet: #152126; --ink: #e3ecea; --muted: #94a7a9; --rule: #26363b;
+    --water: #4fc1c9; --water-soft: #12343a; --road: #f0a35a; --road-soft: #3a2614; --park: #86c97f; --park-soft: #1a3119;
+    --code-bg: #0a1214; --code-fg: #d8e6e3; --code-dim: #6c8582; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f171a; --sheet: #152126; --ink: #e3ecea; --muted: #94a7a9; --rule: #26363b;
+  --water: #4fc1c9; --water-soft: #12343a; --road: #f0a35a; --road-soft: #3a2614; --park: #86c97f; --park-soft: #1a3119;
+  --code-bg: #0a1214; --code-fg: #d8e6e3; --code-dim: #6c8582; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.75;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 32px; padding-block: 32px 80px; }
+@media (min-width: 1060px) { .wrap { grid-template-columns: 210px minmax(0, 1fr); } }
+nav.toc { font-size: 14px; }
+@media (min-width: 1060px) { nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; } }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+nav.toc a { display: block; padding: 4px 10px; border-left: 2px solid var(--rule); color: var(--muted); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { color: var(--water); border-left-color: var(--water); outline: none; }
+nav.toc .label { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+main { min-width: 0; display: grid; gap: 64px; }
+header.hero { display: grid; gap: 12px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; color: var(--water); }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(30px, 5vw, 44px); line-height: 1.2; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--display); font-weight: 800; font-size: clamp(23px, 3.2vw, 30px); line-height: 1.3; margin: 0; text-wrap: balance; }
+h3 { font-size: 18px; margin: 12px 0 0; }
+section { display: grid; gap: 14px; min-width: 0; scroll-margin-top: 24px; }
+section > p, .lead, section > ul, section > ol { max-width: 72ch; margin: 0; }
+.lead { font-size: 18px; color: var(--muted); }
+.file { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.pattern { justify-self: start; display: inline-block; font-size: 13px; padding: 2px 10px; border-radius: 999px; background: var(--water-soft); color: var(--water); font-weight: 500; }
+a { color: var(--water); }
+code { font-family: var(--mono); font-size: .88em; background: var(--water-soft); padding: 1px 5px; border-radius: 4px; }
+pre { margin: 0; font-family: var(--mono); font-size: 13px; line-height: 1.6; background: var(--code-bg); color: var(--code-fg); border-radius: 8px; padding: 14px 16px; overflow-x: auto; }
+.note { border: 1px solid var(--rule); background: var(--sheet); border-radius: 10px; padding: 14px 16px; max-width: 80ch; }
+.note.warn { border-color: var(--road); background: var(--road-soft); }
+.note.good { border-color: var(--park); background: var(--park-soft); }
+.note p { margin: 0; } .note p + p { margin-top: 8px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 10px 14px; }
+.toolbar label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.toolbar input { width: 18px; height: 18px; accent-color: var(--water); }
+.toolbar span.hint { color: var(--muted); font-size: 14px; }
+/* annotated listing */
+/* The code reads as one unbroken editor pane; notes are a numbered list beside it, linked both ways.
+   overflow: clip (not hidden) so the sticky code pane still sticks to the page. */
+.listing { border: 1px solid var(--rule); border-radius: 10px; overflow: clip; background: var(--sheet); display: grid; }
+@media (min-width: 1000px) { .listing { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); } }
+.code { background: var(--code-bg); color: var(--code-fg); font-family: var(--mono); font-size: 13px; line-height: 1.7; padding: 12px 0; overflow: auto; min-width: 0; }
+@media (min-width: 1000px) { .code { position: sticky; top: 12px; align-self: start; max-height: calc(100vh - 24px); } }
+.cl { display: flex; min-width: max-content; padding-right: 16px; border-left: 3px solid transparent; }
+.cl .ln { width: 52px; flex: none; text-align: right; padding-right: 10px; color: var(--code-dim); font-size: 12px; font-variant-numeric: tabular-nums; user-select: none; }
+.cl .b { width: 26px; flex: none; display: flex; align-items: center; }
+.cl .src { white-space: pre; }
+.cl[data-n] { cursor: pointer; }
+.cl[data-n]:hover { background: rgba(255,255,255,.04); }
+.cl.on { background: rgba(111,211,217,.13); border-left-color: var(--code-key); }
+.cl.on:hover { background: rgba(111,211,217,.13); }
+.cl.fold .src { color: var(--code-dim); font-style: italic; }
+.cl.gap { line-height: 1.1; font-size: 12px; }
+.cl.gap .src { color: var(--code-dim); }
+.src .k { color: var(--code-key); } .src .s { color: var(--code-str); } .src .n { color: var(--code-num); } .src .c { color: var(--code-dim); font-style: italic; }
+.badge { display: inline-grid; place-items: center; min-width: 19px; height: 19px; padding: 0 4px; border-radius: 999px; font-family: var(--mono); font-size: 11px; font-weight: 600; font-style: normal; line-height: 1;
+  background: var(--water-soft); color: var(--water); }
+.badge.key { background: var(--road); color: #fff; }
+.code .badge { background: #1f3a3b; color: var(--code-key); }
+.code .badge.key { background: var(--code-str); color: #2a1a08; }
+ol.notes { list-style: none; margin: 0; padding: 4px 0; min-width: 0; }
+ol.notes li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 0 8px; padding: 10px 16px; border-top: 1px solid var(--rule); cursor: pointer; font-size: 14.5px; line-height: 1.7; scroll-margin: 16px; }
+ol.notes li:first-child { border-top: 0; }
+ol.notes li:hover { background: var(--paper); }
+ol.notes li.on { background: var(--water-soft); }
+ol.notes .where { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+ol.notes .body { grid-column: 2; }
+ol.notes code { font-size: .85em; }
+ol.notes .js { display: block; margin-top: 4px; font-family: var(--mono); font-size: 12.5px; color: var(--water); }
+body.quiz ol.notes li:not(.shown) .body { visibility: hidden; height: 0; overflow: hidden; }
+body.quiz ol.notes li:not(.shown) .where::after { content: "　· 点一下看解释"; color: var(--road); }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
+th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.hit { color: var(--park); font-weight: 700; }
+.recap { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.recap > div { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 14px; display: grid; gap: 4px; align-content: start; }
+.recap h4 { margin: 0; font-size: 15px; }
+.recap p { margin: 0; font-size: 14px; color: var(--muted); }
+details.answer { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; max-width: 86ch; }
+details.answer summary { cursor: pointer; font-weight: 500; }
+details.answer[open] summary { color: var(--water); margin-bottom: 8px; }
+details.answer p { margin: 8px 0 0; }
+pre.mermaid { background: var(--sheet); color: var(--ink); text-align: center; }
+:focus-visible { outline: 2px solid var(--road); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="toc" aria-label="目录">
+  <div class="label">课程</div>
+  <ol>
+    <li><a href="#l0">0 · vvvv 怎么调用你的类</a></li>
+    <li><a href="#l1">1 · CenterOn：静态节点</a></li>
+    <li><a href="#l2">2 · ZoomIn：记住一帧</a></li>
+    <li><a href="#l3">3 · Drag：小状态机</a></li>
+    <li><a href="#l4">4 · OpenStreetMap：持有资源</a></li>
+    <li><a href="#l5">5 · Map：比输入活得久</a></li>
+    <li><a href="#l6">6 · FeatureLayer：按内容比较</a></li>
+    <li><a href="#l7">7 · 自己写一个</a></li>
+    <li><a href="#recap">总结：三种比较</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">读懂指南 · 第二册 · 源码对应 commit 6e5f8b2</div>
+  <h1>VL.Mapsui 节点逐行精读</h1>
+  <p class="lead">七课，从 7 行的 CenterOn 读到要管网络连接的 OpenStreetMap。每一课多讲一个新模式，前面讲过的写法后面不再重复。左边是真实源码，像在编辑器里一样连成一整块；带编号的行在右边有解释，难的地方附 JS 写法。鼠标移到解释上，左边对应的行会亮起来；点代码行，右边跳到它的解释。</p>
+  <div class="toolbar">
+    <label for="quiz-toggle"><input type="checkbox" id="quiz-toggle"> 自测模式</label>
+    <span class="hint">打开后只剩编号，解释先藏起来；你自己读那一行，再点编号对答案。</span>
+  </div>
+  <p class="file">长段的 <code>///</code> 文档注释折叠成一行，写明它讲什么。原文就是 vvvv 里鼠标悬停时显示的说明，可以在源文件里读全文。</p>
+</header>
+
+<section id="l0">
+  <span class="pattern">先修课</span>
+  <h2>0 · vvvv 怎么调用你写的类</h2>
+  <p>先看一件真东西。vvvv 打开 patch 时，会把整张图翻译成 C# 再编译。下面几行摘自 <code>HowTo Show a map</code> 生成的 C#（<code>tools\Compile-HelpPatches.ps1 -KeepOutput</code> 可以留下这个文件），一共 375 行。长的行用 … 省略了一部分参数。看懂这几行，你就知道后面每个节点的 <code>Update</code> 是被谁、在什么时候调用的。</p>
+  <div class="listing" data-rows="gen"></div>
+  <div class="note good"><p><strong>记住这张对照：</strong>process 节点在 Create 里 <code>new</code> 一次，之后每帧调用它的 <code>.Update(...)</code>；static 节点没有对象，每帧直接用类名调用。我们的检查器 <code>Compile-HelpPatches.ps1</code> 做的就是读这个文件，确认 <code>new ...Node()</code> 出现在 Create 里，而不是在 Update 里。</p></div>
+</section>
+
+<section id="l1">
+  <span class="pattern">新模式：static 节点 = 每帧调用的纯函数</span>
+  <h2>1 · CenterOn：最简单的节点</h2>
+  <p class="file">src/VL.Mapsui/NavigateNodes.cs · 第 22–34 行，再加第 155–159 行</p>
+  <div class="listing" data-rows="center"></div>
+  <div class="note warn"><p><strong>想一想：</strong>CenterOn 每帧都执行。如果你把它接上，地图就会每帧被拉回这个点，鼠标拖也拖不动。HowTo Set the view 里写的 “Wired every frame they PIN the view” 说的就是这个。所以用鼠标拖地图要用下一课这种会“记事”的节点。</p></div>
+</section>
+
+<section id="l2">
+  <span class="pattern">新模式：用一个字段记住上一帧</span>
+  <h2>2 · ZoomIn：只在“刚按下”那一帧干活</h2>
+  <p class="file">src/VL.Mapsui/ZoomInNode.cs · 全文 46 行</p>
+  <div class="listing" data-rows="zoomin"></div>
+  <h3>第 37 行的判断，按帧看</h3>
+  <p>假设你把一个 Toggle 接到 Trigger，并让它保持按下几帧：</p>
+  <div class="scroll"><table>
+    <tr><th>帧</th><th>trigger（这一帧）</th><th>_was（上一帧）</th><th>trigger &amp;&amp; !_was</th><th>结果</th></tr>
+    <tr><td class="num">1</td><td>false</td><td>false</td><td>false</td><td>不动</td></tr>
+    <tr><td class="num">2</td><td>true</td><td>false</td><td class="hit">true</td><td class="hit">放大一级</td></tr>
+    <tr><td class="num">3</td><td>true</td><td>true</td><td>false</td><td>不动（还按着）</td></tr>
+    <tr><td class="num">4</td><td>true</td><td>true</td><td>false</td><td>不动</td></tr>
+    <tr><td class="num">5</td><td>false</td><td>true</td><td>false</td><td>不动（松开了）</td></tr>
+    <tr><td class="num">6</td><td>true</td><td>false</td><td class="hit">true</td><td class="hit">再放大一级</td></tr>
+  </table></div>
+  <p>如果没有 <code>_was</code>，第 2、3、4 帧都会放大，一秒放大 60 级，每一级都让图层去下载瓦片。这个字段防的就是这种失控。</p>
+</section>
+
+<section id="l3">
+  <span class="pattern">新模式：几个字段组成一个小状态机</span>
+  <h2>3 · Drag：拖动地图</h2>
+  <p class="file">src/VL.Mapsui/DragNode.cs · 第 23–57 行</p>
+  <pre class="mermaid">
+stateDiagram-v2
+  direction LR
+  [*] --> 没在拖
+  没在拖 --> 刚开始: dragging 变 true（第 44 行）&lt;br/&gt;只记位置，不移动
+  刚开始 --> 拖动中: 下一帧 dragging 仍为 true&lt;br/&gt;按差值移动（第 52 行）
+  拖动中 --> 拖动中: 每帧移动，更新上次位置
+  拖动中 --> 没在拖: dragging 变 false（第 35 行）&lt;br/&gt;补一次完整刷新
+  </pre>
+  <div class="listing" data-rows="drag"></div>
+</section>
+
+<section id="l4">
+  <span class="pattern">新模式：持有资源，只在身份变化时重建</span>
+  <h2>4 · OpenStreetMap：一个会联网的节点</h2>
+  <p class="file">src/VL.Mapsui/OpenStreetMapLayerNode.cs · 全文 192 行，代码约 60 行</p>
+  <p>这是整个包里最需要小心的节点：它会发 HTTP 请求，会往硬盘写文件。前面三课的写法这里都会用到，再加上两件新事：<strong>谁来释放资源</strong>，以及<strong>哪些东西能重建、哪些不能</strong>。</p>
+  <div class="listing" data-rows="osm"></div>
+  <div class="note"><p><strong>这一课的要点，一句话：</strong>Update 每帧都会被叫到，但第 118 行的 <code>if</code> 让它几乎永远什么都不做；真要重建时（第 121 行），也只重建便宜的图层，昂贵的瓦片源（第 141 行）一辈子只建一次。</p></div>
+</section>
+
+<section id="l5">
+  <span class="pattern">新模式：lambda 回调，以及“只读一次”的 pin</span>
+  <h2>5 · Map：一张活得比输入还久的地图</h2>
+  <p class="file">src/VL.Mapsui/MapNode.cs · 第 26–121 行</p>
+  <div class="listing" data-rows="map"></div>
+  <div class="note good"><p><strong>一条连起来的保证：</strong>第 84 行逐个按身份比较图层能成立，靠的是上游 OpenStreetMap 节点每帧交出<em>同一个</em>图层对象（第 4 课第 128 行）。Map 自己也每帧交出同一个 <code>_map</code>（第 109 行），于是下游 ToSkiaLayer 也不用重建。整个包的节点就是这样一环扣一环：每一环都保证“输入没变，就交出同一个对象”。</p></div>
+</section>
+
+<section id="l6">
+  <span class="pattern">新模式：按内容比较，而不是按身份</span>
+  <h2>6 · FeatureLayer：你的数据怎么上地图</h2>
+  <p class="file">src/VL.Mapsui/FeatureLayerNode.cs · Update（第 69–132 行）和两个比较函数（第 144–174 行）</p>
+  <p>上一课说每一环都交出同一个对象。但 FeatureLayer 的上游是 VL.NetTopologySuite 的 <code>Feature</code> 节点，它是静态节点，<strong>每帧都会返回一个新对象</strong>，内容却完全一样。这条链在这里断了，所以 FeatureLayer 必须自己按内容判断“变没变”。</p>
+  <div class="listing" data-rows="fl"></div>
+  <p class="file">文件里还有两个函数没逐行讲：<code>Describe</code>（第 200 行起）负责生成 Status 那句提示，<code>ToMapsui</code> 把一个 NTS 要素换成 Mapsui 要素，经纬度转成米。读懂了前面这些，它们只是同样写法的重复。</p>
+</section>
+
+<section id="l7">
+  <span class="pattern">练习</span>
+  <h2>7 · 轮到你：如果要写一个新节点</h2>
+  <p>写之前，<code>docs/RULES.md</code> 要求按顺序问三个问题：</p>
+  <ol>
+    <li><strong>用现有的三个节点在 patch 里连一下就能做到吗？</strong>能的话，它该是一个帮助 patch，不该是新节点。</li>
+    <li><strong>它持有资源吗？</strong>连接、文件、缓存、图层，或者需要记住上一帧？是的话写成 <code>[ProcessNode]</code>，否则写成 static 方法。</li>
+    <li><strong>它替用户做的决定，用户在乎吗？</strong>在乎的话，就做成一个 pin 让用户自己定。</li>
+  </ol>
+  <p>还有一条硬指标：输入 pin 以三个为目标，四个要有理由，五个说明一个节点里塞了两个决定。</p>
+  <h3>题目</h3>
+  <p>假设要做一个 <code>PanEast</code> 节点：每按一下按钮，地图中心往东移 1 度。先想三件事：它该是 static 还是 process？需要几个字段？大概怎么写？想好了再展开答案。下面的代码只是练习答案，包里没有这个节点。</p>
+  <details class="answer"><summary>展开参考答案</summary>
+    <p><strong>process 节点</strong>，因为要只在“刚按下”那一帧动一次，所以和 ZoomIn 一样需要记住上一帧（第 2 课）。它不持有网络或文件，所以不需要 <code>IDisposable</code>。</p>
+<pre><span>[ProcessNode(Name = "PanEast", Category = "Mapsui.Navigate")]
+public class PanEastNode
+{
+    bool _was;                                    // 上一帧的 trigger
+
+    public Map Update(Map map, bool trigger = false, double degrees = 1.0)
+    {
+        if (map is null) return map!;
+
+        if (trigger &amp;&amp; !_was)                        // 只在刚按下那一帧
+        {
+            var v = map.Navigator.Viewport;      // 现在的中心，单位是米
+            var (lon, lat) = SphericalMercator.ToLonLat(v.CenterX, v.CenterY);
+            NavigateNodes.CenterOn(map, lon + degrees, lat);   // 复用第 1 课的静态节点
+        }
+        _was = trigger;                          // 一定写在 if 外面
+        return map;                              // 交出同一个 map，方便串联
+    }
+}</span></pre>
+    <p>三个输入 pin（Map、Trigger、Degrees），没超标。<code>degrees</code> 做成 pin，是因为“一次移多少”是用户在乎的决定（第 3 问）。真要加进包里的话，还要补测试（参照 <code>ZoomIn</code> 的测试用 <code>Zooms</code> 计数）、补一个帮助 patch 并标上 F1，再更新 Compile-HelpPatches 和 Test-VLPatch 里的节点表。</p>
+  </details>
+</section>
+
+<section id="recap">
+  <h2>总结：判断“变没变”的三种方法</h2>
+  <p>七课读下来，这个包里所有的 <code>if</code> 几乎都在回答同一个问题：“这一帧的输入和上一帧一样吗？”问法只有三种：</p>
+  <div class="recap">
+    <div><h4>按身份 · ReferenceEquals</h4><p>“还是同一个对象吗？”最快。用在上游保证会交出同一个对象的地方：缓存（第 4 课 118 行）、样式（第 6 课 118 行）、地图（ToSkiaLayer）。</p></div>
+    <div><h4>逐个按身份 · SequenceEqual</h4><p>“列表里每个位置还是同一个对象吗？”用在图层列表（第 5 课 84 行）。列表对象不保证是同一个，但里面的图层是。</p></div>
+    <div><h4>按内容 · EqualsExact + 属性</h4><p>“内容还一样吗？”最慢，但上游每帧都给新对象时只能这样比：NTS 的要素（第 6 课 110 行）。</p></div>
+  </div>
+  <p>选错了会怎样：该按内容比的地方按身份比，每帧都会重建，地图会闪（FeatureLayer 曾经就是这样）；该按身份比的地方按内容比，也能工作，只是白白浪费计算。</p>
+</section>
+</main>
+</div>
+
+<script>
+// Each row: [line, code, explanation-html, kind]; kind: "" | "fold" (collapsed doc comment) | "key"
+const L = {
+gen: [
+ ["151", "OpenStreetMap_1 = new n11.OpenStreetMapLayerNode();", "<b>Create 里</b>：打开 patch 时执行一次，造出这个节点的对象，以后一直用它。<code>n11</code> 是生成器给命名空间 <code>VL.Mapsui</code> 起的简写。", "key"],
+ ["153", "Map_2 = new n11.MapNode();", "同上，地图节点的对象也只造一次。", ""],
+ ["155", "ToSkiaLayer_3 = new n11.ToSkiaLayerNode();", "同上。三个 process 节点，三次 <code>new</code>，全在 Create 里。", ""],
+ ["94", "var Result_13 = OpenStreetMap_11.Update(enabled: __pad_C34N3DvgyZxzRD4K5lXvfe_2, cache: Cache_12, layersBuilt: out int Layers_Built_14, cacheStatus: out string Cache_Status_15);", "<b>Update 里</b>：每帧执行。每个参数都按名字传：<code>enabled</code> 接的是 Enabled 开关，变量名里那串 <code>C34N3D…</code> 正是这个开关在 .vl 里的 Id；<code>cache</code> 没接线，所以是默认值 null；两个 <code>out</code> 接住两个输出 pin。返回值 <code>Result_13</code> 就是图层，会传给 Cons。", "key"],
+ ["104", "var Result_24 = Map_20.Update(layers: Layers_19, initialCenterLongitude: Initial_Center_Longitude_21, ...);", "地图节点每帧被调用，<code>layers</code> 是 Cons 输出的列表。四个 Initial 参数也是每帧都传进来，第 5 课会讲它为什么只用第一次的值。", ""],
+ ["106", "var Result_26 = ToSkiaLayer_25.Update(map: Result_24, diagnostics: __pad_IpERwpIAJmLMQRWW9sTTcK_3);", "上一行的输出 <code>Result_24</code> 直接当这一行的输入：patch 里的连线，翻译成 C# 就是变量传递。", ""],
+ ["119", "n11.MapInfoNodes.ViewportInfo(map: Result_24, centerLongitude: out double Center_Longitude_39, ...);", "<b>static 节点</b>：没有对象，每帧直接用类名 <code>MapInfoNodes</code> 调用。这就是 static 节点“没有记忆”的原因：它根本没有地方存东西。", "key"],
+],
+center: [
+ ["22", "[Name(\"Navigate\")]", "给这个静态类起一个分类名。分类是 <code>Mapsui</code> + <code>Navigate</code>，所以 vvvv 里显示为 <code>Mapsui.Navigate</code>。", ""],
+ ["23", "public static class NavigateNodes", "<code>static class</code>：不能 <code>new</code>，只是一个装函数的盒子。文件名和它同名（NavigateNodes.cs）。<span class='js'>export const NavigateNodes = { CenterOn() {…}, … }</span>", ""],
+ ["25–27", "/// <summary> Put a WGS84 coordinate at the centre… </summary>", "折叠的文档注释：鼠标悬停在节点上看到的那句说明。WGS84 就是普通的经纬度。", "fold"],
+ ["28", "public static Map CenterOn(Map map, double longitude, double latitude)", "<code>public static</code> 方法 = 一个节点，名字就是方法名 CenterOn。三个参数变成三个输入 pin（vvvv 会把 <code>longitude</code> 显示成 “Longitude”）。最前面的 <code>Map</code> 是返回类型，变成输出 pin。<code>double</code> 是 64 位小数，相当于 JS 的 number。", "key"],
+ ["29", "{", "", ""],
+ ["30", "    var center = SphericalMercator.FromLonLat(longitude, latitude);", "<code>var</code> 相当于 <code>const</code>，类型由右边推出来。把经纬度（度）换算成 Mapsui 内部用的 Web 墨卡托坐标（米）。返回值带 <code>.x</code> 和 <code>.y</code>。<span class='js'>const center = SphericalMercator.fromLonLat(lon, lat);</span>", ""],
+ ["31", "    map.Navigator.CenterOn(center.x, center.y);", "<code>Navigator</code> 是地图的“摄像机”，负责往哪看、看多大。这一行改的是传进来的这个 map 对象本身，没有造新地图。", ""],
+ ["32", "    Refresh(map, continuous: false);", "调用同一个类里的 Refresh（下面第 155 行）。<code>continuous: false</code> 是按名字传参，像 JS 传 <code>{ continuous: false }</code>。意思是“视角定下来了，请把看得到的瓦片都取回来”。", ""],
+ ["33", "    return map;", "交出<b>同一个</b> map。这样几个 Navigate 节点可以首尾相连串在一起，像 jQuery 的链式调用。", ""],
+ ["34", "}", "", ""],
+ ["155", "internal static Map Refresh(Map map, bool continuous = false)", "<code>internal</code>：只在包内可见，所以它<b>不是</b>节点，只是帮手。<code>bool continuous = false</code> 是带默认值的参数。", ""],
+ ["157", "    map.Refresh(continuous ? ChangeType.Continuous : ChangeType.Discrete);", "三元运算符，和 JS 一样。<code>ChangeType</code> 是 Mapsui 定义的枚举（一组命名常量）。拖动中用 Continuous，Mapsui 会少取一点瓦片；停下来用 Discrete，全部取回来。", ""],
+ ["158", "    return map;", "", ""],
+],
+zoomin: [
+ ["1–3", "using System; using Mapsui; using VL.Core.Import;", "三个 import。<code>VL.Core.Import</code> 里有 <code>[ProcessNode]</code> 这个标记。", ""],
+ ["5", "namespace VL.Mapsui;", "这个文件里的类型都属于 <code>VL.Mapsui</code>。去掉开头的 VL 就是分类根 <code>Mapsui</code>（这条规则来自 AssemblyInfo.cs 的 ImportAsIs）。", ""],
+ ["7–19", "/// <summary> Zooming a step at a time, triggered… </summary> <remarks>…</remarks>", "折叠的文档注释。summary 是悬停说明；remarks 解释它为什么必须只在“上升沿”干活：Toggle 一直开着的话，每帧都会放大。", "fold"],
+ ["20", "[ProcessNode(Name = \"ZoomIn\", Category = \"Mapsui.Navigate\")]", "标记：这个类是一个 process 节点，名字 ZoomIn，分类 Mapsui.Navigate。", "key"],
+ ["21", "public class ZoomInNode", "普通的类，不是 static，所以 vvvv 会 <code>new</code> 它一次（见第 0 课）。它不持有网络或文件，所以不用写 <code>: IDisposable</code>。", ""],
+ ["23", "    bool _was;", "<b>这个节点的全部记忆</b>：上一帧 trigger 是不是 true。字段没赋值时默认是 false。<span class='js'>#was = false;</span>", "key"],
+ ["25–29", "/// How many times this node has actually zoomed…", "折叠：解释下面这个计数器是给测试用的。", "fold"],
+ ["30", "    internal int Zooms { get; private set; }", "自动属性：外面能读（<code>get</code>），只有类自己能写（<code>private set</code>）。<code>internal</code>，所以 vvvv 里看不到，只有测试能看到。<span class='js'>get zooms() { return this.#zooms; }</span>", ""],
+ ["33", "    public Map Update(Map map, bool trigger = false)", "<b>每帧被调用的方法</b>。输入 pin：Map 和 Trigger（初始值 false）。返回值：Map。", "key"],
+ ["34", "    {", "", ""],
+ ["35", "        if (map is null) return map!;", "防御：没接地图就原样返回。<code>map!</code> 的 <code>!</code> 只是告诉编译器“我知道这里可能是 null”，压掉警告，运行时什么也不做。", ""],
+ ["37", "        if (trigger && !_was)", "<b>上升沿检测</b>：这一帧按下，上一帧没按。见下面按帧画的表。", "key"],
+ ["38", "        {", "", ""],
+ ["39", "            map.Navigator.ZoomIn();", "Mapsui 自己的放大一级，带一小段动画。", ""],
+ ["40", "            NavigateNodes.Refresh(map, continuous: false);", "调用第 1 课那个帮手：视角变了，去取新瓦片。", ""],
+ ["41", "            Zooms++;", "计数加一，测试靠它断言“按一次只放大一次”。", ""],
+ ["42", "        }", "", ""],
+ ["43", "        _was = trigger;", "<b>记住这一帧</b>，留给下一帧比较。必须写在 if 外面，否则松开之后 <code>_was</code> 永远停在 true，再也按不出第二次。", "key"],
+ ["44", "        return map;", "交出同一个 map，可以串联。", ""],
+],
+drag: [
+ ["26", "    bool _wasDragging;", "上一帧是不是在拖。", "key"],
+ ["27", "    float _lastX;", "上一帧的位置，单位是窗口像素。<code>float</code> 是 32 位小数，比 double 精度低，但像素坐标够用了。", ""],
+ ["28", "    float _lastY;", "", ""],
+ ["31", "    public Map Update(Map map, float x = 0f, float y = 0f, bool dragging = false)", "四个输入 pin：Map、X、Y、Dragging。<code>0f</code> 的 <code>f</code> 表示这是 float 字面量。注意它不管鼠标哪个键算拖动，由你在 patch 里决定给 Dragging 接什么。", "key"],
+ ["33", "        if (map is null) return map!;", "同第 2 课。", ""],
+ ["35", "        if (!dragging)", "<b>状态一：没在拖。</b>", "key"],
+ ["37–38", "// Ending a gesture is worth one discrete refresh…", "普通注释：刚松手时补一次完整刷新。拖动中 Mapsui 取瓦片比较保守，停下来再把屏幕上的全取回来。", "fold"],
+ ["39", "            if (_wasDragging) NavigateNodes.Refresh(map, continuous: false);", "只有“上一帧还在拖”的那一帧才刷新，也就是松手的那一刻。if 后面只有一句时可以不写大括号。", ""],
+ ["40", "            _wasDragging = false;", "", ""],
+ ["41", "            return map;", "提前返回，后面的代码这一帧不再执行。", ""],
+ ["44", "        if (!_wasDragging)", "<b>状态二：刚开始拖</b>（这一帧在拖，上一帧没拖）。", "key"],
+ ["46", "            _wasDragging = true;", "", ""],
+ ["47", "            _lastX = x;", "只记住起点，<b>不移动</b>。原因写在注释里：不然地图会从上一次拖动结束的位置“跳”到现在的鼠标位置。", ""],
+ ["48", "            _lastY = y;", "", ""],
+ ["49", "            return map;", "", ""],
+ ["52", "        NavigateNodes.DragBetween(map, x, y, _lastX, _lastY);", "<b>状态三：拖动中。</b>把“上一帧位置 → 这一帧位置”的差交给静态节点 DragBetween 去移动地图。process 节点负责记事，具体动作复用静态节点：一个记，一个做。", "key"],
+ ["53", "        _lastX = x;", "更新“上一帧”，留给下一帧用。", ""],
+ ["54", "        _lastY = y;", "", ""],
+ ["55", "        return map;", "", ""],
+],
+osm: [
+ ["4–8", "using ILayer = global::Mapsui.Layers.ILayer; …", "起别名的 import。<code>global::</code> 是“从最顶层找”：我们自己的命名空间叫 VL.Mapsui，直接写 Mapsui.Tiling 会被理解成 VL.Mapsui.Tiling，而那个不存在。", ""],
+ ["31", "[ProcessNode(Name = \"OpenStreetMap\", Category = \"Mapsui.Layers\")]", "节点名 OpenStreetMap，类名却是 OpenStreetMapLayerNode：节点名写在标记里，两者不必相同（读懂指南第 6 节）。", ""],
+ ["32", "public class OpenStreetMapLayerNode : IDisposable", "<code>: IDisposable</code> 表示“我有东西要在临终时清理”。vvvv 删除这个节点或关闭 patch 时，会调用它的 <code>Dispose()</code>（第 191 行）。", "key"],
+ ["37", "    internal const string UserAgent = \"VL.Mapsui/0.0.2-alpha (+https://…)\";", "<code>const</code>：编译时就定死的常量。发请求时告诉 OSM 服务器“我是谁”，这是 OSM 使用政策的要求。版本号写在三处，这里是其中一处。", ""],
+ ["39", "    TileLayer? _layer;", "当前交出去的图层。<code>?</code> 表示可以是 null；开始时是 null。", "key"],
+ ["40", "    TileDiskCache? _attached;", "这个图层挂的是哪个缓存，用来判断“缓存换没换”。", ""],
+ ["41", "    string _status = \"off\";", "Cache Status pin 要显示的文字。", ""],
+ ["43–51", "/// The OSM tile source, built once and reused…", "折叠：下面这个瓦片源为什么只建一次。", "fold"],
+ ["52", "    global::BruTile.ITileSource? _source;", "<b>瓦片源</b>：里面有一个 HTTP 客户端（连接池）。它没法被释放，所以建一个就漏一个，必须一辈子只建一次。这是第 12 条规则的由来。", "key"],
+ ["55", "    internal int LayersBuilt { get; private set; }", "建过几次图层，同时也是 Layers Built 输出 pin 的来源。", ""],
+ ["62", "    internal string CacheStatus => _layer is not null && _attached is { IsOn: true }", "<code>=&gt;</code> 定义的是<b>计算属性</b>：每次读取都重新算一遍，没有存储。<code>_attached is { IsOn: true }</code> 是“属性模式”，意思是 “_attached 不是 null 并且它的 IsOn 是 true”。<span class='js'>get cacheStatus() { return this.#layer && this.#attached?.isOn === true ? … : …; }</span>", ""],
+ ["63", "        ? TileCache.Describe(_attached.Folder)", "条件成立：去数一数缓存文件夹里有多少瓦片（这个统计两秒才真正做一次）。", ""],
+ ["64", "        : _status;", "否则显示存好的状态文字。", ""],
+ ["66–94", "/// The layer to put on a map… <remarks>…</remarks>", "折叠：Update 的长说明，讲 Enabled 默认关、Cache 怎么接、为什么没有文件夹 pin、为什么要盯着 Layers Built。", "fold"],
+ ["95", "    public ILayer? Update(", "每帧被调用。返回 <code>ILayer?</code>：一个图层，或者 null（Enabled 关着时）。", "key"],
+ ["96", "        out int layersBuilt,", "输出 pin：Layers Built。", ""],
+ ["97", "        out string cacheStatus,", "输出 pin：Cache Status。", ""],
+ ["98", "        bool enabled = false,", "输入 pin：Enabled，<b>默认关</b>。打开 patch 就是在运行它，默认开着的话，用户还没同意就开始下载了。", "key"],
+ ["99", "        TileDiskCache? cache = null)", "输入 pin：Cache。不接线就是 null，表示“用默认缓存”。", ""],
+ ["101", "        if (!enabled)", "关着的时候：", ""],
+ ["103", "            Release();", "释放图层（第 173 行）。关掉就真的不占资源了。", ""],
+ ["104–105", "            layersBuilt = LayersBuilt; cacheStatus = CacheStatus;", "C# 规定：方法返回之前，每个 <code>out</code> 参数都必须赋过值，否则编译不通过。所以每个 return 前面都有这两行。", ""],
+ ["106", "            return null;", "没有图层交给地图。", ""],
+ ["112", "        var wanted = cache ?? TileCache.Default();", "没接 Cache 就用默认缓存。<code>Default()</code> 每次返回同一个对象，所以下一行按身份比较是成立的。", ""],
+ ["118", "        if (_layer is null || !ReferenceEquals(wanted, _attached))", "<b>整个节点的心脏。</b>只在两种情况下重建：还没有图层（第一次），或者缓存换了一个对象。其余每一帧都跳过。<span class='js'>if (this.#layer === null || wanted !== this.#attached)</span>", "key"],
+ ["120", "            Release();", "先拆掉旧的。", ""],
+ ["121", "            _layer = Build(wanted, out _status);", "建新图层（第 131 行）。<code>out _status</code> 直接把字段当成输出参数传进去，Build 会往里写状态文字。", ""],
+ ["122", "            _attached = wanted;", "记住这次用的是哪个缓存。", ""],
+ ["123", "            LayersBuilt++;", "计数加一。正常情况下它停在 1，只在切换 Enabled 或换缓存时加。", ""],
+ ["126–128", "        layersBuilt = LayersBuilt; cacheStatus = CacheStatus; return _layer;", "绝大多数帧只执行这三行：交出<b>同一个</b>图层对象。", "key"],
+ ["131", "    TileLayer Build(TileDiskCache cache, out string status)", "私有方法（没写 public 就是 private），不是节点。", ""],
+ ["137", "        var layer = _source is null", "第一次还没有瓦片源吗？", "key"],
+ ["138", "            ? OpenStreetMap.CreateTileLayer(UserAgent)", "是：用 Mapsui 自带的工厂一次造出图层和瓦片源，带上我们的 User-Agent。", ""],
+ ["139", "            : new TileLayer(_source);", "否：拿已有的瓦片源包一个新图层。图层便宜，源不便宜。", ""],
+ ["141", "        _source ??= layer.TileSource;", "<code>??=</code>：只有 <code>_source</code> 还是 null 时才赋值，也就是只在第一次把瓦片源存下来。", "key"],
+ ["149", "        if (layer.TileSource is not BruTile.Web.HttpTileSource http)", "类型检查并顺便起名：如果源<b>是</b> HttpTileSource，就把它叫作 <code>http</code>，if 后面的代码可以直接用。这里写的是“不是的话”，对 OSM 来说永远不会发生，算是兜底。<span class='js'>if (!(src instanceof HttpTileSource)) { …; return } const http = src;</span>", ""],
+ ["151–153", "            status = cache.IsOn ? \"cannot cache…\" : TileCache.Describe(cache); return layer;", "兜底分支：报告为什么没法缓存，图层照样交出去。", ""],
+ ["159", "        if (!cache.IsOn)", "TileCache 节点被关掉了（用户说“不要缓存”）。", ""],
+ ["161", "            http.PersistentCache = new BruTile.Cache.NullCache();", "明确挂一个“什么都不存”的缓存。为什么不干脆不设？因为瓦片源是复用的，上次挂的缓存还在它身上，不覆盖掉的话，“关”了还会继续写硬盘。", "key"],
+ ["162–163", "            status = TileCache.Describe(cache); return layer;", "", ""],
+ ["168", "        http.PersistentCache = cache.CacheFor(\"https://tile.openstreetmap.org/standard\")!;", "挂上磁盘缓存。<code>CacheFor</code> 按瓦片服务给每个源分一个子文件夹，避免 OSM 和其他服务的瓦片互相覆盖。末尾的 <code>!</code> 同第 2 课，只是压掉 null 警告。", ""],
+ ["169", "        status = cache.Folder;", "状态显示缓存所在的文件夹。", ""],
+ ["173", "    void Release()", "拆掉图层的私有方法。", "key"],
+ ["183", "        _layer?.AbortFetch();", "<code>?.</code>：不是 null 才调用。先清空排队等着下载的瓦片（最多 128 个）。", ""],
+ ["184", "        _layer?.Dispose();", "再销毁图层。顺序很重要：注释里写了，反过来的话，下载线程可能往一个已经销毁的缓存里写东西。", ""],
+ ["185–187", "        _layer = null; _attached = null; _status = \"off\";", "回到初始状态。注意<b>没有</b>清 <code>_source</code>：瓦片源要留着复用。", ""],
+ ["191", "    public void Dispose() => Release();", "临终清理就是 Release。箭头写法表示方法体只有这一句。", "key"],
+],
+map: [
+ ["26", "[ProcessNode(Name = \"Map\", Category = \"Mapsui\")]", "分类就是根 Mapsui，没有子层。", ""],
+ ["27", "public class MapNode : IDisposable", "", ""],
+ ["29", "    readonly Map _map = new();", "<code>readonly</code>：这个字段只能在创建对象时赋值，之后不能换。所以这个节点一辈子只有<b>一张</b>地图。<code>new()</code> 是省略类型的写法，类型从左边推出来。<span class='js'>readonly #map = new Map();</span>", "key"],
+ ["30", "    ILayer[] _current = Array.Empty<ILayer>();", "上一帧的图层列表。<code>ILayer[]</code> 是数组；<code>Array.Empty&lt;ILayer&gt;()</code> 是一个共享的空数组，尖括号里是泛型参数，意思是“装 ILayer 的”。", ""],
+ ["33", "    internal int MapsBuilt { get; private set; }", "建过几张地图，永远是 1。这里用它兼做“是不是第一帧”的标志。", ""],
+ ["38", "    public Map Update(", "", "key"],
+ ["39", "        IEnumerable<ILayer>? layers = null,", "<code>IEnumerable</code>：任何能逐个遍历的东西（数组、列表、vvvv 的 Spread）。Cons 的输出可以直接接进来。", ""],
+ ["40–42", "        double initialCenterLongitude = 139.7, … = 35.68, int initialZoomLevel = 12)", "三个 Initial pin，默认东京、缩放 12。名字里的 Initial 是认真的：只在开头用一次，见第 52 行。", ""],
+ ["44", "        if (MapsBuilt == 0)", "只在第一帧进去。为什么不写在构造函数里？因为构造函数拿不到 pin 的值，pin 的值要到 Update 才传进来（第 0 课）。", "key"],
+ ["46", "            MapsBuilt = 1;", "", ""],
+ ["51", "            var center = SphericalMercator.FromLonLat(initialCenterLongitude, initialCenterLatitude);", "用第一帧的初始值算出中心点（米）。", ""],
+ ["52", "            _map.Home = navigator =>", "<b>把一个函数存起来，以后再调用。</b>这是 lambda，相当于 JS 的箭头函数。Mapsui 要等窗口有了大小才会调用 Home，那是在 MapsuiLayer.Render 里，可能晚好几帧。<span class='js'>this.#map.home = (navigator) => { … };</span>", "key"],
+ ["53", "            {", "这个函数“记住”了外面的 <code>center</code> 和 <code>initialZoomLevel</code>，这叫闭包，和 JS 一样。之后 pin 再怎么变，这里用的都是第一帧的值。", ""],
+ ["61–63", "                navigator.OverridePanBounds = new MRect(-20037508.342789244, …, 20037508.342789244, …);", "允许平移的范围：整个世界。20037508.34 米是 Web 墨卡托坐标系的边界，等于赤道周长的一半（π × 6378137）。不写这几行的话，只有一个点的地图会被限制在那个点附近，Initial Center 会被吞掉。", ""],
+ ["64", "                navigator.CenterOn(center.x, center.y);", "", ""],
+ ["76", "                ZoomLadder.ZoomToLevel(navigator, initialZoomLevel);", "缩放到初始级别。用我们自己的 ZoomLadder，而不用 Mapsui 的，因为没有瓦片图层的地图上 Mapsui 那个会悄悄失效。", ""],
+ ["77", "            };", "函数定义结束。注意分号：整个 lambda 是一条赋值语句。", ""],
+ ["83", "        var incoming = (layers ?? Enumerable.Empty<ILayer>()).Where(l => l is not null).ToArray();", "没接线就当空列表，过滤掉 null，再变成数组。<code>.Where</code> 就是 filter（LINQ）。<span class='js'>const incoming = (layers ?? []).filter(l => l != null);</span>", ""],
+ ["84", "        if (!incoming.SequenceEqual(_current))", "<b>逐个比较</b>：长度一样、每个位置还是同一个图层对象吗？这里不比列表对象本身（Cons 交出的列表不保证每帧是同一个），而是比列表里的图层。图层没换，就什么都不做。", "key"],
+ ["86", "            _map.Layers.Clear();", "变了：清空，", ""],
+ ["87", "            foreach (var l in incoming) _map.Layers.Add(l);", "按新顺序加回去。<code>foreach</code> 就是 JS 的 <code>for (const l of incoming)</code>。", ""],
+ ["88", "            _current = incoming;", "记住这次的列表。", ""],
+ ["95", "            _map.Refresh();", "新图层不会自己去下载，要有人叫它。漏了这一行，打开 Enabled 后地图会一直是空白。", ""],
+ ["106", "        _map.UpdateAnimations();", "每帧给 Mapsui 一个“时钟滴答”。这一个推进图层的动画。", ""],
+ ["107", "        _map.Navigator.UpdateAnimations();", "这一个推进视角的动画（滚轮缩放的缓动）。两个都要，曾经只调了第一个，结果滚轮缩放完全没反应。", ""],
+ ["109", "        return _map;", "每帧交出<b>同一张</b>地图。", "key"],
+ ["116", "    public void Dispose()", "临终清理：", ""],
+ ["118", "        _map.Layers.Clear();", "先把图层从地图上拿下来，但<b>不销毁</b>它们：图层属于造它们的节点，那些节点会自己 Dispose。", ""],
+ ["119", "        _map.Dispose();", "再销毁地图本身。", ""],
+],
+fl: [
+ ["69–75", "public ILayer? Update(out int layersBuilt, out string status, IEnumerable<NtsFeature>? features = null, IStyle? style = null, bool enabled = true, string name = \"Features\")", "两个输出、四个输入。注意 <code>enabled = true</code>：这个图层只画你自己的数据，不联网，所以默认开着没有问题。", "key"],
+ ["77", "var incoming = features?.Where(f => f?.Geometry is not null).ToArray() ?? Array.Empty<NtsFeature>();", "一行里有三个 null 处理：<code>features?.</code> 没接线时整串结果是 null；<code>f?.Geometry</code> 跳过空要素；最后的 <code>??</code> 把 null 换成空数组。<span class='js'>const incoming = features?.filter(f => f?.geometry != null) ?? [];</span>", ""],
+ ["78", "var wanted = style ?? Styles.Default;", "没接样式就用默认样式。", ""],
+ ["80", "status = Describe(incoming, wanted);", "每帧生成 Status 文字，比如 “2 features”，或者告诉你哪些要素画不出来。", ""],
+ ["82–87", "if (incoming.Length == 0) { Release(); layersBuilt = LayersBuilt; return null; }", "没有要素就不交图层。这样 Map 可以先接好线，等数据来了再画。", ""],
+ ["91", "if (_layer is null)", "<b>图层对象只建一次</b>，和第 4 课一样。", "key"],
+ ["93", "    _layer = new MemoryLayer(name)", "MemoryLayer：Mapsui 里“要素都放在内存里”的图层。", ""],
+ ["94–100", "    { IsMapInfoLayer = true, };", "对象初始化器：建好之后顺手设属性。<code>IsMapInfoLayer</code> 打开后 Pick 才能点中这个图层，Mapsui 默认是关的。<span class='js'>Object.assign(new MemoryLayer(name), { isMapInfoLayer: true })</span>", ""],
+ ["101–102", "    _name = name; LayersBuilt++;", "", ""],
+ ["104–108", "else if (name != _name) { _layer.Name = name; _name = name; }", "改名不重建，直接改属性。字符串用 <code>!=</code> 比较的是内容（C# 的 string 是特例，和 JS 一样）。", ""],
+ ["110", "if (!SameFeatures(incoming, _features))", "<b>按内容比较</b>（第 144 行）。不能用 ReferenceEquals，因为上游 Feature 节点每帧都返回新对象。", "key"],
+ ["112", "    _layer.Features = incoming.Select(ToMapsui).ToArray();", "内容真变了：把每个 NTS 要素换成 Mapsui 要素。<code>.Select(ToMapsui)</code> 就是 <code>.map(toMapsui)</code>，直接把方法名当函数传进去。<b>图层还是原来那个</b>，只换了里面的要素。", ""],
+ ["113", "    _features = incoming;", "记住这次的要素，下一帧拿来比。", ""],
+ ["114", "    _layer.DataHasChanged();", "告诉 Mapsui “内容变了，重画”。", ""],
+ ["115", "    FeatureSetsBuilt++;", "另一个计数器：内容换了几次。它和 LayersBuilt 回答的是两个不同的问题。", ""],
+ ["118–122", "if (!ReferenceEquals(wanted, _style)) { _layer.Style = wanted; _style = wanted; }", "样式按<b>身份</b>比较就够了：样式来自 VectorStyle 等 process 节点，它们每帧交出同一个对象。", ""],
+ ["128", "_layer.Enabled = enabled;", "显示还是隐藏，每帧直接设。隐藏不等于拆掉：要素、样式、渲染缓存都还在，打开时立刻回来。", ""],
+ ["130–131", "layersBuilt = LayersBuilt; return _layer;", "", ""],
+ ["144", "static bool SameFeatures(NtsFeature[] a, NtsFeature[] b)", "<code>static</code> 私有方法：不读写任何字段，只看参数，是一个纯函数。", "key"],
+ ["146", "    if (a.Length != b.Length) return false;", "数量不同，肯定变了。最便宜的判断放最前面。", ""],
+ ["148", "    for (var i = 0; i < a.Length; i++)", "和 JS 的 for 循环一样。", ""],
+ ["150", "        if (ReferenceEquals(a[i], b[i])) continue;", "同一个对象当然内容一样，跳过后面昂贵的比较。", ""],
+ ["151", "        if (a[i].Geometry is not { } left || b[i].Geometry is not { } right) return false;", "<code>is not { } left</code> 的意思是：如果 Geometry 是 null 就返回 false；不是 null 的话，把它叫作 <code>left</code>。一行里同时完成判空和起名。", ""],
+ ["152", "        if (!left.EqualsExact(right)) return false;", "NTS 自己的按内容比较：同类型、同坐标、同顺序。", "key"],
+ ["153", "        if (!SameAttributes(a[i].Attributes, b[i].Attributes)) return false;", "形状一样，还要比属性（名字、数值……）。", ""],
+ ["156", "    return true;", "全部一样。", ""],
+ ["161", "    if (ReferenceEquals(a, b)) return true;", "SameAttributes：同一个表，或者两个都是 null。", ""],
+ ["162", "    if (a is null || b is null) return false;", "一个有一个没有。", ""],
+ ["164–165", "    var names = a.GetNames(); if (names.Length != b.GetNames().Length) return false;", "列数不同。", ""],
+ ["167", "    foreach (var name in names)", "", ""],
+ ["169", "        if (!b.Exists(name)) return false;", "b 里没有这一列。", ""],
+ ["170", "        if (!Equals(a[name], b[name])) return false;", "<code>Equals(x, y)</code>（静态的那个）能处理 null，也会按值比较数字和字符串。<span class='js'>相当于 JS 里先判断 null，再按值比较</span>", ""],
+ ["173", "    return true;", "", ""],
+],
+};
+
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+const KW = /("(?:[^"\\]|\\.)*")|\b(public|private|internal|static|class|readonly|const|bool|int|float|double|string|var|if|else|return|new|null|true|false|out|is|not|foreach|for|in|continue|void|using|namespace|global)\b/g;
+function hl(code) {
+  if (/^\s*(\/\/\/|\/\/)/.test(code)) return '<span class="c">' + esc(code) + '</span>';
+  // One pass over the raw text, so a span inserted for one token is never re-matched by another rule.
+  let out = "", last = 0, m;
+  KW.lastIndex = 0;
+  while ((m = KW.exec(code))) {
+    out += esc(code.slice(last, m.index));
+    out += m[1] ? '<span class="s">' + esc(m[1]) + '</span>' : '<span class="k">' + m[2] + '</span>';
+    last = KW.lastIndex;
+  }
+  return out + esc(code.slice(last));
+}
+// Render: one continuous code pane (a "⋯" line wherever source lines are skipped) + a numbered note list.
+document.querySelectorAll(".listing[data-rows]").forEach(box => {
+  const rows = L[box.dataset.rows] || [];
+  let code = "", notes = "", n = 0, prevEnd = null;
+  for (const [ln, src, ex, kind] of rows) {
+    const nums = (ln.match(/\d+/g) || []).map(Number);
+    const start = nums[0], end = nums[nums.length - 1];
+    if (prevEnd !== null && start !== prevEnd + 1)
+      code += `<div class="cl gap"><span class="ln"></span><span class="b"></span><span class="src">    ⋯</span></div>`;
+    prevEnd = end;
+    const cls = ["cl", kind === "fold" ? "fold" : ""].join(" ");
+    if (ex) {
+      n++;
+      const badge = `<span class="badge${kind === "key" ? " key" : ""}">${n}</span>`;
+      code += `<div class="${cls}" data-n="${n}"><span class="ln">${ln}</span><span class="b">${badge}</span><span class="src">${hl(src)}</span></div>`;
+      notes += `<li data-n="${n}" tabindex="0">${badge}<span class="where">第 ${ln} 行</span><div class="body">${ex}</div></li>`;
+    } else {
+      code += `<div class="${cls}"><span class="ln">${ln}</span><span class="b"></span><span class="src">${hl(src)}</span></div>`;
+    }
+  }
+  box.innerHTML = `<div class="code">${code}</div><ol class="notes">${notes}</ol>`;
+});
+
+// Linking: hovering or clicking a note lights its code line; clicking a code line lights and reveals its note.
+function light(box, n, from) {
+  box.querySelectorAll(".on").forEach(el => el.classList.remove("on"));
+  const line = box.querySelector(`.cl[data-n="${n}"]`), note = box.querySelector(`li[data-n="${n}"]`);
+  if (!line || !note) return;
+  line.classList.add("on"); note.classList.add("on");
+  if (from === "note") {
+    // Scroll only the code pane, never the page.
+    const pane = box.querySelector(".code");
+    const top = line.getBoundingClientRect().top - pane.getBoundingClientRect().top + pane.scrollTop, h = pane.clientHeight;
+    if (top < pane.scrollTop + 24 || top > pane.scrollTop + h - 48) pane.scrollTo({ top: top - h / 3, behavior: "smooth" });
+  } else {
+    note.classList.add("shown");
+    const r = note.getBoundingClientRect();
+    if (r.top < 0 || r.bottom > innerHeight) note.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+}
+document.querySelectorAll(".listing[data-rows]").forEach(box => {
+  box.addEventListener("mouseover", e => { const li = e.target.closest("li[data-n]"); if (li) light(box, li.dataset.n, "note"); });
+  box.addEventListener("focusin", e => { const li = e.target.closest("li[data-n]"); if (li) light(box, li.dataset.n, "note"); });
+  box.addEventListener("click", e => {
+    const li = e.target.closest("li[data-n]");
+    if (li) { li.classList.add("shown"); light(box, li.dataset.n, "note"); return; }
+    const cl = e.target.closest(".cl[data-n]");
+    if (cl) light(box, cl.dataset.n, "code");
+  });
+});
+
+const toggle = document.getElementById("quiz-toggle");
+function setQuiz(on) { document.body.classList.toggle("quiz", on); document.querySelectorAll("li.shown").forEach(r => r.classList.remove("shown")); }
+try { if (localStorage.getItem("vlm-quiz") === "1") { toggle.checked = true; setQuiz(true); } } catch (e) {}
+toggle.addEventListener("change", () => { setQuiz(toggle.checked); try { localStorage.setItem("vlm-quiz", toggle.checked ? "1" : "0"); } catch (e) {} });
+</script>
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+const dark = document.documentElement.dataset.theme === "dark" ||
+  (document.documentElement.dataset.theme !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+mermaid.initialize({ startOnLoad: true, theme: dark ? "dark" : "default" });
+</script>
+</body>
+</html>

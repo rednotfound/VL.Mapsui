@@ -225,6 +225,7 @@ vl-mapsui/
 ├── docs/HELP-PATCH-PLAN.md       # the 2026-09-24 help campaign: decisions, gate, what the patches found
 ├── docs/RELEASE.md               # the release checklist: what each step proves, where it stands
 ├── docs/READING-GUIDE.zh.md      # the maintainer's guide in Chinese, C# explained through JS; keep file names in it current
+├── docs/NODE-READING.zh.html     # its sequel: seven nodes read line by line; quotes source WITH LINE NUMBERS as of 6e5f8b2
 ├── LICENSE, .gitattributes       # MIT; .vl and Help.xml bytes pinned (-text)
 ├── VL.Mapsui.vl / .nuspec        # the package. .vl is hand-edited but never regenerated
 ├── src/VL.Mapsui/                # 32 nodes, one top-level type per file, FILE NAME = TYPE NAME (2026-10-17)

@@ -166,6 +166,7 @@ repository folders, and a missing one fails with an error naming something else.
 - [docs/HELP-PATCH-STYLE.md](docs/HELP-PATCH-STYLE.md) — the help style, measured across 60 community packs
 - [docs/RELEASE.md](docs/RELEASE.md) — the release checklist, what each step proves
 - [docs/READING-GUIDE.zh.md](docs/READING-GUIDE.zh.md) — 读懂指南（中文）: the project for a reader who knows some JavaScript and no C#
+- [docs/NODE-READING.zh.html](docs/NODE-READING.zh.html) — 节点逐行精读（中文）: seven nodes read line by line, the sequel to the guide above; open the file in a browser
 - [CLAUDE.md](CLAUDE.md) — the rules that matter in this repository
 
 ## Licence
