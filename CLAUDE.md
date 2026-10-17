@@ -224,32 +224,33 @@ vl-mapsui/
 ├── docs/HELP-PATCH-STYLE.md      # ⭐ the community's help style, measured, + how 60 packs organize help
 ├── docs/HELP-PATCH-PLAN.md       # the 2026-09-24 help campaign: decisions, gate, what the patches found
 ├── docs/RELEASE.md               # the release checklist: what each step proves, where it stands
+├── docs/READING-GUIDE.zh.md      # the maintainer's guide in Chinese, C# explained through JS; keep file names in it current
 ├── LICENSE, .gitattributes       # MIT; .vl and Help.xml bytes pinned (-text)
 ├── VL.Mapsui.vl / .nuspec        # the package. .vl is hand-edited but never regenerated
-├── src/VL.Mapsui/                # 32 nodes. Feature itself is VL.NetTopologySuite's, not ours
-│   ├── LayerNodes.cs             # [ProcessNode] OpenStreetMap - tile layer, cache, attribution, UserAgent
-│   ├── XyzLayerNodes.cs          # [ProcessNode] XYZ - any slippy-map URL template
-│   ├── CacheNodes.cs, TileCache.cs # [ProcessNode] TileCache + the TileDiskCache value it hands out
-│   ├── GeometryLayerNodes.cs     # [ProcessNode] Geometry - the shortcut: one geometry, one colour
-│   ├── FeatureLayerNodes.cs      # [ProcessNode] FeatureLayer - THE NTS to Mapsui adapter, compares by value
-│   ├── GraticuleNode.cs          # [ProcessNode] Graticule - ours, not Mapsui's
-│   ├── VisibleRangeNodes.cs      # VisibleRange - the zooms a layer is drawn at
-│   ├── StyleNodes.cs             # [ProcessNode] VectorStyle + internal Styles.Combine (FLATTENS - nested draws nothing)
-│   ├── SymbolStyleNodes.cs, LabelStyleNodes.cs # [ProcessNode] SymbolStyle, LabelStyle
-│   ├── GeometryThemeNodes.cs     # [ProcessNode] StyleByGeometry - one style per geometry type
-│   ├── ValueThemeNodes.cs        # [ProcessNode] StyleByValue - the choropleth
-│   ├── MapNode.cs                # [ProcessNode] Map + ViewportInfo / LayerInfo readers
-│   ├── MapNodes.cs               # DiagnosticsLayer
-│   ├── PickNodes.cs              # [ProcessNode] Pick + ScreenToWorld / WorldToScreen - data handed BACK
-│   ├── NavigateNodes.cs          # CenterOn, ZoomToLevel, ZoomByWheel, DragBetween (ZoomAt, Refresh internal)
-│   ├── DragNode.cs, ZoomNodes.cs # [ProcessNode] Drag, ZoomIn, ZoomOut - they remember the previous frame
-│   ├── FrameNodes.cs             # [ProcessNode] ZoomToLayer, ZoomToLayers - on a trigger
-│   ├── ZoomLadder.cs             # slippy zoom level -> resolution, for maps with no tile layer
-│   ├── WidgetNodes.cs            # [ProcessNode] ScaleBar, ZoomButtons, Click (no Attribution: Mapsui draws the credit itself)
-│   ├── WidgetInput.cs            # the hit test behind Click - arithmetic only, testable alone
-│   ├── SkiaNodes.cs              # [ProcessNode] ToSkiaLayer
-│   ├── MapsuiLayer.cs            # VL.Skia.ILayer - draws it, plus the diagnostics overlay
-│   └── PixelSpace.cs             # pixel/VL space bridge
+├── src/VL.Mapsui/                # 32 nodes, one top-level type per file, FILE NAME = TYPE NAME (2026-10-17)
+│   │                             # node -> class -> file table: docs/ARCHITECTURE.md "Where each node lives"
+│   ├── MapNode.cs, MapInfoNodes.cs     # [ProcessNode] Map; static ViewportInfo, LayerInfo
+│   ├── PickNode.cs, ProjectNodes.cs    # [ProcessNode] Pick; static ScreenToWorld, WorldToScreen - data handed BACK
+│   ├── OpenStreetMapLayerNode.cs       # [ProcessNode] OpenStreetMap - tile layer, cache, UserAgent
+│   ├── XyzTileLayerNode.cs             # [ProcessNode] XYZ - any slippy-map URL template
+│   ├── TileCacheNode.cs, TileDiskCache.cs, TileCache.cs # [ProcessNode] TileCache, the value it hands out, its helpers
+│   ├── GeometryLayerNode.cs            # [ProcessNode] Geometry - the shortcut: one geometry, one colour
+│   ├── FeatureLayerNode.cs             # [ProcessNode] FeatureLayer - THE NTS to Mapsui adapter, compares by value
+│   ├── GraticuleNode.cs, GraticuleLayer.cs # [ProcessNode] Graticule - ours, not Mapsui's
+│   ├── VisibleRangeNodes.cs            # static VisibleRange - the zooms a layer is drawn at
+│   ├── VectorStyleNode.cs, Styles.cs, Colors.cs # [ProcessNode] VectorStyle; Styles.Combine FLATTENS (nested draws nothing)
+│   ├── SymbolStyleNode.cs, LabelStyleNode.cs    # [ProcessNode] SymbolStyle (+ SymbolShape enum), LabelStyle
+│   ├── StyleByGeometryNode.cs, GeometryTheme.cs # [ProcessNode] StyleByGeometry + the theme it builds
+│   ├── StyleByValueNode.cs, ValueTheme.cs       # [ProcessNode] StyleByValue - the choropleth
+│   ├── NavigateNodes.cs                # static CenterOn, ZoomToLevel, ZoomByWheel, DragBetween (ZoomAt, Refresh internal)
+│   ├── DragNode.cs, ZoomInNode.cs, ZoomOutNode.cs # [ProcessNode] - they remember the previous frame
+│   ├── ZoomToLayerNode.cs, ZoomToLayersNode.cs    # [ProcessNode] - frame data on a trigger
+│   ├── ZoomLadder.cs                   # slippy zoom level -> resolution, for maps with no tile layer
+│   ├── ScaleBarWidgetNode.cs, ZoomButtonsWidgetNode.cs, WidgetClickNode.cs # [ProcessNode] ScaleBar, ZoomButtons, Click
+│   ├── WidgetSlot.cs, WidgetInput.cs   # one widget on one map (+ WidgetCorner); the hit test behind Click
+│   ├── ToSkiaLayerNode.cs, MapsuiLayer.cs # [ProcessNode] ToSkiaLayer; the VL.Skia.ILayer that draws, + overlay
+│   ├── DebugNodes.cs, DiagnosticsLayer.cs # static DiagnosticsLayer (category Mapsui.Debug)
+│   └── PixelSpace.cs, FeatureHelper.cs, AssemblyInfo.cs # pixel/VL space bridge; NTS<->Mapsui feature helper
 ├── help/VL.Mapsui/               # Explanation + 18 HowTos + Help.xml (8 domain topics); one High flag per node
 ├── test/VL.Mapsui.Tests/         # 244 xunit tests, no network, no vvvv
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
@@ -359,7 +360,7 @@ and what is the maintainer's. The rules that outlive this release:
   `.signature.p7s`) and installed back with `tools\Test-Install.ps1 -Published -Version
   0.0.1-alpha`: both packages signed, 19 of 19 help patches compile from that install.
 - **The version is written in three places, and nothing overrides them:** the nuspec's
-  `<version>`, `LayerNodes.UserAgent` (what OSM's servers see), and the nuspec's dependency on
+  `<version>`, `OpenStreetMapLayerNode.UserAgent` (what OSM's servers see), and the nuspec's dependency on
   `VL.NetTopologySuite`. No `.github\` exists in any family repository.
 - **The maintainer performs the irreversible step.** Claude prepares, validates, commits and pushes
   `main`, then hands over and stops. A published version can never be replaced or deleted.

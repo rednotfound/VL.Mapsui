@@ -13,7 +13,7 @@ namespace VL.Mapsui;
 /// leave running.
 /// </remarks>
 [Name("Debug")]
-public static class MapNodes
+public static class DebugNodes
 {
     /// <summary>
     /// A layer that draws a fixed 200x120 pixel box and prints what it measured about the

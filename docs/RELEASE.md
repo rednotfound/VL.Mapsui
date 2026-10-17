@@ -32,7 +32,7 @@ package nobody could install.
 | install from nuget.org **in vvvv**, following the README | a user gets from the README to a working map | ✅ 2026-09-26, the maintainer in vvvv gamma 7.4: command-line install, Help Browser, own patch through Dependencies — works |
 | tag `v0.0.1-alpha` on GitHub | the source matching the package is findable | ✅ 2026-09-26, pushed by the maintainer; `git ls-remote` shows it on `3a1ac54`, the commit the uploaded nupkg was packed from |
 | GitHub release on the tag | release notes readable without the nuspec | ✅ 2026-09-26, by the maintainer: https://github.com/rednotfound/VL.Mapsui/releases/tag/v0.0.1-alpha, marked pre-release, published (GitHub API) |
-| working version bumped to `0.0.2-alpha` | a local repack can never pass for the published package | ✅ 2026-09-26: nuspec, `LayerNodes.UserAgent`, and the VL.NetTopologySuite dependency (its working version) |
+| working version bumped to `0.0.2-alpha` | a local repack can never pass for the published package | ✅ 2026-09-26: nuspec, `OpenStreetMapLayerNode.UserAgent`, and the VL.NetTopologySuite dependency (its working version) |
 
 `VL.Mapsui` did not exist on nuget.org before the upload (flat container 404, checked 2026-09-26);
 the upload created it under the maintainer's account.
@@ -52,7 +52,7 @@ without `.signature.p7s`.
 - **Every release is a prerelease for now**, `0.0.1-alpha` first — the same suffix as the family,
   managed in step with VL.NetTopologySuite. A user installs with `nuget install VL.Mapsui -pre`.
 - **The version is written in three places, and nothing overrides them:** the nuspec's
-  `<version>`, `LayerNodes.UserAgent` (what OSM's tile servers see, since their policy asks to
+  `<version>`, `OpenStreetMapLayerNode.UserAgent` (what OSM's tile servers see, since their policy asks to
   identify the application), and — from the second release on — the nuspec's dependency on
   `VL.NetTopologySuite`, which follows that package's version.
 - **Right after publishing, the working version becomes `0.0.2-alpha`,** with a comment in the
@@ -130,7 +130,7 @@ git push origin v0.0.1-alpha
 
 # 5. GitHub release on the tag, body = the nuspec's release notes (the maintainer, in the browser).
 
-# 6. The same day: nuspec <version> and LayerNodes.UserAgent -> 0.0.2-alpha, release notes gain a
+# 6. The same day: nuspec <version> and OpenStreetMapLayerNode.UserAgent -> 0.0.2-alpha, release notes gain a
 #    "0.0.2-alpha - In development, not published." line; build, test, commit.
 ```
 

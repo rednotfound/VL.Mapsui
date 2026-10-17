@@ -165,6 +165,7 @@ repository folders, and a missing one fails with an error naming something else.
 - [docs/MAPSUI-SURFACE.md](docs/MAPSUI-SURFACE.md) — what Mapsui offers, what is wrapped, what will not be
 - [docs/HELP-PATCH-STYLE.md](docs/HELP-PATCH-STYLE.md) — the help style, measured across 60 community packs
 - [docs/RELEASE.md](docs/RELEASE.md) — the release checklist, what each step proves
+- [docs/READING-GUIDE.zh.md](docs/READING-GUIDE.zh.md) — 读懂指南（中文）: the project for a reader who knows some JavaScript and no C#
 - [CLAUDE.md](CLAUDE.md) — the rules that matter in this repository
 
 ## Licence

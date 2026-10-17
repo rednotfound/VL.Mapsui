@@ -173,6 +173,78 @@ Two consequences that are easy to get wrong, and did ship wrong before tests cau
 
 ---
 
+## Where each node lives
+
+**vvvv never reads a file name.** A node's name and category come from code: `[ProcessNode(Name,
+Category)]` on a class, or for a static method its own name under the category its static class
+names with `[Name("...")]` (or skips with `[SkipCategory]`), below the `Mapsui` that
+`[assembly: ImportAsIs(Namespace = "VL")]` derives from the namespace. So the name in the
+NodeBrowser, the C# type and the file are three separate names, and only the convention below ties
+the last two together.
+
+**One top-level type per file, and the file is named after the type** — since 2026-10-17. Before
+that, files were named after whatever they first held: `LayerNodes.cs` was the only layer node on
+2026-08-13 and still held only `OpenStreetMap` when six other layer nodes had their own files, and
+`MapNodes.cs` was the all-in-one map spike long after the map moved out of it. The rule is the one
+C# tooling enforces and vvvv's own packages follow:
+
+- StyleCop [SA1649](https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1649.md)
+  (file name matches the first type) and [SA1402](https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1402.md)
+  (one type per file; enums may sit beside the class they serve, as `SymbolShape`, `WidgetCorner`
+  and `ScaleBarUnits` do here). Visual Studio ships *Move type to matching file* and *Sync type and
+  filename* for the same reason ([Microsoft Learn](https://learn.microsoft.com/en-us/visualstudio/ide/reference/move-type-to-matching-file)).
+- [VL.StandardLibs](https://github.com/vvvv/VL.StandardLibs): `VL.TPL.Dataflow` puts node
+  `BufferBlock` in class `BufferBlockNode` in `BufferBlockNode.cs`; `VL.Video` puts `VideoPlayer` in
+  `VideoPlayerFileNode.cs` — a class name longer than the node's is normal there too.
+- The family: VL.NetTopologySuite groups static nodes in one static class per category
+  (`[Name("Operation")] OperationNodes` in `OperationNodes.cs`). Ours do the same: `NavigateNodes`,
+  `ProjectNodes`, `MapInfoNodes`, `VisibleRangeNodes`, `DebugNodes`.
+
+**No folders.** VL.ImGui has them, but its namespaces follow its folders. Here the namespace *is*
+the category, so a folder would either break .NET's namespace-matches-folder convention (IDE0130)
+or move every node to a new category and break every help patch.
+
+Class names were left as they were — no `.vl` names a class, but `tools\Compile-HelpPatches.ps1`
+and the tests do — except `MapNodes`, which became `DebugNodes` to match its category.
+
+| node | category | kind | class | file |
+|---|---|---|---|---|
+| Map | Mapsui | process | `MapNode` | `MapNode.cs` |
+| ViewportInfo, LayerInfo | Mapsui | static | `MapInfoNodes` | `MapInfoNodes.cs` |
+| Pick | Mapsui | process | `PickNode` | `PickNode.cs` |
+| OpenStreetMap | Mapsui.Layers | process | `OpenStreetMapLayerNode` | `OpenStreetMapLayerNode.cs` |
+| XYZ | Mapsui.Layers | process | `XyzTileLayerNode` | `XyzTileLayerNode.cs` |
+| TileCache | Mapsui.Layers | process | `TileCacheNode` | `TileCacheNode.cs` |
+| Geometry | Mapsui.Layers | process | `GeometryLayerNode` | `GeometryLayerNode.cs` |
+| FeatureLayer | Mapsui.Layers | process | `FeatureLayerNode` | `FeatureLayerNode.cs` |
+| Graticule | Mapsui.Layers | process | `GraticuleNode` | `GraticuleNode.cs` |
+| VisibleRange | Mapsui.Layers | static | `VisibleRangeNodes` | `VisibleRangeNodes.cs` |
+| VectorStyle | Mapsui.Styles | process | `VectorStyleNode` | `VectorStyleNode.cs` |
+| SymbolStyle | Mapsui.Styles | process | `SymbolStyleNode` | `SymbolStyleNode.cs` |
+| LabelStyle | Mapsui.Styles | process | `LabelStyleNode` | `LabelStyleNode.cs` |
+| StyleByGeometry | Mapsui.Styles | process | `StyleByGeometryNode` | `StyleByGeometryNode.cs` |
+| StyleByValue | Mapsui.Styles | process | `StyleByValueNode` | `StyleByValueNode.cs` |
+| CenterOn, ZoomToLevel, ZoomByWheel, DragBetween | Mapsui.Navigate | static | `NavigateNodes` | `NavigateNodes.cs` |
+| Drag | Mapsui.Navigate | process | `DragNode` | `DragNode.cs` |
+| ZoomIn | Mapsui.Navigate | process | `ZoomInNode` | `ZoomInNode.cs` |
+| ZoomOut | Mapsui.Navigate | process | `ZoomOutNode` | `ZoomOutNode.cs` |
+| ZoomToLayer | Mapsui.Navigate | process | `ZoomToLayerNode` | `ZoomToLayerNode.cs` |
+| ZoomToLayers | Mapsui.Navigate | process | `ZoomToLayersNode` | `ZoomToLayersNode.cs` |
+| ScreenToWorld, WorldToScreen | Mapsui.Project | static | `ProjectNodes` | `ProjectNodes.cs` |
+| ScaleBar | Mapsui.Widgets | process | `ScaleBarWidgetNode` | `ScaleBarWidgetNode.cs` |
+| ZoomButtons | Mapsui.Widgets | process | `ZoomButtonsWidgetNode` | `ZoomButtonsWidgetNode.cs` |
+| Click | Mapsui.Widgets | process | `WidgetClickNode` | `WidgetClickNode.cs` |
+| ToSkiaLayer | Mapsui.Skia | process | `ToSkiaLayerNode` | `ToSkiaLayerNode.cs` |
+| DiagnosticsLayer | Mapsui.Debug | static | `DebugNodes` | `DebugNodes.cs` |
+
+22 process nodes and 10 static ones. The other files hold what the nodes hand out or use:
+`TileDiskCache` (the cache value), `TileCache` (its helpers), `GeometryTheme` and `ValueTheme`
+(the styles the two theme nodes build), `GraticuleLayer`, `Styles` and `Colors`, `WidgetSlot` and
+`WidgetInput`, `MapsuiLayer` (what `ToSkiaLayer` hands the renderer), `DiagnosticsLayer`,
+`PixelSpace`, `ZoomLadder`, `FeatureHelper`.
+
+---
+
 ## What this package does not own
 
 | | belongs to |

@@ -15,7 +15,7 @@
 
     Note: `nuget pack` reads <version> from the nuspec, and nothing overrides it: there is no
     publish workflow in this repository (checked 2026-09-25, before 0.0.1-alpha). The nuspec is
-    the source of truth, so bump it - and LayerNodes.UserAgent - before packing a release.
+    the source of truth, so bump it - and OpenStreetMapLayerNode.UserAgent - before packing a release.
 
 .EXAMPLE
     .\pack.ps1

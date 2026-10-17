@@ -137,7 +137,7 @@ $OurNodes = @{
     'Pick'            = 'new\s+[\w\.]*PickNode\('
     'ScreenToWorld'   = 'ProjectNodes\.ScreenToWorld\('
     'WorldToScreen'   = 'ProjectNodes\.WorldToScreen\('
-    'DiagnosticsLayer'= 'MapNodes\.DiagnosticsLayer\('
+    'DiagnosticsLayer'= 'DebugNodes\.DiagnosticsLayer\('
     # Mapsui.Layers
     'OpenStreetMap'   = 'new\s+[\w\.]*OpenStreetMapLayerNode\('
     'XYZ'             = 'new\s+[\w\.]*XyzTileLayerNode\('

@@ -5,6 +5,27 @@ them do not belong here.
 
 ---
 
+## 2026-10-17 — every source file renamed after the type it holds; the node descriptions did not move
+
+Files had been named after what they first held: `LayerNodes.cs` held only `OpenStreetMap`,
+`MapNodes.cs` only `DiagnosticsLayer`, and the maintainer, reading the code for the first time,
+could not find a node from its name. Now one top-level type per file and the file is named after
+the type — StyleCop SA1649/SA1402, what VL.TPL.Dataflow and VL.Video do, and how VL.NetTopologySuite
+names its static per-category classes. Sources and the full node → class → file table:
+docs/ARCHITECTURE.md, "Where each node lives". 22 files became 42; one class renamed, `MapNodes` →
+`DebugNodes`; no folders, because here the namespace is the category.
+
+How it could have gone wrong without a build error: a `///` block left behind at a cut is a node
+that loses its description in the NodeBrowser, and the compiler does not care. So the generated
+`VL.Mapsui.xml` was compared against a build of the commit before: 190 members both sides, none
+missing, and the only text that changed was the intended fix of a stray `每` that had been sitting
+in VectorStyle's remarks ("A new style每 frame"). Then build, 244 tests, pack, Test-VLPackage,
+Test-VLPatch (32 of 32 on F1) and Compile-HelpPatches (19 of 19, `DiagnosticsLayer` resolving as
+`DebugNodes.DiagnosticsLayer(`) — all green. No `.vl` names a class or a file, which was checked
+first, so no help patch was touched.
+
+---
+
 ## 2026-09-26 — the README's install path, walked by the maintainer in vvvv 7.4
 
 The one check no script here can make: the maintainer followed the README's "Install and your first
