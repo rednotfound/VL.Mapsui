@@ -13,14 +13,19 @@ using ZoomInOutWidget = global::Mapsui.Widgets.Zoom.ZoomInOutWidget;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// The buttons draw as soon as they are on the map, but a press has to be wired to them like
+// anything else in this package: Click [Mapsui.Widgets] takes a position and a pressed gate,
+// exactly as Drag does. Nothing here decides that the left button means clicking a widget.
+
 /// <summary>
-/// Plus and minus buttons that zoom the map. Wire a <c>Click</c> node for them to respond.
+/// Shows plus and minus buttons that zoom the map.
 /// </summary>
 /// <remarks>
-/// The buttons draw as soon as they are on the map, but a press has to be wired to them like
-/// anything else in this package: <c>Click [Mapsui.Widgets]</c> takes a position and a pressed
-/// gate, exactly as <c>Drag</c> does. Nothing here decides that the left button means clicking a
-/// widget.
+/// The buttons respond only to presses wired through a Click node.
 /// </remarks>
 [ProcessNode(Name = "ZoomButtons", Category = "Mapsui.Widgets")]
 public class ZoomButtonsWidgetNode
@@ -30,7 +35,13 @@ public class ZoomButtonsWidgetNode
     /// <summary>Widgets this node has added. It should reach 1 and stay there.</summary>
     internal int WidgetsAdded => _slot.Added;
 
-    /// <summary>The same map, so this sits in the chain between Map and ToSkiaLayer.</summary>
+    /// <summary>
+    /// Configures the zoom buttons on the map.
+    /// </summary>
+    /// <param name="map">The map to put them on.</param>
+    /// <param name="enabled">Nothing is drawn while off.</param>
+    /// <param name="corner">The corner of the map they sit in.</param>
+    /// <returns>The same map, for the chain between Map and ToSkiaLayer.</returns>
     public Map? Update(
         Map? map,
         bool enabled = true,

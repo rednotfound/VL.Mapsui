@@ -5,26 +5,39 @@ using VL.Core.Import;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// Positions are pixels from the top-left of the view, the same pixels ToSkiaLayer draws in.
+//
+// These are separate nodes rather than pins on the map for a reason: a patch decides what drives
+// them. The mouse is the obvious answer and VL.Skia already has nodes for it, but so are an LFO, an
+// OSC message, a keyboard, or a timeline. Wiring the mouse inside the map node would have taken all
+// of that away.
+//
+// Each one calls Refresh so the layers fetch what the new view needs. Mapsui expects its host to
+// drive that; without it the map moves and then sits on stale tiles, which looks exactly like
+// broken tile loading.
+
 /// <summary>
-/// Moving the map. Positions are pixels from the top-left of the view, the same pixels
-/// ToSkiaLayer draws in.
+/// Moves the map: center, zoom and drag.
 /// </summary>
 /// <remarks>
-/// These are separate nodes rather than pins on the map for a reason: **a patch decides what
-/// drives them.** The mouse is the obvious answer and VL.Skia already has nodes for it, but so
-/// are an LFO, an OSC message, a keyboard, or a timeline. Wiring the mouse inside the map node
-/// would have taken all of that away.
-///
-/// Each one calls Refresh so the layers fetch what the new view needs. Mapsui expects its host
-/// to drive that; without it the map moves and then sits on stale tiles, which looks exactly
-/// like broken tile loading.
+/// Positions are pixels from the top-left of the view.
 /// </remarks>
 [Name("Navigate")]
 public static class NavigateNodes
 {
+    // x first: longitude, then latitude.
+
     /// <summary>
-    /// Put a WGS84 coordinate at the centre of the view. x first: longitude, then latitude.
+    /// Puts a longitude/latitude at the centre of the view.
     /// </summary>
+    /// <param name="map">The map to move.</param>
+    /// <param name="longitude">Degrees east, WGS84.</param>
+    /// <param name="latitude">Degrees north, WGS84.</param>
+    /// <returns>The same map.</returns>
     public static Map CenterOn(Map map, double longitude, double latitude)
     {
         var center = SphericalMercator.FromLonLat(longitude, latitude);
@@ -34,8 +47,11 @@ public static class NavigateNodes
     }
 
     /// <summary>
-    /// Go to a slippy-map zoom level: 0 is the whole world, 19 is a building.
+    /// Zooms to a map zoom level: 0 is the whole world, 19 is a building.
     /// </summary>
+    /// <param name="map">The map to zoom.</param>
+    /// <param name="zoomLevel">The zoom level, 0 to 22.</param>
+    /// <returns>The same map.</returns>
     public static Map ZoomToLevel(Map map, int zoomLevel = 12)
     {
         // Not map.Navigator.ZoomToLevel: on a map with no tile layer that is a silent no-op
@@ -45,15 +61,24 @@ public static class NavigateNodes
         return map;
     }
 
+    // The stateless half of Drag, for a patch that already has both positions; the Drag process
+    // node remembers the previous position itself.
+    //
+    // Refreshes continuously rather than discretely: during a gesture Mapsui uses that to fetch less
+    // aggressively, which is what keeps a drag from becoming a burst of tile requests.
+
     /// <summary>
-    /// Drag the map from one pixel to another. The Drag process node is usually what you want:
-    /// it remembers the previous position for you. This is the stateless half, for a patch that
-    /// already has both positions.
+    /// Drags the map from one pixel to another.
     /// </summary>
     /// <remarks>
-    /// Refreshes continuously rather than discretely: during a gesture Mapsui uses that to fetch
-    /// less aggressively, which is what keeps a drag from becoming a burst of tile requests.
+    /// The Drag node is usually what you want: it remembers the previous position for you.
     /// </remarks>
+    /// <param name="map">The map to move.</param>
+    /// <param name="x">The current position, pixels from the left.</param>
+    /// <param name="y">The current position, pixels from the top.</param>
+    /// <param name="previousX">The previous position, pixels from the left.</param>
+    /// <param name="previousY">The previous position, pixels from the top.</param>
+    /// <returns>The same map.</returns>
     public static Map DragBetween(Map map, float x, float y, float previousX, float previousY)
     {
         if (x == previousX && y == previousY) return map;
@@ -95,26 +120,33 @@ public static class NavigateNodes
         return map;
     }
 
+    // Feed this the change in the wheel, not the wheel itself. VL.Skia's MouseState reports Wheel
+    // State, which accumulates: it counts up and stays there. Put it through FrameDifference
+    // (Animation.FrameBased) and wire the result here. That is how vvvv's own patches read it, and
+    // it is the only place in the shipped documents that pin is connected to anything.
+    //
+    // Notch Size is a pin rather than a constant hidden in here, and the default is 1 because that
+    // is what VL reports: measured in vvvv 7.4, one notch of the wheel moves FrameDifference by
+    // exactly 1. The raw Windows convention is 120 per notch, and something feeding this from a
+    // native message or a MIDI controller may well use that, hence the pin.
+    //
+    // A node that guessed - "divide by 120 if the number looks big" - would silently do nothing for
+    // whoever fell on the wrong side of the guess. That is not hypothetical: this defaulted to 120
+    // for exactly one round, and the symptom was a wheel that scrolled and a map that did not move,
+    // with nothing to indicate why.
+
     /// <summary>
-    /// Zoom around a pixel from a mouse wheel reading, in wheel units rather than whole steps.
+    /// Zooms around a pixel from a mouse wheel reading.
     /// </summary>
     /// <remarks>
-    /// **Feed this the change in the wheel, not the wheel itself.** VL.Skia's MouseState reports
-    /// Wheel State, which accumulates: it counts up and stays there. Put it through
-    /// FrameDifference (Animation.FrameBased) and wire the result here. That is how vvvv's own
-    /// patches read it, and it is the only place in the shipped documents that pin is connected
-    /// to anything.
-    ///
-    /// Notch Size is a pin rather than a constant hidden in here, and the default is **1**
-    /// because that is what VL reports: measured in vvvv 7.4, one notch of the wheel moves
-    /// FrameDifference by exactly 1. The raw Windows convention is 120 per notch, and something
-    /// feeding this from a native message or a MIDI controller may well use that, hence the pin.
-    ///
-    /// A node that guessed - "divide by 120 if the number looks big" - would silently do nothing
-    /// for whoever fell on the wrong side of the guess. That is not hypothetical: this defaulted
-    /// to 120 for exactly one round, and the symptom was a wheel that scrolled and a map that
-    /// did not move, with nothing to indicate why.
+    /// Feed it the change in the wheel, not the wheel itself: put MouseState's Wheel State through FrameDifference first.
     /// </remarks>
+    /// <param name="map">The map to zoom.</param>
+    /// <param name="x">The zoom centre, pixels from the left.</param>
+    /// <param name="y">The zoom centre, pixels from the top.</param>
+    /// <param name="wheelDelta">The change in the wheel this frame. Positive zooms in.</param>
+    /// <param name="notchSize">Wheel units per notch. 1 for vvvv's mouse, 120 for raw Windows values.</param>
+    /// <returns>The same map.</returns>
     public static Map ZoomByWheel(Map map, float x, float y, float wheelDelta = 0f, float notchSize = 1f)
     {
         var steps = WheelSteps(wheelDelta, notchSize);

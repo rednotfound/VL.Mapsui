@@ -13,15 +13,18 @@ using ZoomInOutWidget = global::Mapsui.Widgets.Zoom.ZoomInOutWidget;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// Mapsui expresses this as two independent alignments. One pin instead of two, because "which
+// corner" is the question a patch is actually asking and a widget that needs two pins for its
+// position leaves no room for the pins that say what it IS - three inputs is the target, and 94% of
+// the ecosystem's nodes take three or fewer.
+
 /// <summary>
 /// Where a widget sits in the map window.
 /// </summary>
-/// <remarks>
-/// Mapsui expresses this as two independent alignments. One pin instead of two, because "which
-/// corner" is the question a patch is actually asking and a widget that needs two pins for its
-/// position leaves no room for the pins that say what it *is* - three inputs is the target, and
-/// 94% of the ecosystem's nodes take three or fewer.
-/// </remarks>
 public enum WidgetCorner
 {
     /// <summary>Top left.</summary>

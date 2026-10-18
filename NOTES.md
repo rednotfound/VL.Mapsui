@@ -5,6 +5,22 @@ them do not belong here.
 
 ---
 
+## 2026-10-18 — node documentation is a tooltip, so it is now written as one
+
+vvvv shows every public member's `///` on hover and in the NodeBrowser. Ours carried the design
+rationale: remarks median 494 characters, maximum 3,549 (`SymbolStyle`), where VL.CoreLib's median
+is 50. Seen on a hover in the sibling: `<see cref>` renders as nothing, `<para>`s run together, a
+source line break is a screen line break. `NodeDocsTests` (copied from VL.NetTopologySuite.GeoJSON,
+anchor `MapNode`) went red with **104** findings on the old docs, then green after 71 members'
+docs were rewritten: one-line summaries, one or two short remarks, a line per pin. The rationale was
+moved, not deleted, into `//` comments above each `///` block; a diff of the source shows only
+comment lines changed, and the generated `VL.Mapsui.xml` still documents the same 190 members.
+245 tests green, Test-VLPackage and Test-VLPatch green. build.ps1, pack.ps1 and
+Compile-HelpPatches were NOT run: a vvvv this session did not start (PID 13080) was running and
+both scripts refuse. No `.vl` names a doc comment, so no help patch is affected.
+
+---
+
 ## 2026-10-17 — every source file renamed after the type it holds; the node descriptions did not move
 
 Files had been named after what they first held: `LayerNodes.cs` held only `OpenStreetMap`,

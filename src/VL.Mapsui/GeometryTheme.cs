@@ -8,22 +8,25 @@ using NtsGeometry = NetTopologySuite.Geometries.Geometry;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// A ThemeStyle that also says what it holds. The three styles are properties as well as a decision,
+// because two other nodes have to read them. A ThemeStyle is a function, and a function is opaque:
+// LabelStyle walks the style upstream of it to find the marker it must lift the label clear of, and
+// FeatureLayer walks it to warn when the features it holds cannot be drawn. Neither can call the
+// function - they have no feature to call it with, and at that moment there may not be one. So the
+// answer is carried alongside rather than hidden inside.
+//
+// ThemeStyle.GetStyle cannot be overridden - reflection reports it virtual, but that is only how an
+// interface implementation looks, and the compiler says CS0506. So the dispatch goes to the base
+// constructor as a function over the three PARAMETERS: C# forbids "this" in a base-constructor
+// argument, and captured locals are the way round it.
+
 /// <summary>
-/// A <c>ThemeStyle</c> that also says what it holds.
+/// The style StyleByGeometry builds: one style each for points, lines and polygons.
 /// </summary>
-/// <remarks>
-/// **The three styles are properties as well as a decision, because two other nodes have to read
-/// them.** A `ThemeStyle` is a function, and a function is opaque: `LabelStyle` walks the style
-/// upstream of it to find the marker it must lift the label clear of, and `FeatureLayer` walks it
-/// to warn when the features it holds cannot be drawn. Neither can call the function — they have no
-/// feature to call it with, and at that moment there may not be one. So the answer is carried
-/// alongside rather than hidden inside.
-///
-/// <c>ThemeStyle.GetStyle</c> cannot be overridden — reflection reports it virtual, but that is
-/// only how an interface implementation looks, and the compiler says <c>CS0506</c>. So the dispatch
-/// goes to the base constructor as a function over the three <b>parameters</b>: C# forbids
-/// <c>this</c> in a base-constructor argument, and captured locals are the way round it.
-/// </remarks>
 public sealed class GeometryTheme : ThemeStyle
 {
     internal GeometryTheme(IStyle? point, IStyle? line, IStyle? polygon)

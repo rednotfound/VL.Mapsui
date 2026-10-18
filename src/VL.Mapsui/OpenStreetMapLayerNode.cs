@@ -14,19 +14,25 @@ using VLPath = VL.Lib.IO.Path;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// A process node, and that is not a style choice. A tile layer owns HTTP connections and a disk
+// cache. As a plain static method it would be evaluated once per frame, which is how an earlier
+// version of this package built sixty tile layers a second, exhausted a machine's ephemeral ports
+// and took a home network down.
+//
+// Hand the output to a Map node. Two of them can go into one map, and a patch can put its own
+// layers alongside; that is the point of it being a separate node rather than something hidden
+// inside a single map-shaped thing. Uses Mapsui and BruTile.
+
 /// <summary>
-/// An OpenStreetMap tile layer. Nothing is fetched until Enabled is switched on.
-/// Uses Mapsui and BruTile; tiles are © OpenStreetMap contributors (ODbL).
+/// Shows OpenStreetMap tiles as a map layer.
 /// </summary>
 /// <remarks>
-/// **A process node, and that is not a style choice.** A tile layer owns HTTP connections and a
-/// disk cache. As a plain static method it would be evaluated once per frame, which is how an
-/// earlier version of this package built sixty tile layers a second, exhausted a machine's
-/// ephemeral ports and took a home network down.
-///
-/// Hand the output to a <c>Map</c> node. Two of them can go into one map, and a patch can put
-/// its own layers alongside; that is the point of it being a separate node rather than
-/// something hidden inside a single map-shaped thing.
+/// Nothing is fetched until Enabled is switched on.
+/// Tiles are © OpenStreetMap contributors (ODbL).
 /// </remarks>
 [ProcessNode(Name = "OpenStreetMap", Category = "Mapsui.Layers")]
 public class OpenStreetMapLayerNode : IDisposable
@@ -63,35 +69,43 @@ public class OpenStreetMapLayerNode : IDisposable
         ? TileCache.Describe(_attached.Folder)
         : _status;
 
+    // Enabled defaults to off because opening a document in vvvv runs it. A layer that fetches the
+    // moment a patch is opened gives whoever opened it no chance to decline.
+    //
+    // Cache takes the output of a TileCache node, and nothing else decides where tiles go. Leave it
+    // unconnected for the default location; wire a TileCache node to move the folder or switch
+    // caching off. Keeping tiles that were drawn is what OSM's policy asks for; what it forbids is
+    // the opposite, fetching tiles nobody is looking at.
+    //
+    // There is no folder pin here on purpose. It used to be one, typed as a Path, with "leave it
+    // empty for the default" written on it - and an empty Path IOBox is not empty. VL resolves it
+    // against the document and hands the node the patch's own folder, so 444 tiles were written
+    // next to two repositories while every guard reported success. A folder is now decided in one
+    // place, by a node whose whole job that is.
+    //
+    // Cache Status reports the folder this layer actually writes to and how much is in it, or the
+    // reason nothing is kept. A folder that cannot be used does NOT silently fall back to the
+    // default: files appearing somewhere nobody asked for, with nothing to say so, is the worse
+    // outcome.
+    //
+    // Layers Built should settle at 1 and stay there. A number that climbs frame after frame means
+    // an input is changing every frame, and every rebuild starts a fresh round of tile requests -
+    // the failure that once exhausted a machine's ephemeral ports and took a home network down. It
+    // is an output pin rather than something hidden in an overlay so a patch can watch it, or act
+    // on it.
+
     /// <summary>
-    /// The layer to put on a map, or nothing while Enabled is off.
+    /// Configures the OpenStreetMap layer.
     /// </summary>
     /// <remarks>
-    /// Enabled defaults to off because opening a document in vvvv runs it. A layer that fetches
-    /// the moment a patch is opened gives whoever opened it no chance to decline.
-    ///
-    /// **Cache takes the output of a <c>TileCache</c> node, and nothing else decides where tiles
-    /// go.** Leave it unconnected for the default location; wire a TileCache node to move the
-    /// folder or switch caching off. Keeping tiles that were drawn is what OSM's policy asks for;
-    /// what it forbids is the opposite, fetching tiles nobody is looking at.
-    ///
-    /// There is no folder pin here on purpose. It used to be one, typed as a Path, with "leave it
-    /// empty for the default" written on it — and an empty Path IOBox is not empty. VL resolves it
-    /// against the document and hands the node the patch's own folder, so 444 tiles were written
-    /// next to two repositories while every guard reported success. A folder is now decided in one
-    /// place, by a node whose whole job that is.
-    ///
-    /// Cache Status reports the folder this layer actually writes to and how much is in it, or the
-    /// reason nothing is kept. A folder that cannot be used does **not** silently fall back to the
-    /// default: files appearing somewhere nobody asked for, with nothing to say so, is the worse
-    /// outcome.
-    ///
-    /// **Watch Layers Built.** It should settle at 1 and stay there. A number that climbs frame
-    /// after frame means an input is changing every frame, and every rebuild starts a fresh
-    /// round of tile requests — the failure that once exhausted a machine's ephemeral ports and
-    /// took a home network down. It is an output pin rather than something hidden in an overlay
-    /// so a patch can watch it, or act on it.
+    /// Enabled is off by default, so opening a patch fetches nothing until you switch it on.
+    /// Tiles that were drawn are kept in %LOCALAPPDATA%\VL.Mapsui\tiles unless a TileCache node says otherwise.
     /// </remarks>
+    /// <param name="layersBuilt">How many times the layer was built. It should stay at 1.</param>
+    /// <param name="cacheStatus">The folder tiles are kept in and how much is there, or why nothing is kept.</param>
+    /// <param name="enabled">Fetches tiles while on. Off by default.</param>
+    /// <param name="cache">The output of a TileCache node. Unconnected uses the default folder.</param>
+    /// <returns>The layer, for a Map's Layers, or nothing while Enabled is off.</returns>
     public ILayer? Update(
         out int layersBuilt,
         out string cacheStatus,

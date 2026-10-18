@@ -22,7 +22,7 @@ than what is wrapped (a few dozen of its 306 public types; see
 |---|---|
 | ✅ | 32 nodes: tile layers (OpenStreetMap, any XYZ service), a disk cache, geometry and feature layers, a lat/lon graticule, five styles, navigation, picking, pixel↔degree conversion, widgets |
 | ✅ | 19 help patches, every node opens one on F1; each compiles headlessly and was opened in vvvv before release |
-| ✅ | 244 tests, no network, shaped like frame loops because the expensive bugs here were about lifetime |
+| ✅ | 245 tests, no network, shaped like frame loops because the expensive bugs here were about lifetime |
 | ⚠️ | Mapsui 4.1.9, not 5.x: Mapsui 5 needs SkiaSharp 3 and vvvv ships 2.88 |
 | ❌ | Not wrapped yet: editing geometry on the map, WMS/WFS, image and rasterizing layers, TMS, layer opacity. The map is WebMercator; reprojection is not exposed |
 
@@ -143,7 +143,7 @@ package and is retired.
 ## Building
 
 ```powershell
-dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj   # 244 tests, ~2 s, no network
+dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj   # 245 tests, ~2 s, no network
 .\build.ps1                                                # build + stage dist\
 .\pack.ps1                                                 # + a .nupkg in dist\feed
 .\tools\Test-VLPackage.ps1                                 # static package checks

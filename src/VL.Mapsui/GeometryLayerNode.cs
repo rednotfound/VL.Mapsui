@@ -11,25 +11,30 @@ using SphericalMercator = global::Mapsui.Projections.SphericalMercator;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// This is where the packages meet, and they meet through NetTopologySuite rather than through each
+// other. VL.GIS computes geometry - reproject, buffer, intersect, read GeoJSON - and hands out plain
+// NTS types; this turns those into something Mapsui draws. Neither package references the other,
+// and neither needs to: NTS is the vocabulary they already share, which is also why the same node
+// works for geometry from any other source. Uses Mapsui and NetTopologySuite.
+//
+// Coordinates are WGS84 longitude and latitude, x first. That is what VL.GIS produces and what
+// every GeoJSON file carries; Mapsui works in spherical mercator, so this projects on the way in.
+// Doing it here rather than making the patch do it is the point of the node: which projection a map
+// engine happens to draw in is not a decision anyone wants to take.
+//
+// A process node rather than a static method, for the usual reason - see the OpenStreetMap layer.
+// Rebuilding a layer every frame is how a map ends up refetching and re-styling sixty times a
+// second.
+
 /// <summary>
-/// Draws geometry on the map — the layer that puts your own data over the basemap.
-/// Uses Mapsui and NetTopologySuite.
+/// Draws geometry over the map in one colour.
 /// </summary>
 /// <remarks>
-/// **This is where the two packages meet, and they meet through NetTopologySuite rather than
-/// through each other.** VL.GIS computes geometry — reproject, buffer, intersect, read GeoJSON —
-/// and hands out plain NTS types; this turns those into something Mapsui draws. Neither package
-/// references the other, and neither needs to: NTS is the vocabulary they already share, which is
-/// also why the same node works for geometry from any other source.
-///
-/// **Coordinates are WGS84 longitude and latitude, x first.** That is what VL.GIS produces and
-/// what every GeoJSON file carries; Mapsui works in spherical mercator, so this projects on the
-/// way in. Doing it here rather than making the patch do it is the point of the node: which
-/// projection a map engine happens to draw in is not a decision anyone wants to take.
-///
-/// A process node rather than a static method, for the usual reason — see the OpenStreetMap
-/// layer. Rebuilding a layer every frame is how a map ends up refetching and re-styling sixty
-/// times a second.
+/// Geometry is in longitude and latitude (WGS84), x first.
 /// </remarks>
 [ProcessNode(Name = "Geometry", Category = "Mapsui.Layers")]
 public class GeometryLayerNode : IDisposable
@@ -48,18 +53,26 @@ public class GeometryLayerNode : IDisposable
     /// <summary>How often the shapes on the layer were replaced.</summary>
     internal int FeatureSetsBuilt => _layer.FeatureSetsBuilt;
 
+    // Feed it geometry from VL.GIS - GIS.Geometry, GIS.Serialization, GIS.Projection - in WGS84
+    // lon/lat. An empty or null input gives no layer rather than an empty one, so a Map can be wired
+    // up before there is anything to draw.
+    //
+    // Watch Layers Built. A number that climbs frame after frame means one of the inputs is changing
+    // every frame; the geometry set is compared by identity, so building new geometry objects each
+    // frame rebuilds the layer even when the shapes are the same.
+
     /// <summary>
-    /// A layer drawing the given geometry, ready to hand to a Map alongside a tile layer.
+    /// Configures the geometry layer.
     /// </summary>
     /// <remarks>
-    /// Feed it geometry from VL.GIS — <c>GIS.Geometry</c>, <c>GIS.Serialization</c>,
-    /// <c>GIS.Projection</c> — in WGS84 lon/lat. An empty or null input gives no layer rather
-    /// than an empty one, so a Map can be wired up before there is anything to draw.
-    ///
-    /// **Watch Layers Built.** A number that climbs frame after frame means one of the inputs is
-    /// changing every frame; the geometry set is compared by identity, so building new geometry
-    /// objects each frame rebuilds the layer even when the shapes are the same.
+    /// The geometries are compared by identity, so build them once rather than every frame.
     /// </remarks>
+    /// <param name="layersBuilt">How many times the layer was built. It should settle at 1.</param>
+    /// <param name="geometries">The shapes to draw, in longitude and latitude.</param>
+    /// <param name="fillColor">Fill for polygons and points.</param>
+    /// <param name="lineColor">Colour of lines and outlines.</param>
+    /// <param name="lineWidth">Line width in pixels.</param>
+    /// <returns>The layer, for a Map's Layers, or nothing while there is no geometry.</returns>
     public ILayer? Update(
         out int layersBuilt,
         IEnumerable<Geometry>? geometries = null,

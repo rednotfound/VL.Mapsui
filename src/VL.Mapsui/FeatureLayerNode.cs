@@ -17,22 +17,30 @@ using StyleCollection = global::Mapsui.Styles.StyleCollection;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// This is the adapter between NetTopologySuite and Mapsui. The conversion lives here, on the
+// consuming side, and only here. A feature arrives as NetTopologySuite's neutral Feature - geometry
+// plus attributes, knowing nothing about rendering - and leaves as something Mapsui draws. Putting
+// the adapter in this package rather than teaching NTS about Mapsui is what keeps the dependency
+// pointing one way: whatever produced the geometry never has to know which engine ends up drawing
+// it.
+//
+// Coordinates are WGS84 longitude and latitude, x first, which is what every GeoJSON file carries
+// and what VL.GIS produces. Mapsui works in spherical mercator, so this projects on the way in - on
+// a copy, so the geometry the patch still holds is not silently turned into metres.
+//
+// A process node, because a layer is a resource: rebuilding one every frame re-styles and
+// re-renders everything on it.
+
 /// <summary>
-/// Draws features on the map. This is the adapter between NetTopologySuite and Mapsui.
+/// Draws features on the map with a style.
 /// </summary>
 /// <remarks>
-/// **The conversion lives here, on the consuming side, and only here.** A feature arrives as
-/// NetTopologySuite's neutral <c>Feature</c> — geometry plus attributes, knowing nothing about
-/// rendering — and leaves as something Mapsui draws. Putting the adapter in this package rather
-/// than teaching NTS about Mapsui is what keeps the dependency pointing one way: whatever produced
-/// the geometry never has to know which engine ends up drawing it.
-///
-/// **Coordinates are WGS84 longitude and latitude, x first**, which is what every GeoJSON file
-/// carries and what VL.GIS produces. Mapsui works in spherical mercator, so this projects on the
-/// way in — on a copy, so the geometry the patch still holds is not silently turned into metres.
-///
-/// A process node, because a layer is a resource: rebuilding one every frame re-styles and
-/// re-renders everything on it.
+/// Geometry is in longitude and latitude (WGS84), x first.
+/// Status says when the style will draw nothing for some of the features.
 /// </remarks>
 [ProcessNode(Name = "FeatureLayer", Category = "Mapsui.Layers")]
 public class FeatureLayerNode : IDisposable
@@ -52,20 +60,29 @@ public class FeatureLayerNode : IDisposable
     /// </summary>
     internal int FeatureSetsBuilt { get; private set; }
 
+    // No features gives no layer rather than an empty one, so a Map can be wired up before there is
+    // anything to draw.
+    //
+    // Layers Built should reach 1 and stay, and it now can: features are compared by value, not by
+    // reference. That is not a refinement, it is the difference between a map and a flickering map.
+    // Feature is a static node, so VL evaluates it every frame and it returns a new object every
+    // frame; comparing those by reference meant the layer was rebuilt sixty times a second, the Map
+    // saw a new layer each time and rebuilt in turn, and the whole thing flickered. Seen on screen
+    // before any test caught it.
+    //
+    // Status exists for what will NOT be drawn: this node is the only place that sees the features
+    // and the style together (see Describe below).
+
     /// <summary>
-    /// A layer drawing the given features, ready to hand to a Map alongside a tile layer.
+    /// Configures the feature layer.
     /// </summary>
-    /// <remarks>
-    /// No features gives no layer rather than an empty one, so a Map can be wired up before there
-    /// is anything to draw.
-    ///
-    /// **Watch Layers Built.** It should reach 1 and stay, and it now can: **features are compared
-    /// by value, not by reference.** That is not a refinement, it is the difference between a map
-    /// and a flickering map. `Feature` is a static node, so VL evaluates it every frame and it
-    /// returns a new object every frame; comparing those by reference meant the layer was rebuilt
-    /// sixty times a second, the Map saw a new layer each time and rebuilt in turn, and the whole
-    /// thing flickered. Seen on screen before any test caught it.
-    /// </remarks>
+    /// <param name="layersBuilt">How many times the layer was built. It should settle at 1.</param>
+    /// <param name="status">The number of features, and any that the style will not draw.</param>
+    /// <param name="features">The features to draw, in longitude and latitude.</param>
+    /// <param name="style">How to draw them. Unconnected gives a default style.</param>
+    /// <param name="enabled">Hides the layer while off, without rebuilding it.</param>
+    /// <param name="name">The layer's name.</param>
+    /// <returns>The layer, for a Map's Layers, or nothing while there are no features.</returns>
     public ILayer? Update(
         out int layersBuilt,
         out string status,

@@ -287,7 +287,7 @@ P = ProcessNode（有状态，22 个），S = 静态方法（每帧执行的纯�
 | `src/VL.Mapsui/` | 节点的 C# 源码，一个类型一个文件，文件名 = 类名 |
 | `src/VL.Mapsui/VL.Mapsui.csproj` | C# 项目文件，相当于 package.json 的 dependencies + 编译设置 |
 | `help/VL.Mapsui/` | 19 个帮助 patch（1 个 Explanation + 18 个 HowTo）+ `Help.xml`（Help Browser 的目录和顺序） |
-| `test/VL.Mapsui.Tests/` | 244 个自动测试；`LifetimeTests.cs` 是“跑 100 帧只建 1 次”，`*Facts.cs` 测 Mapsui 本身的行为 |
+| `test/VL.Mapsui.Tests/` | 245 个自动测试；`LifetimeTests.cs` 是“跑 100 帧只建 1 次”，`*Facts.cs` 测 Mapsui 本身的行为 |
 | `docs/` | 设计文档，见第 13 节 |
 | `tools/` | PowerShell 脚本：启动 vvvv、各种检查器、Normalize；`legacy/` 是退役的生成器 |
 | `VL.Mapsui.vl` | 包的“入口文件”，声明依赖了 Mapsui、NTS 等。声明了，节点才能用这些类型 |
@@ -321,7 +321,7 @@ P = ProcessNode（有状态，22 个），S = 静态方法（每帧执行的纯�
 
 **F1 是怎么找到帮助 patch 的？**每个节点在某个 patch 里被标成 “High HelpFocus”。`Test-VLPatch.ps1` 检查 32 个节点每个都有且只有一个高优先标记。
 
-## 11. 测试：244 个，大约 2 秒跑完
+## 11. 测试：245 个，大约 2 秒跑完
 
 xUnit 相当于 Jest：`[Fact]` 就是 `test(...)`，`Assert.Equal(1, x)` 就是 `expect(x).toBe(1)`。
 
@@ -345,7 +345,7 @@ public void A_hundred_frames_with_unchanged_inputs_build_one_layer()
 
 ```mermaid
 flowchart LR
-  A["build.ps1<br/>编译 + 放到 dist"] --> B["dotnet test<br/>244 个测试"]
+  A["build.ps1<br/>编译 + 放到 dist"] --> B["dotnet test<br/>245 个测试"]
   B --> C["pack.ps1<br/>打 .nupkg"]
   C --> D["Test-VLPackage<br/>包能贡献节点吗"]
   D --> E["Test-VLPatch<br/>每个 .vl 合法、F1 齐全"]

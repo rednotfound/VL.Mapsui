@@ -20,7 +20,7 @@ package nobody could install.
 
 | step | proves | state |
 |---|---|---|
-| `dotnet test` | the arithmetic, and that nothing rebuilds per frame | ✅ 244 tests |
+| `dotnet test` | the arithmetic, and that nothing rebuilds per frame | ✅ 245 tests |
 | `tools\Test-VLPackage.ps1` | the package can contribute nodes at all, no stray tiles, every help patch pinned `0.0.0` | ✅ |
 | `tools\Test-VLPatch.ps1` | every `.vl` well formed, `Help.xml` complete, every node F1-flagged | ✅ 20 documents, 32 of 32 |
 | `pack.ps1` + `tools\Compile-HelpPatches.ps1` | every node in every help patch resolves against the **packed** nupkg, and every process node is built in `Create` — read from the generated C# | ✅ 19 patches |

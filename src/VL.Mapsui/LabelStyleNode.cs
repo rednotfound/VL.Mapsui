@@ -12,34 +12,41 @@ using Offset = global::Mapsui.Styles.Offset;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// Labels are the difference between shapes on a map and data you can read.
+//
+// Attribute names an attribute, it is not the text. Mapsui's LabelColumn looks the name up on every
+// feature, so one style labels a thousand features with a thousand different words - which is the
+// point, and the reason Feature carries attributes at all. Leave it empty and there is nothing to
+// write, so the style upstream passes through unchanged.
+//
+// Style is an input so the two arrive at a layer as one. A layer takes a single style, and a shape
+// usually wants both a fill and a label; wiring VectorStyle into this makes the pair a chain in the
+// patch rather than two things a FeatureLayer would have to know how to merge. Nothing upstream is
+// required - labels alone are a legitimate map.
+//
+// That input is also how the label knows to get out of the marker's way. Mapsui centres a label on
+// the feature it names - Offset (0,0), both alignments Center - which is right for a polygon and
+// wrong for a point with a symbol on it, where the text and the marker then fight for the same
+// pixels. Every cartographic convention puts a point label BESIDE its symbol: the marker says where,
+// the label says what, and they must not share ink.
+//
+// So when a SymbolStyle is found upstream, this node reads its scale, works out how big the marker
+// is, and lifts the label clear of it. No pin for it, because nothing needs to be asked - the node
+// is already holding the symbol whose size is the answer. When there is no symbol upstream the label
+// is left centred, which is where a polygon's label belongs.
+//
+// Stateful for its identity, exactly like VectorStyle: a layer treats a new style object as a
+// change, and Mapsui keys its rendered-geometry cache on the style object itself.
+
 /// <summary>
-/// Writes an attribute of each feature on the map. This is the difference between shapes on a map
-/// and data you can read.
+/// Writes an attribute of each feature on the map as text.
 /// </summary>
 /// <remarks>
-/// **Attribute names an attribute, it is not the text.** Mapsui's `LabelColumn` looks the name up
-/// on every feature, so one style labels a thousand features with a thousand different words — which
-/// is the point, and the reason `Feature` carries attributes at all. Leave it empty and there is
-/// nothing to write, so the style upstream passes through unchanged.
-///
-/// **Style is an input so the two arrive at a layer as one.** A layer takes a single style, and a
-/// shape usually wants both a fill and a label; wiring `VectorStyle` into this makes the pair a
-/// chain in the patch rather than two things a `FeatureLayer` would have to know how to merge.
-/// Nothing upstream is required — labels alone are a legitimate map.
-///
-/// **That input is also how the label knows to get out of the marker's way.** Mapsui centres a
-/// label on the feature it names — `Offset (0,0)`, both alignments `Center` — which is right for a
-/// polygon and wrong for a point with a symbol on it, where the text and the marker then fight for
-/// the same pixels. Every cartographic convention puts a point label *beside* its symbol: the
-/// marker says where, the label says what, and they must not share ink.
-///
-/// So when a `SymbolStyle` is found upstream, this node reads its scale, works out how big the
-/// marker is, and lifts the label clear of it. **No pin for it, because nothing needs to be asked**
-/// — the node is already holding the symbol whose size is the answer. When there is no symbol
-/// upstream the label is left centred, which is where a polygon's label belongs.
-///
-/// Stateful for its identity, exactly like `VectorStyle`: a layer treats a new style object as a
-/// change, and Mapsui keys its rendered-geometry cache on the style object itself.
+/// Wire a style into Style to get shapes and labels together; a point label moves above a SymbolStyle marker.
 /// </remarks>
 [ProcessNode(Name = "LabelStyle", Category = "Mapsui.Styles")]
 public class LabelStyleNode
@@ -53,12 +60,21 @@ public class LabelStyleNode
     /// <summary>Styles built by this node. It should reach 1 and stay there.</summary>
     internal int StylesBuilt { get; private set; }
 
-    /// <summary>A style to hand to a layer, labels included.</summary>
+    // The halo is not a pin and is on by default: white behind dark text is what makes a label
+    // readable over aerial imagery or a busy basemap, and a label nobody can read is not a feature.
+    // Colour and size are pins because they are the two anyone actually changes.
+
+    /// <summary>
+    /// Configures the labels.
+    /// </summary>
     /// <remarks>
-    /// The halo is not a pin and is on by default: white behind dark text is what makes a label
-    /// readable over aerial imagery or a busy basemap, and a label nobody can read is not a
-    /// feature. Colour and size are pins because they are the two anyone actually changes.
+    /// Text has a white halo so it stays readable over any background.
     /// </remarks>
+    /// <param name="style">An optional style to draw under the labels, for example a VectorStyle.</param>
+    /// <param name="attribute">The name of the attribute to write. Empty passes Style through unchanged.</param>
+    /// <param name="color">Text colour. Unconnected gives black.</param>
+    /// <param name="size">Text size.</param>
+    /// <returns>A style for a layer, labels included.</returns>
     public IStyle? Update(
         IStyle? style = null,
         string attribute = "",

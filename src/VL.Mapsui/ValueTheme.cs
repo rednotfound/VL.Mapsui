@@ -11,19 +11,22 @@ using IAttributesTable = NetTopologySuite.Features.IAttributesTable;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// The same shape as GeometryTheme and for the same reason: a theme is a function and a function is
+// opaque, but FeatureLayer has to warn about features this style cannot draw, and it cannot call the
+// function to find out - so the inputs are carried alongside as properties.
+//
+// The dispatch guards run in the factory, once, rather than per feature: an empty attribute name, an
+// unwired pin or mismatched style kinds each produce a theme that draws nothing at all, and the
+// per-feature closure only ever handles the case that varies per feature - whether ITS attribute
+// reads as a number.
+
 /// <summary>
-/// A theme interpolating between two styles across a numeric attribute, that also says what it holds.
+/// The style StyleByValue builds: two styles blended by a numeric attribute.
 /// </summary>
-/// <remarks>
-/// The same shape as <see cref="GeometryTheme"/> and for the same reason: a theme is a function and
-/// a function is opaque, but `FeatureLayer` has to warn about features this style cannot draw, and
-/// it cannot call the function to find out — so the inputs are carried alongside as properties.
-///
-/// The dispatch guards run in the factory, once, rather than per feature: an empty attribute name,
-/// an unwired pin or mismatched style kinds each produce a theme that draws nothing at all, and the
-/// per-feature closure only ever handles the case that varies per feature — whether ITS attribute
-/// reads as a number.
-/// </remarks>
 public sealed class ValueTheme : ThemeStyle
 {
     /// <summary>How many distinct interpolated styles exist between the two ends. See the node's remarks.</summary>
@@ -42,10 +45,10 @@ public sealed class ValueTheme : ThemeStyle
     /// <summary>The attribute whose value picks the style.</summary>
     public string Attribute { get; }
 
-    /// <summary>The value drawn with <see cref="MinStyle"/>; smaller values clamp to it.</summary>
+    /// <summary>The value drawn with Min Style; smaller values are drawn the same.</summary>
     public double Min { get; }
 
-    /// <summary>The value drawn with <see cref="MaxStyle"/>; larger values clamp to it.</summary>
+    /// <summary>The value drawn with Max Style; larger values are drawn the same.</summary>
     public double Max { get; }
 
     /// <summary>What the low end of the range is drawn with.</summary>

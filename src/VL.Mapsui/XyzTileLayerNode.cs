@@ -10,28 +10,33 @@ using BruTileAttribution = BruTile.Attribution;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// This is what stops the package being about one basemap. OpenStreetMap is a convenience for the
+// most common source; this is the general one, and the architecture should not depend on any
+// single provider: terrain, satellite, an authority's own service, your own server.
+//
+// The template takes {z} for zoom, {x} for column and {y} for row - the convention every slippy
+// map uses, so a URL copied from a provider's documentation usually works unchanged, e.g.
+// https://tile.opentopomap.org/{z}/{x}/{y}.png
+//
+// Attribution is a pin rather than an afterthought. Nearly every tile service requires it, and
+// this pin is the only place the credit comes from: Mapsui's renderer prints every layer's
+// attribution bottom right by itself (measured 2026-09-26, AttributionRenderingFacts), and a layer
+// with none prints nothing, silently. Filling it in is the difference between complying and
+// appearing to.
+//
+// A process node for the same reason the OpenStreetMap one is: a tile layer owns HTTP connections
+// and a disk cache, and a static method is evaluated every frame.
+
 /// <summary>
-/// A tile layer from any XYZ (slippy map) URL template — terrain, satellite, an authority's own
-/// service, your own server. Nothing is fetched until Enabled is switched on.
+/// Shows tiles from any XYZ (slippy map) URL template as a map layer.
 /// </summary>
 /// <remarks>
-/// **This is what stops the package being about one basemap.** `OpenStreetMap` is a convenience for
-/// the most common source; this is the general one, and the architecture should not depend on any
-/// single provider.
-///
-/// The template takes <c>{z}</c> for zoom, <c>{x}</c> for column and <c>{y}</c> for row — the
-/// convention every slippy map uses, so a URL copied from a provider's documentation usually works
-/// unchanged:
-/// <code>https://tile.opentopomap.org/{z}/{x}/{y}.png</code>
-///
-/// **Attribution is a pin rather than an afterthought.** Nearly every tile service requires it, and
-/// this pin is the only place the credit comes from: Mapsui's renderer prints every layer's
-/// attribution bottom right by itself (measured 2026-09-26, AttributionRenderingFacts), and a layer
-/// with none prints nothing, silently. Filling it in is the difference between complying and
-/// appearing to.
-///
-/// A process node for the same reason the OpenStreetMap one is: a tile layer owns HTTP connections
-/// and a disk cache, and a static method is evaluated every frame.
+/// Nothing is fetched until Enabled is switched on.
+/// The template uses {z}, {x} and {y}, e.g. https://tile.opentopomap.org/{z}/{x}/{y}.png
 /// </remarks>
 [ProcessNode(Name = "XYZ", Category = "Mapsui.Layers")]
 public class XyzTileLayerNode : IDisposable
@@ -76,18 +81,30 @@ public class XyzTileLayerNode : IDisposable
         ? TileCache.Describe(_attached.Folder)
         : _status;
 
+    // Enabled defaults to off because opening a document in vvvv runs it, and whoever opened it has
+    // agreed to nothing yet - the same rule as everywhere else here, and it matters more for a
+    // source you chose than for one this package suggested.
+    //
+    // A template without {x}, {y} and {z} is refused rather than used: every tile would resolve to
+    // the same URL, so the map would quietly fill with one image repeated, and the server would be
+    // asked for it over and over.
+    //
+    // Attribution: Mapsui prints it bottom right by itself, and a layer with none prints nothing.
+
     /// <summary>
-    /// The layer to put on a map, or nothing while Enabled is off or the template is unusable.
+    /// Configures the XYZ tile layer.
     /// </summary>
     /// <remarks>
-    /// Enabled defaults to off because opening a document in vvvv runs it, and whoever opened it
-    /// has agreed to nothing yet — the same rule as everywhere else here, and it matters more for a
-    /// source you chose than for one this package suggested.
-    ///
-    /// A template without <c>{x}</c>, <c>{y}</c> and <c>{z}</c> is refused rather than used: every
-    /// tile would resolve to the same URL, so the map would quietly fill with one image repeated,
-    /// and the server would be asked for it over and over.
+    /// Enabled is off by default, so opening a patch fetches nothing until you switch it on.
+    /// A template without {x}, {y} and {z} is refused, and Cache Status says why.
     /// </remarks>
+    /// <param name="layersBuilt">How many times the layer was built. It should stay at 1 until an input changes.</param>
+    /// <param name="cacheStatus">The folder tiles are kept in and how much is there, or why nothing is kept.</param>
+    /// <param name="urlTemplate">The tile URL with {z}, {x} and {y} placeholders.</param>
+    /// <param name="attribution">The credit the tile service requires. It is printed bottom right on the map.</param>
+    /// <param name="enabled">Fetches tiles while on. Off by default.</param>
+    /// <param name="cache">The output of a TileCache node. Unconnected uses the default folder.</param>
+    /// <returns>The layer, for a Map's Layers, or nothing while Enabled is off or the template is unusable.</returns>
     public ILayer? Update(
         out int layersBuilt,
         out string cacheStatus,

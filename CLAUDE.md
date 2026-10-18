@@ -28,7 +28,7 @@ a user has to delete by hand.
 
 **Current state (2026-09-26): `0.0.1-alpha` is on nuget.org — a prerelease, an early preview, not a
 stable version. The working version is `0.0.2-alpha`.** A map renders in vvvv 7.4, pans, zooms and takes geometry from
-any NTS source. **32 nodes, 244 tests.** VL.NetTopologySuite, which this package depends on, went up the
+any NTS source. **32 nodes, 245 tests.** VL.NetTopologySuite, which this package depends on, went up the
 same day, first. See "Releasing"
 below and [docs/RELEASE.md](docs/RELEASE.md). **The help is the second test suite: 19 patches in the
 community's measured style, every one of the 32 nodes opens one on F1** (`tools\Test-VLPatch.ps1`
@@ -256,7 +256,7 @@ vl-mapsui/
 │   ├── DebugNodes.cs, DiagnosticsLayer.cs # static DiagnosticsLayer (category Mapsui.Debug)
 │   └── PixelSpace.cs, FeatureHelper.cs, AssemblyInfo.cs # pixel/VL space bridge; NTS<->Mapsui feature helper
 ├── help/VL.Mapsui/               # Explanation + 18 HowTos + Help.xml (8 domain topics); one High flag per node
-├── test/VL.Mapsui.Tests/         # 244 xunit tests, no network, no vvvv
+├── test/VL.Mapsui.Tests/         # 245 xunit tests, no network, no vvvv
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org
 └── tools/
@@ -275,7 +275,7 @@ vl-mapsui/
 
 ## Tests
 
-`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 244 tests, about two seconds. No
+`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 245 tests, about two seconds. No
 network and no vvvv: the tile source is faked, and the geometry tests use a MemoryLayer.
 
 They exist because the expensive bug here was a **lifetime** bug, not an arithmetic one, so
@@ -301,6 +301,26 @@ The test project references `VL.Core` and `VL.Core.Skia` **without** `ExcludeAss
 `src\VL.Mapsui`. The package excludes them because vvvv supplies its own; a test host supplies
 nothing, and without them every test fails on `Could not load file or assembly 'VL.Core.Skia'`
 before reaching an assertion.
+
+## Node documentation is a tooltip
+
+**Every `///` on a public member is shown to the user** — on hover in the patch and in the
+NodeBrowser (The Gray Book, *writing-nodes*: summary "a one-liner", remarks "usage instructions,
+warnings", param/returns "short info"). Until 2026-10-18 the family wrote design rationale there:
+this package's remarks had a median of 494 characters and a maximum of 3,549 (`SymbolStyle`'s class), and
+in VL.NetTopologySuite a hover on `GetAttribute` showed a 1,500-character essay. Seen on that hover:
+`<see cref>` renders as **nothing**, `<para>`s run together without a space, and **a line break in
+the source is a line break on screen**.
+
+So: `<summary>` one line; `<remarks>` one or two sentences a user needs; `<param>` / `<returns>`
+one short line per pin; plain text, one sentence per source line. **The reasoning moves to `//`
+comments above the `///` block**, where it stays next to the code and never reaches a tooltip.
+vvvv's own CoreLib measures summary median 68 characters, remarks median 50.
+
+`NodeDocsTests` enforces it on the built `VL.Mapsui.xml` for every public member (summary 200,
+remarks 300, pins 200 characters; no `see`/`para`/`list`/`code`; no break inside a sentence). It
+went red with 104 findings on the old docs. The same file is in VL.NetTopologySuite and
+VL.NetTopologySuite.GeoJSON; only the anchor type differs.
 
 ## Node categories
 

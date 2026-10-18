@@ -11,28 +11,28 @@ using MapsuiColor = global::Mapsui.Styles.Color;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// A style is a value, and this node is still stateful - for a different reason than the layers are.
+// It hands out the same object while its inputs are unchanged, because a style's IDENTITY matters
+// downstream twice over:
+// - a layer treats a new style as a change and rebuilds, so a fresh instance per frame would rebuild
+//   the feature layer sixty times a second - the failure this package was rebuilt to undo, wearing a
+//   colour picker;
+// - Mapsui caches rendered geometry per style object: IFeature.RenderedGeometry is an
+//   IDictionary<IStyle, object>. A new style per frame means a new key every frame, on every feature.
+// So the rule "anything holding a resource is a process node" gains a second clause here: or
+// anything whose identity is compared downstream. Nothing is held open; the object simply has to be
+// the same object.
+//
+// The defaults are deliberately visible without configuration - a translucent red fill with a solid
+// outline shows up on any basemap, which is what a first patch needs.
+
 /// <summary>
-/// How geometry is drawn: fill, outline, line width. Hand it to a <c>FeatureLayer</c>.
+/// Styles lines and polygons: fill colour, line colour and line width.
 /// </summary>
-/// <remarks>
-/// **A style is a value, and this node is still stateful — for a different reason than the layers
-/// are.** It hands out the same object while its inputs are unchanged, because a style's *identity*
-/// matters downstream twice over:
-///
-/// - a layer treats a new style as a change and rebuilds, so a fresh instance per frame would
-///   rebuild the feature layer sixty times a second — the failure this package was rebuilt to undo,
-///   wearing a colour picker
-/// - Mapsui caches rendered geometry **per style object**: `IFeature.RenderedGeometry` is an
-///   `IDictionary&lt;IStyle, object&gt;`. A new style per frame means a new key every frame, on every
-///   feature
-///
-/// So the rule "anything holding a resource is a process node" gains a second clause here: **or
-/// anything whose identity is compared downstream**. Nothing is held open; the object simply has to
-/// be the same object.
-///
-/// The defaults are deliberately visible without configuration — a translucent red fill with a
-/// solid outline shows up on any basemap, which is what a first patch needs.
-/// </remarks>
 [ProcessNode(Name = "VectorStyle", Category = "Mapsui.Styles")]
 public class VectorStyleNode
 {
@@ -44,7 +44,13 @@ public class VectorStyleNode
     /// <summary>Styles built by this node. It should reach 1 and stay there.</summary>
     internal int StylesBuilt { get; private set; }
 
-    /// <summary>A style to hand to a layer.</summary>
+    /// <summary>
+    /// Configures the style.
+    /// </summary>
+    /// <param name="fillColor">The polygon fill. Unconnected gives a translucent red.</param>
+    /// <param name="lineColor">Lines and polygon outlines. Unconnected gives red.</param>
+    /// <param name="lineWidth">Line width in pixels.</param>
+    /// <returns>A style for a layer, or for StyleByGeometry's Line and Polygon pins.</returns>
     public IStyle Update(
         Color4? fillColor = null,
         Color4? lineColor = null,

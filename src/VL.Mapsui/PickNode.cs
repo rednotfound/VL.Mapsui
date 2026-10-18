@@ -13,30 +13,38 @@ using AttributesTable = NetTopologySuite.Features.AttributesTable;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// The other direction of the whole package: geometry has been going in, and this is the first node
+// that hands something back.
+//
+// It answers about a position, not about a click. There is no Pressed pin here and that is
+// deliberate: what counts as a click belongs to the patch, exactly as it does for Drag and Click.
+// Wire the mouse position in and it reports continuously; put a Sample and Hold after it, gated on
+// a button, and it reports on click. Deciding here would take that choice away from every patch,
+// and the same instinct - swallowing the mouse inside a node - is what this package was rebuilt to
+// undo.
+//
+// A layer has to opt in, and nothing says so when it has not. Mapsui only hit-tests layers whose
+// IsMapInfoLayer is true, and it defaults to false - measured: with it off, a click on the dead
+// centre of a square returns no feature and no error. FeatureLayer therefore switches it on for
+// every layer it builds. Tile layers stay off, which is right: there is no feature under a tile.
+//
+// What comes back is NetTopologySuite's Feature, in WGS84 - the same type that went in, in the same
+// coordinates. It is a new object rather than the one the patch is holding: Mapsui was handed a
+// projected copy, so this projects back. Compare it by value, not by reference.
+//
+// A process node because it owns a MapRenderer, which is what performs the hit test, and building
+// one per frame is the mistake this repository is named after.
+
 /// <summary>
-/// What is under a point on the map. The other direction of the whole package: geometry has been
-/// going in, and this is the first node that hands something back.
+/// Finds the feature under a point on the map.
 /// </summary>
 /// <remarks>
-/// **It answers about a position, not about a click.** There is no Pressed pin here and that is
-/// deliberate: what counts as a click belongs to the patch, exactly as it does for `Drag` and
-/// `Click`. Wire the mouse position in and it reports continuously; put a `Sample and Hold` after
-/// it, gated on a button, and it reports on click. Deciding here would take that choice away from
-/// every patch, and the same instinct — swallowing the mouse inside a node — is what this package
-/// was rebuilt to undo.
-///
-/// **A layer has to opt in, and nothing says so when it has not.** Mapsui only hit-tests layers
-/// whose `IsMapInfoLayer` is true, and it defaults to **false** — measured: with it off, a click on
-/// the dead centre of a square returns no feature and no error. `FeatureLayer` therefore switches
-/// it on for every layer it builds. Tile layers stay off, which is right: there is no feature under
-/// a tile to find.
-///
-/// **What comes back is NetTopologySuite's `Feature`, in WGS84** — the same type that went in, in
-/// the same coordinates. It is a new object rather than the one the patch is holding: Mapsui was
-/// handed a projected copy, so this projects back. Compare it by value, not by reference.
-///
-/// A process node because it owns a `MapRenderer`, which is what performs the hit test, and
-/// building one per frame is the mistake this repository is named after.
+/// Reports continuously; to report on click, put a Sample and Hold after it, gated on a button.
+/// The feature comes back in longitude/latitude as a new object, so compare it by value.
 /// </remarks>
 [ProcessNode(Name = "Pick", Category = "Mapsui")]
 public class PickNode
@@ -45,22 +53,29 @@ public class PickNode
     // a fresh MapRenderer over a layer that has never been rendered returns hits.
     readonly MapRenderer _renderer = new();
 
+    // X and Y are pixels from the top-left of the view, the same ones Drag and Click take and the
+    // same ones ToSkiaLayer draws in - MouseState's Position, split.
+    //
+    // The hit is exact, with no tolerance. Measured on a square spanning screen x 100..300: x 300
+    // hits and 301 misses. Mapsui's margin parameter does not widen it for geometry - 0, 4, 8 and 32
+    // all miss five pixels outside the edge - so it is not offered here rather than offered and
+    // useless. A patch wanting a fat finger has to grow the geometry, not the query.
+    //
+    // When features overlap, the topmost wins: last layer first, and within a layer the last
+    // feature. That is the same order they were drawn in, the only answer matching what the eye picked.
+
     /// <summary>
-    /// The feature under the given view pixel, or nothing when there is none there.
+    /// Returns the feature under the given view pixel, or nothing when there is none.
     /// </summary>
     /// <remarks>
-    /// X and Y are pixels from the top-left of the view, the same ones `Drag` and `Click` take and
-    /// the same ones `ToSkiaLayer` draws in — `MouseState`'s Position, split.
-    ///
-    /// **The hit is exact, with no tolerance.** Measured on a square spanning screen x 100..300: x
-    /// 300 hits and 301 misses. Mapsui's `margin` parameter does not widen it for geometry — 0, 4,
-    /// 8 and 32 all miss five pixels outside the edge — so it is not offered here rather than
-    /// offered and useless. A patch wanting a fat finger has to grow the geometry, not the query.
-    ///
-    /// **When features overlap, the topmost wins**: last layer first, and within a layer the last
-    /// feature. That is the same order they were drawn in, which is the only answer that matches
-    /// what the eye picked.
+    /// The hit is exact, with no tolerance; when features overlap, the topmost wins.
     /// </remarks>
+    /// <param name="map">The map to look in.</param>
+    /// <param name="hit">True when a feature is under the point.</param>
+    /// <param name="layer">The name of the layer the feature is on, or why nothing was found.</param>
+    /// <param name="x">Pixels from the left of the view, as MouseState's Position gives them.</param>
+    /// <param name="y">Pixels from the top of the view.</param>
+    /// <returns>The feature, in longitude/latitude.</returns>
     public NtsFeature? Update(Map? map, out bool hit, out string layer, float x = 0f, float y = 0f)
     {
         hit = false;

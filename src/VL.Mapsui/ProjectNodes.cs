@@ -13,27 +13,38 @@ using AttributesTable = NetTopologySuite.Features.AttributesTable;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// Separate from Pick because it is a different question with a different answer: Pick finds
+// nothing in the sea, while this still says which sea. Measured - Mapsui fills in the world
+// position even when the hit test finds no feature.
+//
+// Pure arithmetic on the viewport, so a static node: it holds nothing and there is nothing to
+// rebuild.
+
 /// <summary>
-/// Where a point on the view is in the world, whether or not anything is drawn there.
+/// Converts between view pixels and longitude/latitude, whether or not anything is drawn there.
 /// </summary>
-/// <remarks>
-/// Separate from `Pick` because it is a different question with a different answer: `Pick` finds
-/// nothing in the sea, while this still says which sea. Measured — Mapsui fills in the world
-/// position even when the hit test finds no feature.
-///
-/// Pure arithmetic on the viewport, so a static node: it holds nothing and there is nothing to
-/// rebuild.
-/// </remarks>
 [Name("Project")]
 public static class ProjectNodes
 {
+    // x first, as everywhere else here. Both are 0 until the map has been drawn once, because a
+    // viewport with no size has no coordinates to convert into - the same reason Home cannot run
+    // before the first frame.
+
     /// <summary>
-    /// The WGS84 longitude and latitude under a view pixel. x first, as everywhere else here.
+    /// Returns the longitude and latitude under a view pixel.
     /// </summary>
     /// <remarks>
-    /// Both are 0 until the map has been drawn once, because a viewport with no size has no
-    /// coordinates to convert into — the same reason `Home` cannot run before the first frame.
+    /// Both are 0 until the map has been drawn once.
     /// </remarks>
+    /// <param name="map">The map whose view is used.</param>
+    /// <param name="longitude">Degrees east, WGS84.</param>
+    /// <param name="latitude">Degrees north, WGS84.</param>
+    /// <param name="x">Pixels from the left of the view.</param>
+    /// <param name="y">Pixels from the top of the view.</param>
     public static void ScreenToWorld(Map? map, out double longitude, out double latitude, float x = 0f, float y = 0f)
     {
         longitude = 0;
@@ -48,10 +59,19 @@ public static class ProjectNodes
         (longitude, latitude) = SphericalMercator.ToLonLat(world.X, world.Y);
     }
 
+    // The inverse of ScreenToWorld, for putting something of your own on top of the map.
+
     /// <summary>
-    /// The view pixel a WGS84 coordinate is drawn at — the inverse, for putting something of your
-    /// own on top of the map.
+    /// Returns the view pixel a longitude/latitude is drawn at.
     /// </summary>
+    /// <remarks>
+    /// Use it to draw something of your own on top of the map.
+    /// </remarks>
+    /// <param name="map">The map whose view is used.</param>
+    /// <param name="x">Pixels from the left of the view.</param>
+    /// <param name="y">Pixels from the top of the view.</param>
+    /// <param name="longitude">Degrees east, WGS84.</param>
+    /// <param name="latitude">Degrees north, WGS84.</param>
     public static void WorldToScreen(Map? map, out float x, out float y, double longitude = 0, double latitude = 0)
     {
         x = 0;

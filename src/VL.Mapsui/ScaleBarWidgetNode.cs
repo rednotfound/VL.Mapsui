@@ -24,16 +24,19 @@ public enum ScaleBarUnits
     Nautical,
 }
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// Mapsui's Skia renderer already knows how to draw this - measured, not assumed: a fresh
+// MapRenderer arrives with 9 widget renderers registered, ScaleBarWidget among them - so the widget
+// draws the moment it is on the map.
+//
+// A process node because Map.Widgets can only be appended to; see WidgetSlot<T>.
+
 /// <summary>
-/// A scale bar on the map. Nothing is drawn while Enabled is off.
+/// Shows a scale bar on the map.
 /// </summary>
-/// <remarks>
-/// Mapsui's Skia renderer already knows how to draw this - measured, not assumed: a fresh
-/// MapRenderer arrives with 9 widget renderers registered, ScaleBarWidget among them - so the
-/// widget draws the moment it is on the map.
-///
-/// A process node because Map.Widgets can only be appended to; see <see cref="WidgetSlot{T}"/>.
-/// </remarks>
 [ProcessNode(Name = "ScaleBar", Category = "Mapsui.Widgets")]
 public class ScaleBarWidgetNode
 {
@@ -42,7 +45,14 @@ public class ScaleBarWidgetNode
     /// <summary>Widgets this node has added. It should reach 1 and stay there.</summary>
     internal int WidgetsAdded => _slot.Added;
 
-    /// <summary>The same map, so this sits in the chain between Map and ToSkiaLayer.</summary>
+    /// <summary>
+    /// Configures the scale bar on the map.
+    /// </summary>
+    /// <param name="map">The map to put it on.</param>
+    /// <param name="enabled">Nothing is drawn while off.</param>
+    /// <param name="units">Metric, imperial or nautical.</param>
+    /// <param name="corner">The corner of the map it sits in.</param>
+    /// <returns>The same map, for the chain between Map and ToSkiaLayer.</returns>
     public Map? Update(
         Map? map,
         bool enabled = true,

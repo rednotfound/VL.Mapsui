@@ -8,20 +8,26 @@ using VL.Core.Import;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// A process node because the map owns its layers, and those own connections and caches.
+//
+// The Initial pins are named that way because they mean it. They are applied once, when the
+// viewport first has a size - a zoom level means nothing before then - and ignored on every frame
+// after. Reading them continuously would undo any navigation on the very next frame, so dragging a
+// map would be impossible.
+//
+// To move the map, use the nodes in Mapsui.Navigate. That is also where a patch wires the mouse,
+// an LFO, or anything else it wants to drive the view with.
+
 /// <summary>
-/// A Mapsui map: a stack of layers, a viewport, and a navigator.
-/// Feed it layers, move it with the nodes in Mapsui.Navigate, and draw it with ToSkiaLayer.
+/// A map: a stack of layers, a viewport and a navigator.
 /// </summary>
 /// <remarks>
-/// A process node because the map owns its layers, and those own connections and caches.
-///
-/// **The Initial pins are named that way because they mean it.** They are applied once, when the
-/// viewport first has a size - a zoom level means nothing before then - and ignored on every
-/// frame after. Reading them continuously would undo any navigation on the very next frame, so
-/// dragging a map would be impossible.
-///
-/// To move the map, use the nodes in Mapsui.Navigate. That is also where a patch wires the
-/// mouse, an LFO, or anything else it wants to drive the view with.
+/// Move it with the nodes in Mapsui.Navigate and draw it with ToSkiaLayer.
+/// The Initial pins are applied once, when the map first has a size, so they never undo navigation.
 /// </remarks>
 [ProcessNode(Name = "Map", Category = "Mapsui")]
 public class MapNode : IDisposable
@@ -33,8 +39,13 @@ public class MapNode : IDisposable
     internal int MapsBuilt { get; private set; }
 
     /// <summary>
-    /// The map, ready for the navigation and drawing nodes.
+    /// Configures the map with its layers.
     /// </summary>
+    /// <param name="layers">The layers, bottom first.</param>
+    /// <param name="initialCenterLongitude">Longitude of the centre when the map first appears.</param>
+    /// <param name="initialCenterLatitude">Latitude of the centre when the map first appears.</param>
+    /// <param name="initialZoomLevel">Zoom level when the map first appears.</param>
+    /// <returns>The map, ready for the navigation and drawing nodes.</returns>
     public Map Update(
         IEnumerable<ILayer>? layers = null,
         double initialCenterLongitude = 139.7,
@@ -109,10 +120,9 @@ public class MapNode : IDisposable
         return _map;
     }
 
-    /// <summary>
-    /// Disposes the map, but not the layers: those belong to the nodes that made them, and
-    /// VL disposes those separately.
-    /// </summary>
+    // Not the layers: those belong to the nodes that made them, and VL disposes those separately.
+
+    /// <summary>Releases the map.</summary>
     public void Dispose()
     {
         _map.Layers.Clear();

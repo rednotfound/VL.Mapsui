@@ -6,14 +6,21 @@ using BruTile.Cache;
 
 namespace VL.Mapsui;
 
+// The /// text below is what vvvv shows on hover and in the NodeBrowser - user-facing, short, one
+// sentence per line (a line break in the source is a line break in the tooltip). The reasoning
+// lives here.
+//
+// A tile cache on disk: a folder, and the BruTile cache attached to it. This is a value a patch
+// passes around rather than a setting on the layer node, which is what TileCache produces and
+// OpenStreetMap consumes. The shape matters: it used to be two pins on the layer node (Cache To
+// Disk, Cache Folder) AND a separate node showing the default, and the two disagreed - one read a
+// pin, the other read nothing at all. One node owns it now.
+
 /// <summary>
-/// A tile cache on disk: a folder, and the BruTile cache attached to it.
+/// A tile cache on disk, made by the TileCache node.
 /// </summary>
 /// <remarks>
-/// This is a **value a patch passes around** rather than a setting on the layer node, which is what
-/// <c>TileCache</c> produces and <c>OpenStreetMap</c> consumes. The shape matters: it used to be two
-/// pins on the layer node (Cache To Disk, Cache Folder) *and* a separate node showing the default,
-/// and the two disagreed — one read a pin, the other read nothing at all. One node owns it now.
+/// Hand it to a tile layer's Cache pin.
 /// </remarks>
 public sealed class TileDiskCache
 {
@@ -30,16 +37,18 @@ public sealed class TileDiskCache
     /// <summary>Why this cache is off, when it is off because something went wrong.</summary>
     public string? Problem { get; }
 
-    /// <summary>Whether this cache is switched on. A cache that is off is still a value.</summary>
+    // "Off" has to be something rather than nothing, and so does "this folder did not work". An
+    // unconnected pin hands a node null, and so would a connected node that returned null when
+    // switched off or when the folder was unusable - the three would be indistinguishable, and a
+    // layer could not tell "nobody said anything, use the default" from "somebody said no". That is
+    // the same ambiguity that let an empty Path IOBox pass for an empty pin and put 444 tiles next
+    // to two repositories, so it is worth not rebuilding one level up. A test caught exactly that
+    // regression here: a failed folder came back as null and the layer fell back to the default,
+    // silently, which is the one thing this package promises not to do.
+
+    /// <summary>Whether this cache is switched on.</summary>
     /// <remarks>
-    /// **"Off" has to be something rather than nothing, and so does "this folder did not work".**
-    /// An unconnected pin hands a node null, and so would a connected node that returned null when
-    /// switched off or when the folder was unusable — the three would be indistinguishable, and a
-    /// layer could not tell "nobody said anything, use the default" from "somebody said no". That
-    /// is the same ambiguity that let an empty Path IOBox pass for an empty pin and put 444 tiles
-    /// next to two repositories, so it is worth not rebuilding one level up. A test caught exactly
-    /// that regression here: a failed folder came back as null and the layer fell back to the
-    /// default, silently, which is the one thing this package promises not to do.
+    /// Off when the TileCache node is disabled or its folder could not be used; Problem says which.
     /// </remarks>
     public bool IsOn => Cache is not null;
 
