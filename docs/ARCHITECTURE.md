@@ -82,7 +82,7 @@ by hand, and it makes the order legible instead of accidental.
 
 ```
 whatever computes geometry              VL.Mapsui                Mapsui
-(VL.NetTopologySuite, VL.GeoJSON)  ──►  adapter          ──►     GeometryFeature
+(VL.NetTopologySuite, VL.NetTopologySuite.GeoJSON)  ──►  adapter  ──►  GeometryFeature
       NTS Geometry / Feature            (FeatureLayer)           MemoryLayer
 ```
 
@@ -100,7 +100,7 @@ Dependency direction, which is the same statement read downwards:
 VL.Mapsui ──► VL.NetTopologySuite ──► NetTopologySuite     ✅ rendering above processing
 VL.Mapsui ──► Mapsui              ──► NetTopologySuite     ✅
 VL.NetTopologySuite ──► Mapsui                             ✗ must never happen
-VL.GeoJSON          ──► Mapsui                             ✗ must never happen either
+VL.NetTopologySuite.GeoJSON ──► Mapsui                     ✗ must never happen either
 ```
 
 **VL.NetTopologySuite is the package that makes geometry**; this one draws it. The dependency is
@@ -108,13 +108,14 @@ declared in the nuspec so `HowTo Draw your own shapes` opens working rather than
 fetch a missing document dependency by itself. That direction is allowed and the reverse never is:
 nothing that computes geometry may learn about a renderer.
 
-The siblings compose **through NTS**, none referencing another — VL.GIS did the same while it
-lived. A patch needing two packages cannot ship inside one whose dependencies do not guarantee the
+The siblings compose **through NTS**. The only arrows between them point at VL.NetTopologySuite —
+this package's, and since 2026-10-18 VL.NetTopologySuite.GeoJSON's — and none between this package and the GeoJSON
+one; VL.GIS composed the same way while it lived. A patch needing two packages cannot ship inside one whose dependencies do not guarantee the
 other, so every such patch lives in VL.Overworld, the course, which declares the whole family and
 compiles them all as a standing integration test.
 
 **Coordinates crossing in are WGS84 longitude and latitude, x first** — what GeoJSON carries and
-what VL.NetTopologySuite and VL.GeoJSON produce. Mapsui draws in spherical mercator, so the adapter projects on the way in, on
+what VL.NetTopologySuite and VL.NetTopologySuite.GeoJSON produce. Mapsui draws in spherical mercator, so the adapter projects on the way in, on
 a copy. Which projection an engine happens to draw in is not a decision anyone wants to take.
 
 **A CRS is an identifier** (`"EPSG:3857"`), which is what Mapsui itself uses. No universal CRS

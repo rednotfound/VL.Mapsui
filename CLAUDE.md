@@ -14,11 +14,14 @@ nothing else.
 |---|---|
 | `vl-mapsui` (here) | draws maps: tiles, layers, styles, picking |
 | `D:\2026_Projects\vl-nettopologysuite` | geometry — points, lines, polygons, operations |
-| `D:\2026_Projects\vl-geojson` | reads and writes the format data arrives in |
+| `D:\2026_Projects\vl-geojson` | `VL.NetTopologySuite.GeoJSON` (was `VL.GeoJSON` until 2026-10-18) — reads and writes the format data arrives in |
 | `D:\2026_Projects\vl-overworld` | **the course.** No nodes; it declares the other three and holds every patch that needs more than one of them |
 
-They compose through **NetTopologySuite**, a library they share rather than an agreement they made:
-none of them references another. The retired `VL.GIS` lives only on GitHub now
+They compose through **NetTopologySuite**, a library they share rather than an agreement they made.
+**Every dependency arrow points at VL.NetTopologySuite**: this package and VL.NetTopologySuite.GeoJSON each depend
+on it, neither depends on the other, and VL.NetTopologySuite references nothing of ours. (Until
+2026-10-18 this line said "none of them references another", which this package's own nuspec had
+already made untrue.) The retired `VL.GIS` lives only on GitHub now
 (`rednotfound/vvvv-gis`; the local clone is gone as of 2026-09-25). Its published `0.2.0-alpha`
 still declares BruTile 6 and conflicts with this package — the README's Install section says what
 a user has to delete by hand.

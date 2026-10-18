@@ -134,7 +134,7 @@ library they share rather than a dependency on each other:
 | package | what it does |
 |---|---|
 | [VL.NetTopologySuite](https://github.com/rednotfound/VL.NetTopologySuite) | geometry: points, lines, polygons, operations |
-| [VL.GeoJSON](https://github.com/rednotfound/VL.GeoJSON) | reads and writes the format data arrives in |
+| [VL.NetTopologySuite.GeoJSON](https://github.com/rednotfound/VL.NetTopologySuite.GeoJSON) | reads and writes the format data arrives in |
 | [VL.Overworld](https://github.com/rednotfound/VL.Overworld) | the course: no nodes, every patch that needs more than one package |
 
 [VL.GIS](https://github.com/rednotfound/vvvv-gis) was the first attempt at all of this in one

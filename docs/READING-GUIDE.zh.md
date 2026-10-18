@@ -29,11 +29,11 @@ C# 旁边都附了 JS 写法。写于 2026-10-17，对应工作版本 0.0.2-alph
 ```mermaid
 flowchart LR
   NTS["VL.NetTopologySuite<br/>造几何：点、线、面"]
-  GJ["VL.GeoJSON<br/>读写 GeoJSON 文件"]
+  GJ["VL.NetTopologySuite.GeoJSON<br/>读写 GeoJSON 文件"]
   MS["VL.Mapsui（这里）<br/>画地图"]
   OW["VL.Overworld<br/>课程：没有节点，只有跨包的 patch"]
   NTS -- "nuget 依赖" --> MS
-  NTS -. "共用 NTS 类型" .-> GJ
+  NTS -- "nuget 依赖" --> GJ
   MS --> OW
   NTS --> OW
   GJ --> OW

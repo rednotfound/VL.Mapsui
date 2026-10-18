@@ -10,7 +10,7 @@ documentation.
 version on nuget.org can be unlisted, never deleted or replaced.
 
 Order across the family: **VL.NetTopologySuite ✅ (2026-09-26) → VL.Mapsui → VL.Overworld**, with
-VL.GeoJSON free to go any time. This package declares `VL.NetTopologySuite 0.0.1-alpha`, which
+VL.NetTopologySuite.GeoJSON (formerly VL.GeoJSON) free to go any time after VL.NetTopologySuite 0.0.3-alpha, which it needs. This package declares `VL.NetTopologySuite 0.0.1-alpha`, which
 resolves from nuget.org since 2026-09-26 — before that, publishing this one would have produced a
 package nobody could install.
 
