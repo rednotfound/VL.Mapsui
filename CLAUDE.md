@@ -26,6 +26,13 @@ already made untrue.) The retired `VL.GIS` lives only on GitHub now
 still declares BruTile 6 and conflicts with this package — the README's Install section says what
 a user has to delete by hand.
 
+**2026-11-08: `0.0.2-alpha` prepared for release** - no node changed; the help follows
+VL.NetTopologySuite 0.0.6-alpha's rename of `Read WKT` / `Write WKT` to `FromWKT` / `ToWKT` (19 node
+references in 10 patches, and their notes), every patch pins that version, and the nuspec requires
+it. The family moved together that evening: VL.NetTopologySuite 0.0.6-alpha, then
+VL.NetTopologySuite.GeoJSON 0.0.2-alpha (`FromGeoJSON` / `ToGeoJSON`), then this, then VL.Overworld.
+NOTES.md keeps the old name where it records what was measured then.
+
 **Current state (2026-09-26): `0.0.1-alpha` is on nuget.org — a prerelease, an early preview, not a
 stable version. The working version is `0.0.2-alpha`.** A map renders in vvvv 7.4, pans, zooms and takes geometry from
 any NTS source. **32 nodes, 245 tests.** VL.NetTopologySuite, which this package depends on, went up the

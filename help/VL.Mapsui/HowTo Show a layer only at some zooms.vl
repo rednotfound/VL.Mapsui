@@ -2,7 +2,7 @@
 <Document xmlns:p="property" xmlns:r="reflection" Id="HJDzfn0aHLYpGNxR2l8gDY" LanguageVersion="2025.7.4" Version="0.128">
   <NugetDependency Id="GiryhXwP8KbKP3MvV8pMiu" Location="VL.CoreLib" Version="2025.7.4" />
   <NugetDependency Id="KxGk10RsN6k7enxOO2Z8d3" Location="VL.Skia" Version="2025.7.4" />
-  <NugetDependency Id="UtK2ofcItXbCxU1CXGJho1" Location="VL.NetTopologySuite" Version="0.0.1-alpha" />
+  <NugetDependency Id="UtK2ofcItXbCxU1CXGJho1" Location="VL.NetTopologySuite" Version="0.0.6-alpha" />
   <Patch Id="DOWTzXepZde8d9EZ6O4Kpy">
     <Canvas Id="So21hEtcjV1JyJvNC4Z8EI" DefaultCategory="Main" BordersChecked="false" CanvasType="FullCategory" />
     <!--
@@ -43,7 +43,7 @@
           <Node Bounds="60,230,90,19" Id="RMzbicKuM6mse6Lzb6xiOJ">
             <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Read WKT" />
+              <Choice Kind="OperationCallFlag" Name="FromWKT" />
             </p:NodeReference>
             <Pin Id="H9oJYlRmcUWzduqQC3LT7c" Name="WKT" Kind="InputPin" />
             <Pin Id="Rl3b3r9m7WFw1yOUC2qZLL" Name="Factory" Kind="InputPin" />

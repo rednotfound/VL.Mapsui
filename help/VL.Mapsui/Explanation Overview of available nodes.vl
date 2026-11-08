@@ -800,7 +800,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="StYtSDxoah9SyZbXmWVoe0" Bounds="660,922,660,96" ShowValueBox="true" isIOBox="true" Value="Geometry: VL.NetTopologySuite makes it (Point, Polygon, Read WKT) and defines Feature; this package only draws and picks them.&#xD;&#xA;Files and services: VL.GeoJSON reads the format data arrives in.&#xD;&#xA;Manners: tiles come from donated servers. Nothing fetches until Enabled is on, only drawn tiles are kept, and requests name this package.&#xD;&#xA;If Layers Built ever climbs frame after frame, close vvvv.">
+          <Pad Id="StYtSDxoah9SyZbXmWVoe0" Bounds="660,922,660,96" ShowValueBox="true" isIOBox="true" Value="Geometry: VL.NetTopologySuite makes it (Point, Polygon, FromWKT) and defines Feature; this package only draws and picks them.&#xD;&#xA;Files and services: VL.GeoJSON reads the format data arrives in.&#xD;&#xA;Manners: tiles come from donated servers. Nothing fetches until Enabled is on, only drawn tiles are kept, and requests name this package.&#xD;&#xA;If Layers Built ever climbs frame after frame, close vvvv.">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>

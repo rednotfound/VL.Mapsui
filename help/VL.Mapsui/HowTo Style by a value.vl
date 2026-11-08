@@ -2,7 +2,7 @@
 <Document xmlns:p="property" xmlns:r="reflection" Id="KtGkU2YnMzUvrNH3Q2Zy7k" LanguageVersion="2025.7.4" Version="0.128">
   <NugetDependency Id="HEidozxAI4vx8rx8aZtYun" Location="VL.CoreLib" Version="2025.7.4" />
   <NugetDependency Id="NcwdM9VtdwAxpz08sf9IYX" Location="VL.Skia" Version="2025.7.4" />
-  <NugetDependency Id="SOL8lG753Rn7qdwI69KAGp" Location="VL.NetTopologySuite" Version="0.0.1-alpha" />
+  <NugetDependency Id="SOL8lG753Rn7qdwI69KAGp" Location="VL.NetTopologySuite" Version="0.0.6-alpha" />
   <Patch Id="SUlOAZJxH6dsRaGtRb01s6">
     <Canvas Id="L1Q2sxC0XHHpGbVEunkZTS" DefaultCategory="Main" BordersChecked="false" CanvasType="FullCategory" />
     <!--
@@ -48,7 +48,7 @@
           <Node Bounds="66,280,90,19" Id="O03LiDfXPeJErUetTNIzOY">
             <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Read WKT" />
+              <Choice Kind="OperationCallFlag" Name="FromWKT" />
             </p:NodeReference>
             <Pin Id="C2H3SUjguC9gumNxV898nE" Name="WKT" Kind="InputPin" />
             <Pin Id="BCl90LeHes2h7QLcvTofKi" Name="Factory" Kind="InputPin" />
@@ -88,7 +88,7 @@
           <Node Bounds="306,280,90,19" Id="ROiBDHwKEvN2tFyqcfwMZa">
             <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Read WKT" />
+              <Choice Kind="OperationCallFlag" Name="FromWKT" />
             </p:NodeReference>
             <Pin Id="TwLL1i97UY22LSSdHOR3H0" Name="WKT" Kind="InputPin" />
             <Pin Id="I7iu5mOVofD8CUgeDzeC6M" Name="Factory" Kind="InputPin" />
@@ -128,7 +128,7 @@
           <Node Bounds="546,280,90,19" Id="MvLhVf3WbT66G6N4EGPapQ">
             <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Read WKT" />
+              <Choice Kind="OperationCallFlag" Name="FromWKT" />
             </p:NodeReference>
             <Pin Id="SVXlXcfjlZfpDHJJ0Esa8u" Name="WKT" Kind="InputPin" />
             <Pin Id="NtdIp9F4QhxIemUp4UFPjE" Name="Factory" Kind="InputPin" />
@@ -168,7 +168,7 @@
           <Node Bounds="786,280,90,19" Id="M5ZR3mIrRGBtnjB2vyHcbu">
             <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Read WKT" />
+              <Choice Kind="OperationCallFlag" Name="FromWKT" />
             </p:NodeReference>
             <Pin Id="UIHD1mZ8WMW9lPb2KaVNDQ" Name="WKT" Kind="InputPin" />
             <Pin Id="Bm10Hys0kypHHfLpSFmb9L" Name="Factory" Kind="InputPin" />
@@ -208,7 +208,7 @@
           <Node Bounds="1026,280,90,19" Id="DlZx1i7KSywNoyKNbJ0R8G">
             <p:NodeReference LastCategoryFullName="NTS.IO" LastDependency="VL.NetTopologySuite.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="OperationCallFlag" Name="Read WKT" />
+              <Choice Kind="OperationCallFlag" Name="FromWKT" />
             </p:NodeReference>
             <Pin Id="Gv3hHuWfOEjFZ0W5hNBdPP" Name="WKT" Kind="InputPin" />
             <Pin Id="C4eGSHSwDPbgC5jO7QmZlD" Name="Factory" Kind="InputPin" />

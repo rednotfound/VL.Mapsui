@@ -11,7 +11,7 @@
 
     WHAT IS DIFFERENT FOR A MAP PATCH: every one ends in Map -> ToSkiaLayer -> Renderer, so MapWindow
     emits those three wired, and Save-Doc always declares VL.Skia (the Renderer) and VL.Mapsui 0.0.0.
-    A patch that also takes NTS nodes (Read WKT, Feature) passes -Nts, which is allowed here because
+    A patch that also takes NTS nodes (FromWKT, Feature) passes -Nts, which is allowed here because
     this package's own nuspec depends on VL.NetTopologySuite; any other VL.* package is refused by
     Test-VLPackage.ps1 and belongs in VL.Overworld.
 

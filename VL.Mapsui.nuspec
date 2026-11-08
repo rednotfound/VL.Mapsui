@@ -40,7 +40,11 @@
     </description>
     <summary>Mapsui map engine as composable nodes for vvvv gamma.</summary>
     <releaseNotes>
-      0.0.2-alpha - In development, not published.
+      0.0.2-alpha (2026-11-08) - No node added, removed or changed; 32 nodes. Every node's tooltip
+      is now short: a one-line summary, a sentence of usage and a line per pin. The help follows
+      VL.NetTopologySuite 0.0.6-alpha, which renamed Read WKT and Write WKT to FromWKT and ToWKT,
+      and this version requires it: a patch of yours made with the older VL.NetTopologySuite shows
+      Read WKT unresolved - put FromWKT in its place.
 
       0.0.1-alpha (2026-09-26) - The first release, a prerelease. 32 nodes in eight categories - Mapsui,
       Mapsui.Layers, Mapsui.Styles, Mapsui.Navigate, Mapsui.Project, Mapsui.Widgets, Mapsui.Skia,
@@ -79,7 +83,7 @@
           VL dependency at all and its help uses VL.Stride) because everything there ships inside
           vvvv and is therefore always present. Nothing guarantees that for us.
         -->
-        <dependency id="VL.NetTopologySuite"   version="0.0.2-alpha" />
+        <dependency id="VL.NetTopologySuite"   version="0.0.6-alpha" />
         <dependency id="Mapsui.Rendering.Skia" version="4.1.9" />
       </group>
     </dependencies>

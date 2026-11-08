@@ -280,7 +280,7 @@ public class FeatureLayerTests
     {
         // **The test the earlier ones were missing.** Every other test here hands the layer an
         // array built once, which is not what a patch does: `Feature` is a static node, so VL
-        // evaluates it sixty times a second and it returns a NEW object every frame. Read WKT
+        // evaluates it sixty times a second and it returns a NEW object every frame. FromWKT
         // upstream is static too, so even the geometry is a new object each frame.
         //
         // Caught on screen before it was caught here: the map flickered, because a new feature set
