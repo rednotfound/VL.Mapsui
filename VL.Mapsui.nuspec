@@ -2,10 +2,11 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>VL.Mapsui</id>
-    <!-- The WORKING version: always one ahead of what is on nuget.org (0.0.1-alpha, 2026-09-26), so a
+    <!-- The WORKING version: always one ahead of what is on nuget.org (0.0.2-alpha, 2026-11-08), so a
          local repack can never be mistaken for the published package in a NuGet cache. Managed in
-         step with VL.NetTopologySuite, whose working version is the dependency below. -->
-    <version>0.0.2-alpha</version>
+         step with VL.NetTopologySuite; the dependency below is the oldest PUBLISHED version of it
+         that this package's help works with (0.0.6-alpha: FromWKT), never its working version. -->
+    <version>0.0.3-alpha</version>
     <title>VL.Mapsui — Mapsui map engine nodes for vvvv gamma</title>
     <authors>VL.Mapsui Contributors</authors>
     <owners>VL.Mapsui Contributors</owners>
@@ -40,6 +41,8 @@
     </description>
     <summary>Mapsui map engine as composable nodes for vvvv gamma.</summary>
     <releaseNotes>
+      0.0.3-alpha - In development, not published.
+
       0.0.2-alpha (2026-11-08) - No node added, removed or changed; 32 nodes. Every node's tooltip
       is now short: a one-line summary, a sentence of usage and a line per pin. The help follows
       VL.NetTopologySuite 0.0.6-alpha, which renamed Read WKT and Write WKT to FromWKT and ToWKT,

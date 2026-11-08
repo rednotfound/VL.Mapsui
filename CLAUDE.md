@@ -26,7 +26,9 @@ already made untrue.) The retired `VL.GIS` lives only on GitHub now
 still declares BruTile 6 and conflicts with this package — the README's Install section says what
 a user has to delete by hand.
 
-**2026-11-08: `0.0.2-alpha` prepared for release** - no node changed; the help follows
+**2026-11-08: `0.0.2-alpha` is on nuget.org** (browser upload; installed back with `Test-Install
+-Published -Version 0.0.2-alpha`, both packages signed, 19 of 19 compile); **working version
+`0.0.3-alpha`** (nuspec + UserAgent). No node changed in it; the help follows
 VL.NetTopologySuite 0.0.6-alpha's rename of `Read WKT` / `Write WKT` to `FromWKT` / `ToWKT` (19 node
 references in 10 patches, and their notes), every patch pins that version, and the nuspec requires
 it. The family moved together that evening: VL.NetTopologySuite 0.0.6-alpha, then
