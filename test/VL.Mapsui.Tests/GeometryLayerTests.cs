@@ -125,6 +125,20 @@ public class GeometryLayerTests
     }
 
     [Fact]
+    public void An_empty_geometry_is_skipped_and_does_not_stretch_the_extent_to_the_origin()
+    {
+        // VL.NetTopologySuite 0.0.8 gives an empty geometry where it gave null; Mapsui 4.1.9 reads an
+        // empty geometry's extent as the box (-1, -1)-(0, 0), so the layer reached the mercator origin.
+        using var node = new GeometryLayerNode();
+        var layer = node.Update(out _, new Geometry[] { Tokyo().Buffer(0.002), Factory.CreateGeometryCollection() });
+        Assert.NotNull(layer);
+        Assert.True(layer!.Extent!.Left > 1_000_000, $"extent reaches {layer.Extent.Left}");
+
+        using var alone = new GeometryLayerNode();
+        Assert.Null(alone.Update(out _, new Geometry[] { Factory.CreatePolygon() }));
+    }
+
+    [Fact]
     public void Nothing_is_built_for_nothing_to_draw()
     {
         // A Map should be wireable before there is any data, without an empty layer appearing in
