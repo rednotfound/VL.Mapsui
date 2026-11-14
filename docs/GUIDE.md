@@ -1,4 +1,7 @@
-# VL.Mapsui
+# VL.Mapsui — the guide
+
+The long read: how the package thinks, what will bite you, what is verified and how, and how it is
+built. The short one is the [README](../README.md).
 
 [Mapsui](https://mapsui.com) — a real map engine — as nodes for [vvvv gamma](https://vvvv.org):
 tile layers, your own geometry and features on top, styles, labels, picking, widgets, and a node
@@ -15,11 +18,11 @@ that draws the map into VL.Skia.
 `0.0.6-alpha`, which renamed `Read WKT` / `Write WKT` to `FromWKT` / `ToWKT`: the help here uses the
 new names, and a patch of yours made before shows `Read WKT` unresolved - put `FromWKT` in its place.
 How a release gets to nuget.org, and what
-each check before and after that proves, is in [docs/RELEASE.md](docs/RELEASE.md). It works — a map renders in vvvv
+each check before and after that proves, is in [docs/RELEASE.md](RELEASE.md). It works — a map renders in vvvv
 7.4, pans, zooms, draws geometry from any NetTopologySuite source and tells you which feature is
 under the mouse — but the node surface can still change between versions, and Mapsui is far larger
 than what is wrapped (a few dozen of its 306 public types; see
-[docs/MAPSUI-SURFACE.md](docs/MAPSUI-SURFACE.md)).
+[docs/MAPSUI-SURFACE.md](MAPSUI-SURFACE.md)).
 
 | | |
 |---|---|
@@ -162,19 +165,19 @@ repository folders, and a missing one fails with an error naming something else.
 
 ## Reading
 
-- [NOTES.md](NOTES.md) — what was measured, with dates
-- [docs/RULES.md](docs/RULES.md) — what earns a node, and when a node runs
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — the pipeline and the NetTopologySuite boundary
-- [docs/MAPSUI-SURFACE.md](docs/MAPSUI-SURFACE.md) — what Mapsui offers, what is wrapped, what will not be
-- [docs/HELP-PATCH-STYLE.md](docs/HELP-PATCH-STYLE.md) — the help style, measured across 60 community packs
-- [docs/RELEASE.md](docs/RELEASE.md) — the release checklist, what each step proves
-- [docs/READING-GUIDE.zh.md](docs/READING-GUIDE.zh.md) — 读懂指南（中文）: the project for a reader who knows some JavaScript and no C#
-- [docs/NODE-READING.zh.html](docs/NODE-READING.zh.html) — 节点逐行精读（中文）: seven nodes read line by line, the sequel to the guide above; open the file in a browser
-- [CLAUDE.md](CLAUDE.md) — the rules that matter in this repository
+- [NOTES.md](../NOTES.md) — what was measured, with dates
+- [docs/RULES.md](RULES.md) — what earns a node, and when a node runs
+- [docs/ARCHITECTURE.md](ARCHITECTURE.md) — the pipeline and the NetTopologySuite boundary
+- [docs/MAPSUI-SURFACE.md](MAPSUI-SURFACE.md) — what Mapsui offers, what is wrapped, what will not be
+- [docs/HELP-PATCH-STYLE.md](HELP-PATCH-STYLE.md) — the help style, measured across 60 community packs
+- [docs/RELEASE.md](RELEASE.md) — the release checklist, what each step proves
+- [docs/READING-GUIDE.zh.md](READING-GUIDE.zh.md) — 读懂指南（中文）: the project for a reader who knows some JavaScript and no C#
+- [docs/NODE-READING.zh.html](NODE-READING.zh.html) — 节点逐行精读（中文）: seven nodes read line by line, the sequel to the guide above; open the file in a browser
+- [CLAUDE.md](../CLAUDE.md) — the rules that matter in this repository
 
 ## Licence
 
-VL.Mapsui is MIT — see [LICENSE](LICENSE). The package contains only its own assembly, help
+VL.Mapsui is MIT — see [LICENSE](../LICENSE). The package contains only its own assembly, help
 patches and docs; everything else arrives as a NuGet dependency under its own licence:
 [Mapsui](https://github.com/Mapsui/Mapsui) (MIT), [BruTile](https://github.com/BruTile/BruTile)
 (Apache-2.0), [NetTopologySuite](https://github.com/NetTopologySuite/NetTopologySuite) and
