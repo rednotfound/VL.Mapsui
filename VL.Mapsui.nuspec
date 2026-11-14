@@ -41,7 +41,12 @@
     </description>
     <summary>Mapsui map engine as composable nodes for vvvv gamma.</summary>
     <releaseNotes>
-      0.0.3-alpha - In development, not published.
+      0.0.3-alpha (2026-11-15) - No node added, removed or changed; 32 nodes. Fixed: GeometryLayer and
+      FeatureLayer skip an empty geometry as they skip a missing one. Since VL.NetTopologySuite
+      0.0.8-alpha a node whose input is missing gives an empty geometry instead of nothing, and one
+      empty geometry stretched the layer's extent from your data to the map's origin, off the coast of
+      Africa. The README is the short one the vvvv libraries have; the long read is docs/GUIDE.md on
+      GitHub.
 
       0.0.2-alpha (2026-11-08) - No node added, removed or changed; 32 nodes. Every node's tooltip
       is now short: a one-line summary, a sentence of usage and a line per pin. The help follows
