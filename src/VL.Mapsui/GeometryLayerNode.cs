@@ -80,7 +80,11 @@ public class GeometryLayerNode : IDisposable
         Color4? lineColor = null,
         float lineWidth = 2f)
     {
-        var incoming = geometries?.Where(g => g is not null).ToArray() ?? Array.Empty<Geometry>();
+        // Empty geometries are skipped as nulls are. Since VL.NetTopologySuite 0.0.8 a node whose input
+        // is missing gives an empty geometry rather than null, and Mapsui 4.1.9 turns an empty
+        // geometry's null envelope into a box from (-1, -1) to (0, 0) (measured): one empty feature
+        // stretched the layer's extent to the mercator origin, off the coast of Africa.
+        var incoming = geometries?.Where(g => g is not null && !g.IsEmpty).ToArray() ?? Array.Empty<Geometry>();
 
         // Features are rebuilt only when the geometry set changes. Building them every frame would
         // hand the layer a new set every frame and rebuild it, which is the whole failure this

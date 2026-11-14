@@ -91,7 +91,9 @@ public class FeatureLayerNode : IDisposable
         bool enabled = true,
         string name = "Features")
     {
-        var incoming = features?.Where(f => f?.Geometry is not null).ToArray() ?? Array.Empty<NtsFeature>();
+        // Empty geometries are skipped as nulls are: see GeometryLayerNode (an empty one stretches the
+        // layer's extent to the mercator origin in Mapsui 4.1.9, measured 2026-11-14).
+        var incoming = features?.Where(f => f?.Geometry is not null && !f.Geometry.IsEmpty).ToArray() ?? Array.Empty<NtsFeature>();
         var wanted = style ?? Styles.Default;
 
         status = Describe(incoming, wanted);
