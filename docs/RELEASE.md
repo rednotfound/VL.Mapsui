@@ -139,3 +139,20 @@ git push origin v0.0.1-alpha
 - VL.Overworld can declare VL.Mapsui like any other package instead of reaching it through
   `--package-repositories`.
 - The next release goes out with way C, written once for the family.
+
+## `0.0.3-alpha` — 2026-11-15
+
+No node changed. GeometryLayer and FeatureLayer skip empty geometries (`822d3bf`): with
+VL.NetTopologySuite 0.0.8-alpha a missing input gives an empty geometry, and Mapsui 4.1.9 reads
+an empty geometry's extent as (-1, -1)-(0, 0), stretching the layer to the mercator origin
+(measured in a probe; the test negative-tested with both filters removed). The README became the
+short vvvv-library one (`ea9cada`), the old one docs/GUIDE.md. Built, tested and packed in a git
+worktree (`vl-mapsui-wt`), because the main folder held another session's uncommitted
+`tools/Check-VvvvPackages.ps1`. Gate green: 246 tests, pack, Test-VLPackage, Test-VLPatch, 19 of
+19 patches, Test-Install with dependencies from nuget.org; the nupkg's patches byte-identical to
+the tree. **One test failed once right after the clean build and passed six reruns**: the
+wall-clock thresholds in TileCacheTests (200 / 300 ms), ScaleTests and NavigateTests meet a cold
+JIT on a busy machine; older than this release, worth widening. Merged as PR #2, the maintainer
+tagged it and uploaded in the browser; `Test-Install -Published -Version 0.0.3-alpha` green
+(both packages signed; NuGet resolves the dependency to its lowest fit, VL.NetTopologySuite
+0.0.6-alpha). Working version `0.0.4-alpha`.

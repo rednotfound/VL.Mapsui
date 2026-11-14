@@ -26,6 +26,13 @@ already made untrue.) The retired `VL.GIS` lives only on GitHub now
 still declares BruTile 6 and conflicts with this package — the README's Install section says what
 a user has to delete by hand.
 
+**2026-11-15: `0.0.3-alpha` is on nuget.org; working version `0.0.4-alpha`** (nuspec + UserAgent).
+It skips empty geometries in both layer nodes: since VL.NetTopologySuite 0.0.8-alpha a missing
+input gives an empty geometry, and Mapsui 4.1.9 reads its extent as (-1, -1)-(0, 0), which
+stretched a layer to the mercator origin. Built and packed in a git worktree beside this folder,
+because this one held another session's uncommitted work. The README is the short vvvv-library
+one; the old README is docs/GUIDE.md.
+
 **2026-11-08: `0.0.2-alpha` is on nuget.org** (browser upload; installed back with `Test-Install
 -Published -Version 0.0.2-alpha`, both packages signed, 19 of 19 compile); **working version
 `0.0.3-alpha`** (nuspec + UserAgent). No node changed in it; the help follows
