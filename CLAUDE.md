@@ -37,7 +37,7 @@ NOTES.md keeps the old name where it records what was measured then.
 
 **Current state (2026-09-26): `0.0.1-alpha` is on nuget.org — a prerelease, an early preview, not a
 stable version. The working version is `0.0.2-alpha`.** A map renders in vvvv 7.4, pans, zooms and takes geometry from
-any NTS source. **32 nodes, 262 tests.** VL.NetTopologySuite, which this package depends on, went up the
+any NTS source. **32 nodes, 283 tests.** VL.NetTopologySuite, which this package depends on, went up the
 same day, first. See "Releasing"
 below and [docs/RELEASE.md](docs/RELEASE.md). **The help is the second test suite: 20 patches (19 until 2026-11-15) in the
 community's measured style, every one of the 32 nodes opens one on F1** (`tools\Test-VLPatch.ps1`
@@ -69,6 +69,17 @@ two repositories while every guard reported success. Only an **unconnected** pin
 that can mean "the default". The cache is a value now (`TileCache` produces it, `OpenStreetMap`
 consumes it) and no patch here contains a Path IOBox. See NOTES.md, 2026-08-14, and rule 8 below.
 
+**The map is an engine out of the box (2026-11-15, the maintainer's decision; 283 tests, seen in vvvv
+with the real mouse - NOTES.md):** a map drawn by `ToSkiaLayer` answers the mouse - left drag pans,
+the wheel zooms, a left press clicks a widget. There is no default basemap (built and withdrawn the
+same day): OpenStreetMap is a layer the patch adds, and basemap and data are not separated. `ToSkiaLayer`'s `Interactive` pin switches
+that off; wiring a `Drag`, `DragBetween`, `ZoomByWheel` or `Click` node takes that one gesture over
+automatically, so no existing patch pans twice. The code and the reasoning are in
+`src\VL.Mapsui\MapInteraction.cs`; it goes through the same Navigator calls as the Navigate nodes and
+rebuilds nothing (rule 4 is untouched). **Owed: the help** - `HowTo Show a map` and `HowTo Drive the
+map with the mouse` still teach the fourteen-node way as the only way, and no patch shows
+`Interactive`.
+
 **The layers read a geometry's SRID (2026-11-15, not yet published):** 0 and 4326
 are projected, 3857 is drawn as it is, anything else is left off the layer and `Status` names the
 code. Reprojection is VL.PROJ's (`D:\2026_Projects\vl-proj`, on nuget.org since 2026-11-14) and
@@ -92,9 +103,14 @@ writing any node; the four questions at the top of it would have prevented both.
    exhausted the machine's 16,384 ephemeral ports and **took down the author's home network** —
    and the same bug is why nothing was ever drawn, since tiles arrived for maps already
    discarded.
-2. **`Enabled` is off by default** on anything that fetches. Whoever opens the patch has not
-   agreed to anything yet. OpenStreetMap runs on donated hardware and its tile policy forbids
-   bulk downloading; we send a User-Agent naming this package.
+2. **`Enabled` is ON by default on `OpenStreetMap` and `XYZ` since 2026-11-15** - the maintainer's
+   decision, reversing "off by default on anything that fetches": a tile layer placed in a patch
+   means "show me these tiles". What the old rule protected is kept by other means and must stay:
+   one tile source per node (rule 4), only drawn tiles requested, a week's disk cache, a User-Agent
+   naming this package - OpenStreetMap runs on donated hardware and its policy forbids bulk
+   downloading. **This package's help patches still ship with the toggle wired and off**
+   (`Normalize-HelpPatches` forces it): browsing help must not fetch on every F1. There is no
+   default basemap (built and withdrawn the same day): OSM is a layer the patch adds.
 3. **Never leave vvvv running unattended, and never start it in the background.** Launch, read
    the value, close. Leaks accumulate across sessions — this one grew over several. **Launch only
    through `tools\Open-HelpPatch.ps1`** — there are three package repository folders, and every
@@ -251,6 +267,7 @@ vl-mapsui/
 ├── src/VL.Mapsui/                # 32 nodes, one top-level type per file, FILE NAME = TYPE NAME (2026-10-17)
 │   │                             # node -> class -> file table: docs/ARCHITECTURE.md "Where each node lives"
 │   ├── MapNode.cs, MapInfoNodes.cs     # [ProcessNode] Map; static ViewportInfo, LayerInfo
+│   ├── MapInteraction.cs               # the built-in mouse: left drag, wheel, widget press; steps aside for wired nodes
 │   ├── PickNode.cs, ProjectNodes.cs    # [ProcessNode] Pick; static ScreenToWorld, WorldToScreen - data handed BACK
 │   ├── OpenStreetMapLayerNode.cs       # [ProcessNode] OpenStreetMap - tile layer, cache, UserAgent
 │   ├── XyzTileLayerNode.cs             # [ProcessNode] XYZ - any slippy-map URL template
@@ -273,7 +290,7 @@ vl-mapsui/
 │   ├── DebugNodes.cs, DiagnosticsLayer.cs # static DiagnosticsLayer (category Mapsui.Debug)
 │   └── PixelSpace.cs, FeatureHelper.cs, AssemblyInfo.cs # pixel/VL space bridge; NTS<->Mapsui feature helper
 ├── help/VL.Mapsui/               # Explanation + 19 HowTos + Help.xml (8 domain topics); one High flag per node
-├── test/VL.Mapsui.Tests/         # 262 xunit tests, no network, no vvvv
+├── test/VL.Mapsui.Tests/         # 283 xunit tests, no network, no vvvv
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org
 └── tools/
@@ -292,7 +309,7 @@ vl-mapsui/
 
 ## Tests
 
-`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 262 tests, about two seconds. No
+`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 283 tests, about two seconds. No
 network and no vvvv: the tile source is faked, and the geometry tests use a MemoryLayer.
 
 They exist because the expensive bug here was a **lifetime** bug, not an arithmetic one, so

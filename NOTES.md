@@ -5,6 +5,101 @@ them do not belong here.
 
 ---
 
+## 2026-11-15 — the map answers the mouse by default; the nodes are the override. A default basemap was built and withdrawn
+
+The maintainer's observation, the same day as the SRID work: the package had been built as parts,
+and people want an engine - "放一个 render 就直接加 layer", add data, override when needed. Counted
+here: a map that stands still is 6 nodes, one that pans and zooms is 14 (`Console`, `Group`,
+`MouseState`, `Vector (Split)`, `Drag`, `FrameDifference`, `ZoomByWheel`, `ZoomIn`, `ZoomOut` on
+top). Surveyed: MapLibre / Mapbox GL (`scrollZoom`, `dragPan` on unless `interactive: false`),
+OpenLayers (nine default interactions unless `interactions` is passed), deck.gl (`controller:
+true`), and in vvvv itself `SceneWindow`'s `Enable Default Camera` and `Camera [Skia]`, whose
+tooltip reads "Pan: Right drag, Zoom: Mouse wheel". `docs/RULES.md` had this down as an undecided
+tension since 2026-09-24. Decided: default on, left button, with ways out.
+
+**What was built.**
+
+- `MapsuiLayer.Notify` had returned false for everything since 2026-08. It now hands mouse
+  notifications to `MapInteraction`: left press starts a drag (a widget gets the press first), move
+  pans through `Navigator.Drag`, release or a lost mouse ends it with one discrete refresh, each
+  wheel notification is one zoom step by its sign. Nothing is marked handled, so a `Console` in
+  the same `Group` still hears the mouse and `Pick` keeps working.
+- `ToSkiaLayer` gained `Interactive` (default on).
+- **The nodes step the default aside.** `Drag`, `DragBetween`, `ZoomByWheel` and `Click` stamp the
+  map every frame they run; the built-in gesture of that kind is skipped while the stamp is younger
+  than 250 ms. Without this every patch made against 0.0.1 and 0.0.2 - where those nodes were the
+  only way - would pan twice per drag: 4 help patches here and 10 units in VL.Overworld wire them.
+- **Built, measured, then withdrawn the same day:** `Map` with `Layers` unconnected built its own
+  `OpenStreetMap` node, enabled, with the default cache. It worked (the probe below ran on it). The
+  flaw was in the rule, not the code: the basemap vanished the moment data was connected. The
+  alternatives were surveyed - ArcGIS (`basemap` beside `layers`), Leaflet's layer control (base
+  layers exclusive, overlays not) and deck.gl (the basemap is another library) separate basemap
+  from data; OpenLayers, MapLibre and Mapsui itself keep one ordered stack so data can sit between
+  roads and labels - and the maintainer chose the single stack: **OpenStreetMap is a layer the
+  patch adds, like any other, and there is no default basemap.** `MapNode` and the navigation
+  tests are back to what they were.
+
+**What the tests found.** `TileCache.Stats` kept its two-second memo in a plain static
+`Dictionary`. With several maps now reaching the default cache folder (and xunit running classes in
+parallel) it threw "a concurrent update was performed on this collection" once in the first two
+runs, while the default basemap existed. It is a `ConcurrentDictionary` now, and stays one.
+
+280 tests (262 + 18, `InteractionTests`). Negative-tested: with the stamp check returning false,
+the three step-aside tests fail.
+
+**Seen in vvvv 7.4 the same day**, with the real mouse (a script moving the cursor and pressing
+the button over the renderer; launcher, own pid, closed each time). `build.ps1`, `pack.ps1`,
+`Compile-HelpPatches` 20 of 20, `Test-VLPackage` green first.
+
+- A probe of three nodes, `Map` (nothing connected, on the default basemap that existed that
+  afternoon) → `ToSkiaLayer` (Diagnostics) → `Renderer`:
+  Kyoto on OpenStreetMap, `© OpenStreetMap contributors` bottom right, overlay `layers 1 -
+  OpenStreetMap enabled=True`, `cache on`. A left drag of 150, 60 pixels moved the centre from
+  15114706.78, 4162691.33 to 15111840.39, 4163845.05 - 2866.4 m west at 19.1093 m/px is exactly 150
+  pixels. Two wheel notches forward took the resolution from 19.1093 to 4.7773, two steps in. The
+  overlay still read `switch #1`: one layer set for the whole session, nothing rebuilt. 8 TCP
+  connections after 40 s and 8 at the end.
+- `HowTo Drive the map with the mouse`, which wires its own `Drag`: a drag of 200 pixels moved the
+  140 E meridian from x = 457 to x = 655. Once, not twice. (The parallels also shifted 10 px with
+  no vertical drag asked for; not explained, not pursued.)
+- `Explanation Overview of available nodes`, whose `Map` has nothing connected and is not drawn:
+  0 TCP connections after 35 s, the same as the tile-less patch above. (With the default basemap
+  gone this is no longer a question, but it was the answer: an undrawn map fetched nothing.)
+
+Still owed: the help. `HowTo Show a map` and `HowTo Drive the map with the mouse` teach the
+fourteen-node way as the only way, and no patch shows `Interactive`. Not tested: a widget press
+through the built-in route in vvvv (unit level only for the routing, none for a real button), a
+touchpad, and a map drawn into part of a window.
+
+### The same evening: `Enabled` is on by default
+
+With the default basemap withdrawn, the door was the `Enabled` switch again: the smallest map that
+shows anything was a tile layer plus a toggle someone had to find. The maintainer reversed "off by
+default on anything that fetches" for `OpenStreetMap` and `XYZ`. What the rule protected is kept by
+other means and stated in `docs/RULES.md` rule 10: one tile source per node, only drawn tiles, a
+week's disk cache, the User-Agent. This package's help patches keep their toggles, wired and off -
+every one of them wires `Enabled` (scanned, here and in VL.Overworld: the only unwired tile layers
+are the two in the Overview, which are not drawn) - so reading help still fetches nothing.
+
+No test depended on the old default. One went red once anyway:
+`A_hundred_frames_with_unchanged_inputs_build_one_layer` built TWO layers in one run of two.
+`TileCache.Default()` was `_default ??= Create(...)`, and the default cache is compared by
+reference as part of a layer's rebuild identity - two test classes racing through it each got
+their own instance, and the node saw "a different cache" on the next frame. It is a thread-safe
+`Lazy` now; eight consecutive runs green. Neither this nor the dictionary above could happen in a
+patch, which runs on one thread, but a test that fails one run in two is not a test.
+
+283 tests. **Seen in vvvv 7.4:** five nodes with nothing wired to `Enabled` or to the mouse -
+`OpenStreetMap` → `Cons` → `Map` → `ToSkiaLayer` → `Renderer` - draw Kyoto with its credit; a left
+drag of 150, 60 pixels moved the centre from the initial 15112968, 4161965 to 15110101.45,
+4163111.73, which is 150 and 60 pixels at 19.1093 m/px; two wheel notches gave 4.7773. 0 TCP
+connections after 40 s (the view was in the disk cache from the afternoon), 6 after moving. The
+Overview: 0 connections after 30 s. `Compile-HelpPatches` 20 of 20, `Test-VLPatch`,
+`Test-VLPackage` green. (The afternoon's probe had started 91 and 38 pixels off its initial
+centre; this one started on it. Not explained - a hand on the mouse is the likeliest cause.)
+
+---
+
 ## 2026-11-15 — the layers read the SRID: 3857 is drawn as it is, anything else is refused by name
 
 VL.PROJ went up on 2026-11-14, and with it and `SetSRID` a patch can hold geometry that is not

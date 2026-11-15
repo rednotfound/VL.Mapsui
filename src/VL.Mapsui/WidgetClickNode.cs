@@ -64,6 +64,9 @@ public class WidgetClickNode
         handled = false;
         if (map is null) return null;
 
+        // A Click node on the map owns widget presses; the built-in press steps aside.
+        MapInteraction.DrivenByPatch(map, MapInteraction.Gesture.Click);
+
         if (pressed && !_wasPressed)
             handled = WidgetInput.Route(map, new global::Mapsui.MPoint(x, y));
 

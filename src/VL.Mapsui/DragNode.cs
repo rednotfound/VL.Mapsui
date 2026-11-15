@@ -47,6 +47,10 @@ public class DragNode
     {
         if (map is null) return map!;
 
+        // Every frame, dragging or not: a Drag node on the map means the patch owns the drag, and
+        // the built-in one steps aside rather than moving the map a second time.
+        MapInteraction.DrivenByPatch(map, MapInteraction.Gesture.Drag);
+
         if (!dragging)
         {
             // Ending a gesture is worth one discrete refresh: during the drag Mapsui was asked
@@ -64,7 +68,7 @@ public class DragNode
             return map;
         }
 
-        NavigateNodes.DragBetween(map, x, y, _lastX, _lastY);
+        NavigateNodes.Pan(map, x, y, _lastX, _lastY);
         _lastX = x;
         _lastY = y;
         return map;

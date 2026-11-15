@@ -267,7 +267,7 @@ and the tests do — except `MapNodes`, which became `DebugNodes` to match its c
 | moving geometry between coordinate reference systems | **VL.PROJ** (`Reproject`, `CRS`). The layers here read the SRID and refuse what they cannot take; they never transform it |
 | file formats — GeoJSON, GeoParquet, Shapefile | focused packages of their own |
 | the UI host | **vvvv itself.** `Mapsui.UI.*` — the WPF, Avalonia, MAUI and Blazor MapControls — are not wrapped and will not be. `ToSkiaLayer` plus VL.Skia's `Renderer` is the whole of that bridge, and it is what "MapControl" means here |
-| what the mouse means | the patch. Every interaction node takes a position and a gate |
+| what the mouse means | **a default, then the patch** (2026-11-15). The map answers left drag, wheel and widget presses itself (`MapInteraction`, reached through the Skia layer's `Notify`); `ToSkiaLayer`'s `Interactive` pin switches that off, and a wired `Drag` / `ZoomByWheel` / `Click` takes its gesture over. Every interaction node still takes a position and a gate |
 
 ---
 

@@ -65,29 +65,29 @@ sealed class MapsuiLayer : ILayer, IDisposable
     // a concrete rectangle would make downstream layout try to fit it.
     public Stride.Core.Mathematics.RectangleF? Bounds => null;
 
-    /// <summary>
-    /// Notifications pass straight through.
-    /// </summary>
-    /// <remarks>
-    /// **Interaction is the patch's business, not this layer's.** An earlier version handled
-    /// drag and wheel in here, which quietly decided that the left button pans and the wheel
-    /// zooms, and left no way to drive the map from an LFO, an OSC message or a keyboard.
-    /// VL.Skia already has Mouse, MouseState and Notifications nodes; a patch reads those and
-    /// wires them to Mapsui.Navigate. That composition is the reason to reach for a patching
-    /// environment in the first place.
-    ///
-    /// Returning false leaves every notification for whatever else is in the scene graph.
-    ///
-    /// **Widgets are not an exception, and an earlier version of this made them one.** It handled a
-    /// mouse press in here and offered it to the widgets, which quietly decided that a left press
-    /// is what clicking a widget means - the same mistake as deciding that the left button pans,
-    /// one layer down. vvvv's own answer is in VL.Skia's Explanation Mouse and Keyboard: *"The
-    /// Mouse and Keyboard nodes need to be connected to the Renderer they want to interact with"*.
-    /// The mouse is a value you wire, not something a layer swallows. So a press reaches a widget
-    /// through the <c>Click</c> node, in the patch, where it is visible - and that node reports
-    /// whether a widget took it, so the patch can decide not to pan as well.
-    /// </remarks>
-    public bool Notify(INotification notification, CallerInfo caller) => false;
+    /// <summary>Whether the map answers the mouse itself: left drag pans, the wheel zooms.</summary>
+    public bool Interactive { get; set; } = true;
+
+    readonly MapInteraction _interaction = new();
+
+    // The map answers the mouse unless told not to - see MapInteraction for the decision, its date
+    // and the two ways out (the Interactive switch, and wiring a Navigate node, which makes the
+    // default step aside for that gesture).
+    //
+    // HISTORY, because this method has now been written three ways. The first version handled drag
+    // and wheel in here with no way to switch it off, which left no route for an LFO, an OSC
+    // message or a keyboard. The second (2026-08) therefore handled nothing: "interaction is the
+    // patch's business". That was the right criticism and the wrong cure - it made every patch
+    // build the floor. This version keeps the default and adds the ways out.
+    //
+    // It always returns false and marks nothing handled: a Console in the same Group still hears
+    // every notification, which is how Pick and ScreenToWorld get their mouse.
+    public bool Notify(INotification notification, CallerInfo caller)
+    {
+        if (Interactive) _interaction.Handle(_map, notification, _width, _height);
+        else _interaction.Cancel();
+        return false;
+    }
 
     public void Render(CallerInfo caller)
     {

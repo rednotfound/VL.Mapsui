@@ -19,14 +19,19 @@ namespace VL.Mapsui;
 // after. Reading them continuously would undo any navigation on the very next frame, so dragging a
 // map would be impossible.
 //
-// To move the map, use the nodes in Mapsui.Navigate. That is also where a patch wires the mouse,
-// an LFO, or anything else it wants to drive the view with.
+// The mouse moves the map once ToSkiaLayer draws it (2026-11-15, MapInteraction). The nodes in
+// Mapsui.Navigate are for moving it from the patch - an LFO, a button, or a patch's own idea of the
+// mouse.
+//
+// No default basemap. One was built on 2026-11-15 (Layers unconnected gave OpenStreetMap) and
+// withdrawn by the maintainer the same day: OpenStreetMap is a layer like any other, added by the
+// patch, and basemap and data are not two kinds of thing here. NOTES.md has what was measured.
 
 /// <summary>
 /// A map: a stack of layers, a viewport and a navigator.
 /// </summary>
 /// <remarks>
-/// Move it with the nodes in Mapsui.Navigate and draw it with ToSkiaLayer.
+/// Draw it with ToSkiaLayer; the mouse moves it, and so do the nodes in Mapsui.Navigate.
 /// The Initial pins are applied once, when the map first has a size, so they never undo navigation.
 /// </remarks>
 [ProcessNode(Name = "Map", Category = "Mapsui")]

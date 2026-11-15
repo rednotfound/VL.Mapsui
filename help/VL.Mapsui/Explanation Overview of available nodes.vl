@@ -55,7 +55,7 @@
             <Pin Id="QbJ1l9aOrRXUHmvs8MQRhE" Name="Layers Built" Kind="OutputPin" />
             <Pin Id="MjhWb38y4BLiSN9xvOlmEx" Name="Cache Status" Kind="OutputPin" />
           </Node>
-          <Pad Id="E0JIzMRBZKca12z0HnEI9X" Bounds="190,227,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; The OSM basemap. Enabled starts OFF: nothing fetches until you say so.">
+          <Pad Id="E0JIzMRBZKca12z0HnEI9X" Bounds="190,227,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; The OSM basemap. Fetches once it is drawn; Enabled switches it off.">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>

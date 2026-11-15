@@ -81,6 +81,14 @@ public static class NavigateNodes
     /// <returns>The same map.</returns>
     public static Map DragBetween(Map map, float x, float y, float previousX, float previousY)
     {
+        // Wired means the patch drags this map itself, so the built-in drag steps aside.
+        MapInteraction.DrivenByPatch(map, MapInteraction.Gesture.Drag);
+        return Pan(map, x, y, previousX, previousY);
+    }
+
+    // The move itself, without the claim - what the built-in interaction calls.
+    internal static Map Pan(Map map, float x, float y, float previousX, float previousY)
+    {
         if (x == previousX && y == previousY) return map;
 
         map.Navigator.Drag(new MPoint(x, y), new MPoint(previousX, previousY));
@@ -149,6 +157,8 @@ public static class NavigateNodes
     /// <returns>The same map.</returns>
     public static Map ZoomByWheel(Map map, float x, float y, float wheelDelta = 0f, float notchSize = 1f)
     {
+        // Stamped on every frame, wheel turning or not: the node being there is the claim.
+        MapInteraction.DrivenByPatch(map, MapInteraction.Gesture.Wheel);
         var steps = WheelSteps(wheelDelta, notchSize);
         return steps == 0 ? map : ZoomAt(map, x, y, steps);
     }

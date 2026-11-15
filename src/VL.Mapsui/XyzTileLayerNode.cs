@@ -95,14 +95,14 @@ public class XyzTileLayerNode : IDisposable
     /// Configures the XYZ tile layer.
     /// </summary>
     /// <remarks>
-    /// Enabled is off by default, so opening a patch fetches nothing until you switch it on.
+    /// Fetches as soon as it is on a map that is drawn; Enabled switches it off.
     /// A template without {x}, {y} and {z} is refused, and Cache Status says why.
     /// </remarks>
     /// <param name="layersBuilt">How many times the layer was built. It should stay at 1 until an input changes.</param>
     /// <param name="cacheStatus">The folder tiles are kept in and how much is there, or why nothing is kept.</param>
     /// <param name="urlTemplate">The tile URL with {z}, {x} and {y} placeholders.</param>
     /// <param name="attribution">The credit the tile service requires. It is printed bottom right on the map.</param>
-    /// <param name="enabled">Fetches tiles while on. Off by default.</param>
+    /// <param name="enabled">Fetches tiles while on. Off gives no layer.</param>
     /// <param name="cache">The output of a TileCache node. Unconnected uses the default folder.</param>
     /// <returns>The layer, for a Map's Layers, or nothing while Enabled is off or the template is unusable.</returns>
     public ILayer? Update(
@@ -112,7 +112,7 @@ public class XyzTileLayerNode : IDisposable
         // parameter at its capitals, and the C# name cannot carry an acronym through that.
         [Pin(Name = "URL Template")] string urlTemplate = "",
         string attribution = "",
-        bool enabled = false,
+        bool enabled = true,
         TileDiskCache? cache = null)
     {
         if (!enabled)

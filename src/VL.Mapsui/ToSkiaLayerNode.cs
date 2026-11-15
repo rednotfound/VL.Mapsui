@@ -13,7 +13,7 @@ namespace VL.Mapsui;
 // A process node because it owns a Mapsui MapRenderer, which caches what it has rasterised.
 
 /// <summary>
-/// Draws a map into VL.Skia's scene graph.
+/// Draws a map into VL.Skia's scene graph, and lets the mouse move it.
 /// </summary>
 [ProcessNode(Name = "ToSkiaLayer", Category = "Mapsui.Skia")]
 public class ToSkiaLayerNode : IDisposable
@@ -25,20 +25,23 @@ public class ToSkiaLayerNode : IDisposable
     // itself, because an unrecognised Space value is silently replaced by the default and the
     // result is indistinguishable from a broken patch.
     //
-    // This node does not handle the mouse. Interaction is the patch's business: read the mouse with
-    // VL.Skia's own nodes and drive Mapsui.Navigate with it.
+    // The map answers the mouse by default since 2026-11-15 (MapInteraction has the decision).
+    // Interactive is the pin that says no; wiring a Drag, ZoomByWheel or Click node takes that one
+    // gesture over without touching the pin.
 
     /// <summary>
     /// Configures the layer that draws the map.
     /// </summary>
     /// <remarks>
+    /// Drag with the left button to pan, turn the wheel to zoom.
+    /// A Drag, ZoomByWheel or Click node wired to the map takes that gesture over.
     /// The Renderer's Space pin does not need setting.
-    /// The mouse is not handled here: wire VL.Skia's mouse nodes to Mapsui.Navigate.
     /// </remarks>
     /// <param name="map">The map to draw.</param>
     /// <param name="diagnostics">Prints the map's viewport and layer state over it.</param>
+    /// <param name="interactive">Off makes the map ignore the mouse, to drive it entirely from the patch.</param>
     /// <returns>A layer for a Renderer.</returns>
-    public ILayer? Update(Map? map, bool diagnostics = false)
+    public ILayer? Update(Map? map, bool diagnostics = false, bool interactive = true)
     {
         if (map is null)
         {
@@ -56,6 +59,7 @@ public class ToSkiaLayerNode : IDisposable
         }
 
         _layer.Diagnostics = diagnostics;
+        _layer.Interactive = interactive;
         return _layer;
     }
 

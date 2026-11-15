@@ -132,13 +132,17 @@ static class TileCache
     /// <summary>A cache that is switched off, remembering the folder it would have used.</summary>
     public static TileDiskCache Off(string folder) => new(folder, null);
 
-    static TileDiskCache? _default;
+    // Lazy, and thread-safe on purpose (2026-11-15). The default cache is compared BY REFERENCE -
+    // it is part of a layer's rebuild identity - so two callers racing through a plain `??=` each
+    // got their own instance, the layer node saw "a different cache" on the next frame and built
+    // a second layer. One process, one default cache, whoever asks first.
+    static readonly Lazy<TileDiskCache> _default = new(() => Create(DefaultDirectory), isThreadSafe: true);
 
     /// <summary>
     /// The cache used when nothing is connected to a layer's Cache pin. Built once and handed out
     /// by reference; it is off, with a problem, if LOCALAPPDATA itself cannot be written to.
     /// </summary>
-    public static TileDiskCache Default() => _default ??= Create(DefaultDirectory);
+    public static TileDiskCache Default() => _default.Value;
 
     /// <summary>One line for a status pin: where this cache writes, or why it does not.</summary>
     public static string Describe(TileDiskCache cache)
@@ -155,7 +159,11 @@ static class TileCache
 
     static readonly Stopwatch Since = Stopwatch.StartNew();
     static readonly TimeSpan MinimumInterval = TimeSpan.FromSeconds(2);
-    static readonly Dictionary<string, (TimeSpan read, int tiles, long bytes)> Remembered =
+    // Concurrent since 2026-11-15. A patch calls this from one thread, but the test host runs
+    // classes in parallel and more than one of them reaches the default folder: a plain Dictionary
+    // written from two threads threw "a concurrent update was performed on this collection" once
+    // in two runs, the day a (since withdrawn) default basemap made that path busier.
+    static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (TimeSpan read, int tiles, long bytes)> Remembered =
         new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>

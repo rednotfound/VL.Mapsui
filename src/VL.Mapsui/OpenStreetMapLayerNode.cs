@@ -94,22 +94,35 @@ public class OpenStreetMapLayerNode : IDisposable
     // is an output pin rather than something hidden in an overlay so a patch can watch it, or act
     // on it.
 
+    // ENABLED IS ON BY DEFAULT since 2026-11-15, the maintainer's decision, reversing the rule this
+    // package was written under ("off by default on anything that fetches"). The reasoning: a tile
+    // layer placed in a patch can only mean "show me these tiles", every map library in the field
+    // fetches the moment a layer is added, and a map that draws nothing until a switch is found is
+    // the first thing a newcomer meets. What the old rule protected is kept by other means: one
+    // tile source per node however often the layer is rebuilt, only tiles that are drawn are
+    // requested, they are cached on disk for a week, and the User-Agent names this package. The
+    // 2026-08 incident was a per-frame REBUILD, which the tests still lock out; it was never the
+    // default. Nothing is requested until the layer is on a map that is drawn.
+    //
+    // This package's own help patches still ship with the toggle wired and off
+    // (Normalize-HelpPatches sets it): browsing help should not fetch on every F1.
+
     /// <summary>
     /// Configures the OpenStreetMap layer.
     /// </summary>
     /// <remarks>
-    /// Enabled is off by default, so opening a patch fetches nothing until you switch it on.
+    /// Fetches as soon as it is on a map that is drawn; Enabled switches it off.
     /// Tiles that were drawn are kept in %LOCALAPPDATA%\VL.Mapsui\tiles unless a TileCache node says otherwise.
     /// </remarks>
     /// <param name="layersBuilt">How many times the layer was built. It should stay at 1.</param>
     /// <param name="cacheStatus">The folder tiles are kept in and how much is there, or why nothing is kept.</param>
-    /// <param name="enabled">Fetches tiles while on. Off by default.</param>
+    /// <param name="enabled">Fetches tiles while on. Off gives no layer.</param>
     /// <param name="cache">The output of a TileCache node. Unconnected uses the default folder.</param>
     /// <returns>The layer, for a Map's Layers, or nothing while Enabled is off.</returns>
     public ILayer? Update(
         out int layersBuilt,
         out string cacheStatus,
-        bool enabled = false,
+        bool enabled = true,
         TileDiskCache? cache = null)
     {
         if (!enabled)

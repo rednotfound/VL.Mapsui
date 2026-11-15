@@ -64,10 +64,14 @@ transitive closure.
    so `.Result` / `.Wait()` deadlocks it — the window closes without the process exiting. Return
    `IObservable`, or wrap in `Task.Run`. Testing sync-over-async in a host without a context
    (PowerShell) proves nothing about a host that has one.
-10. **A node pointing at free public infrastructure is off by default.** Zero requests on open, a
-    disk cache, a User-Agent naming the package, and an on-screen count of what has been built.
-    OpenStreetMap's tile policy forbids bulk downloading, and whoever opens a patch has not agreed
-    to anything yet.
+10. **A node pointing at free public infrastructure asks for no more than is looked at.** A disk
+    cache, a User-Agent naming the package, one connection pool however often the layer is
+    rebuilt, only the tiles that are drawn, and an on-screen count of what has been built -
+    OpenStreetMap's tile policy forbids bulk downloading. *Until 2026-11-15 this rule also said
+    "off by default: zero requests on open".* The maintainer reversed that half for
+    `OpenStreetMap` and `XYZ`: a tile layer placed in a patch means "show me these tiles", and
+    every map library fetches when a layer is added. A package's own help patches still ship
+    with the toggle wired and off, so reading help fetches nothing.
 11. **Never leave vvvv running unattended, and never start it in the background.** Launch, read
     the value, close. Leaks accumulate across sessions.
 12. **When a node rebuilds, do not rebuild what you cannot release.** Rule 8 stops the rebuild
@@ -120,8 +124,16 @@ Measured across the 45 packs shipped with vvvv 7.4 and 17 community packages.
   `OrbitCamera [Stride]`, no mouse pin, `Initial …` pins only, a three-node help patch. The incident
   behind this rule was a node that *rebuilt the map* on movement, not one that interpreted the
   mouse, so the two claims are not the same. The wiring form costs six nodes here (measured in
-  `HowTo Drive the map with the mouse`; `docs/HELP-PATCH-PLAN.md`). Undecided; decide with that
-  number, not from this bullet.
+  `HowTo Drive the map with the mouse`; `docs/HELP-PATCH-PLAN.md`). ~~Undecided~~ **Decided
+  2026-11-15 by the maintainer: the map reads the host's mouse itself, by default, the way
+  `Camera [Skia]` and `SceneWindow`'s default camera do** - "nobody wants to build the floor; add
+  data, and override when you need to", which is also how MapLibre, OpenLayers, Leaflet and deck.gl
+  ship. So "what the mouse means" comes off the never-bundle list **as a default with two ways
+  out**: `ToSkiaLayer`'s `Interactive` pin, and wiring the Navigate node, which takes that gesture
+  over. What stays on the list is the thing the incident was actually about: **nothing a mouse does
+  may rebuild the map.** A default without a way out is still forbidden. (A default basemap was
+  built with it and withdrawn the same day: OpenStreetMap stays a layer the patch adds, and this
+  package does not separate basemap from data - half the field does, half does not; NOTES.md.)
 - **Help is the teaching surface, not a fatter node.** VL.Skia ships 4 C# static nodes and **98
   help patches**; VL.Stride ships none and 125. In libraries people learn from, help runs 16–24%
   of node count. Five prefixes, not interchangeable: `Explanation` (one per library, the front
