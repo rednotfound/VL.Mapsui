@@ -25,7 +25,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="Fg0HGyra5AuGSOVLWtFEte" Bounds="60,90,560,64" ShowValueBox="true" isIOBox="true" Value="Mapsui is a map engine: it owns its tiles, styles, labels and viewport, and draws itself. Wire layers into a MapWindow and it is on screen, moved by the mouse. Or take the parts: a Map, the Navigate nodes, ToSkiaLayer into any Renderer. Nothing here decides what the mouse means - you wire that.">
+          <Pad Id="Fg0HGyra5AuGSOVLWtFEte" Bounds="60,90,560,64" ShowValueBox="true" isIOBox="true" Value="Mapsui is a map engine: it owns its tiles, styles, labels and viewport, and draws itself. Wire layers into a MapWindow and it is on screen, moved by the mouse. Or take the parts: a Map, the Navigate nodes, ToSkiaLayer into any Renderer. The mouse works by itself; wire a Navigate node to take over.">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -742,7 +742,7 @@
             <Pin Id="M2QnoMOo4vn2RQWPsgz58q" Name="Corner" Kind="InputPin" />
             <Pin Id="Ec5c0kjUaViU4x7tWcVt0C" Name="Result" Kind="OutputPin" />
           </Node>
-          <Pad Id="Szan8S1P2ZVR1umahn4A3Q" Bounds="1150,667,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; + and - buttons. Click is what makes them work.">
+          <Pad Id="Szan8S1P2ZVR1umahn4A3Q" Bounds="1150,667,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; + and - buttons. The map presses them itself.">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -764,7 +764,7 @@
             <Pin Id="VvO5iksMTtIkpLGkswmyy6" Name="Result" Kind="OutputPin" />
             <Pin Id="ElY963JbC295f04WqtTmdi" Name="Handled" Kind="OutputPin" />
           </Node>
-          <Pad Id="VVBaMNe5ro3Jjy2SwxinnU" Bounds="1150,711,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; A press on a widget. Handled says: do not also drag.">
+          <Pad Id="VVBaMNe5ro3Jjy2SwxinnU" Bounds="1150,711,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; Hands a press over, for a patch that owns the mouse.">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -782,7 +782,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="LkBPKPZQeVbSoEGdFnZKl5" Bounds="60,922,560,60" ShowValueBox="true" isIOBox="true" Value="HowTo Show a map is the smallest complete map. The layer ladder: Geometry is a shape; FeatureLayer is a shape with attributes, which is what labels, picking and styling by a value all read.">
+          <Pad Id="LkBPKPZQeVbSoEGdFnZKl5" Bounds="60,922,560,60" ShowValueBox="true" isIOBox="true" Value="HowTo Open a map window is the smallest complete map. The layer ladder: Geometry is a shape; FeatureLayer is a shape with attributes, which is what labels, picking and styling by a value all read.">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -800,7 +800,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="StYtSDxoah9SyZbXmWVoe0" Bounds="660,922,660,96" ShowValueBox="true" isIOBox="true" Value="Geometry: VL.NetTopologySuite makes it (Point, Polygon, FromWKT) and defines Feature; this package only draws and picks them.&#xD;&#xA;Files and services: VL.GeoJSON reads the format data arrives in.&#xD;&#xA;Manners: tiles come from donated servers. Nothing fetches until Enabled is on, only drawn tiles are kept, and requests name this package.&#xD;&#xA;If Layers Built ever climbs frame after frame, close vvvv.">
+          <Pad Id="StYtSDxoah9SyZbXmWVoe0" Bounds="660,922,660,96" ShowValueBox="true" isIOBox="true" Value="Geometry: VL.NetTopologySuite makes it (Point, Polygon, FromWKT) and defines Feature; this package only draws and picks them.&#xD;&#xA;Files and services: VL.NetTopologySuite.GeoJSON reads the format data arrives in.&#xD;&#xA;Manners: tiles come from donated servers. A tile layer fetches once it is drawn, only drawn tiles are kept, and requests name this package.&#xD;&#xA;If Layers Built ever climbs frame after frame, close vvvv.">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>

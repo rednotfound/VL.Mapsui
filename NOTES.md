@@ -196,6 +196,15 @@ changed: `HowTo Draw many features`, whose `Drag` / `ZoomByWheel` chain is there
 around and is redundant now - it is the maintainer's own patch. The four patches with Navigate
 nodes in the chain and the four that read the window's mouse keep the layer form on purpose.
 
+### The map presses its own widgets - seen in vvvv with the real mouse
+
+A scratch patch: `Graticule` → `Cons` → `MapWindow`, and `MapWindow.Map` → `ZoomButtons` →
+`ScaleBar`, with no `Click` node. Both widgets are drawn, so a widget node works off `MapWindow`'s
+`Map` output. Left press on `+` followed by a drag of 150 x 60 px: the map zoomed one level (a
+degree went from 182 px to 364 px, the 20 km bar doubled) and did **not** pan - the 140 E meridian
+went from x = 504 to x = 559, where zooming about the centre puts it (558); a pan on top would
+have put it near 708. 0 TCP connections throughout.
+
 ---
 
 ## 2026-11-15 — the layers read the SRID: 3857 is drawn as it is, anything else is refused by name
