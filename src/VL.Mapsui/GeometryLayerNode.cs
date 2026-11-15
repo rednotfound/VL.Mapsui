@@ -26,6 +26,12 @@ namespace VL.Mapsui;
 // Doing it here rather than making the patch do it is the point of the node: which projection a map
 // engine happens to draw in is not a decision anyone wants to take.
 //
+// The SRID on a geometry is read, since 2026-11-15 (VL.PROJ made non-4326 geometry a thing a patch
+// can hold): 0 and 4326 are longitude and latitude and are projected, 3857 is already the map's
+// own system and is copied as it is, and anything else is NOT drawn and Status says so. It is not
+// reprojected here: that needs PROJ, and a map engine has no business requiring a native library
+// to draw a point. VL.PROJ's Reproject is one node upstream.
+//
 // A process node rather than a static method, for the usual reason - see the OpenStreetMap layer.
 // Rebuilding a layer every frame is how a map ends up refetching and re-styling sixty times a
 // second.
@@ -35,6 +41,7 @@ namespace VL.Mapsui;
 /// </summary>
 /// <remarks>
 /// Geometry is in longitude and latitude (WGS84), x first.
+/// A geometry whose SRID is 3857 is drawn as it is; any other SRID but 0 and 4326 is not drawn.
 /// </remarks>
 [ProcessNode(Name = "Geometry", Category = "Mapsui.Layers")]
 public class GeometryLayerNode : IDisposable
@@ -45,6 +52,7 @@ public class GeometryLayerNode : IDisposable
     readonly FeatureLayerNode _layer = new();
 
     Geometry[] _geometries = Array.Empty<Geometry>();
+    int[] _srids = Array.Empty<int>();
     NtsFeature[] _features = Array.Empty<NtsFeature>();
 
     /// <summary>Layers built by this node. Should settle at 1 and stay there.</summary>
@@ -68,6 +76,7 @@ public class GeometryLayerNode : IDisposable
     /// The geometries are compared by identity, so build them once rather than every frame.
     /// </remarks>
     /// <param name="layersBuilt">How many times the layer was built. It should settle at 1.</param>
+    /// <param name="status">The number of shapes, and any that are not drawn because of their SRID.</param>
     /// <param name="geometries">The shapes to draw, in longitude and latitude.</param>
     /// <param name="fillColor">Fill for polygons and points.</param>
     /// <param name="lineColor">Colour of lines and outlines.</param>
@@ -75,6 +84,7 @@ public class GeometryLayerNode : IDisposable
     /// <returns>The layer, for a Map's Layers, or nothing while there is no geometry.</returns>
     public ILayer? Update(
         out int layersBuilt,
+        out string status,
         IEnumerable<Geometry>? geometries = null,
         Color4? fillColor = null,
         Color4? lineColor = null,
@@ -86,16 +96,22 @@ public class GeometryLayerNode : IDisposable
         // hand the layer a new set every frame and rebuild it, which is the whole failure this
         // package guards against - and it would be hidden inside a convenience node, which is
         // worse than having it in the open.
-        if (!incoming.SequenceEqual(_geometries))
+        //
+        // The SRIDs are compared beside the geometries, as numbers: NTS's equality looks at
+        // coordinates only, and the same coordinates under another SRID are another place. Without
+        // this, typing a different SRID into SetSRID upstream left the old shape on the map.
+        var srids = Array.ConvertAll(incoming, g => g.SRID);
+        if (!incoming.SequenceEqual(_geometries) || !srids.SequenceEqual(_srids))
         {
             _features = incoming.Select(g => FeatureHelper.Feature(g)).ToArray();
             _geometries = incoming;
+            _srids = srids;
         }
 
-        // Status is swallowed here on purpose: this node only ever draws geometry the patch handed
-        // it as geometry, with a VectorStyle it built itself, so the mixed-style warning cannot
-        // apply. Exposing it would be a pin that always says the same thing.
-        return _layer.Update(out layersBuilt, out _, _features,
+        // Status was swallowed here until 2026-11-15, when it had only style warnings to give and
+        // this node builds its own style. A geometry in a CRS the map cannot take is a thing it can
+        // now say, and an empty map with no reason is the failure this family keeps paying for.
+        return _layer.Update(out layersBuilt, out status, _features,
             _style.Update(fillColor, lineColor, lineWidth), name: "Geometry");
     }
 
@@ -110,10 +126,29 @@ public class GeometryLayerNode : IDisposable
     internal static Geometry ToMercator(Geometry geometry)
     {
         var projected = geometry.Copy();
-        projected.Apply(new LonLatToMercator());
-        projected.GeometryChanged();
+        if (!IsWebMercator(geometry.SRID))
+        {
+            projected.Apply(new LonLatToMercator());
+            projected.GeometryChanged();
+        }
+
+        // The copy says what it is. Copy() carries the input's SRID across, and metres labelled
+        // 4326 is a lie that ToLonLat's caller would then hand back to the patch.
+        projected.SRID = WebMercator;
         return projected;
     }
+
+    internal const int Wgs84 = 4326;
+    internal const int WebMercator = 3857;
+
+    // 0 is NTS's "nobody said" (and -1 some readers' spelling of it), which every geometry had
+    // before SetSRID existed; it keeps meaning longitude and latitude, as it always did here.
+    internal static bool IsLonLat(int srid) => srid <= 0 || srid == Wgs84;
+
+    internal static bool IsWebMercator(int srid) => srid == WebMercator;
+
+    /// <summary>Whether the map can take this geometry: longitude and latitude, or its own EPSG:3857.</summary>
+    internal static bool CanDraw(Geometry geometry) => IsLonLat(geometry.SRID) || IsWebMercator(geometry.SRID);
 
     sealed class LonLatToMercator : ICoordinateSequenceFilter
     {
@@ -144,6 +179,7 @@ public class GeometryLayerNode : IDisposable
         var projected = geometry.Copy();
         projected.Apply(new MercatorToLonLat());
         projected.GeometryChanged();
+        projected.SRID = Wgs84;
         return projected;
     }
 

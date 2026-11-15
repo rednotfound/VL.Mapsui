@@ -32,6 +32,9 @@ namespace VL.Mapsui;
 // and what VL.GIS produces. Mapsui works in spherical mercator, so this projects on the way in - on
 // a copy, so the geometry the patch still holds is not silently turned into metres.
 //
+// The geometry's SRID decides what happens to it (2026-11-15, see GeometryLayerNode): 0 and 4326
+// are projected, 3857 is copied, anything else is left off the layer and named in Status.
+//
 // A process node, because a layer is a resource: rebuilding one every frame re-styles and
 // re-renders everything on it.
 
@@ -40,13 +43,15 @@ namespace VL.Mapsui;
 /// </summary>
 /// <remarks>
 /// Geometry is in longitude and latitude (WGS84), x first.
-/// Status says when the style will draw nothing for some of the features.
+/// A geometry whose SRID is 3857 is drawn as it is; any other SRID but 0 and 4326 is not drawn.
+/// Status says when some of the features will not be drawn, and why.
 /// </remarks>
 [ProcessNode(Name = "FeatureLayer", Category = "Mapsui.Layers")]
 public class FeatureLayerNode : IDisposable
 {
     MemoryLayer? _layer;
     NtsFeature[] _features = Array.Empty<NtsFeature>();
+    int[] _srids = Array.Empty<int>();
     IStyle? _style;
     string _name = string.Empty;
 
@@ -96,7 +101,13 @@ public class FeatureLayerNode : IDisposable
 
         status = Describe(incoming, wanted);
 
-        if (incoming.Length == 0)
+        // Only what the map can take goes on the layer. The rest is in Status, by name; drawing
+        // Dutch grid metres as degrees puts nothing on screen and says nothing about why.
+        var drawable = incoming;
+        if (Array.Exists(incoming, f => !GeometryLayerNode.CanDraw(f.Geometry)))
+            drawable = Array.FindAll(incoming, f => GeometryLayerNode.CanDraw(f.Geometry));
+
+        if (drawable.Length == 0)
         {
             Release();
             layersBuilt = LayersBuilt;
@@ -124,10 +135,11 @@ public class FeatureLayerNode : IDisposable
             _name = name;
         }
 
-        if (!SameFeatures(incoming, _features))
+        if (!SameFeatures(drawable, _features) || !SameSrids(drawable, _srids))
         {
-            _layer.Features = incoming.Select(ToMapsui).ToArray();
-            _features = incoming;
+            _layer.Features = drawable.Select(ToMapsui).ToArray();
+            _features = drawable;
+            _srids = Array.ConvertAll(drawable, f => f.Geometry.SRID);
             _layer.DataHasChanged();
             FeatureSetsBuilt++;
         }
@@ -169,6 +181,20 @@ public class FeatureLayerNode : IDisposable
             if (!left.EqualsExact(right)) return false;
             if (!SameAttributes(a[i].Attributes, b[i].Attributes)) return false;
         }
+
+        return true;
+    }
+
+    // The SRIDs the layer was built from, kept beside the features rather than read off them:
+    // EqualsExact does not look at the SRID, and the same coordinates mean a different place in
+    // 4326 and in 3857. Kept as numbers because a geometry is mutable - an SRID set in place on an
+    // object the layer already holds would otherwise compare equal to itself.
+    static bool SameSrids(NtsFeature[] features, int[] srids)
+    {
+        if (features.Length != srids.Length) return false;
+
+        for (var i = 0; i < features.Length; i++)
+            if (features[i].Geometry.SRID != srids[i]) return false;
 
         return true;
     }
@@ -220,6 +246,19 @@ public class FeatureLayerNode : IDisposable
 
         var shapes = features.Count(f => f.Geometry is not null && !IsPointLike(f.Geometry));
         var plural = features.Length == 1 ? "feature" : "features";
+
+        // First, because it is the most complete way to draw nothing: a geometry in a CRS the map
+        // cannot take is left off the layer whatever the style says.
+        var foreign = features.Count(f => !GeometryLayerNode.CanDraw(f.Geometry));
+        if (foreign > 0)
+        {
+            var codes = features.Where(f => !GeometryLayerNode.CanDraw(f.Geometry))
+                .Select(f => f.Geometry.SRID).Distinct().OrderBy(s => s).Select(s => $"EPSG:{s}");
+            return $"{features.Length} {plural}, but {foreign} of them "
+                 + $"{(foreign == 1 ? "is" : "are")} in {string.Join(", ", codes)} and NOT drawn. "
+                 + "The map takes longitude and latitude (SRID 4326 or 0) or EPSG:3857. "
+                 + "Reproject to 4326 first.";
+        }
 
         // A bare SymbolStyle over anything but points: the shapes are simply absent.
         if (shapes > 0 && DrawsPointsOnly(style))
@@ -341,6 +380,7 @@ public class FeatureLayerNode : IDisposable
         _layer?.Dispose();
         _layer = null;
         _features = Array.Empty<NtsFeature>();
+        _srids = Array.Empty<int>();
         _style = null;
         _name = string.Empty;
     }

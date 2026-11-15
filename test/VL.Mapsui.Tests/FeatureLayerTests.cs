@@ -357,9 +357,9 @@ public class FeatureLayerTests
         var geometry = new Geometry[] { Factory.CreatePoint(new Coordinate(139.7671, 35.6812)) };
 
         for (int frame = 0; frame < 100; frame++)
-            node.Update(out var built, geometry, lineWidth: 4f);
+            node.Update(out var built, out _, geometry, lineWidth: 4f);
 
-        var layer = node.Update(out var layersBuilt, geometry, lineWidth: 4f);
+        var layer = node.Update(out var layersBuilt, out _, geometry, lineWidth: 4f);
 
         Assert.NotNull(layer);
         Assert.Equal(1, layersBuilt);

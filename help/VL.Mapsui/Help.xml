@@ -17,6 +17,7 @@
 	</Topic>
 	<Topic title="Your data on the map">
 		<VLDocument link="HowTo Draw a geometry.vl" tags="geometry,wkt,shape,polygon,layer,colour,color,simplest,offline,graticule,nts,netTopologySuite" />
+		<VLDocument link="HowTo Draw geometry in another CRS.vl" tags="srid,crs,epsg,4326,3857,webMercator,wgs84,setSRID,reproject,proj,projection,coordinateSystem,status,notDrawn,geometry" />
 		<VLDocument link="HowTo Draw your own shapes.vl" tags="feature,featureLayer,vectorStyle,attributes,dictionary,add,geometry,wkt,polygon,nts,netTopologySuite,status" />
 		<VLDocument link="HowTo Label your data.vl" tags="label,labelStyle,text,attribute,attributes,dictionary,feature,style,halo" />
 		<VLDocument link="HowTo Draw many features.vl" tags="record,class,type,many,thousand,scale,spread,instance,feature,create,performance,symbol,marker,point,symbolStyle,label,forEach,pad" />

@@ -2,7 +2,7 @@
 <Document xmlns:p="property" xmlns:r="reflection" Id="BvdDyvQbtDwmsbeGQGACZQ" LanguageVersion="2025.7.4" Version="0.128">
   <NugetDependency Id="BxkD8Tol8FyXQE3QWwjq6C" Location="VL.CoreLib" Version="2025.7.4" />
   <NugetDependency Id="I0XP8ur8lBiv6AVBhP3Dbd" Location="VL.Skia" Version="2025.7.4" />
-  <NugetDependency Id="Q7O5PriJx1o5hm5F6RI7Az" Location="VL.NetTopologySuite" Version="0.0.6-alpha" />
+  <NugetDependency Id="Q7O5PriJx1o5hm5F6RI7Az" Location="VL.NetTopologySuite" Version="0.0.8-alpha" />
   <Patch Id="Kon3lKnlUD4eueDd5QAkGH">
     <Canvas Id="OMIjsG9587igyM284yR2DF" DefaultCategory="Main" BordersChecked="false" CanvasType="FullCategory" />
     <!--

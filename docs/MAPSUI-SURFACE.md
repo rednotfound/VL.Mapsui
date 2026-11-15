@@ -401,9 +401,16 @@ returns the topmost; the rest is one pin away the day something needs it.
 ### Projection — used internally, not exposed
 
 `SphericalMercator`, `Projection`, `ProjectionDefaults`, `CrsHelper`, `CrsIdentifier`, `Mercator`.
-We call `SphericalMercator.FromLonLat` in three places. Whether any of this should become nodes is
-a boundary question with VL.GIS, which already wraps ProjNet for reprojection — see
-`docs/RULES.md` on bundling, and VL.GIS's `docs/DESIGN.md` on the division of labour.
+We call `SphericalMercator.FromLonLat` / `ToLonLat` wherever degrees meet the map, and that is the
+whole of it. **None of this becomes nodes: reprojection belongs to VL.PROJ** (`Reproject`, `CRS`;
+PROJ 9.5 with the EPSG database, on nuget.org since 2026-11-14), which replaced the retired
+VL.GIS and its ProjNet wrapper. Mapsui's own `Projection` knows spherical mercator and nothing
+else, so wrapping it would give a second, weaker `Reproject`.
+
+What this package does with a CRS is read it: `Geometry` and `FeatureLayer` look at each
+geometry's SRID, project 0 and 4326, take 3857 as it is, and leave anything else off the layer
+with `Status` saying which code and what to do. See `docs/ARCHITECTURE.md`, "The CRS travels on
+the geometry".
 
 ### Animation, fetching, rendering internals
 

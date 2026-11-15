@@ -5,7 +5,7 @@
     <!-- The WORKING version: always one ahead of what is on nuget.org (0.0.2-alpha, 2026-11-08), so a
          local repack can never be mistaken for the published package in a NuGet cache. Managed in
          step with VL.NetTopologySuite; the dependency below is the oldest PUBLISHED version of it
-         that this package's help works with (0.0.6-alpha: FromWKT), never its working version. -->
+         that this package's help works with (0.0.8-alpha: SetSRID, which the help uses since 2026-11-15; FromWKT came in 0.0.6), never its working version. -->
     <version>0.0.3-alpha</version>
     <title>VL.Mapsui — Mapsui map engine nodes for vvvv gamma</title>
     <authors>VL.Mapsui Contributors</authors>
@@ -32,7 +32,7 @@
       service, VL.NetTopologySuite, a ForEach over a record of your own - never has to know that
       Mapsui will draw it.
 
-      32 nodes and 19 help patches, from the smallest working map to styling by a value; every
+      32 nodes and 20 help patches, from the smallest working map to styling by a value; every
       node opens one on F1.
 
       The node surface can still change between prereleases, and Mapsui's editing and WMS/WFS
@@ -41,7 +41,11 @@
     </description>
     <summary>Mapsui map engine as composable nodes for vvvv gamma.</summary>
     <releaseNotes>
-      0.0.3-alpha - In development, not published.
+      0.0.3-alpha - In development, not published. Geometry and FeatureLayer read each geometry's
+      SRID: 0 and 4326 are longitude and latitude as before, 3857 is drawn as it is, and any other
+      is not drawn - Status names the code and says to Reproject (VL.PROJ) to 4326 first. Geometry
+      has a new Status output. What Pick hands back is labelled SRID 4326. New help patch: HowTo Draw
+      geometry in another CRS (20 patches). Requires VL.NetTopologySuite 0.0.8-alpha, for SetSRID.
 
       0.0.2-alpha (2026-11-08) - No node added, removed or changed; 32 nodes. Every node's tooltip
       is now short: a one-line summary, a sentence of usage and a line per pin. The help follows
@@ -86,7 +90,7 @@
           VL dependency at all and its help uses VL.Stride) because everything there ships inside
           vvvv and is therefore always present. Nothing guarantees that for us.
         -->
-        <dependency id="VL.NetTopologySuite"   version="0.0.6-alpha" />
+        <dependency id="VL.NetTopologySuite"   version="0.0.8-alpha" />
         <dependency id="Mapsui.Rendering.Skia" version="4.1.9" />
       </group>
     </dependencies>

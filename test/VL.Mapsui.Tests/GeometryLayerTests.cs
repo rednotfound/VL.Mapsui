@@ -108,7 +108,7 @@ public class GeometryLayerTests
         var geometries = new Geometry[] { Tokyo().Buffer(0.002) };
 
         for (int frame = 0; frame < 100; frame++)
-            node.Update(out _, geometries);
+            node.Update(out _, out _, geometries);
 
         Assert.Equal(1, node.LayersBuilt);
     }
@@ -119,9 +119,9 @@ public class GeometryLayerTests
         using var node = new GeometryLayerNode();
         var geometries = new Geometry[] { Tokyo() };
 
-        var first = node.Update(out _, geometries);
+        var first = node.Update(out _, out _, geometries);
         for (int frame = 0; frame < 10; frame++)
-            Assert.Same(first, node.Update(out _, geometries));
+            Assert.Same(first, node.Update(out _, out _, geometries));
     }
 
     [Fact]
@@ -131,8 +131,8 @@ public class GeometryLayerTests
         // its layer list.
         using var node = new GeometryLayerNode();
 
-        Assert.Null(node.Update(out _, null));
-        Assert.Null(node.Update(out _, Array.Empty<Geometry>()));
+        Assert.Null(node.Update(out _, out _, null));
+        Assert.Null(node.Update(out _, out _, Array.Empty<Geometry>()));
         Assert.Equal(0, node.LayersBuilt);
     }
 
@@ -157,9 +157,9 @@ public class GeometryLayerTests
         // a Map compares, and handing out a new one made the whole map flicker.
         using var node = new GeometryLayerNode();
 
-        for (int frame = 0; frame < 5; frame++) node.Update(out _, new Geometry[] { Tokyo() });
+        for (int frame = 0; frame < 5; frame++) node.Update(out _, out _, new Geometry[] { Tokyo() });
         for (int frame = 0; frame < 5; frame++)
-            node.Update(out _, new Geometry[] { Factory.CreatePoint(new Coordinate(1, 1)) });
+            node.Update(out _, out _, new Geometry[] { Factory.CreatePoint(new Coordinate(1, 1)) });
 
         Assert.Equal(1, node.LayersBuilt);        // one layer, kept
         Assert.Equal(2, node.FeatureSetsBuilt);   // two distinct shapes, two replacements
@@ -174,10 +174,10 @@ public class GeometryLayerTests
         using var node = new GeometryLayerNode();
         var geometries = new Geometry[] { Tokyo() };
 
-        var first = node.Update(out _, geometries);
+        var first = node.Update(out _, out _, geometries);
         var firstStyle = ((global::Mapsui.Layers.MemoryLayer)first!).Style;
 
-        var second = node.Update(out _, geometries, fillColor: new Color4(0f, 1f, 0f, 1f));
+        var second = node.Update(out _, out _, geometries, fillColor: new Color4(0f, 1f, 0f, 1f));
 
         Assert.Same(first, second);                                                   // same layer
         Assert.NotSame(firstStyle, ((global::Mapsui.Layers.MemoryLayer)second!).Style); // new style on it
@@ -190,7 +190,7 @@ public class GeometryLayerTests
         // VL hands out nulls where a node upstream had nothing to give.
         using var node = new GeometryLayerNode();
 
-        var layer = node.Update(out _, new Geometry?[] { null, Tokyo() }!);
+        var layer = node.Update(out _, out _, new Geometry?[] { null, Tokyo() }!);
 
         Assert.NotNull(layer);
     }
@@ -199,7 +199,7 @@ public class GeometryLayerTests
     public void Dispose_is_safe_to_call_twice()
     {
         var node = new GeometryLayerNode();
-        node.Update(out _, new Geometry[] { Tokyo() });
+        node.Update(out _, out _, new Geometry[] { Tokyo() });
 
         node.Dispose();
         node.Dispose();

@@ -5,6 +5,68 @@ them do not belong here.
 
 ---
 
+## 2026-11-15 — the layers read the SRID: 3857 is drawn as it is, anything else is refused by name
+
+VL.PROJ went up on 2026-11-14, and with it and `SetSRID` a patch can hold geometry that is not
+longitude and latitude. Nothing under `src\` read `SRID` (grep: no match), so a geometry on the
+Dutch grid wired straight into `Geometry` or `FeatureLayer` was projected as if 85065 were a
+longitude. Not measured in vvvv what that drew; read from the code, it could only be nothing or
+nonsense, and no pin said why.
+
+Now, per geometry: SRID 0 (or -1) and 4326 are projected as before; 3857 is copied without
+projecting; any other SRID is left off the layer and `Status` reads, for example, `4 features, but
+3 of them are in EPSG:2263, EPSG:28992 and NOT drawn. The map takes longitude and latitude (SRID
+4326 or 0) or EPSG:3857. Reproject to 4326 first.` When nothing is left to draw the node gives no
+layer, as it does for no features. `Geometry` gained a `Status` output for this (it had none:
+the only warnings were about styles, and it builds its own). Nothing is reprojected here and
+VL.PROJ is not a dependency.
+
+Three things that would have been wrong without a test each:
+
+- **`EqualsExact` does not compare the SRID.** The same two numbers are a different place in 4326
+  and in 3857, so changing only the SRID would have kept the old shape on screen. The layer keeps
+  the SRIDs it was built from as integers, beside the features - integers, because a geometry is
+  mutable and an SRID set in place on an object the layer already holds compares equal to itself.
+- **`Copy()` carries the SRID across**, so the internal mercator copy of a 4326 geometry was
+  labelled 4326, and `Pick` handed back whatever label the input had: 0 for most data, and for a
+  3857 input it would have been degrees labelled 3857. The mercator copy is now labelled 3857 and
+  what `Pick` returns is labelled 4326. That is a change for unlabelled input (0 became 4326); it
+  is what the coordinates are, and VL.PROJ's `Reproject` refuses 0.
+- A foreign-CRS feature arriving as a new object every frame builds nothing, a hundred frames
+  running.
+
+261 tests (245 + 16, `SridTests`). Negative-tested: with `CanDraw` returning true and
+`IsWebMercator` false, 10 of the 16 fail. `build.ps1`, `pack.ps1`, `Compile-HelpPatches` (19 of 19,
+every process node in Create) and `Test-VLPackage` pass.
+
+### Later the same day: the help, and a hole the help would have fallen into
+
+Writing the patch found what the tests had not: **`Geometry` itself did not notice an SRID that
+changed under the same coordinates.** It keeps its features while the geometry set compares equal,
+`SequenceEqual` on NTS geometry is `EqualsExact`, and that ignores the SRID - so `FeatureLayer` was
+handed the same feature objects and had nothing to compare. The first tests changed the coordinates
+together with the SRID and passed. Typing another number into `SetSRID` in a patch is exactly the
+other case. The node now compares the SRIDs beside the geometries; one more test, 262.
+
+- `HowTo Draw a geometry` (the F1 page of `Geometry`): a `Status` readout under the new pin, in the
+  arrangement the maintainer gave `HowTo Draw your own shapes` (Status under the right pin, Layers
+  Built under the middle one); everything below moved down 40 px, nothing else touched.
+- **New: `HowTo Draw geometry in another CRS`**, three cells - 4326, 3857, 28992 - each with its
+  own WKT, `SetSRID`, layer and `Status`. No VL.PROJ in it, so it may live here.
+- `SetSRID` arrived in VL.NetTopologySuite 0.0.7, so the nuspec and all 11 patches that name the
+  package now ask for **0.0.8-alpha** (was 0.0.6-alpha).
+
+**Seen in vvvv 7.4** (launcher, own pid, closed each time, Normalize after): the 4326 square and the
+3857 square stand side by side on the same parallels between 34.98 and 34.99, which a
+double-projected or unprojected 3857 square could not do; the third cell draws nothing and its
+readout says `1 feature, but 1 of them is in EPSG:28992 and NOT drawn. ...`; `Draw a geometry` reads
+`1 feature` and Layers Built 1. `Compile-HelpPatches` 20 of 20, generated C# read: `SetSRID` takes
+both pads, each `Status` reaches its pad. `Test-VLPatch` (32 of 32 on F1) and `Test-VLPackage` pass.
+A readout whose stringtype is `Comment` wraps a long sentence; the editor draws no label for it.
+Not done: typing a different SRID into a box by hand, in vvvv.
+
+---
+
 ## 2026-10-18 — node documentation is a tooltip, so it is now written as one
 
 vvvv shows every public member's `///` on hover and in the NodeBrowser. Ours carried the design

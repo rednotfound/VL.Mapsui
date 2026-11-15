@@ -118,8 +118,21 @@ compiles them all as a standing integration test.
 what VL.NetTopologySuite and VL.NetTopologySuite.GeoJSON produce. Mapsui draws in spherical mercator, so the adapter projects on the way in, on
 a copy. Which projection an engine happens to draw in is not a decision anyone wants to take.
 
-**A CRS is an identifier** (`"EPSG:3857"`), which is what Mapsui itself uses. No universal CRS
-object is invented here.
+**The CRS travels on the geometry, as its SRID, and the layers read it** (since 2026-11-15; the
+family's rule, set by `SetSRID` in VL.NetTopologySuite and `Reproject` in VL.PROJ):
+
+| SRID | what `Geometry` and `FeatureLayer` do |
+|---|---|
+| 0 (unset) or 4326 | longitude and latitude: projected, as always |
+| 3857 | already the map's own system: copied as it is |
+| anything else | **not drawn**, and `Status` names the code and says to `Reproject` to 4326 |
+
+Nothing is reprojected here. That takes PROJ, which is VL.PROJ's, one node upstream; this package
+does not depend on it and will not, because a map engine has no business requiring a native
+library. What is handed back out (`Pick`) is always longitude and latitude and is labelled 4326.
+
+No universal CRS object is invented here: an SRID is an integer, and Mapsui's own identifier is the
+string `"EPSG:3857"`.
 
 ---
 
@@ -250,9 +263,9 @@ and the tests do — except `MapNodes`, which became `DebugNodes` to match its c
 
 | | belongs to |
 |---|---|
-| geometry processing — buffer, intersect, reproject | NTS, and packages wrapping it |
+| geometry processing — buffer, intersect | NTS, and VL.NetTopologySuite wrapping it |
+| moving geometry between coordinate reference systems | **VL.PROJ** (`Reproject`, `CRS`). The layers here read the SRID and refuse what they cannot take; they never transform it |
 | file formats — GeoJSON, GeoParquet, Shapefile | focused packages of their own |
-| projection infrastructure beyond an identifier | a ProjNet-shaped package |
 | the UI host | **vvvv itself.** `Mapsui.UI.*` — the WPF, Avalonia, MAUI and Blazor MapControls — are not wrapped and will not be. `ToSkiaLayer` plus VL.Skia's `Renderer` is the whole of that bridge, and it is what "MapControl" means here |
 | what the mouse means | the patch. Every interaction node takes a position and a gate |
 

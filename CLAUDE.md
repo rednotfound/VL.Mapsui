@@ -37,9 +37,9 @@ NOTES.md keeps the old name where it records what was measured then.
 
 **Current state (2026-09-26): `0.0.1-alpha` is on nuget.org — a prerelease, an early preview, not a
 stable version. The working version is `0.0.2-alpha`.** A map renders in vvvv 7.4, pans, zooms and takes geometry from
-any NTS source. **32 nodes, 245 tests.** VL.NetTopologySuite, which this package depends on, went up the
+any NTS source. **32 nodes, 262 tests.** VL.NetTopologySuite, which this package depends on, went up the
 same day, first. See "Releasing"
-below and [docs/RELEASE.md](docs/RELEASE.md). **The help is the second test suite: 19 patches in the
+below and [docs/RELEASE.md](docs/RELEASE.md). **The help is the second test suite: 20 patches (19 until 2026-11-15) in the
 community's measured style, every one of the 32 nodes opens one on F1** (`tools\Test-VLPatch.ps1`
 audits the flags), all 19 compile with every process node constructed in `Create`
 (`tools\Compile-HelpPatches.ps1` reads the generated C#), and every one was hand-arranged by the
@@ -68,6 +68,14 @@ document's own folder — so the layer was handed a perfectly good folder and wr
 two repositories while every guard reported success. Only an **unconnected** pin produces the `null`
 that can mean "the default". The cache is a value now (`TileCache` produces it, `OpenStreetMap`
 consumes it) and no patch here contains a Path IOBox. See NOTES.md, 2026-08-14, and rule 8 below.
+
+**The layers read a geometry's SRID (2026-11-15, not yet published):** 0 and 4326
+are projected, 3857 is drawn as it is, anything else is left off the layer and `Status` names the
+code. Reprojection is VL.PROJ's (`D:\2026_Projects\vl-proj`, on nuget.org since 2026-11-14) and
+this package does not depend on it. `Geometry` gained a `Status` output, wired in `HowTo Draw a
+geometry`; the new `HowTo Draw geometry in another CRS` shows all three cases with `SetSRID`, which
+is why the nuspec and every patch now ask for **VL.NetTopologySuite 0.0.8-alpha**. Both patches were
+opened and photographed in vvvv that day; the maintainer has not arranged the new one yet.
 
 Measurements and their dates live in [NOTES.md](NOTES.md). Claims without a measurement behind
 them do not belong there or here.
@@ -237,7 +245,7 @@ vl-mapsui/
 ├── docs/HELP-PATCH-PLAN.md       # the 2026-09-24 help campaign: decisions, gate, what the patches found
 ├── docs/RELEASE.md               # the release checklist: what each step proves, where it stands
 ├── docs/READING-GUIDE.zh.md      # the maintainer's guide in Chinese, C# explained through JS; keep file names in it current
-├── docs/NODE-READING.zh.html     # its sequel: seven nodes read line by line; quotes source WITH LINE NUMBERS as of 6e5f8b2
+├── docs/NODE-READING.zh.html     # its sequel: seven nodes read line by line; quotes source WITH LINE NUMBERS as of 6e5f8b2 (FeatureLayer/Geometry moved on 2026-11-15)
 ├── LICENSE, .gitattributes       # MIT; .vl and Help.xml bytes pinned (-text)
 ├── VL.Mapsui.vl / .nuspec        # the package. .vl is hand-edited but never regenerated
 ├── src/VL.Mapsui/                # 32 nodes, one top-level type per file, FILE NAME = TYPE NAME (2026-10-17)
@@ -264,8 +272,8 @@ vl-mapsui/
 │   ├── ToSkiaLayerNode.cs, MapsuiLayer.cs # [ProcessNode] ToSkiaLayer; the VL.Skia.ILayer that draws, + overlay
 │   ├── DebugNodes.cs, DiagnosticsLayer.cs # static DiagnosticsLayer (category Mapsui.Debug)
 │   └── PixelSpace.cs, FeatureHelper.cs, AssemblyInfo.cs # pixel/VL space bridge; NTS<->Mapsui feature helper
-├── help/VL.Mapsui/               # Explanation + 18 HowTos + Help.xml (8 domain topics); one High flag per node
-├── test/VL.Mapsui.Tests/         # 245 xunit tests, no network, no vvvv
+├── help/VL.Mapsui/               # Explanation + 19 HowTos + Help.xml (8 domain topics); one High flag per node
+├── test/VL.Mapsui.Tests/         # 262 xunit tests, no network, no vvvv
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org
 └── tools/
@@ -284,7 +292,7 @@ vl-mapsui/
 
 ## Tests
 
-`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 245 tests, about two seconds. No
+`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 262 tests, about two seconds. No
 network and no vvvv: the tile source is faked, and the geometry tests use a MemoryLayer.
 
 They exist because the expensive bug here was a **lifetime** bug, not an arithmetic one, so
