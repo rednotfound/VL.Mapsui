@@ -8,8 +8,8 @@
          that this package's help works with (0.0.6-alpha: FromWKT), never its working version. -->
     <version>0.0.4-alpha</version>
     <title>VL.Mapsui — Mapsui map engine nodes for vvvv gamma</title>
-    <authors>VL.Mapsui Contributors</authors>
-    <owners>VL.Mapsui Contributors</owners>
+    <authors>red</authors>
+    <owners>red</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <projectUrl>https://github.com/rednotfound/VL.Mapsui</projectUrl>
