@@ -130,6 +130,72 @@ says "nothing in VL.Mapsui decides what the mouse means".
 Not verified: a Skia or ImGui control drawn over the map keeping its own clicks (unit level only);
 `MapWindow`'s optional `Bounds` pin; two `MapWindow`s in one patch.
 
+### UI drawn over the map: the claim was wrong, and one wire fixes it
+
+The interaction code skipped "a press something else already handled" and the notes above called
+that the protection for a control drawn over the map. Verified in vvvv instead of believed, with a
+shipped ImGui help patch (`Explanation Binding a Data to UI`: a float slider) grouped OVER
+`OpenStreetMap` → `Map` → `ToSkiaLayer` in one Renderer, and the real mouse:
+
+| | slider | map centre |
+|---|---|---|
+| drag starting on the slider | 0.500 → 0.769 | 15112967.84, 4161965.18 → **15110101.45, 4163111.73** - panned by the whole drag |
+| the same, with `IsAnyItemHovered` → `NOT` → `Interactive` | 0.500 → 0.769 | unchanged |
+| drag on open map, same wiring | 0.500 | → 15110101.45, 4163111.73 |
+
+Why, read from VL.StandardLibs' source: `Group.Notify` asks `Input 2` first and returns at once if
+it says true, otherwise the lower input; VL.ImGui's `ToSkiaLayer.Notify` feeds ImGui and returns
+false unless one of its own inner Skia layers says true - it never consults `WantCaptureMouse`;
+and `SkiaRenderer.OnNotification` does `n.Handled = Input.Notify(...)`, so `Handled` is written
+after every layer has already been asked. The check on `Handled` in `MapInteraction` therefore
+never fires in a Skia Renderer. It stays (harmless, right for a host that sets it); the comments,
+the test's name and CLAUDE.md now say what is true.
+
+The cure is not ours to build in: the map cannot see into ImGui, and vvvv's answer is ImGui's own
+query nodes. That is the use the `Interactive` pin turned out to have. An ordinary Skia layer that
+returns true from `Notify` already keeps its events - `Group` never passes them down.
+
+Not done: a help patch showing it. Not tested: `IsWindowHovered` (true everywhere while ImGui's
+fullscreen window is on, by its own help's note), a control that becomes active without being
+hovered first, touch.
+
+### The help follows: MapWindow is the host, and a lesson on UI over the map
+
+The maintainer asked for the help to be brought up to date in bulk. Surveyed first (a script over
+all 21 patches: nodes, what feeds `ToSkiaLayer` and the `Renderer`, which notes mention the host or
+the mouse), then:
+
+- **Nine hosts converted in place** to `MapWindow`: `Cache tiles`, `Draw a geometry`, `Draw geometry
+  in another CRS`, `Draw your own shapes`, `Label your data`, `Stack several layers`, `Style by a
+  value`, `Style mixed geometry`, `Use any tile service`. The converter refuses anything but the
+  plain chain (one consumer of `Map.Result`, one of `ToSkiaLayer.Result`, no other link touching
+  either node, no setting on `ToSkiaLayer`), keeps the window's `Bounds`, then checks the XML
+  parse, id uniqueness and dangling link ends. 352 lines went, 48 came.
+- It refused one for a reason of its own making: **`HowTo Draw geometry in another CRS` had bare LF
+  line endings** - 372 of them, since the `sed -i` that pinned its dependency that morning. Every
+  other `.vl` here is CRLF. Restored, then converted. A scan now shows no bare LF in any patch.
+- `Explanation Overview`: `MapWindow` first under "Mapsui - the map itself" (the four nodes below
+  it moved down 44 px), and the opening sentence names both forms.
+- Six sentences corrected in `Show a map` (a stray "' job" left by the earlier edit), `Add widgets`
+  (the buttons work by themselves; `Click` is for a patch that owns the mouse), `Set the view` and
+  `Show a layer only at some zooms` (a Navigate node wired every frame pins the view against the
+  mouse as well).
+- **New `HowTo Put UI over the map`**: `Graticule` → `Map` → `ToSkiaLayer` grouped under an ImGui
+  region with a slider; `IsAnyItemHovered` → `NOT` → `Interactive`. `Test-VLPackage` now lets a
+  help patch name `VL.ImGui` / `VL.ImGui.Skia`, which ship inside vvvv as VL.Skia does.
+
+Checked: `Test-VLPatch` 23 documents, 33 of 33 on F1; `Compile-HelpPatches` 22 of 22;
+`Test-VLPackage`; generated C# of the new patch read. **In vvvv 7.4:** `Style by a value` after
+conversion - a window titled `Map`, the four squares on the ramp, its layout untouched; the
+Overview opens; in `Put UI over the map`, dragging the slider took it from 0.000 to 0.509 with the
+139.5 E meridian still at x = 304, and dragging open map by 200 px took that meridian to x = 504
+with the slider still at 0.000.
+
+Not opened in vvvv after conversion: the other eight converted patches (compiled only). Not
+changed: `HowTo Draw many features`, whose `Drag` / `ZoomByWheel` chain is there only to move
+around and is redundant now - it is the maintainer's own patch. The four patches with Navigate
+nodes in the chain and the four that read the window's mouse keep the layer form on purpose.
+
 ---
 
 ## 2026-11-15 — the layers read the SRID: 3857 is drawn as it is, anything else is refused by name

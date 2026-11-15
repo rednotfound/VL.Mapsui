@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document xmlns:p="property" xmlns:r="reflection" Id="C0lZMYEZASazGk0pPvbEW5" LanguageVersion="2025.7.4" Version="0.128">
+  <NugetDependency Id="As2nCJcGGs2qH31EbDk8pW" Location="VL.CoreLib" Version="2025.7.4" />
+  <NugetDependency Id="OZZ4pSKis7ihglvyEuP1HX" Location="VL.Skia" Version="2025.7.4" />
+  <NugetDependency Id="QubWZZLGaDl4zj89zQ2C5w" Location="VL.ImGui.Skia" Version="2025.7.4" />
+  <Patch Id="DKZMgG4KABnEe1kbmlIcL3">
+    <Canvas Id="SkNsTjK1bEKUsGjTZ4mM9e" DefaultCategory="Main" BordersChecked="false" CanvasType="FullCategory" />
+    <!--
+
+    ************************ Application ************************
+
+-->
+    <Node Name="Application" Bounds="100,100" Id="ODtWB6xXvMgxJ3OgiT8rDd">
+      <p:NodeReference>
+        <Choice Kind="ContainerDefinition" Name="Process" />
+        <CategoryReference Kind="Category" Name="Primitive" />
+      </p:NodeReference>
+      <Patch Id="EQAqzhRBXWjOmhmliBgkJS">
+        <Canvas Id="CIsXqTyFEPCm98TvUb954c" CanvasType="Group">
+          <Pad Id="Tk3gjRyr6kGUoox9c5GWpJ" Bounds="60,40,330,41" ShowValueBox="true" isIOBox="true" Value="Put UI over the map!">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">20</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="PysNTWjurgMeeFHCfjzj3C" Bounds="60,90,600,64" ShowValueBox="true" isIOBox="true" Value="A map is a Skia layer, so other things can share its window: Group it with ImGui, shapes or text. One wire keeps the map still while the mouse is on a control - without it, dragging the slider pans the map too.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Node Bounds="60,200,110,19" Id="VZSM1wUsXqakUupyHhUEcY">
+            <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Graticule" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="JeFCFV1DnaF8nWDRlzO1dL" Name="Result" Kind="OutputPin" />
+            <Pin Id="LcE691mEbXSlMICfckUKgy" Name="Lines Built" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,250,39,19" Id="G5E9GoPo7SWYieogtty870">
+            <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Cons" />
+              <CategoryReference Kind="RecordType" Name="Spread" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="PZQry6lj8IhUNdGCZeHF7p" Name="Input" Kind="InputPin" />
+            <Pin Id="Nqfi2S3YPXDAAHMsLFNCSS" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,300,110,19" Id="U8CX5TYEX2LhrkkBbBZUsZ">
+            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Map" />
+              <PinReference Kind="InputPin" Name="Initial Center Latitude" />
+              <PinReference Kind="InputPin" Name="Initial Center Longitude" />
+              <PinReference Kind="InputPin" Name="Initial Zoom Level" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="AAAX7GqbniwPBzApC3l2kD" Name="Layers" Kind="InputPin" />
+            <Pin Id="FQJAOji8VzZnnzC3cqXrKU" Name="Initial Center Longitude" Kind="InputPin" DefaultValue="139.7">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Float64" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="QJXBgKAQ4RQIvmSiqvalhH" Name="Initial Center Latitude" Kind="InputPin" DefaultValue="35.68">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Float64" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="AndtlBfpoL2HurGvpCuIEv" Name="Initial Zoom Level" Kind="InputPin" DefaultValue="10">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Integer32" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="RzZn3VWvT2vQzheXMsqQV6" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,440,130,19" Id="GT1VxernOVDhIxznRymt4u">
+            <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="Ao8gG5Zk6NtkhxyKh9KJjU" Name="Map" Kind="InputPin" />
+            <Pin Id="UYZCEs8o1KnJfjn94g3wlH" Name="Interactive" Kind="InputPin" />
+            <Pin Id="VytThOK6Olfe8VqiGhF9aA" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="300,200,250,150" Id="MOiOoHGc4lC6KZgxqypLOj">
+            <p:NodeReference LastCategoryFullName="Graphics.Skia.Layer" LastDependency="VL.ImGui.Skia.vl">
+              <Choice Kind="StatefulRegion" Name="Region (Stateful)" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="ImGui" />
+            </p:NodeReference>
+            <Patch Id="JFa99lTZBKkeuBqEHdbkf3" ManuallySortedPins="true">
+              <Patch Id="Jp00lrXWkvoQTQPsaBLj8y" Name="Create" ManuallySortedPins="true" />
+              <Patch Id="QryzMLCzYhCb9jPPZsGWTa" Name="Update" ManuallySortedPins="true" />
+              <Node Bounds="320,235,145,19" Id="DPTnhqPLZQlZGRTX1OKp53">
+                <p:NodeReference LastCategoryFullName="ImGui.Widgets" LastDependency="VL.ImGUI.Nodes">
+                  <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+                  <Choice Kind="ProcessNode" Name="Slider (Float)" />
+                  <CategoryReference Kind="Category" Name="Widgets" NeedsToBeDirectParent="true" />
+                </p:NodeReference>
+              </Node>
+              <Node Bounds="320,295,110,19" Id="SCYprVFdiiMsvej8nOukWY">
+                <p:NodeReference LastCategoryFullName="ImGui.Queries" LastDependency="VL.ImGui.Skia.vl">
+                  <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+                  <Choice Kind="ProcessNode" Name="IsAnyItemHovered" />
+                </p:NodeReference>
+                <Pin Id="B3NLpBp0cxudKBXLaUvU4g" Name="Value" Kind="OutputPin" />
+              </Node>
+              <Patch Id="SgcJ2RCt5Wf9ULjctigGLS" Name="Dispose" />
+            </Patch>
+            <ControlPoint Id="SsWW3cF2OC6ejqKtoLOKsw" Bounds="425,343" Alignment="Bottom" />
+            <Pin Id="IYhZLNhooqbyJP2YxrXj87" Name="Output" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="185,395,37,19" Id="VDLKotnRnxh3kdA1MnMWTN">
+            <p:NodeReference LastCategoryFullName="Primitive.Boolean" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="NOT" />
+            </p:NodeReference>
+            <Pin Id="NzvQS8h7ecTHFAH8eIR16q" Name="Input" Kind="StateInputPin" />
+            <Pin Id="N0P3Flm3jeLZ7RNeqZJsnh" Name="Output" Kind="StateOutputPin" />
+          </Node>
+          <Node Bounds="60,500,60,19" Id="Jlvb3LorliMs0fFp1SU1N0">
+            <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Group" />
+              <CategoryReference Kind="Category" Name="Skia" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="C3M5sdNmz0A20MlKc2qYz0" Name="Input" Kind="InputPin" />
+            <Pin Id="LXlzLDExmIvy4M8bqgnzLq" Name="Input 2" Kind="InputPin" />
+            <Pin Id="Edy2ZCMjrJIwCwHTbGtzWo" Name="Output" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="20,560,185,19" Id="CINh4HfSTHeBKdZp1aF1gR">
+            <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="Renderer" />
+              <PinReference Kind="InputPin" Name="Bounds" />
+              <PinReference Kind="InputPin" Name="Bound to Document" />
+            </p:NodeReference>
+            <Pin Id="G65exlnIJaovFX5BoLygMb" Name="Bounds" Kind="InputPin" DefaultValue="926, 114, 900, 560">
+              <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
+                <Choice Kind="TypeFlag" Name="Rectangle" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="OLGII18yCDSOmFfbCbVt2s" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Boolean" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="ArzAvOnlKaVxqb4teuFhUz" Name="Input" Kind="InputPin" />
+          </Node>
+          <Pad Id="IWLicTQyUHbasywVQgDBBz" Bounds="600,200,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; Any ImGui widgets. Drag the slider, then drag the map beside it.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="MWFKfVC59M6Nz8t5iLPQ31" Bounds="600,290,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; IsAnyItemHovered: is the mouse on a control? ImGui does not keep its events to itself, so the patch has to ask.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="Q7gE4jSQWEshbXoryo1zf0" Bounds="600,390,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; NOT into Interactive: the map lets go of the mouse while it is on a control. Unplug this wire and the slider drags the map with it.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="SNBN2CdbxHlRhEscRERZO6" Bounds="600,500,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Group draws Input first and Input 2 over it. This is what Map and ToSkiaLayer are for - MapWindow keeps its window to itself.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+        </Canvas>
+        <Patch Id="JGq5rPjUmVkyxR1kqnGA92" Name="Create" />
+        <Patch Id="KgeKcSYvuiO7BwffHEbJpS" Name="Update" />
+        <ProcessDefinition Id="GjYjcXmzX7BpcPmTlHaUsk">
+          <Fragment Id="VDGDHoYKtrzqKQbw25ypqV" Patch="JGq5rPjUmVkyxR1kqnGA92" Enabled="true" />
+          <Fragment Id="BjJEPx9xkG1TLJjfp9nNW9" Patch="KgeKcSYvuiO7BwffHEbJpS" Enabled="true" />
+        </ProcessDefinition>
+        <Link Id="UYd8gQyrL49w1c0B5izeqI" Ids="JeFCFV1DnaF8nWDRlzO1dL,PZQry6lj8IhUNdGCZeHF7p" />
+        <Link Id="THZKx8x2vdHrvz69d4ia9P" Ids="Nqfi2S3YPXDAAHMsLFNCSS,AAAX7GqbniwPBzApC3l2kD" />
+        <Link Id="VjsG4mZGzftzIACmHLx08z" Ids="RzZn3VWvT2vQzheXMsqQV6,Ao8gG5Zk6NtkhxyKh9KJjU" />
+        <Link Id="MHkq5v5uHFZnQlClqn612n" Ids="B3NLpBp0cxudKBXLaUvU4g,SsWW3cF2OC6ejqKtoLOKsw" />
+        <Link Id="UbsCLV3CL1i2ujwfaOzhD2" Ids="SsWW3cF2OC6ejqKtoLOKsw,NzvQS8h7ecTHFAH8eIR16q" />
+        <Link Id="Kdy7R0FwKRvcvpwRtDEK7p" Ids="N0P3Flm3jeLZ7RNeqZJsnh,UYZCEs8o1KnJfjn94g3wlH" />
+        <Link Id="U8XXLdYaW5IKFvt9v5uuhP" Ids="VytThOK6Olfe8VqiGhF9aA,C3M5sdNmz0A20MlKc2qYz0" />
+        <Link Id="GAU7CBrjwSfQSTiJ4NiLsw" Ids="IYhZLNhooqbyJP2YxrXj87,LXlzLDExmIvy4M8bqgnzLq" />
+        <Link Id="St6UTbQqBTSEW4t7ZeCFaQ" Ids="Edy2ZCMjrJIwCwHTbGtzWo,ArzAvOnlKaVxqb4teuFhUz" />
+      </Patch>
+    </Node>
+  </Patch>
+  <NugetDependency Id="QyNFD3Tkhs77NSP1B052qN" Location="VL.Mapsui" Version="0.0.0" />
+</Document>

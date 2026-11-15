@@ -25,7 +25,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="R1D1kS6CQ5RzqqwWOtYaHW" Bounds="60,90,560,82" ShowValueBox="true" isIOBox="true" Value="Mapsui's own furniture. Each node takes the map, puts one widget on it once, and hands the map on. Map.Widgets is append-only, so Enabled is how a widget goes away. Click is what makes the buttons work - and tells Drag not to pan when you pressed one.">
+          <Pad Id="R1D1kS6CQ5RzqqwWOtYaHW" Bounds="60,90,560,82" ShowValueBox="true" isIOBox="true" Value="Mapsui's own furniture. Each node takes the map, puts one widget on it once, and hands the map on. Map.Widgets is append-only, so Enabled is how a widget goes away. The buttons work by themselves; Click and the gated Drag here are for a patch that owns the mouse.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -298,7 +298,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="EWHl2hdcAMHFTjOGHHSi0p" Bounds="640,400,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; Click hands a press to the widgets. Handled is true while a button takes it, so Drag is gated with Left Pressed AND NOT Handled: pressing + does not also pan.">
+          <Pad Id="EWHl2hdcAMHFTjOGHHSi0p" Bounds="640,400,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; A map presses its own widgets. This is the wiring for a patch that owns the mouse: Click hands the press over, and Drag is gated with Left Pressed AND NOT Handled, so + does not also pan.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -325,7 +325,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="FSS9VCr9vQh5hJJYzOA2Jr" Bounds="640,677,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; ZoomButtons: + and -. They work because Click is wired; the widgets are drawn last, over everything.">
+          <Pad Id="FSS9VCr9vQh5hJJYzOA2Jr" Bounds="640,677,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; ZoomButtons: + and -. A map presses them itself; here Click does, because this patch owns the mouse. Drawn last, over everything.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>

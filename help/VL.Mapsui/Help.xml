@@ -40,6 +40,9 @@
 		<VLDocument link="HowTo Pick what you clicked.vl" tags="pick,click,hit,hitTest,select,mapInfo,feature,attributes,split,tryGetValue,mouse" />
 		<VLDocument link="HowTo Convert screen and world.vl" tags="screenToWorld,worldToScreen,project,pixel,screen,world,coordinates,longitude,latitude,mouse,cursor,console,mouseState" />
 	</Topic>
+	<Topic title="Sharing the window">
+		<VLDocument link="HowTo Put UI over the map.vl" tags="ui,overlay,imgui,slider,button,group,layer,toSkiaLayer,interactive,isAnyItemHovered,mouse,drag,control,gui,hud,panel" />
+	</Topic>
 	<Topic title="Widgets">
 		<VLDocument link="HowTo Add widgets to the map.vl" tags="widget,scalebar,attribution,zoom,buttons,zoomButtons,click,handled,legal,credit" />
 	</Topic>

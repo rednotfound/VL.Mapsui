@@ -231,7 +231,8 @@ foreach ($helpDoc in $helpDocs) {
     # nuspec declares them all and whose validator enforces the mirror image of this check.
     # VL.NetTopologySuite is exempt: this package's own nuspec depends on it, so a patch using it
     # resolves for every installer.
-    $allowed = @($localNames) + @('VL.CoreLib', 'VL.Skia', 'VL.NetTopologySuite')
+    # VL.ImGui and VL.ImGui.Skia ship inside vvvv like VL.Skia (2026-11-15: HowTo Put UI over the map).
+    $allowed = @($localNames) + @('VL.CoreLib', 'VL.Skia', 'VL.ImGui', 'VL.ImGui.Skia', 'VL.NetTopologySuite')
     $foreign = @([regex]::Matches($helpRaw, '<NugetDependency\b[^>]*\bLocation="(VL\.[^"]*)"') |
         ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -notin $allowed } | Sort-Object -Unique)
 

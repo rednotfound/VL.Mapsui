@@ -188,7 +188,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="In3MPr0otcgwHoL1tHGbH5" Bounds="507,511,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Initial Center and Initial Zoom Level are where the window opens. Afterwards the mouse moves it, and so do the Navigate nodes' job.">
+          <Pad Id="In3MPr0otcgwHoL1tHGbH5" Bounds="507,511,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Initial Center and Initial Zoom Level are where the window opens. Afterwards the mouse moves it, and so do the Navigate nodes.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>

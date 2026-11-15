@@ -262,7 +262,9 @@
           <Node Bounds="350,715,110,19" Id="TJBHBY5JPpGz9yJhUJZT8U">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="ProcessAppFlag" Name="Map" />
+              <Choice Kind="ProcessAppFlag" Name="MapWindow" />
+              <PinReference Kind="InputPin" Name="Bound to Document" />
+              <PinReference Kind="InputPin" Name="Bounds" />
               <PinReference Kind="InputPin" Name="Initial Center Latitude" />
               <PinReference Kind="InputPin" Name="Initial Center Longitude" />
               <PinReference Kind="InputPin" Name="Initial Zoom Level" />
@@ -284,36 +286,17 @@
                 <Choice Kind="TypeFlag" Name="Integer32" />
               </p:TypeAnnotation>
             </Pin>
-            <Pin Id="SJGTbqVJShB7ERy4YCmVbs" Name="Result" Kind="OutputPin" />
-          </Node>
-          <Node Bounds="350,775,130,19" Id="GyDNretkPQOk4ZvhwWEDMW">
-            <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
-            </p:NodeReference>
-            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
-            <Pin Id="UXincZFFKcGxxIDmdakZ3Y" Name="Map" Kind="InputPin" />
-            <Pin Id="VdZy20mA99Wub7vbJI5AFU" Name="Diagnostics" Kind="InputPin" />
-            <Pin Id="OOOQlNkKP8bvf5apIg4cb5" Name="Result" Kind="OutputPin" />
-          </Node>
-          <Node Bounds="310,835,185,19" Id="SVLVueKv8JqhDvu3iC6mhd">
-            <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="ProcessAppFlag" Name="Renderer" />
-              <PinReference Kind="InputPin" Name="Bound to Document" />
-              <PinReference Kind="InputPin" Name="Bounds" />
-            </p:NodeReference>
-            <Pin Id="IEqhPsPzA2EgkGFtaS4Mcr" Name="Bounds" Kind="InputPin" DefaultValue="926, 114, 900, 560">
+            <Pin Id="Ar3vfwMIrAE4d0HR5VRJf4" Name="Bounds" Kind="InputPin" DefaultValue="926, 114, 900, 560">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
             </Pin>
-            <Pin Id="Po68SmS6nTveSJfImPCgYq" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
+            <Pin Id="JLb8qEXcwgDYCknvxtSA8w" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
-            <Pin Id="VwrxOeO6IpdyEfRA7lYF1J" Name="Input" Kind="InputPin" />
+            <Pin Id="SJGTbqVJShB7ERy4YCmVbs" Name="Map" Kind="OutputPin" />
           </Node>
           <Pad Id="U3BV0DD3MqqVhxqN99zcXO" Bounds="620,622,300,44" ShowValueBox="true" isIOBox="true" Value="&lt; No tiles: the graticule gives the map its bearings.">
             <p:TypeAnnotation>
@@ -363,8 +346,6 @@
         <Link Id="P2icdiZAd0WtgaLkzNqJXr" Ids="VEekPAupwgzBWtR55MYxxH,CsnpkfP55ltUEiBhl893He" />
         <Link Id="COZVlowNGSby1LeukALRMg" Ids="QwwPzManFM2zA6uJmR0lD2,M5q2vkTmKTck7AzLCejz5W" />
         <Link Id="Rqd8oezi1juhWhLFqRiuzC" Ids="Cs3lavMNHM1LkIXIyz22i2,Og3IecYSP8K1sbw84p4UXQ" />
-        <Link Id="LCO97zRqDfeOoHoCL5WelZ" Ids="SJGTbqVJShB7ERy4YCmVbs,UXincZFFKcGxxIDmdakZ3Y" />
-        <Link Id="K5odIrq8JXFHTv8Rv0DGVj" Ids="OOOQlNkKP8bvf5apIg4cb5,VwrxOeO6IpdyEfRA7lYF1J" />
       </Patch>
     </Node>
   </Patch>

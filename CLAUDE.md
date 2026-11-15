@@ -39,7 +39,7 @@ NOTES.md keeps the old name where it records what was measured then.
 stable version. The working version is `0.0.2-alpha`.** A map renders in vvvv 7.4, pans, zooms and takes geometry from
 any NTS source. **33 nodes (32 in C#, `MapWindow` patched), 283 tests.** VL.NetTopologySuite, which this package depends on, went up the
 same day, first. See "Releasing"
-below and [docs/RELEASE.md](docs/RELEASE.md). **The help is the second test suite: 21 patches (19 until 2026-11-15) in the
+below and [docs/RELEASE.md](docs/RELEASE.md). **The help is the second test suite: 22 patches (19 until 2026-11-15) in the
 community's measured style, every one of the 33 nodes opens one on F1** (`tools\Test-VLPatch.ps1`
 audits the flags), all 19 compile with every process node constructed in `Create`
 (`tools\Compile-HelpPatches.ps1` reads the generated C#), and every one was hand-arranged by the
@@ -88,8 +88,27 @@ this package's first PATCHED node: a process definition inside `VL.Mapsui.vl` wr
 whoever needs UI over the map uses the layer form and Skia's `Group`; a pin can be added later
 without breaking a patch, never removed. `Compile-HelpPatches` recognises it by
 `MapWindow_P.Create(`. `HowTo Open a map window` is its F1 page and the first lesson; `HowTo Show a
-map` is now "the parts". **Not yet verified in vvvv: a Skia or ImGui button drawn over the map
-keeping its own clicks** - the code skips a press something else handled, unit-tested only.
+map` is now "the parts".
+
+**UI over the map needs one wire, and the first version of this claimed otherwise (measured in vvvv,
+2026-11-15).** An ImGui slider drawn over the map in a `Group`: dragging it moved the slider AND
+panned the map. In VL.Skia a layer keeps an event by returning true from `Notify` (`Group` asks the
+upper input first and stops there); `Handled` is written by the Renderer only after the dispatch,
+and VL.ImGui's layer never returns true. So the map cannot know, and vvvv's own idiom is the cure:
+**`IsAnyItemHovered [ImGui.Queries]` → `NOT` → `ToSkiaLayer.Interactive`**. Seen with that wiring:
+the slider moves, the map stays, open map still pans. `HowTo Put UI over the map` teaches it (seen
+in vvvv: slider 0.000 → 0.509 with the grid still; a drag on open map moves the grid 200 px).
+
+**The help's host is `MapWindow` since 2026-11-15.** Nine patches whose host was the bare `Map` →
+`ToSkiaLayer` → `Renderer` chain were converted in place (the `Map` node became `MapWindow`, the two
+others and their links went; the window keeps its bounds). **Which form a patch uses now says
+something:** `MapWindow` where the map is only the stage (layers, styles, cache, CRS); the chain
+where Navigate nodes sit in it (`Set the view`, `Frame your data`, `Draw a graticule`, `Show a layer
+only at some zooms`) or where the patch needs the window's mouse through `Console` (`Pick`,
+`Convert screen and world`, `Add widgets`, `Drive the map with the mouse`) or draws over the map
+(`Put UI over the map`). `HowTo Draw many features` still wires `Drag` and `ZoomByWheel` only to
+move around - redundant now, left alone because it is the maintainer's own patch. The Overview
+lists `MapWindow` first under "the map itself".
 
 **The layers read a geometry's SRID (2026-11-15, not yet published):** 0 and 4326
 are projected, 3857 is drawn as it is, anything else is left off the layer and `Status` names the
@@ -300,7 +319,7 @@ vl-mapsui/
 │   ├── ToSkiaLayerNode.cs, MapsuiLayer.cs # [ProcessNode] ToSkiaLayer; the VL.Skia.ILayer that draws, + overlay
 │   ├── DebugNodes.cs, DiagnosticsLayer.cs # static DiagnosticsLayer (category Mapsui.Debug)
 │   └── PixelSpace.cs, FeatureHelper.cs, AssemblyInfo.cs # pixel/VL space bridge; NTS<->Mapsui feature helper
-├── help/VL.Mapsui/               # Explanation + 20 HowTos + Help.xml (8 domain topics); one High flag per node
+├── help/VL.Mapsui/               # Explanation + 21 HowTos + Help.xml (9 domain topics); one High flag per node
 ├── test/VL.Mapsui.Tests/         # 283 xunit tests, no network, no vvvv
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org

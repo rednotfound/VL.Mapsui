@@ -25,7 +25,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="ErGnACRQ924CGWM8eKO5Qi" Bounds="60,90,520,82" ShowValueBox="true" isIOBox="true" Value="Where the map looks, set directly. Every Navigate node takes the map and hands it on, so they chain. Wired every frame they PIN the view - fine here, not once a mouse drives the map (HowTo Drive the map with the mouse).">
+          <Pad Id="ErGnACRQ924CGWM8eKO5Qi" Bounds="60,90,520,82" ShowValueBox="true" isIOBox="true" Value="Where the map looks, set directly. Every Navigate node takes the map and hands it on, so they chain. Wired every frame they PIN the view: here the pads are the view, and the mouse cannot move it for longer than a frame.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>

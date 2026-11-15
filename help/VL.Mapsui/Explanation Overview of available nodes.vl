@@ -25,7 +25,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="Fg0HGyra5AuGSOVLWtFEte" Bounds="60,90,560,64" ShowValueBox="true" isIOBox="true" Value="Mapsui is a map engine: it owns its tiles, styles, labels and viewport, and draws itself. Wire layers into a Map, move it with Navigate nodes, hand it to ToSkiaLayer. Nothing here decides what the mouse means - you wire that.">
+          <Pad Id="Fg0HGyra5AuGSOVLWtFEte" Bounds="60,90,560,64" ShowValueBox="true" isIOBox="true" Value="Mapsui is a map engine: it owns its tiles, styles, labels and viewport, and draws itself. Wire layers into a MapWindow and it is on screen, moved by the mouse. Or take the parts: a Map, the Navigate nodes, ToSkiaLayer into any Renderer. Nothing here decides what the mouse means - you wire that.">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -565,7 +565,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Node Bounds="1020,230,110,19" Id="IoUlzX9vHNNMf17K5Z6xfy">
+          <Node Bounds="1020,274,110,19" Id="IoUlzX9vHNNMf17K5Z6xfy">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Map" />
@@ -577,7 +577,7 @@
             <Pin Id="Rb6pVmwJVWx10KkCMd8UwB" Name="Initial Zoom Level" Kind="InputPin" />
             <Pin Id="H7ykZSKPdgK6p33hWL4Osa" Name="Result" Kind="OutputPin" />
           </Node>
-          <Pad Id="KyYL5DOkad6yeipjqh7LZM" Bounds="1150,227,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; Holds the layers, owns the viewport. The Initial pins say where it opens.">
+          <Pad Id="KyYL5DOkad6yeipjqh7LZM" Bounds="1150,271,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; Holds the layers, owns the viewport. The Initial pins say where it opens.">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -586,7 +586,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Node Bounds="1020,274,110,19" Id="FThmfxs4QQ7Q2LoiXjpEix">
+          <Node Bounds="1020,318,110,19" Id="FThmfxs4QQ7Q2LoiXjpEix">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="ViewportInfo" />
@@ -599,7 +599,7 @@
             <Pin Id="PGT2jV7Wc3qHV83PkWoiXo" Name="Width" Kind="OutputPin" />
             <Pin Id="SuUYHPmMph9SDTt2qrBSIJ" Name="Height" Kind="OutputPin" />
           </Node>
-          <Pad Id="GpoLHtb5Mkf2PXyo8whfa9" Bounds="1150,271,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; Centre, resolution, size - read back.">
+          <Pad Id="GpoLHtb5Mkf2PXyo8whfa9" Bounds="1150,315,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; Centre, resolution, size - read back.">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -608,7 +608,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Node Bounds="1020,318,110,19" Id="N1VSRtraUvGwOnBKj26Bei">
+          <Node Bounds="1020,362,110,19" Id="N1VSRtraUvGwOnBKj26Bei">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="OperationCallFlag" Name="LayerInfo" />
@@ -619,7 +619,7 @@
             <Pin Id="NaDLq1vZ7ZEowaoUtG3G6h" Name="Busy" Kind="OutputPin" />
             <Pin Id="A0OiyvjeQa8o49TulIkAn8" Name="Names" Kind="OutputPin" />
           </Node>
-          <Pad Id="MHUYbycSCcEBhOFz4HXK8A" Bounds="1150,315,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; Layer count, whether any is still fetching, and their names.">
+          <Pad Id="MHUYbycSCcEBhOFz4HXK8A" Bounds="1150,359,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; Layer count, whether any is still fetching, and their names.">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -628,7 +628,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Node Bounds="1020,362,110,19" Id="GPzRW2VohwnkqRWH3FUW3G">
+          <Node Bounds="1020,406,110,19" Id="GPzRW2VohwnkqRWH3FUW3G">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
               <Choice Kind="ProcessAppFlag" Name="Pick" />
@@ -641,7 +641,7 @@
             <Pin Id="St7qQpDoB0vmxSFZK02rDM" Name="Hit" Kind="OutputPin" />
             <Pin Id="S6cgyHkUe1edTyAvZNzNTN" Name="Layer" Kind="OutputPin" />
           </Node>
-          <Pad Id="CRS4Nsca8CXm4kRxeDriqS" Bounds="1150,359,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; The feature under a pixel. Continuous - you decide what a click is.">
+          <Pad Id="CRS4Nsca8CXm4kRxeDriqS" Bounds="1150,403,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; The feature under a pixel. Continuous - you decide what a click is.">
             <p:TypeAnnotation>
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -802,6 +802,24 @@
           </Pad>
           <Pad Id="StYtSDxoah9SyZbXmWVoe0" Bounds="660,922,660,96" ShowValueBox="true" isIOBox="true" Value="Geometry: VL.NetTopologySuite makes it (Point, Polygon, FromWKT) and defines Feature; this package only draws and picks them.&#xD;&#xA;Files and services: VL.GeoJSON reads the format data arrives in.&#xD;&#xA;Manners: tiles come from donated servers. Nothing fetches until Enabled is on, only drawn tiles are kept, and requests name this package.&#xD;&#xA;If Layers Built ever climbs frame after frame, close vvvv.">
             <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Node Bounds="1020,230,110,19" Id="VygSImiVQcpRHZq57qewlE">
+            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="MapWindow" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="T5y72kRMhWzqpJxBZc0OQX" Name="Layers" Kind="InputPin" />
+            <Pin Id="KXWEJ6TGA1NLWvGcdPS0cu" Name="Map" Kind="OutputPin" />
+          </Node>
+          <Pad Id="TsludHzhplus3iFVgN5R7D" Bounds="1150,227,300,40" ShowValueBox="true" isIOBox="true" Value="&lt; A map in one node: its window, and the mouse moves it. Start here.">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
             <p:ValueBoxSettings>

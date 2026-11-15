@@ -132,9 +132,12 @@ public class InteractionTests
     }
 
     [Fact]
-    public void A_press_something_else_already_took_does_not_start_a_drag()
+    public void A_press_already_marked_handled_does_not_start_a_drag()
     {
-        // An ImGui button drawn over the map, say.
+        // For a host that marks a notification before passing it on. VL.Skia's Renderer is NOT
+        // such a host - it writes Handled after the dispatch returns, and VL.ImGui's layer never
+        // claims the mouse - so this is not what protects an ImGui control drawn over the map.
+        // Measured in vvvv 2026-11-15: that takes Interactive, gated by ImGui's IsAnyItemHovered.
         using var mapNode = new MapNode();
         var (map, layer, _) = Scene(mapNode);
         var before = map.Navigator.Viewport.CenterX;

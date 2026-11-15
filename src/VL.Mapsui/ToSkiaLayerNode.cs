@@ -35,6 +35,7 @@ public class ToSkiaLayerNode : IDisposable
     /// <remarks>
     /// Drag with the left button to pan, turn the wheel to zoom.
     /// A Drag, ZoomByWheel or Click node wired to the map takes that gesture over.
+    /// With UI drawn over the map, switch Interactive off while the mouse is on it: ImGui has IsAnyItemHovered.
     /// The Renderer's Space pin does not need setting.
     /// </remarks>
     /// <param name="map">The map to draw.</param>

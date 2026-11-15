@@ -30,6 +30,18 @@ namespace VL.Mapsui;
 //
 // Nothing here marks a notification handled. A Console in the same Group still hears everything,
 // so Pick and ScreenToWorld keep working off the same mouse.
+//
+// UI DRAWN OVER THE MAP - measured in vvvv on 2026-11-15, and not what the first version assumed.
+// In VL.Skia a layer keeps an event to itself by RETURNING TRUE from Notify: Group asks Input 2
+// (the upper layer) first and stops there if it says true, so this class never hears of it.
+// `INotification.Handled` is no part of that - SkiaRenderer writes it AFTER the whole dispatch has
+// returned, so the checks on it below can never fire inside a Skia Renderer (they are kept for a
+// host that does set it, and cost nothing). And VL.ImGui's layer returns false whatever ImGui is
+// doing with the mouse. Result, seen: dragging an ImGui slider drawn over the map moved the slider
+// from 0.500 to 0.769 AND panned the map by the whole drag.
+// The cure is the patch's, and it is vvvv's own idiom: VL.ImGui has query nodes for exactly this.
+// IsAnyItemHovered -> NOT -> ToSkiaLayer's Interactive. Seen with that wiring: the slider moves and
+// the map stays; a drag on open map still pans. This is what the Interactive pin is for.
 
 sealed class MapInteraction
 {

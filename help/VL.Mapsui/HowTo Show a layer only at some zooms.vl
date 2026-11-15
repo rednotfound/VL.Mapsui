@@ -235,7 +235,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="Ku92BiIo4dFiH5RRp2vxU9" Bounds="444,622,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; ZoomToLevel is wired every frame here, so the pad IS the zoom. With a mouse driving the map you would not do that.">
+          <Pad Id="Ku92BiIo4dFiH5RRp2vxU9" Bounds="444,622,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; ZoomToLevel is wired every frame here, so the pad IS the zoom and the wheel cannot change it. Drag still pans.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>

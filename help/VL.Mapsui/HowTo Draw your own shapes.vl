@@ -152,7 +152,9 @@
           <Node Bounds="60,860,110,19" Id="GRMKxWZ46KT4QP0d7x87la">
             <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
               <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="ProcessAppFlag" Name="Map" />
+              <Choice Kind="ProcessAppFlag" Name="MapWindow" />
+              <PinReference Kind="InputPin" Name="Bound to Document" />
+              <PinReference Kind="InputPin" Name="Bounds" />
               <PinReference Kind="InputPin" Name="Initial Zoom Level" />
               <PinReference Kind="InputPin" Name="Initial Center Longitude" />
               <PinReference Kind="InputPin" Name="Initial Center Latitude" />
@@ -174,55 +176,17 @@
                 <Choice Kind="TypeFlag" Name="Integer32" />
               </p:TypeAnnotation>
             </Pin>
-            <Pin Id="N858FCXQx9H9R2ea3u3BgU" Name="Result" Kind="OutputPin" />
-          </Node>
-          <Node Bounds="60,920,130,19" Id="Tu559dTU5OCA60jVTJVB6K">
-            <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
-            </p:NodeReference>
-            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
-            <Pin Id="B4XzRWVZNvfehYZ3Hi2Lu5" Name="Map" Kind="InputPin" />
-            <Pin Id="LS8KJRGvqMpOHD6uGKr53s" Name="Diagnostics" Kind="InputPin" />
-            <Pin Id="VYgDKFZ9eS9DQF0gVNRJgn" Name="Result" Kind="OutputPin" />
-          </Node>
-          <Node Bounds="20,990,185,19" Id="V3tQaw2yhuyachL2l0xwzv">
-            <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
-              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
-              <Choice Kind="ProcessAppFlag" Name="Renderer" />
-              <PinReference Kind="InputPin" Name="Bound to Document" />
-              <PinReference Kind="InputPin" Name="Bounds" />
-            </p:NodeReference>
-            <Pin Id="Pklym3Gsch5L17MuUFVh4I" Name="Node Context" Kind="InputPin" IsHidden="true" />
-            <Pin Id="BMy7RaWNedBNqsYHysi2yL" Name="Bounds" Kind="InputPin" DefaultValue="970, 187, 900, 560">
+            <Pin Id="P9wzbcb0kRVCezrGZvQepk" Name="Bounds" Kind="InputPin" DefaultValue="970, 187, 900, 560">
               <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
                 <Choice Kind="TypeFlag" Name="Rectangle" />
               </p:TypeAnnotation>
             </Pin>
-            <Pin Id="VYXFGeyOTMlM3AN2u6Yxh6" Name="Save Bounds" Kind="InputPin" IsHidden="true" />
-            <Pin Id="LmpwT7HrPy1wGlaCnj0JUU" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
+            <Pin Id="Genpj9tirX1Y8T1ZIh1TCO" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
               <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
                 <Choice Kind="TypeFlag" Name="Boolean" />
               </p:TypeAnnotation>
             </Pin>
-            <Pin Id="AjaaZI38gYjM09JtB3eqTR" Name="Dialog If Document Changed" Kind="InputPin" IsHidden="true" />
-            <Pin Id="QKWUlPoAf5WPNuKu12LdoR" Name="Always On Top" Kind="InputPin" IsHidden="true" />
-            <Pin Id="FJeCdpDmesLPkkSDo2jbiB" Name="Extend Into Title Bar" Kind="InputPin" IsHidden="true" />
-            <Pin Id="Dwd315WK0mr7U2UQtsc7HR" Name="Input" Kind="InputPin" />
-            <Pin Id="KmtqM8UnJ8bMAuTFDmh4R9" Name="Title" Kind="InputPin" />
-            <Pin Id="VP5wYkxAATiNlpGEwudiU9" Name="Title Bar Interaction Width" Kind="InputPin" IsHidden="true" />
-            <Pin Id="FtRpS13dH7BNh3uQKrijQh" Name="Color" Kind="InputPin" />
-            <Pin Id="IQUAlnagRpONUDtJf6bRW6" Name="Clear" Kind="InputPin" />
-            <Pin Id="KXtR7ywUoRkOTmpym9laSV" Name="Space" Kind="InputPin" />
-            <Pin Id="Bmm8W2XmOx5MpdnrpIA3Rx" Name="Show Cursor" Kind="InputPin" />
-            <Pin Id="TDQxK8MX6HgLoK1fBthk7K" Name="VSync" Kind="InputPin" />
-            <Pin Id="CJG53KAOQWlPYwtA07jzty" Name="Commands" Kind="InputPin" IsHidden="true" />
-            <Pin Id="PjlTdZtzapYQR12s6aF5L4" Name="Enable Keyboard Shortcuts" Kind="InputPin" IsHidden="true" />
-            <Pin Id="Nyb09Z5Hn2hM2Nq1ohuCzH" Name="Enabled" Kind="InputPin" />
-            <Pin Id="GwTZlaumDZBN7mljHkQAmQ" Name="Form Bounds Notifications" Kind="OutputPin" IsHidden="true" />
-            <Pin Id="Q20H6ksJgkRLNtLzfP2bhS" Name="Form" Kind="OutputPin" />
-            <Pin Id="KIvJ7qsrP4PPBHRU8beasx" Name="ClientBounds" Kind="OutputPin" />
-            <Pin Id="PJQuZGze8S4NGW5pFLW3UJ" Name="Render Time" Kind="OutputPin" />
+            <Pin Id="N858FCXQx9H9R2ea3u3BgU" Name="Map" Kind="OutputPin" />
           </Node>
           <Pad Id="FAYQcfqT91Su8GTi2g8JDN" Bounds="568,190,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Same WKT as HowTo Draw a geometry. VL.NetTopologySuite makes the geometry; this package draws it.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
@@ -313,8 +277,6 @@
         <Link Id="TQt37uwvrRMZOBV56xgDJg" Ids="Gjc7Otg9wKpIAPyVH1NZfO,LpRiAiMgIjQsnMKpu42eks" />
         <Link Id="AK2h1gUr7nvVhnTioR2E1z" Ids="MmyY8JRI0cPWfsRONBuhBF,I4zWrzP1Hr5p2SGgcfvres" />
         <Link Id="GIRJ613Uzr2KclSBJ68LpP" Ids="LQynofHCZ9okPrMzVuC2ZO,TzKM2NOhIl192MdELr3KLV" />
-        <Link Id="A6rS8tS56Geo1uGsTnswkx" Ids="N858FCXQx9H9R2ea3u3BgU,B4XzRWVZNvfehYZ3Hi2Lu5" />
-        <Link Id="I4MFXGDWArXdDlis0vWx6f" Ids="VYgDKFZ9eS9DQF0gVNRJgn,Dwd315WK0mr7U2UQtsc7HR" />
         <Link Id="KJ6ACq5dnPlOa60xBFQg7Q" Ids="PWm86r791FiBtpvStxFtDz,OCR2xPyPk8kNexTnYtVIta" />
         <Link Id="AvVkfc2Y7CBPrOYMVyi4GC" Ids="FE4WbThuLt6O41RL0YA1lS,DPN0EPZBNTiS8mjQpDekqF" />
         <Link Id="SfgT2mmM2p9L5mEgqgbovL" Ids="PCfapX4zB5qPNgSAXdKaef,PkPk5Ulz2tKNG0zkqVA3oP" />

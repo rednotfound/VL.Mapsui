@@ -166,7 +166,11 @@ A Pad's `Comment` label renders to the right of the box at ~6.5 px per character
 - No "One idea:" openers, no 900-pixel boxes, no paragraphs about design decisions — those live in
   `docs/ARCHITECTURE.md` and `docs/MAPSUI-SURFACE.md`, which a help patch may name in one line if
   it must.
-- The host is `Map` → `ToSkiaLayer` → `Renderer` and nothing else rides along: no mouse chain
+- **The host is `MapWindow` since 2026-11-15** - one node, and the mouse moves it. The chain `Map`
+  → `ToSkiaLayer` → `Renderer` is for a patch that needs it: Navigate nodes in the chain, the
+  window's mouse through `Console`, or something else drawn in the same window.
+- Until then the host was `Map` → `ToSkiaLayer` → `Renderer`, and the rest of this bullet still
+  holds for either: nothing else rides along, no mouse chain
   unless the mouse is the topic, no tile layer unless tiles are the topic (a `Graticule` gives an
   offline map its bearings). See D1 and D2 in `docs/HELP-PATCH-PLAN.md`.
 - Topics in `Help.xml` are domain words, one node group per HowTo, one `High` flag per node.
