@@ -156,3 +156,28 @@ JIT on a busy machine; older than this release, worth widening. Merged as PR #2,
 tagged it and uploaded in the browser; `Test-Install -Published -Version 0.0.3-alpha` green
 (both packages signed; NuGet resolves the dependency to its lowest fit, VL.NetTopologySuite
 0.0.6-alpha). Working version `0.0.4-alpha`.
+
+## `0.0.4-alpha` — 2026-11-15
+
+The layers read a geometry's SRID (`10a9f5c`); the map answers the mouse and `Enabled` is on by
+default (`b0785a6`); `MapWindow`, the first patched node (`b1b3b0b`); the help's host is
+`MapWindow`, and `HowTo Put UI over the map` (`26da110`). 33 nodes, 22 help patches, 284 tests.
+
+**It was prepared as 0.0.3-alpha.** The branch was cut before 0.0.3-alpha went out from a worktree,
+and the whole gate ran green under that number twice; only `git merge --ff-only` showed that local
+`main` was eleven commits behind `origin/main` and that the tag existed. nuget.org would have
+refused the upload, so nothing was at risk but an afternoon. **Step 0 is now: `git fetch`, and
+`main` must equal `origin/main`.** Merged (`2a557b8`): nuspec and UserAgent renumbered, the short
+README and docs/GUIDE.md brought up to the new defaults, the empty-geometry test given `Status`.
+
+Gate on the merged tree: build, 284 tests, pack, Test-VLPackage, Test-VLPatch (33 of 33 on F1),
+Compile-HelpPatches 22 of 22, Test-Install -FromNuGetOrg 22 of 22. In vvvv that day: the nine
+converted patches opened one by one, the widget press, the slider over the map. **One run is
+unexplained:** `HowTo Cache tiles` once opened fetching (8 connections, tiles, zoom 10 instead of
+12) with its toggle off; three later openings, and copies with the toggle spelled `false`, `False`
+and `True`, all behaved. A hand on the mouse - the toggle clicked, two notches of wheel - fits what
+was seen; it was not confirmed.
+
+Pushed to `main` directly, no PR; the maintainer uploaded in the browser; `Test-Install -Published
+-Version 0.0.4-alpha` green (both packages signed, VL.NetTopologySuite resolved to 0.0.8-alpha).
+Working version `0.0.5-alpha`.

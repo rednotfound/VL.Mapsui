@@ -26,7 +26,11 @@ already made untrue.) The retired `VL.GIS` lives only on GitHub now
 still declares BruTile 6 and conflicts with this package — the README's Install section says what
 a user has to delete by hand.
 
-**2026-11-15: `0.0.3-alpha` is on nuget.org; working version `0.0.4-alpha`** (nuspec + UserAgent).
+**2026-11-15, the same evening: `0.0.4-alpha` is on nuget.org too; working version `0.0.5-alpha`**
+(nuspec + UserAgent). Installed back with `Test-Install -Published -Version 0.0.4-alpha`: both
+packages signed, 22 of 22 compile.
+
+**2026-11-15: `0.0.3-alpha` is on nuget.org** (the working version after it was `0.0.4-alpha`).
 **Everything below dated 2026-11-15 - SRID, the mouse, `Enabled` on, `MapWindow`, the help's new
 host - is 0.0.4-alpha**: it was built on a branch cut before 0.0.3-alpha was released from a
 worktree, called itself 0.0.3-alpha until the merge found the tag, and was renumbered then.

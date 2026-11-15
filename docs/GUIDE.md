@@ -7,7 +7,7 @@ built. The short one is the [README](../README.md).
 tile layers, your own geometry and features on top, styles, labels, picking, widgets, and a node
 that draws the map into VL.Skia.
 
-## ⚠️ Status: 0.0.4-alpha, an early preview
+## ⚠️ Status: 0.0.4-alpha on nuget.org since 2026-11-15, an early preview
 
 > **EARLY — not ready for real work yet.** Node names, pins and behaviour may change between
 > prereleases without a migration path, so do not build a project you have to deliver on it yet.
