@@ -41,7 +41,7 @@
     </description>
     <summary>Mapsui map engine as composable nodes for vvvv gamma.</summary>
     <releaseNotes>
-      0.0.3-alpha - In development, not published. Geometry and FeatureLayer read each geometry's
+      0.0.3-alpha (2026-11-15) - Geometry and FeatureLayer read each geometry's
       SRID: 0 and 4326 are longitude and latitude as before, 3857 is drawn as it is, and any other
       is not drawn - Status names the code and says to Reproject (VL.PROJ) to 4326 first. Geometry
       has a new Status output. What Pick hands back is labelled SRID 4326. OpenStreetMap and XYZ now
@@ -49,7 +49,10 @@
       for a patch that must open offline). The mouse moves the map without any wiring - left drag
       pans, the wheel zooms. ToSkiaLayer's new Interactive pin
       switches that off, and a Drag, ZoomByWheel or Click node wired to the map takes that gesture
-      over, so patches made with 0.0.2-alpha behave as before. New help patch: HowTo Draw
+      over, so patches made with 0.0.2-alpha behave as before - except a map that was meant to
+      stand still, which now needs Interactive off. The map presses its own widgets: ZoomButtons
+      work without a Click node. UI drawn over the map in a Group needs one wire, IsAnyItemHovered
+      to NOT to Interactive (HowTo Put UI over the map). New help patch: HowTo Draw
       geometry in another CRS. New node MapWindow: a map
       in one node, with its window (help: HowTo Open a map window, HowTo Put UI over the map; 33 nodes, 22 patches). Requires VL.NetTopologySuite 0.0.8-alpha, for SetSRID.
 
