@@ -121,6 +121,7 @@
       it is a 2000-line working log of this repository, full of machine paths, and a user reading
       the package wants the design, not the forensics.
     -->
+    <file src="LICENSE" target="docs\LICENSE" />
     <file src="README.md" target="docs\" />
     <file src="docs\ARCHITECTURE.md" target="docs\" />
     <file src="docs\MAPSUI-SURFACE.md" target="docs\" />
