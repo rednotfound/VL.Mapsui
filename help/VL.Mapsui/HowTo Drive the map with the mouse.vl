@@ -25,7 +25,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="DJ8pJkXZNgMFlAk0kMVpul" Bounds="60,90,520,82" ShowValueBox="true" isIOBox="true" Value="Nothing in VL.Mapsui decides what the mouse means. This wiring is one choice - left-drag pans, the wheel zooms, two bangs step a level - and the map nodes would not care if an LFO, OSC or a keyboard drove them instead.">
+          <Pad Id="DJ8pJkXZNgMFlAk0kMVpul" Bounds="60,90,520,82" ShowValueBox="true" isIOBox="true" Value="A map answers the mouse by itself. Wire these nodes to decide what the mouse means: a Drag or ZoomByWheel on the map takes that gesture over. Here left-drag pans, the wheel zooms, two bangs step a level - an LFO or OSC could drive them instead.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>

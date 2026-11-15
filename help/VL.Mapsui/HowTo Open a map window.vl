@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document xmlns:p="property" xmlns:r="reflection" Id="N7V3eTvg4zivl9Hem783vS" LanguageVersion="2025.7.4" Version="0.128">
+  <NugetDependency Id="LkpdTtrzaWh5foJeLINqFW" Location="VL.CoreLib" Version="2025.7.4" />
+  <NugetDependency Id="UHxFtz54Bs40vGgdygkQXa" Location="VL.Skia" Version="2025.7.4" />
+  <Patch Id="HWtlguU9PN4WaUIbS8uUKU">
+    <Canvas Id="HcPWf6IvwUJRiHkxX8z67g" DefaultCategory="Main" BordersChecked="false" CanvasType="FullCategory" />
+    <!--
+
+    ************************ Application ************************
+
+-->
+    <Node Name="Application" Bounds="100,100" Id="CoF30LtAue1e4Db8nvqCZ2">
+      <p:NodeReference>
+        <Choice Kind="ContainerDefinition" Name="Process" />
+        <CategoryReference Kind="Category" Name="Primitive" />
+      </p:NodeReference>
+      <Patch Id="Hc7TP9bqdkPPepkChcfwhv">
+        <Canvas Id="CHNrxdz5adPVVvKHYDXbOk" CanvasType="Group">
+          <Pad Id="RBizgUTcj8NQBJXfEerLQS" Bounds="60,40,240,41" ShowValueBox="true" isIOBox="true" Value="Use MapWindow!">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">20</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="Nb7gwZRj59pK2AWurF7dwF" Bounds="60,90,560,64" ShowValueBox="true" isIOBox="true" Value="A map in one node. Connect layers and the window answers the mouse: left drag pans, the wheel zooms. This patch ships with Enabled off - switch it on to fetch OpenStreetMap.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="LSZhWC2nOoaiMUrWiWzzsf" Comment="Enabled" Bounds="62,180,35,35" ShowValueBox="true" isIOBox="true" Value="False">
+            <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="ImmutableTypeFlag" Name="Boolean" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:buttonmode p:Assembly="VL.UI.Forms" p:Type="VL.HDE.PatchEditor.Editors.ButtonModeEnum">Toggle</p:buttonmode>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="OvIhyVNYemrPgzEU05CfHz" Bounds="300,180,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Switch on to fetch tiles. In your own patch a tile layer is on from the start; help patches ship switched off.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Node Bounds="60,240,110,19" Id="KHZK4djjtkyea9i0hdyKt9">
+            <p:NodeReference LastCategoryFullName="Mapsui.Layers" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="OpenStreetMap" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="VhDNfsNSJbcdn5eWIIfR1K" Name="Enabled" Kind="InputPin" />
+            <Pin Id="FI692OcxMAR2sDMzjdpLNn" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Pad Id="HDbUPtD8hdTORMjcuo8O0f" Bounds="300,250,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; OpenStreetMap is a layer like any other. Whatever you connect is drawn, bottom first.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Node Bounds="60,290,39,19" Id="CEbWqHs6HcKq9gxVj3zQL5">
+            <p:NodeReference LastCategoryFullName="Collections.Spread" LastDependency="VL.CoreLib.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="Cons" />
+              <CategoryReference Kind="RecordType" Name="Spread" NeedsToBeDirectParent="true" />
+            </p:NodeReference>
+            <Pin Id="NJpSaFpiOopEc5anSGgNlS" Name="Input" Kind="InputPin" />
+            <Pin Id="OMKgdzhnJk9PiyecsRgVrK" Name="Result" Kind="OutputPin" />
+          </Node>
+          <Node Bounds="60,345,130,19" Id="OGCJpgsURlYIQG7vPtRqey">
+            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="ProcessAppFlag" Name="MapWindow" />
+              <PinReference Kind="InputPin" Name="Bound to Document" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">High</p:HelpFocus>
+            <Pin Id="VbAfixkKJU9N0OIE4ElShf" Name="Layers" Kind="InputPin" />
+            <Pin Id="JCKzX7HwYJYF5SEEuq5z59" Name="Initial Center Longitude" Kind="InputPin" />
+            <Pin Id="Jczb4qMQYtxJNHyhugLJpo" Name="Initial Center Latitude" Kind="InputPin" />
+            <Pin Id="PPdRU6ze60szP5azTye6WM" Name="Initial Zoom Level" Kind="InputPin" />
+            <Pin Id="LziLG5zmc5MFi8EuFZuLK8" Name="Interactive" Kind="InputPin" />
+            <Pin Id="KI1TAvkjVFovB05cTyMTFX" Name="Bound to Document" Kind="InputPin" DefaultValue="True">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Boolean" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="KP0bfXFgDgo7rRkP56gXDO" Name="Map" Kind="OutputPin" />
+          </Node>
+          <Pad Id="SzJHfAxton67O40ROsmxTP" Bounds="300,330,320,80" ShowValueBox="true" isIOBox="true" Value="&lt; The window, the map and the mouse in one node. Initial Center and Initial Zoom Level are where it opens; Interactive off makes it ignore the mouse.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Node Bounds="60,410,110,19" Id="L90TzlB5khFcc1wGIlljUr">
+            <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.vl">
+              <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+              <Choice Kind="OperationCallFlag" Name="ViewportInfo" />
+            </p:NodeReference>
+            <p:HelpFocus p:Assembly="VL.Lang" p:Type="VL.Model.HelpPriority">Low</p:HelpFocus>
+            <Pin Id="JF8nqHe9qNYOJ8Nsn3VOry" Name="Map" Kind="InputPin" />
+            <Pin Id="I7P4QqAim9YFt0TJroh8bZ" Name="Center Longitude" Kind="OutputPin" />
+            <Pin Id="EfDWU2YyUI63HGVxy1QPob" Name="Center Latitude" Kind="OutputPin" />
+            <Pin Id="FErD6mXrOmmuMFfwvesKf0" Name="Resolution" Kind="OutputPin" />
+          </Node>
+          <Pad Id="UZZl2B2VqcJOEP87hXhtED" Comment="Center Longitude" Bounds="60,455,70,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="KSgw8FnKjG5Y2XdRnY4Y0W" Comment="Center Latitude" Bounds="95,490,70,15" ShowValueBox="true" isIOBox="true" />
+          <Pad Id="VRFTttj39jBmOw2plnpwKI" Bounds="300,418,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; The Map output is the map itself: for ViewportInfo, Pick and the Navigate nodes. Drag the map and watch the centre.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+          <Pad Id="S3HOTmYlEguFUaCweCByNw" Bounds="300,488,320,44" ShowValueBox="true" isIOBox="true" Value="&lt; To draw anything else in the same window, use the parts instead: HowTo Show a map.">
+            <p:TypeAnnotation>
+              <Choice Kind="TypeFlag" Name="String" />
+            </p:TypeAnnotation>
+            <p:ValueBoxSettings>
+              <p:fontsize p:Type="Int32">9</p:fontsize>
+              <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
+            </p:ValueBoxSettings>
+          </Pad>
+        </Canvas>
+        <Patch Id="DFh6QswCJjgbiBVWjvQoad" Name="Create" />
+        <Patch Id="EpoufaSi21fD3agLsrrhkJ" Name="Update" />
+        <ProcessDefinition Id="BxbUB2UPrnTU7poTNW8c4Y">
+          <Fragment Id="Hi1FRRl76m2NF7uAeiYu6p" Patch="DFh6QswCJjgbiBVWjvQoad" Enabled="true" />
+          <Fragment Id="KmJrA70ZCYpRUtY1PJLmi1" Patch="EpoufaSi21fD3agLsrrhkJ" Enabled="true" />
+        </ProcessDefinition>
+        <Link Id="JKzlR8dVHMzpeQ7ujoVVv7" Ids="LSZhWC2nOoaiMUrWiWzzsf,VhDNfsNSJbcdn5eWIIfR1K" />
+        <Link Id="IotDdi04qpn3Eel4k2j1vN" Ids="FI692OcxMAR2sDMzjdpLNn,NJpSaFpiOopEc5anSGgNlS" />
+        <Link Id="OElH0EefN2kQXkCgZ9MEcS" Ids="OMKgdzhnJk9PiyecsRgVrK,VbAfixkKJU9N0OIE4ElShf" />
+        <Link Id="VzbnwGAewGWFnLKiHeDjj5" Ids="KP0bfXFgDgo7rRkP56gXDO,JF8nqHe9qNYOJ8Nsn3VOry" />
+        <Link Id="AmYykJjK6nnAL1dTqQE5Z5" Ids="I7P4QqAim9YFt0TJroh8bZ,UZZl2B2VqcJOEP87hXhtED" />
+        <Link Id="TQrcYwH3Zyt7AwI3vItbFy" Ids="EfDWU2YyUI63HGVxy1QPob,KSgw8FnKjG5Y2XdRnY4Y0W" />
+      </Patch>
+    </Node>
+  </Patch>
+  <NugetDependency Id="M43SmcifmULRmqF7zJv0Zx" Location="VL.Mapsui" Version="0.0.0" />
+</Document>

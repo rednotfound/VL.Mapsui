@@ -395,11 +395,11 @@ if (-not $Path) {
 # the node's Node Info. Measured 2026-09-24: 511 of vvvv 7.4's 689 shipped help patches carry flags.
 if (-not $Path) {
     Write-Host "`nvalidating help flags (F1)" -ForegroundColor Cyan
-    # The 32 public nodes of VL.Mapsui (src\VL.Mapsui; 36 until ToFeatures, ZoomAt and Refresh were removed 2026-09-25, and Attribution 2026-09-26): every [ProcessNode] and every
+    # The 33 public nodes of VL.Mapsui - 32 in C# plus MapWindow, patched in VL.Mapsui.vl since 2026-11-15 (src\VL.Mapsui; 36 until ToFeatures, ZoomAt and Refresh were removed 2026-09-25, and Attribution 2026-09-26): every [ProcessNode] and every
     # public static method of a [Name]d static class. A node added to the package and not here is
     # invisible to this audit, so keep the two in step - docs\MAPSUI-SURFACE.md lists the same set.
     $ourNodes = @(
-        'Mapsui|Map', 'Mapsui|ViewportInfo', 'Mapsui|LayerInfo', 'Mapsui|Pick',
+        'Mapsui|Map', 'Mapsui|MapWindow', 'Mapsui|ViewportInfo', 'Mapsui|LayerInfo', 'Mapsui|Pick',
         'Mapsui.Project|ScreenToWorld', 'Mapsui.Project|WorldToScreen', 'Mapsui.Debug|DiagnosticsLayer',
         'Mapsui.Layers|OpenStreetMap', 'Mapsui.Layers|XYZ', 'Mapsui.Layers|FeatureLayer', 'Mapsui.Layers|Geometry',
         'Mapsui.Layers|TileCache', 'Mapsui.Layers|Graticule', 'Mapsui.Layers|VisibleRange',

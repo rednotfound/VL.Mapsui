@@ -223,6 +223,7 @@ and the tests do — except `MapNodes`, which became `DebugNodes` to match its c
 
 | node | category | kind | class | file |
 |---|---|---|---|---|
+| MapWindow | Mapsui | **patched** process | a definition in `VL.Mapsui.vl` wrapping `Map`, `ToSkiaLayer` and Skia's `Renderer` | `VL.Mapsui.vl` |
 | Map | Mapsui | process | `MapNode` | `MapNode.cs` |
 | ViewportInfo, LayerInfo | Mapsui | static | `MapInfoNodes` | `MapInfoNodes.cs` |
 | Pick | Mapsui | process | `PickNode` | `PickNode.cs` |

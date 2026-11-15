@@ -32,7 +32,7 @@
       service, VL.NetTopologySuite, a ForEach over a record of your own - never has to know that
       Mapsui will draw it.
 
-      32 nodes and 20 help patches, from the smallest working map to styling by a value; every
+      33 nodes and 21 help patches, from the smallest working map to styling by a value; every
       node opens one on F1.
 
       The node surface can still change between prereleases, and Mapsui's editing and WMS/WFS
@@ -50,7 +50,8 @@
       pans, the wheel zooms. ToSkiaLayer's new Interactive pin
       switches that off, and a Drag, ZoomByWheel or Click node wired to the map takes that gesture
       over, so patches made with 0.0.2-alpha behave as before. New help patch: HowTo Draw
-      geometry in another CRS (20 patches). Requires VL.NetTopologySuite 0.0.8-alpha, for SetSRID.
+      geometry in another CRS. New node MapWindow: a map
+      in one node, with its window (help: HowTo Open a map window; 33 nodes, 21 patches). Requires VL.NetTopologySuite 0.0.8-alpha, for SetSRID.
 
       0.0.2-alpha (2026-11-08) - No node added, removed or changed; 32 nodes. Every node's tooltip
       is now short: a one-line summary, a sentence of usage and a line per pin. The help follows

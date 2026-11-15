@@ -8,7 +8,117 @@
   <NugetDependency Id="DtwXVBRe6aQkT181NLhE1i" Location="NetTopologySuite.Features" Version="2.1.0" />
   <NugetDependency Id="DFZbuOs18UewjPmtzRlxNE" Location="Mapsui.Rendering.Skia" Version="4.1.9" />
   <Patch Id="LVkoJXByLMF5JQz9FpO910">
-    <Canvas Id="AhuURXyh7Pvvv7k8RuOlFF" DefaultCategory="Mapsui" CanvasType="FullCategory" />
+    <Canvas Id="AhuURXyh7Pvvv7k8RuOlFF" DefaultCategory="Mapsui" CanvasType="FullCategory">
+      <Node Name="MapWindow" Bounds="100,220" Id="GrVqnAqigq0jIsS9YywPnH" Summary="A window that shows a map. The mouse moves it." Remarks="Connect layers and it is a map: left drag pans, the wheel zooms.&#xD;&#xA;The Map output goes to the Navigate nodes and to Pick.&#xD;&#xA;To draw anything else in the same window, use Map and ToSkiaLayer with a Renderer instead." Tags="renderer,window,map">
+        <p:NodeReference>
+          <Choice Kind="ContainerDefinition" Name="Process" />
+          <FullNameCategoryReference ID="Primitive" />
+        </p:NodeReference>
+        <Patch Id="C9iprShirg9BV8ohm2ffeU">
+          <Canvas Id="IeeLQcOMlc3szPvVaaRSVQ" CanvasType="Group">
+            <Node Bounds="100,160,110,19" Id="UL3GClzTnPtIzZVSQDAOkQ">
+              <p:NodeReference LastCategoryFullName="Mapsui" LastDependency="VL.Mapsui.dll">
+                <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+                <Choice Kind="ProcessAppFlag" Name="Map" />
+              </p:NodeReference>
+              <Pin Id="JQmXSa0afIizSnqcQAoYA6" Name="Layers" Kind="InputPin" />
+              <Pin Id="IQiRfFrZkiFoTXDHWDn8j8" Name="Initial Center Longitude" Kind="InputPin" />
+              <Pin Id="PRznP5HgZy7BEYOd0ORLIM" Name="Initial Center Latitude" Kind="InputPin" />
+              <Pin Id="DwBDhCd1z1Pz2XyJooRUDu" Name="Initial Zoom Level" Kind="InputPin" />
+              <Pin Id="NqmZ6Krn614jfV40wMEaHX" Name="Result" Kind="OutputPin" />
+            </Node>
+            <Node Bounds="100,220,130,19" Id="RhfrqMVqncda9SanGJ9kPO">
+              <p:NodeReference LastCategoryFullName="Mapsui.Skia" LastDependency="VL.Mapsui.dll">
+                <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+                <Choice Kind="ProcessAppFlag" Name="ToSkiaLayer" />
+              </p:NodeReference>
+              <Pin Id="UMoc25yAXUw4unHKh4fWmd" Name="Map" Kind="InputPin" />
+              <Pin Id="CP3POJEhe5sTTtYwAjYzoW" Name="Interactive" Kind="InputPin" />
+              <Pin Id="B7ZOWzFnLuVXaA20Mbr2Ek" Name="Result" Kind="OutputPin" />
+            </Node>
+            <Node Bounds="60,280,185,19" Id="RBKQAi2wzH07wnJdL3xwnB">
+              <p:NodeReference LastCategoryFullName="Graphics.Skia" LastDependency="VL.Skia.vl">
+                <Choice Kind="NodeFlag" Name="Node" Fixed="true" />
+                <Choice Kind="ProcessAppFlag" Name="Renderer" />
+                <PinReference Kind="InputPin" Name="Bound to Document" />
+                <PinReference Kind="InputPin" Name="Bounds" />
+              </p:NodeReference>
+              <Pin Id="DCxuyIVvqQDaQs7SSHxmkW" Name="Bounds" Kind="InputPin" />
+              <Pin Id="At27ZwnyL37E7S70VUGPPL" Name="Bound to Document" Kind="InputPin" />
+              <Pin Id="LeJhRAaISMDwPOXpW85iDp" Name="Input" Kind="InputPin" />
+              <Pin Id="B0nEDnXTHgAluSn75ZURmR" Name="Title" Kind="InputPin" DefaultValue="Map">
+                <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                  <Choice Kind="TypeFlag" Name="String" />
+                </p:TypeAnnotation>
+              </Pin>
+            </Node>
+          </Canvas>
+          <Patch Id="RpyQI6nnzkMBkLhuaJYmK6" Name="Create">
+            <Pin Id="PbfViCxfJPXbbyhxodGHHD" Name="Bounds" Kind="InputPin" Bounds="420,80" DefaultValue="1000, 40, 900, 560" Visibility="Optional">
+              <p:TypeAnnotation LastCategoryFullName="System.Drawing" LastDependency="System.Drawing.dll">
+                <Choice Kind="TypeFlag" Name="Rectangle" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="C9v0pLzA177o5U6KWNsvJq" Name="Bound to Document" Kind="InputPin" Bounds="540,80" DefaultValue="False" Visibility="Optional">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Boolean" />
+              </p:TypeAnnotation>
+            </Pin>
+          </Patch>
+          <Patch Id="UdjUtF2QrhFjWJ1EGzbQ8s" Name="Update">
+            <Pin Id="LJyYxviIYMqcb12bCE7QZ1" Name="Layers" Kind="InputPin" Bounds="100,80">
+              <p:TypeAnnotation LastCategoryFullName="Collections" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Sequence" />
+                <p:TypeArguments>
+                  <TypeReference LastCategoryFullName="Mapsui.Layers" LastDependency="Mapsui.dll">
+                    <Choice Kind="TypeFlag" Name="ILayer" />
+                  </TypeReference>
+                </p:TypeArguments>
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="MQwoLEekibLvzWzut8sukG" Name="Initial Center Longitude" Kind="InputPin" Bounds="180,80" DefaultValue="139.7">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Float64" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="CeecyAYX9DNDlnliGkdLqi" Name="Initial Center Latitude" Kind="InputPin" Bounds="260,80" DefaultValue="35.68">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Float64" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="HlNx7V0140ChIU88mPHsfq" Name="Initial Zoom Level" Kind="InputPin" Bounds="340,80" DefaultValue="12">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Integer32" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="Ns1sPymuSoC1Rb62AvyjMU" Name="Interactive" Kind="InputPin" Bounds="380,120" DefaultValue="True">
+              <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
+                <Choice Kind="TypeFlag" Name="Boolean" />
+              </p:TypeAnnotation>
+            </Pin>
+            <Pin Id="OONoYBehUPZuWALFetJ2Ig" Name="Map" Kind="OutputPin" Bounds="300,340">
+              <p:TypeAnnotation LastCategoryFullName="Mapsui" LastDependency="Mapsui.dll">
+                <Choice Kind="TypeFlag" Name="Map" />
+              </p:TypeAnnotation>
+            </Pin>
+          </Patch>
+          <ProcessDefinition Id="IZ8sWFkiagOaMEEgpqmJBg">
+            <Fragment Id="OGOBzdpo7SEGRsXsPA6sBn" Patch="RpyQI6nnzkMBkLhuaJYmK6" Enabled="true" />
+            <Fragment Id="BdRZrQEvGGyJwZkpOtv9DZ" Patch="UdjUtF2QrhFjWJ1EGzbQ8s" Enabled="true" />
+          </ProcessDefinition>
+          <Link Id="PwXlv0cwByupruA1qFNaAq" Ids="LJyYxviIYMqcb12bCE7QZ1,JQmXSa0afIizSnqcQAoYA6" IsHidden="true" />
+          <Link Id="BNaAs5wxAbn5PpnSn82kzs" Ids="MQwoLEekibLvzWzut8sukG,IQiRfFrZkiFoTXDHWDn8j8" IsHidden="true" />
+          <Link Id="DqIClqlosaJiWEm52vRP5A" Ids="CeecyAYX9DNDlnliGkdLqi,PRznP5HgZy7BEYOd0ORLIM" IsHidden="true" />
+          <Link Id="POusCjO7ezFJSi1KJCrnC8" Ids="HlNx7V0140ChIU88mPHsfq,DwBDhCd1z1Pz2XyJooRUDu" IsHidden="true" />
+          <Link Id="O7yPjO7wafRNCMZHM78tgq" Ids="Ns1sPymuSoC1Rb62AvyjMU,CP3POJEhe5sTTtYwAjYzoW" IsHidden="true" />
+          <Link Id="DfxeGDqFGfb3KsThbHz7p9" Ids="NqmZ6Krn614jfV40wMEaHX,UMoc25yAXUw4unHKh4fWmd" />
+          <Link Id="LROGsYx8AQrZ6Bc2NcsCmz" Ids="B7ZOWzFnLuVXaA20Mbr2Ek,LeJhRAaISMDwPOXpW85iDp" />
+          <Link Id="HA9fHQ0A2jiZDWWb7LClGY" Ids="NqmZ6Krn614jfV40wMEaHX,OONoYBehUPZuWALFetJ2Ig" IsHidden="true" />
+          <Link Id="UQd0nKYBNHwDkT6wVQyN1r" Ids="PbfViCxfJPXbbyhxodGHHD,DCxuyIVvqQDaQs7SSHxmkW" IsHidden="true" />
+          <Link Id="CjWmkVwbHBKKS2gfPzDTPp" Ids="C9v0pLzA177o5U6KWNsvJq,At27ZwnyL37E7S70VUGPPL" IsHidden="true" />
+        </Patch>
+      </Node>
+    </Canvas>
     <!--
 
     ************************ Application ************************

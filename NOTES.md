@@ -98,6 +98,38 @@ Overview: 0 connections after 30 s. `Compile-HelpPatches` 20 of 20, `Test-VLPatc
 `Test-VLPackage` green. (The afternoon's probe had started 91 and 38 pixels off its initial
 centre; this one started on it. Not explained - a hand on the mouse is the likeliest cause.)
 
+### And `MapWindow`: the package's first patched node
+
+Asked whether to wrap everything in one node "like SceneRender". Read first: VL.Skia's `Renderer`
+is itself a VL patch around `SkiaRendererNode`, with `Bounds` and `Bound to Document` on its
+Create fragment; VL.Stride's `SceneWindow` is the same shape with `Camera` + `Enable Default
+Camera`, and `SceneTexture` is "the same but returns a texture". Skia's `Renderer (OffScreen)`
+returns an IMAGE - so the twin a patch can keep building UI on is not an off-screen window but the
+LAYER, which `Map` → `ToSkiaLayer` already is. Hence three forms, not two new nodes: `MapWindow`,
+the layer form, the Navigate nodes.
+
+`MapWindow` is a process definition in `VL.Mapsui.vl` (the root `Canvas` is no longer
+self-closed): `Map` → `ToSkiaLayer` → `Renderer` (title `Map`), Update pins `Layers`
+(`Sequence<ILayer>`), the three `Initial` pins and `Interactive`, optional Create pins `Bounds` and
+`Bound to Document`, output `Map`. Every pin typed, per the family's subpatch recipe
+(vl-overworld `docs/SUBPATCHES.md`). **No Overlay pin**: surveyed (corner slots in MapLibre,
+deck.gl, ArcGIS `view.ui.add`, Google's control positions; OpenLayers' `stopEvent`; Unity's three
+canvas modes; Stride's optional, hidden `Additional Scene Renderers`) and left out by the
+maintainer - UI over the map is what the layer form and Skia's `Group` are for.
+
+Generated C# of a probe: `MapWindow_P.Create(Node_Context, Bounds_In, Bound_to_Document_In)` in the
+caller's `__Create__`, `MapWindow_11.Update(Layers_In: ..., Interactive_In: ...)` in `Update`, the
+`Map` output feeding `ViewportInfo`. **Seen in vvvv 7.4:** `OpenStreetMap` → `Cons` → `MapWindow`
+opens a window titled `Map` over Kyoto with its credit; the same scripted drag and two wheel
+notches end on the same street grid as the five-node probe. `HowTo Open a map window` (new, first
+in Help.xml) opened and photographed. `Test-VLPatch` 33 of 33 on F1, `Compile-HelpPatches` 21 of
+21, `Test-VLPackage` green. `HowTo Show a map` and `HowTo Drive the map with the mouse` had three
+sentences changed (text only): the first is "the parts MapWindow is made of", the second no longer
+says "nothing in VL.Mapsui decides what the mouse means".
+
+Not verified: a Skia or ImGui control drawn over the map keeping its own clicks (unit level only);
+`MapWindow`'s optional `Bounds` pin; two `MapWindow`s in one patch.
+
 ---
 
 ## 2026-11-15 — the layers read the SRID: 3857 is drawn as it is, anything else is refused by name

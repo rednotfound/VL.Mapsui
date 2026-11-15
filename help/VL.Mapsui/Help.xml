@@ -10,6 +10,7 @@
 		<VLDocument link="Explanation Overview of available nodes.vl" tags="overview,explanation,start,map,mapsui,openstreetmap,osm,tiles,gis,layers,styles,navigate,widgets,categories" />
 	</Topic>
 	<Topic title="A map on screen">
+		<VLDocument link="HowTo Open a map window.vl" tags="mapWindow,window,map,first,smallest,start,openstreetmap,osm,tiles,mouse,drag,pan,wheel,zoom,interactive,viewportInfo,renderer" />
 		<VLDocument link="HowTo Show a map.vl" tags="map,tiles,openstreetmap,osm,enabled,toSkiaLayer,renderer,viewportInfo,diagnostics,smallest,first" />
 		<VLDocument link="HowTo Cache tiles.vl" tags="cache,tileCache,disk,folder,tiles,size,offline,expire,localappdata,path,policy" />
 		<VLDocument link="HowTo Use any tile service.vl" tags="xyz,tiles,url,template,slippy,tileServer,basemap,terrain,satellite,opentopomap,attribution,enabled,policy" />

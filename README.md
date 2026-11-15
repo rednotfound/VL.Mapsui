@@ -23,8 +23,8 @@ than what is wrapped (a few dozen of its 306 public types; see
 
 | | |
 |---|---|
-| ✅ | 32 nodes: tile layers (OpenStreetMap, any XYZ service), a disk cache, geometry and feature layers, a lat/lon graticule, five styles, navigation, picking, pixel↔degree conversion, widgets |
-| ✅ | 20 help patches, every node opens one on F1; each compiles headlessly and was opened in vvvv before release |
+| ✅ | 33 nodes: tile layers (OpenStreetMap, any XYZ service), a disk cache, geometry and feature layers, a lat/lon graticule, five styles, navigation, picking, pixel↔degree conversion, widgets |
+| ✅ | 21 help patches, every node opens one on F1; each compiles headlessly and was opened in vvvv before release |
 | ✅ | 283 tests, no network, shaped like frame loops because the expensive bugs here were about lifetime |
 | ⚠️ | Mapsui 4.1.9, not 5.x: Mapsui 5 needs SkiaSharp 3 and vvvv ships 2.88 |
 | ❌ | Not wrapped yet: editing geometry on the map, WMS/WFS, image and rasterizing layers, TMS, layer opacity. The map is WebMercator; reprojection is not exposed |
@@ -75,7 +75,7 @@ and uninstalling VL.GIS does not remove it. The symptom is a `TypeLoadException`
 ## Not one map node
 
 ```
-Mapsui              Map  ViewportInfo  LayerInfo  Pick
+Mapsui              MapWindow  Map  ViewportInfo  LayerInfo  Pick
 Mapsui.Layers       OpenStreetMap  XYZ  TileCache  Geometry  FeatureLayer  Graticule  VisibleRange
 Mapsui.Styles       VectorStyle  SymbolStyle  LabelStyle  StyleByGeometry  StyleByValue
 Mapsui.Navigate     CenterOn  ZoomToLevel  ZoomByWheel  DragBetween  Drag  ZoomIn  ZoomOut

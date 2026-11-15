@@ -29,6 +29,7 @@ out to be sitting in a Mapsui dependency we already ship.
 | `LabelStyle` | `Mapsui.Styles` | writes an attribute of each feature. `LabelColumn` names an attribute, so one style labels a thousand features differently |
 | `Geometry` | `Mapsui.Layers` | the shortcut: shapes and one colour, composed from the three above |
 | `TileCache` | `Mapsui.Layers` | the disk cache itself: where tiles go and how much is there |
+| `MapWindow` | `Mapsui` | nothing of Mapsui's: `Map` + `ToSkiaLayer` + VL.Skia's `Renderer` in one patched node. Mapsui's own equivalent, `MapControl`, is a UI-framework control and is not wrapped |
 | `Map` | `Mapsui` | the `Map` and its layer collection |
 | `ViewportInfo`, `LayerInfo` | `Mapsui` | readers — centre, resolution, size; layer count and busy |
 | `CenterOn`, `ZoomToLevel`, `ZoomByWheel`, `DragBetween` | `Mapsui.Navigate` | the navigator |

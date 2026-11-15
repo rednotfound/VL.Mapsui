@@ -37,10 +37,10 @@ NOTES.md keeps the old name where it records what was measured then.
 
 **Current state (2026-09-26): `0.0.1-alpha` is on nuget.org — a prerelease, an early preview, not a
 stable version. The working version is `0.0.2-alpha`.** A map renders in vvvv 7.4, pans, zooms and takes geometry from
-any NTS source. **32 nodes, 283 tests.** VL.NetTopologySuite, which this package depends on, went up the
+any NTS source. **33 nodes (32 in C#, `MapWindow` patched), 283 tests.** VL.NetTopologySuite, which this package depends on, went up the
 same day, first. See "Releasing"
-below and [docs/RELEASE.md](docs/RELEASE.md). **The help is the second test suite: 20 patches (19 until 2026-11-15) in the
-community's measured style, every one of the 32 nodes opens one on F1** (`tools\Test-VLPatch.ps1`
+below and [docs/RELEASE.md](docs/RELEASE.md). **The help is the second test suite: 21 patches (19 until 2026-11-15) in the
+community's measured style, every one of the 33 nodes opens one on F1** (`tools\Test-VLPatch.ps1`
 audits the flags), all 19 compile with every process node constructed in `Create`
 (`tools\Compile-HelpPatches.ps1` reads the generated C#), and every one was hand-arranged by the
 user in the GUI, then opened in vvvv and photographed (last full pass 2026-09-25). The plan, the decisions and what the patches found are in
@@ -76,9 +76,20 @@ same day): OpenStreetMap is a layer the patch adds, and basemap and data are not
 that off; wiring a `Drag`, `DragBetween`, `ZoomByWheel` or `Click` node takes that one gesture over
 automatically, so no existing patch pans twice. The code and the reasoning are in
 `src\VL.Mapsui\MapInteraction.cs`; it goes through the same Navigator calls as the Navigate nodes and
-rebuilds nothing (rule 4 is untouched). **Owed: the help** - `HowTo Show a map` and `HowTo Drive the
-map with the mouse` still teach the fourteen-node way as the only way, and no patch shows
-`Interactive`.
+rebuilds nothing (rule 4 is untouched).
+
+**Three ways to put a map on screen, since 2026-11-15** (Stride's shape: `SceneWindow`, then the
+parts): **`MapWindow`** - one node, a window, the mouse; **`Map` → `ToSkiaLayer` → any `Renderer`** -
+the same thing as a Skia layer, for a patch that draws other things in that window (ImGui, Skia, a
+`Group`) or renders off screen; and the **Navigate nodes** to drive it from the patch. `MapWindow` is
+this package's first PATCHED node: a process definition inside `VL.Mapsui.vl` wrapping `Map`,
+`ToSkiaLayer` and Skia's `Renderer`, copied from how VL.Skia's own `Renderer` and VL.Stride's
+`SceneWindow` are built. It has **no Overlay pin, on purpose** (the maintainer's call, 2026-11-15):
+whoever needs UI over the map uses the layer form and Skia's `Group`; a pin can be added later
+without breaking a patch, never removed. `Compile-HelpPatches` recognises it by
+`MapWindow_P.Create(`. `HowTo Open a map window` is its F1 page and the first lesson; `HowTo Show a
+map` is now "the parts". **Not yet verified in vvvv: a Skia or ImGui button drawn over the map
+keeping its own clicks** - the code skips a press something else handled, unit-tested only.
 
 **The layers read a geometry's SRID (2026-11-15, not yet published):** 0 and 4326
 are projected, 3857 is drawn as it is, anything else is left off the layer and `Status` names the
@@ -263,7 +274,7 @@ vl-mapsui/
 ├── docs/READING-GUIDE.zh.md      # the maintainer's guide in Chinese, C# explained through JS; keep file names in it current
 ├── docs/NODE-READING.zh.html     # its sequel: seven nodes read line by line; quotes source WITH LINE NUMBERS as of 6e5f8b2 (FeatureLayer/Geometry moved on 2026-11-15)
 ├── LICENSE, .gitattributes       # MIT; .vl and Help.xml bytes pinned (-text)
-├── VL.Mapsui.vl / .nuspec        # the package. .vl is hand-edited but never regenerated
+├── VL.Mapsui.vl / .nuspec        # the package. .vl is hand-edited but never regenerated; it DEFINES MapWindow (a patch)
 ├── src/VL.Mapsui/                # 32 nodes, one top-level type per file, FILE NAME = TYPE NAME (2026-10-17)
 │   │                             # node -> class -> file table: docs/ARCHITECTURE.md "Where each node lives"
 │   ├── MapNode.cs, MapInfoNodes.cs     # [ProcessNode] Map; static ViewportInfo, LayerInfo
@@ -289,7 +300,7 @@ vl-mapsui/
 │   ├── ToSkiaLayerNode.cs, MapsuiLayer.cs # [ProcessNode] ToSkiaLayer; the VL.Skia.ILayer that draws, + overlay
 │   ├── DebugNodes.cs, DiagnosticsLayer.cs # static DiagnosticsLayer (category Mapsui.Debug)
 │   └── PixelSpace.cs, FeatureHelper.cs, AssemblyInfo.cs # pixel/VL space bridge; NTS<->Mapsui feature helper
-├── help/VL.Mapsui/               # Explanation + 19 HowTos + Help.xml (8 domain topics); one High flag per node
+├── help/VL.Mapsui/               # Explanation + 20 HowTos + Help.xml (8 domain topics); one High flag per node
 ├── test/VL.Mapsui.Tests/         # 283 xunit tests, no network, no vvvv
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org
@@ -297,7 +308,7 @@ vl-mapsui/
     ├── Open-HelpPatch.ps1        # the ONLY way to launch vvvv here - three package repositories
     ├── Open-HelpPatch-GUI.ps1    # the picker window behind Open-HelpPatch.cmd (repo root): open, close mine, normalize, check
     ├── Test-VLPackage.ps1        # static package validator
-    ├── Test-VLPatch.ps1          # per-document validator: IDs, links, label overlap, help flags (32 of 32), Help.xml pairing
+    ├── Test-VLPatch.ps1          # per-document validator: IDs, links, label overlap, help flags (33 of 33), Help.xml pairing
     ├── HelpPatchGen.ps1          # scaffold for a new help patch (MapWindow, MouseXY, Button); the .vl is the truth afterwards
     ├── Capture-Renderer.ps1      # photographs the renderer (-Title '' the editor) - rung 4 without a person relaying
     ├── Normalize-HelpPatches.ps1 # run after any GUI session - vvvv repins deps AND saves Enabled=True

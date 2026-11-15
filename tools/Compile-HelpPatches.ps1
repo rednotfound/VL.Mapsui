@@ -132,6 +132,10 @@ if ($patches.Count -eq 0) { throw "No help patch matches -Patch '$Patch'" }
 $OurNodes = @{
     # Mapsui
     'Map'             = 'new\s+[\w\.]*MapNode\('
+    # MapWindow is PATCHED (a process definition in VL.Mapsui.vl, 2026-11-15), not a C# class: a
+    # resolved use compiles to MapWindow_P.Create(...) in the caller's __Create__ and nowhere else,
+    # so this one pattern is both the resolution check and the Create check.
+    'MapWindow'       = 'MapWindow_P\.Create\('
     'ViewportInfo'    = 'MapInfoNodes\.ViewportInfo\('
     'LayerInfo'       = 'MapInfoNodes\.LayerInfo\('
     'Pick'            = 'new\s+[\w\.]*PickNode\('

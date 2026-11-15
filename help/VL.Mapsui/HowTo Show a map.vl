@@ -25,7 +25,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="Ki4IMtiCn6qrN3JRnVRjn0" Bounds="60,90,520,82" ShowValueBox="true" isIOBox="true" Value="The smallest complete map: a tile layer, a Map to hold it, ToSkiaLayer to draw it. Enabled starts OFF - opening this document runs it, and you have agreed to nothing yet. Read the note beside the switch, then switch it on.">
+          <Pad Id="Ki4IMtiCn6qrN3JRnVRjn0" Bounds="60,90,520,82" ShowValueBox="true" isIOBox="true" Value="The parts MapWindow is made of: a tile layer, a Map to hold it, ToSkiaLayer to draw it into any Renderer. The mouse moves it. This patch ships with Enabled OFF - read the note beside the switch, then switch it on.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
@@ -188,7 +188,7 @@
               <p:stringtype p:Assembly="VL.Core" p:Type="VL.Core.StringType">Comment</p:stringtype>
             </p:ValueBoxSettings>
           </Pad>
-          <Pad Id="In3MPr0otcgwHoL1tHGbH5" Bounds="507,511,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Initial Center and Initial Zoom Level are where the window opens. Moving it afterwards is the Navigate nodes' job.">
+          <Pad Id="In3MPr0otcgwHoL1tHGbH5" Bounds="507,511,320,62" ShowValueBox="true" isIOBox="true" Value="&lt; Initial Center and Initial Zoom Level are where the window opens. Afterwards the mouse moves it, and so do the Navigate nodes' job.">
             <p:TypeAnnotation LastCategoryFullName="Primitive" LastDependency="VL.CoreLib.vl">
               <Choice Kind="TypeFlag" Name="String" />
             </p:TypeAnnotation>
