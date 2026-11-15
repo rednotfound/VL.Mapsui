@@ -26,6 +26,17 @@ already made untrue.) The retired `VL.GIS` lives only on GitHub now
 still declares BruTile 6 and conflicts with this package — the README's Install section says what
 a user has to delete by hand.
 
+**2026-11-15: `0.0.3-alpha` is on nuget.org; working version `0.0.4-alpha`** (nuspec + UserAgent).
+**Everything below dated 2026-11-15 - SRID, the mouse, `Enabled` on, `MapWindow`, the help's new
+host - is 0.0.4-alpha**: it was built on a branch cut before 0.0.3-alpha was released from a
+worktree, called itself 0.0.3-alpha until the merge found the tag, and was renumbered then.
+**`git fetch` and compare `main` with `origin/main` before preparing a release.**
+It skips empty geometries in both layer nodes: since VL.NetTopologySuite 0.0.8-alpha a missing
+input gives an empty geometry, and Mapsui 4.1.9 reads its extent as (-1, -1)-(0, 0), which
+stretched a layer to the mercator origin. Built and packed in a git worktree beside this folder,
+because this one held another session's uncommitted work. The README is the short vvvv-library
+one; the old README is docs/GUIDE.md.
+
 **2026-11-08: `0.0.2-alpha` is on nuget.org** (browser upload; installed back with `Test-Install
 -Published -Version 0.0.2-alpha`, both packages signed, 19 of 19 compile); **working version
 `0.0.3-alpha`** (nuspec + UserAgent). No node changed in it; the help follows
@@ -37,7 +48,7 @@ NOTES.md keeps the old name where it records what was measured then.
 
 **Current state (2026-09-26): `0.0.1-alpha` is on nuget.org — a prerelease, an early preview, not a
 stable version. The working version is `0.0.2-alpha`.** A map renders in vvvv 7.4, pans, zooms and takes geometry from
-any NTS source. **33 nodes (32 in C#, `MapWindow` patched), 283 tests.** VL.NetTopologySuite, which this package depends on, went up the
+any NTS source. **33 nodes (32 in C#, `MapWindow` patched), 284 tests.** VL.NetTopologySuite, which this package depends on, went up the
 same day, first. See "Releasing"
 below and [docs/RELEASE.md](docs/RELEASE.md). **The help is the second test suite: 22 patches (19 until 2026-11-15) in the
 community's measured style, every one of the 33 nodes opens one on F1** (`tools\Test-VLPatch.ps1`
@@ -69,7 +80,7 @@ two repositories while every guard reported success. Only an **unconnected** pin
 that can mean "the default". The cache is a value now (`TileCache` produces it, `OpenStreetMap`
 consumes it) and no patch here contains a Path IOBox. See NOTES.md, 2026-08-14, and rule 8 below.
 
-**The map is an engine out of the box (2026-11-15, the maintainer's decision; 283 tests, seen in vvvv
+**The map is an engine out of the box (2026-11-15, the maintainer's decision; 284 tests, seen in vvvv
 with the real mouse - NOTES.md):** a map drawn by `ToSkiaLayer` answers the mouse - left drag pans,
 the wheel zooms, a left press clicks a widget. There is no default basemap (built and withdrawn the
 same day): OpenStreetMap is a layer the patch adds, and basemap and data are not separated. `ToSkiaLayer`'s `Interactive` pin switches
@@ -320,7 +331,7 @@ vl-mapsui/
 │   ├── DebugNodes.cs, DiagnosticsLayer.cs # static DiagnosticsLayer (category Mapsui.Debug)
 │   └── PixelSpace.cs, FeatureHelper.cs, AssemblyInfo.cs # pixel/VL space bridge; NTS<->Mapsui feature helper
 ├── help/VL.Mapsui/               # Explanation + 21 HowTos + Help.xml (9 domain topics); one High flag per node
-├── test/VL.Mapsui.Tests/         # 283 xunit tests, no network, no vvvv
+├── test/VL.Mapsui.Tests/         # 284 xunit tests, no network, no vvvv
 ├── build.ps1, pack.ps1           # build + stage dist\, pack into dist\feed\
 ├── NuGet.config                  # sources pinned to nuget.org
 └── tools/
@@ -339,7 +350,7 @@ vl-mapsui/
 
 ## Tests
 
-`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 283 tests, about two seconds. No
+`dotnet test test\VL.Mapsui.Tests\VL.Mapsui.Tests.csproj` — 284 tests, about two seconds. No
 network and no vvvv: the tile source is faked, and the geometry tests use a MemoryLayer.
 
 They exist because the expensive bug here was a **lifetime** bug, not an arithmetic one, so

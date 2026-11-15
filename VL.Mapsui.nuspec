@@ -2,14 +2,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>VL.Mapsui</id>
-    <!-- The WORKING version: always one ahead of what is on nuget.org (0.0.2-alpha, 2026-11-08), so a
+    <!-- The WORKING version: always one ahead of what is on nuget.org (0.0.3-alpha, 2026-11-15), so a
          local repack can never be mistaken for the published package in a NuGet cache. Managed in
          step with VL.NetTopologySuite; the dependency below is the oldest PUBLISHED version of it
          that this package's help works with (0.0.8-alpha: SetSRID, which the help uses since 2026-11-15; FromWKT came in 0.0.6), never its working version. -->
-    <version>0.0.3-alpha</version>
+    <version>0.0.4-alpha</version>
     <title>VL.Mapsui — Mapsui map engine nodes for vvvv gamma</title>
-    <authors>VL.Mapsui Contributors</authors>
-    <owners>VL.Mapsui Contributors</owners>
+    <authors>red</authors>
+    <owners>red</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <projectUrl>https://github.com/rednotfound/VL.Mapsui</projectUrl>
@@ -17,31 +17,10 @@
          is packed to docs\ below), and nuget pack refuses to pack if it is not in <files>. Settled
          the same way in VL.NetTopologySuite, 2026-09-25. -->
     <readme>docs\README.md</readme>
-    <description>
-      EARLY - not ready for real work yet.
-
-      A real map engine as nodes for vvvv gamma. Tile layers from OpenStreetMap or any XYZ
-      service, your own geometry drawn on top, labels taken from your data, and a Pick node
-      that tells you which feature you are pointing at.
-
-      Deliberately not one all-in-one map node. The pieces are Mapsui's own - Map, layers,
-      Navigator - so a patch composes them, decides for itself how the mouse drives the map,
-      and can put its own layers on it. That is what a patching environment is for.
-
-      Geometry crosses the boundary as NetTopologySuite, so whatever produced it - a file, a
-      service, VL.NetTopologySuite, a ForEach over a record of your own - never has to know that
-      Mapsui will draw it.
-
-      33 nodes and 22 help patches, from the smallest working map to styling by a value; every
-      node opens one on F1.
-
-      The node surface can still change between prereleases, and Mapsui's editing and WMS/WFS
-      surfaces are not wrapped yet. Requires vvvv gamma 7.4 or newer (.NET 8).
-      Install with: nuget install VL.Mapsui -pre
-    </description>
-    <summary>Mapsui map engine as composable nodes for vvvv gamma.</summary>
+    <description>Maps in VL, built on Mapsui: OpenStreetMap or any tile service, with your own geometry and features on top.</description>
+    <summary>Maps in VL, built on Mapsui: OpenStreetMap or any tile service, with your own geometry and features on top.</summary>
     <releaseNotes>
-      0.0.3-alpha (2026-11-15) - Geometry and FeatureLayer read each geometry's
+      0.0.4-alpha (2026-11-15) - Geometry and FeatureLayer read each geometry's
       SRID: 0 and 4326 are longitude and latitude as before, 3857 is drawn as it is, and any other
       is not drawn - Status names the code and says to Reproject (VL.PROJ) to 4326 first. Geometry
       has a new Status output. What Pick hands back is labelled SRID 4326. OpenStreetMap and XYZ now
@@ -55,6 +34,13 @@
       to NOT to Interactive (HowTo Put UI over the map). New help patch: HowTo Draw
       geometry in another CRS. New node MapWindow: a map
       in one node, with its window (help: HowTo Open a map window, HowTo Put UI over the map; 33 nodes, 22 patches). Requires VL.NetTopologySuite 0.0.8-alpha, for SetSRID.
+
+      0.0.3-alpha (2026-11-15) - No node added, removed or changed; 32 nodes. Fixed: GeometryLayer and
+      FeatureLayer skip an empty geometry as they skip a missing one. Since VL.NetTopologySuite
+      0.0.8-alpha a node whose input is missing gives an empty geometry instead of nothing, and one
+      empty geometry stretched the layer's extent from your data to the map's origin, off the coast of
+      Africa. The README is the short one the vvvv libraries have; the long read is docs/GUIDE.md on
+      GitHub.
 
       0.0.2-alpha (2026-11-08) - No node added, removed or changed; 32 nodes. Every node's tooltip
       is now short: a one-line summary, a sentence of usage and a line per pin. The help follows
@@ -127,6 +113,7 @@
       it is a 2000-line working log of this repository, full of machine paths, and a user reading
       the package wants the design, not the forensics.
     -->
+    <file src="LICENSE" target="docs\LICENSE" />
     <file src="README.md" target="docs\" />
     <file src="docs\ARCHITECTURE.md" target="docs\" />
     <file src="docs\MAPSUI-SURFACE.md" target="docs\" />
