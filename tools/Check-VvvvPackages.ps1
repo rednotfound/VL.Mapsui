@@ -12,7 +12,10 @@
     For every package folder in %LOCALAPPDATA%\vvvv\gamma\nugets it reads the .nuspec and lib\
     folders and reports:
       - OLDER COPY     another version of the same package is installed (only the highest is wanted)
-      - OLD .NET       a VL.* package whose lib\ has no net8.0-compatible target (net5/6/7, net4x)
+      - FOR BETA       a VL.* package built only for .NET Framework (net4x, dx11): vvvv beta, not gamma
+      - OLDER .NET     only net5/6/7 targets. Usually still loads in gamma 7 (.NET 8 runs net6 code);
+                       it broke for VL.Fuse 1.0.0-alpha04 because that build expected an older VL.Stride,
+                       not because of net6 itself. A hint to check, not a verdict
       - UPDATE n.n.n   nuget.org has a newer version (prereleases included: the family is alpha)
 
     -Update     installs the latest version of every VL.* package flagged UPDATE or OLD .NET, with
@@ -112,13 +115,13 @@ $installed = foreach ($dir in Get-ChildItem $Folder -Directory) {
 }
 if (-not $installed) { Write-Host "No packages in $Folder"; return }
 
-# a target vvvv 7.x (.NET 8) can load: net8.0, netstandard, net8.0-windows...; not net5/6/7 or net4x
-function Test-Net8Compatible($tfms) {
-    if (-not $tfms -or $tfms.Count -eq 0) { return $true }     # no lib\: a VL-only package
-    foreach ($t in $tfms) {
-        if ($t -match '^net(8|9|10)\.\d' -or $t -match '^netstandard' -or $t -match '^netcoreapp') { return $true }
-    }
-    return $false
+# What a package's lib\ targets, judged for vvvv gamma 7 (.NET 8): 'ok', 'older' (net5/6/7 only) or
+# 'beta' (.NET Framework / dx11 only - vvvv beta's world).
+function Get-TargetClass($tfms) {
+    if (-not $tfms -or $tfms.Count -eq 0) { return 'ok' }      # no lib\: a VL-only package
+    if (@($tfms | Where-Object { $_ -match '^net(8|9|10)\.\d' -or $_ -match '^netstandard' }).Count -gt 0) { return 'ok' }
+    if (@($tfms | Where-Object { $_ -match '^net[5-7]\.\d' -or $_ -match '^netcoreapp' }).Count -gt 0) { return 'older' }
+    return 'beta'
 }
 
 # ---------------------------------------------------------------- nuget.org
@@ -145,7 +148,12 @@ $rows = foreach ($g in ($installed | Where-Object { $All -or $_.Id -like 'VL.*' 
     foreach ($p in $sorted) {
         $notes = @()
         if ($p -ne $highest) { $notes += 'OLDER COPY' }
-        if ($p.Id -like 'VL.*' -and -not (Test-Net8Compatible $p.Tfms)) { $notes += "OLD .NET ($($p.Tfms -join ','))" }
+        if ($p.Id -like 'VL.*') {
+            switch (Get-TargetClass $p.Tfms) {
+                'beta'  { $notes += "FOR BETA ($($p.Tfms -join ','))" }
+                'older' { $notes += "older .NET ($($p.Tfms -join ',')) - usually fine" }
+            }
+        }
         $l = $latest[$p.Id]
         if ($p -eq $highest -and $l -and (Compare-Versions $l $p.Version) -gt 0) { $notes += "UPDATE $l" }
         [pscustomobject]@{ Package = $p.Id; Installed = $p.Version; Latest = $(if ($Offline) { '-' } elseif ($l) { $l } else { '(not on nuget.org)' }); Notes = ($notes -join '; '); _p = $p }
@@ -176,7 +184,7 @@ if ($vvvvDir) {
 # ---------------------------------------------------------------- -Update
 if ($Update) {
     $nuget = Join-Path $vvvvDir.FullName 'tools\NuGet.exe'
-    $toUpdate = @($rows | Where-Object { $_.Package -like 'VL.*' -and $_.Notes -match 'UPDATE|OLD \.NET' -and $_.Latest -notmatch '^\(|^-$' } | Select-Object -ExpandProperty Package -Unique)
+    $toUpdate = @($rows | Where-Object { $_.Package -like 'VL.*' -and $_.Notes -match 'UPDATE' -and $_.Latest -notmatch '^\(|^-$' } | Select-Object -ExpandProperty Package -Unique)
     foreach ($id in $toUpdate) {
         Write-Host "`n== installing $id $($latest[$id])" -ForegroundColor Cyan
         & $nuget install $id -Version $latest[$id] -OutputDirectory $Folder -Source https://api.nuget.org/v3/index.json -NonInteractive | Select-Object -Last 2
@@ -187,24 +195,50 @@ if ($Update) {
 
 # ---------------------------------------------------------------- -RemoveOld
 if ($RemoveOld) {
-    # re-read: -Update may just have added versions
+    # A nuspec dependency is a RANGE: "1.4.0" means >= 1.4.0, "[1.4.0]" means exactly, "[1.0,2.0)"
+    # an interval. An older copy may go when the highest installed version satisfies every range that
+    # names the package - counting only packages that will themselves remain. Iterate to a fixpoint,
+    # because removing one old package can release the old dependencies it pinned.
+    function Test-InRange([string]$version, [string]$range) {
+        $r = $range.Trim()
+        if (-not $r) { return $true }
+        if ($r -notmatch '^[\[\(]') { return (Compare-Versions $version $r) -ge 0 }        # plain = minimum
+        $incLo = $r.StartsWith('['); $incHi = $r.EndsWith(']')
+        $parts = $r.Trim('[', ']', '(', ')').Split(',')
+        if ($parts.Count -eq 1) { return (Compare-Versions $version $parts[0].Trim()) -eq 0 }  # [x] exact
+        $lo = $parts[0].Trim(); $hi = $parts[1].Trim()
+        if ($lo) { $c = Compare-Versions $version $lo; if ($c -lt 0 -or ($c -eq 0 -and -not $incLo)) { return $false } }
+        if ($hi) { $c = Compare-Versions $version $hi; if ($c -gt 0 -or ($c -eq 0 -and -not $incHi)) { return $false } }
+        return $true
+    }
     $now = foreach ($dir in Get-ChildItem $Folder -Directory) {
         try { $x = Read-Nuspec $dir.FullName } catch { continue }
         if (-not $x) { continue }
         [pscustomobject]@{ Id = [string]$x.package.metadata.id; Version = [string]$x.package.metadata.version; Path = $dir.FullName
-            Deps = @($x.SelectNodes("//*[local-name()='dependency']") | ForEach-Object { "$($_.id)|$(($_.version -replace '[\[\]\(\)\s]', '' -split ',')[0])".ToLowerInvariant() }) }
+            Deps = @($x.SelectNodes("//*[local-name()='dependency']") | ForEach-Object { [pscustomobject]@{ Id = [string]$_.id; Range = [string]$_.version } }) }
     }
-    foreach ($g in ($now | Where-Object { $All -or $_.Id -like 'VL.*' } | Group-Object Id | Where-Object Count -gt 1)) {
-        $sorted = @($g.Group | Sort-Object { ConvertTo-Comparable $_.Version })
-        foreach ($old in $sorted[0..($sorted.Count - 2)]) {
-            $key = "$($old.Id)|$($old.Version)".ToLowerInvariant()
-            $users = @($now | Where-Object { $_.Path -ne $old.Path -and $_.Deps -contains $key })
-            if ($users.Count -gt 0) {
-                Write-Host "kept     $($old.Id) $($old.Version) - still named by $(($users | ForEach-Object { "$($_.Id) $($_.Version)" }) -join ', ')" -ForegroundColor Yellow
-                continue
-            }
+    $highest = @{}
+    foreach ($g in ($now | Group-Object Id)) { $highest[$g.Name] = ($g.Group | Sort-Object { ConvertTo-Comparable $_.Version })[-1] }
+    $candidates = @($now | Where-Object { ($All -or $_.Id -like 'VL.*') -and $_ -ne $highest[$_.Id] })
+    $remove = [System.Collections.Generic.HashSet[string]]::new()
+    $why = @{}
+    do {
+        $changed = $false
+        foreach ($old in $candidates) {
+            if ($remove.Contains($old.Path)) { continue }
+            $blockers = @($now | Where-Object { -not $remove.Contains($_.Path) -and $_.Path -ne $old.Path } | Where-Object {
+                $d = @($_.Deps | Where-Object Id -eq $old.Id)
+                $d.Count -gt 0 -and @($d | Where-Object { -not (Test-InRange $highest[$old.Id].Version $_.Range) }).Count -gt 0 })
+            if ($blockers.Count -eq 0) { [void]$remove.Add($old.Path); $changed = $true }
+            else { $why[$old.Path] = ($blockers | ForEach-Object { "$($_.Id) $($_.Version)" }) -join ', ' }
+        }
+    } while ($changed)
+    foreach ($old in $candidates) {
+        if ($remove.Contains($old.Path)) {
             Remove-Item -LiteralPath $old.Path -Recurse -Force
             Write-Host "removed  $($old.Id) $($old.Version)" -ForegroundColor Green
+        } else {
+            Write-Host "kept     $($old.Id) $($old.Version) - $($why[$old.Path]) needs exactly this version" -ForegroundColor Yellow
         }
     }
 }
