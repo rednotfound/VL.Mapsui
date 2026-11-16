@@ -81,5 +81,13 @@
     -->
     <PackageReference Include="NetTopologySuite.Features" Version="2.1.0" />
     <PackageReference Include="Mapsui.Rendering.Skia" Version="4.1.9" />
+
+    <!--
+      VL.NetTopologySuite for IBasemap only (2026-11-16): this package offers its OpenStreetMap tiles
+      as the basemap of GeometryEditor's window (OsmBasemap.cs, Initializer.cs), as VL.PROJ offers
+      its CRS catalogue. Compile-time only; vvvv loads the assembly from the VL.NetTopologySuite
+      package, which VL.Mapsui.vl and the nuspec declare. 0.0.10-alpha is the first with IBasemap.
+    -->
+    <PackageReference Include="VL.NetTopologySuite" Version="0.0.10-alpha" ExcludeAssets="runtime" />
   </ItemGroup>
 </Project>

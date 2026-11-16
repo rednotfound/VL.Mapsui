@@ -73,11 +73,11 @@ public sealed class GeometryTheme : ThemeStyle
 
     internal static GeometryKind Kind(NtsGeometry geometry) => geometry switch
     {
-        NetTopologySuite.Geometries.Point or NetTopologySuite.Geometries.MultiPoint => GeometryKind.Point,
+        global::NetTopologySuite.Geometries.Point or global::NetTopologySuite.Geometries.MultiPoint => GeometryKind.Point,
         // A LinearRing IS a LineString in NTS, so it is caught by the pattern below; naming it
         // would be dead code that reads like a decision.
-        NetTopologySuite.Geometries.LineString or NetTopologySuite.Geometries.MultiLineString => GeometryKind.Line,
-        NetTopologySuite.Geometries.Polygon or NetTopologySuite.Geometries.MultiPolygon => GeometryKind.Polygon,
+        global::NetTopologySuite.Geometries.LineString or global::NetTopologySuite.Geometries.MultiLineString => GeometryKind.Line,
+        global::NetTopologySuite.Geometries.Polygon or global::NetTopologySuite.Geometries.MultiPolygon => GeometryKind.Polygon,
         _ => GeometryKind.Other,
     };
 

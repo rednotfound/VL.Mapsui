@@ -87,7 +87,7 @@
           VL dependency at all and its help uses VL.Stride) because everything there ships inside
           vvvv and is therefore always present. Nothing guarantees that for us.
         -->
-        <dependency id="VL.NetTopologySuite"   version="0.0.8-alpha" />
+        <dependency id="VL.NetTopologySuite"   version="0.0.10-alpha" />
         <dependency id="Mapsui.Rendering.Skia" version="4.1.9" />
       </group>
     </dependencies>

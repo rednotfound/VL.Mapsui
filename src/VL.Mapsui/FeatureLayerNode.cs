@@ -339,7 +339,7 @@ public class FeatureLayerNode : IDisposable
     }
 
     static bool IsPointLike(NtsGeometry geometry)
-        => geometry is NetTopologySuite.Geometries.Point or NetTopologySuite.Geometries.MultiPoint;
+        => geometry is global::NetTopologySuite.Geometries.Point or global::NetTopologySuite.Geometries.MultiPoint;
 
     /// <summary>A SymbolStyle somewhere, and nothing alongside it that can draw a shape.</summary>
     static bool DrawsPointsOnly(IStyle style)

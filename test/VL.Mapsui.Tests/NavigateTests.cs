@@ -118,8 +118,8 @@ public class NavigateTests
         // so nothing existed for a viewport limiter to clamp against.
         using var layerNode = new FeatureLayerNode();
         var layer = layerNode.Update(out _, out _,
-            new[] { new NtsFeature(new NetTopologySuite.IO.WKTReader().Read("POINT (0 0)"),
-                                   new NetTopologySuite.Features.AttributesTable()) },
+            new[] { new NtsFeature(new global::NetTopologySuite.IO.WKTReader().Read("POINT (0 0)"),
+                                   new global::NetTopologySuite.Features.AttributesTable()) },
             new SymbolStyleNode().Update());
 
         using var node = new MapNode();
