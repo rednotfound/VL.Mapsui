@@ -23,7 +23,7 @@ public class GeometryLayerTests
 
     // NetTopologySuite.Geometries.Point and Stride.Core.Mathematics.Point are both in scope here,
     // and both are called Point.
-    static NetTopologySuite.Geometries.Point Tokyo()
+    static global::NetTopologySuite.Geometries.Point Tokyo()
         => Factory.CreatePoint(new Coordinate(139.7671, 35.6812));
 
     // ── Projection ────────────────────────────────────────────────────────────

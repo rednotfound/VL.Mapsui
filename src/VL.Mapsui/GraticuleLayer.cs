@@ -112,7 +112,7 @@ sealed class GraticuleLayer : BaseLayer
                 foreach (var lat in lats)
                 {
                     var (x, y) = SphericalMercator.FromLonLat(lon, lat);
-                    var label = new GeometryFeature(new NetTopologySuite.Geometries.Point(x, y));
+                    var label = new GeometryFeature(new global::NetTopologySuite.Geometries.Point(x, y));
                     label["label"] = string.Format(CultureInfo.InvariantCulture,
                         "{0:0.#####}, {1:0.#####}", lon, lat);
                     features.Add(label);

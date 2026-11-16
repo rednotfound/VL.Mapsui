@@ -48,6 +48,8 @@
     -->
     <PackageReference Include="VL.Core" Version="2025.7.4" />
     <PackageReference Include="VL.Core.Skia" Version="2025.7.4" />
+    <!-- The basemap (OsmBasemap) implements VL.NetTopologySuite's IBasemap: the src project takes it compile-time only, a test run needs the assembly. -->
+    <PackageReference Include="VL.NetTopologySuite" Version="0.0.10-alpha" />
   </ItemGroup>
 
   <ItemGroup>

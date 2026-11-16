@@ -15,7 +15,7 @@ namespace VL.Mapsui.Tests;
 public class FeatureLayerStatusTests
 {
     static NtsFeature Wkt(string wkt) =>
-        new(new NetTopologySuite.IO.WKTReader().Read(wkt), new NetTopologySuite.Features.AttributesTable());
+        new(new global::NetTopologySuite.IO.WKTReader().Read(wkt), new global::NetTopologySuite.Features.AttributesTable());
 
     /// <summary>
     /// **A SymbolStyle over a polygon is a silent empty screen, and this is where it stops being

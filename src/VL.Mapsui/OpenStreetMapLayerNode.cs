@@ -42,6 +42,10 @@ public class OpenStreetMapLayerNode : IDisposable
     // deserves to know who is asking, and a shared constant means one place to change it.
     internal const string UserAgent = "VL.Mapsui/0.0.5-alpha (+https://github.com/rednotfound/VL.Mapsui)";
 
+    // The disk folder key for OSM's standard tiles. Shared with OsmBasemap (the GeometryEditor's
+    // basemap), so a place seen on a map is in the editor offline, and the other way round.
+    internal const string CacheKey = "https://tile.openstreetmap.org/standard";
+
     TileLayer? _layer;
     TileDiskCache? _attached;
     string _status = "off";
@@ -192,7 +196,7 @@ public class OpenStreetMapLayerNode : IDisposable
 
         // Its own folder under the cache root. Sharing one with XYZ meant whichever source drew
         // first owned every tile, so switching basemaps did nothing at all - see TileDiskCache.CacheFor.
-        http.PersistentCache = cache.CacheFor("https://tile.openstreetmap.org/standard")!;
+        http.PersistentCache = cache.CacheFor(CacheKey)!;
         status = cache.Folder;      // CacheStatus re-reads the size every frame from here on
         return layer;
     }
