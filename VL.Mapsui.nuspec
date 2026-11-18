@@ -20,7 +20,12 @@
     <description>Maps in VL, built on Mapsui: OpenStreetMap or any tile service, with your own geometry and features on top.</description>
     <summary>Maps in VL, built on Mapsui: OpenStreetMap or any tile service, with your own geometry and features on top.</summary>
     <releaseNotes>
-      0.0.5-alpha - In development, not published.
+      0.0.5-alpha (2026-11-18) - No node changed. With this package installed,
+      VL.NetTopologySuite's GeometryEditor window draws OpenStreetMap under the drawing when the
+      editor's SRID is 4326 or 3857 (the B key switches it). The tiles are the OpenStreetMap
+      layer's own, from the same disk cache, so a place already seen on a map is there in the
+      editor; at most two are downloaded at a time and none off screen. Requires
+      VL.NetTopologySuite 0.0.10-alpha.
 
       0.0.4-alpha (2026-11-15) - Geometry and FeatureLayer read each geometry's
       SRID: 0 and 4326 are longitude and latitude as before, 3857 is drawn as it is, and any other
