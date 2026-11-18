@@ -40,7 +40,7 @@ public class OpenStreetMapLayerNode : IDisposable
     // OSM's tile usage policy requires a User-Agent naming the application. The default one is
     // not acceptable for anything beyond a first trial. Shared with the XYZ node: any tile server
     // deserves to know who is asking, and a shared constant means one place to change it.
-    internal const string UserAgent = "VL.Mapsui/0.0.5-alpha (+https://github.com/rednotfound/VL.Mapsui)";
+    internal const string UserAgent = "VL.Mapsui/0.0.6-alpha (+https://github.com/rednotfound/VL.Mapsui)";
 
     // The disk folder key for OSM's standard tiles. Shared with OsmBasemap (the GeometryEditor's
     // basemap), so a place seen on a map is in the editor offline, and the other way round.

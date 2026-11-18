@@ -26,7 +26,12 @@ already made untrue.) The retired `VL.GIS` lives only on GitHub now
 still declares BruTile 6 and conflicts with this package — the README's Install section says what
 a user has to delete by hand.
 
-**2026-11-15, the same evening: `0.0.4-alpha` is on nuget.org too; working version `0.0.5-alpha`**
+**2026-11-18: `0.0.5-alpha` is on nuget.org; working version `0.0.6-alpha`** (nuspec + UserAgent).
+No node changed: this package offers OpenStreetMap tiles to VL.NetTopologySuite's GeometryEditor
+window (`Initializer.cs`, `OsmBasemap.cs`), and requires VL.NetTopologySuite 0.0.10-alpha for it.
+290 tests.
+
+**2026-11-15, the same evening: `0.0.4-alpha` is on nuget.org too; the working version after it was `0.0.5-alpha`**
 (nuspec + UserAgent). Installed back with `Test-Install -Published -Version 0.0.4-alpha`: both
 packages signed, 22 of 22 compile.
 

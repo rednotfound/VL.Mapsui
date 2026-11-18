@@ -2,11 +2,11 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>VL.Mapsui</id>
-    <!-- The WORKING version: always one ahead of what is on nuget.org (0.0.4-alpha, 2026-11-15), so a
+    <!-- The WORKING version: always one ahead of what is on nuget.org (0.0.5-alpha, 2026-11-18), so a
          local repack can never be mistaken for the published package in a NuGet cache. Managed in
          step with VL.NetTopologySuite; the dependency below is the oldest PUBLISHED version of it
          that this package's help works with (0.0.8-alpha: SetSRID, which the help uses since 2026-11-15; FromWKT came in 0.0.6), never its working version. -->
-    <version>0.0.5-alpha</version>
+    <version>0.0.6-alpha</version>
     <title>VL.Mapsui — Mapsui map engine nodes for vvvv gamma</title>
     <authors>red</authors>
     <owners>red</owners>
@@ -20,6 +20,8 @@
     <description>Maps in VL, built on Mapsui: OpenStreetMap or any tile service, with your own geometry and features on top.</description>
     <summary>Maps in VL, built on Mapsui: OpenStreetMap or any tile service, with your own geometry and features on top.</summary>
     <releaseNotes>
+      0.0.6-alpha - In development, not published.
+
       0.0.5-alpha (2026-11-18) - No node changed. With this package installed,
       VL.NetTopologySuite's GeometryEditor window draws OpenStreetMap under the drawing when the
       editor's SRID is 4326 or 3857 (the B key switches it). The tiles are the OpenStreetMap

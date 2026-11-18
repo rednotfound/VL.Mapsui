@@ -181,3 +181,15 @@ was seen; it was not confirmed.
 Pushed to `main` directly, no PR; the maintainer uploaded in the browser; `Test-Install -Published
 -Version 0.0.4-alpha` green (both packages signed, VL.NetTopologySuite resolved to 0.0.8-alpha).
 Working version `0.0.5-alpha`.
+
+## `0.0.5-alpha` — 2026-11-18
+
+No node changed: OpenStreetMap as the basemap of VL.NetTopologySuite's GeometryEditor window
+(`dbe0057`, PR #6, built 2026-11-16). Released the evening the maintainer, installing from nuget.org
+to record a video, did not find the basemap. **Local `main` was four commits behind `origin/main`
+again**, this time caught at step 0. Order: VL.NetTopologySuite 0.0.10-alpha uploaded first; once it
+was listed, the temporary local feed left NuGet.config and the gate ran: build, 290 tests, pack,
+Test-VLPackage, Test-VLPatch (33 of 33 on F1), Compile-HelpPatches 22 of 22, Test-Install
+-FromNuGetOrg (VL.NetTopologySuite 0.0.10-alpha signed). **Nothing was opened in vvvv this round.**
+The maintainer uploaded in the browser; `Test-Install -Published -Version 0.0.5-alpha` green (both
+packages signed). Working version `0.0.6-alpha`.
